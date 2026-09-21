@@ -17,7 +17,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { money } from "@/lib/utils";
+import { money, moneyCents } from "@/lib/utils";
 import { StateName, Pct } from "@/components/state-name";
 import { CHART } from "@/lib/palette";
 import { SETTING_LABELS, SETTING_SHORT, type CareSetting, historySpan } from "@/lib/costs";
@@ -875,35 +875,21 @@ export function ReportView({
               </p>
             ) : null}
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[1080px] text-sm">
+              <table className="w-full min-w-[960px] text-sm">
                 <thead>
                   <tr className="text-left text-xs uppercase tracking-wide text-muted">
                     <th className="py-2 pr-2">Year</th>
-                    <th className="py-2 pr-2">Status</th>
-                    <th className="py-2 pr-2 text-right">Annual cost</th>
                     {policy.enabled ? (
-                      <>
-                        <th className="py-2 pr-2 text-right">Ins. on claim</th>
-                        <th className="py-2 pr-2 text-right">Ins. paid (arrears)</th>
-                        <th className="py-2 pr-2 text-right">Insurance pool at start of year</th>
-                        <th className="py-2 pr-2 text-right">Insurance pool after claim debit</th>
-                        <th className="py-2 pr-2 text-right">Premium</th>
-                      </>
+                      <th className="py-2 pr-2 text-right">Insurance Benefit Pool</th>
                     ) : null}
-                    <th className="py-2 pr-2 text-right">
-                      {policy.enabled ? "Asset co-pay" : "Assets applied"}
-                    </th>
-                    <th className="py-2 pr-2 text-right">
-                      {policy.enabled ? "Countable assets remaining" : "Assets remaining"}
-                    </th>
+                    <th className="py-2 pr-2 text-right">Annual Care Costs</th>
                     {policy.enabled ? (
-                      <th className="py-2 pr-2 text-right">Total remaining (ins. + assets)</th>
+                      <th className="py-2 pr-2 text-right">Insurance Balance</th>
                     ) : null}
-                    {iraBal > 0 ? (
-                      <th className="py-2 pr-2 text-right">IRA remaining</th>
-                    ) : null}
-                    <th className="py-2 pr-2 text-right">Shortfall this year</th>
-                    <th className="py-2 text-right">Cumulative shortfall</th>
+                    <th className="py-2 pr-2 text-right">Countable Assets</th>
+                    <th className="py-2 pr-2 text-right">Co-pay from Countable Assets</th>
+                    <th className="py-2 pr-2 text-right">Total Remaining</th>
+                    <th className="py-2 text-right">Cumulative Shortfall</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -929,11 +915,7 @@ export function ReportView({
                       Math.round(r.insurancePoolRemaining) <= 0;
                     const allGone = totalOutYear != null && r.year === totalOutYear;
                     const gone = insGone || allGone;
-                    const goneNote = allGone
-                      ? " · funds depleted"
-                      : insGone
-                        ? " · insurance pool depleted"
-                        : "";
+                    const assetsBeforeCopay = r.remaining + r.drawn;
                     const remainIdx = result.rows.findIndex((x) => x.year === r.year);
                     const remainTone = remainingToneAt(
                       result.rows,
@@ -951,56 +933,27 @@ export function ReportView({
                     const cell = gone ? "py-2 pr-2 font-bold amt-red" : "py-2 pr-2";
                     return (
                     <tr key={r.year} className={`border-t tabular-nums ${gone ? "bg-cream" : "border-line"}`}>
-                      <td className={cell}>
-                        {calendarYear(r.year)}{" "}
-                        <span className={`text-xs ${gone ? "font-bold amt-red" : "text-muted"}`}>Y{r.year}</span>
-                      </td>
-                      <td className={cell}>
-                        {r.status}{goneNote}
-                        {r.payPath ? (
-                          <span className={`mt-0.5 block text-xs ${gone ? "font-bold amt-red" : "text-muted"}`}>{r.payPath}</span>
-                        ) : null}
-                        {r.claimPhase ? (
-                          <span className="mt-0.5 block text-xs text-gold-ink">{r.claimPhase}</span>
-                        ) : null}
-                      </td>
-                      <td className={`${cell} text-right`}>{r.cost ? money(r.cost) : "—"}</td>
+                      <td className={cell}>{calendarYear(r.year)}</td>
                       {policy.enabled ? (
-                        <>
-                          <td className={`${cell} text-right`}>
-                            {r.insurance ? money(r.insurance) : "—"}
-                          </td>
-                          <td className={`${cell} text-right`}>
-                            {r.insurancePaid ? money(r.insurancePaid) : "—"}
-                          </td>
-                          <td className={`${cell} text-right`}>
-                            {result.lifetimeBenefit ? "Lifetime" : money(r.insurancePoolStart)}
-                          </td>
-                          <td className={`${cell} text-right`}>
-                            {result.lifetimeBenefit ? "Lifetime" : money(r.insurancePoolRemaining)}
-                          </td>
-                          <td className={`${cell} text-right`}>
-                            {r.premium ? money(r.premium) : "—"}
-                          </td>
-                        </>
-                      ) : null}
-                      <td className={`${cell} text-right`}>{r.drawn ? money(r.drawn) : "—"}</td>
-                      <td className={`${policy.enabled ? cell : `py-2 pr-2 ${remainClass}`} text-right`} title={policy.enabled ? undefined : remainTitle}>{money(r.remaining)}</td>
-                      {policy.enabled ? (
-                        <td className={`py-2 pr-2 text-right ${remainClass}`} title={remainTitle}>
-                          {result.lifetimeBenefit
-                            ? `${money(r.remaining)} + lifetime`
-                            : money(totalLeft)}
+                        <td className={`${cell} text-right`}>
+                          {result.lifetimeBenefit ? "Lifetime" : moneyCents(r.insurancePoolStart)}
                         </td>
                       ) : null}
-                      {iraBal > 0 ? (
-                        <td className="py-2 pr-2 text-right">{money(r.remainingIra)}</td>
+                      <td className={`${cell} text-right`}>{moneyCents(r.cost)}</td>
+                      {policy.enabled ? (
+                        <td className={`${cell} text-right`}>
+                          {result.lifetimeBenefit ? "Lifetime" : moneyCents(r.insurancePoolRemaining)}
+                        </td>
                       ) : null}
-                      <td className={`py-2 pr-2 text-right ${r.shortfall ? "text-deplete" : ""}`}>
-                        {r.shortfall ? money(r.shortfall) : "—"}
+                      <td className={`${cell} text-right`}>{moneyCents(assetsBeforeCopay)}</td>
+                      <td className={`${cell} text-right`}>{moneyCents(r.drawn)}</td>
+                      <td className={`py-2 pr-2 text-right ${remainClass}`} title={remainTitle}>
+                        {result.lifetimeBenefit
+                          ? `${moneyCents(r.remaining)} + lifetime`
+                          : moneyCents(totalLeft)}
                       </td>
                       <td className={`py-2 text-right ${r.shortfallCumulative ? "text-deplete" : ""}`}>
-                        {r.shortfallCumulative ? money(r.shortfallCumulative) : "—"}
+                        {r.shortfallCumulative ? moneyCents(r.shortfallCumulative) : "—"}
                       </td>
                     </tr>
                     );
@@ -1022,7 +975,7 @@ export function ReportView({
             if not, $14,000 × 3 years is $42,000 cumulative unpaid. If insurance covers the
             year, assets are not drawn for care.
             {policy.enabled
-              ? " The insurance pool is daily benefit × 365 × benefit period. A care year starts with the unused pool and ends after that calendar year’s insurance paid is debited. Reimbursement cash still posts in arrears in the “Ins. paid (arrears)” column."
+              ? " Insurance Benefit Pool is daily benefit × 365 × benefit period at the start of the year. Insurance Balance is that pool after the calendar year’s covered claim is subtracted. Countable Assets are before this year’s co-pay. Total Remaining is Insurance Balance plus assets after co-pay."
               : " With no policy, the full annual cost is amortized from assets until they run out."}
           </p>
           <p className="mt-3 text-sm">

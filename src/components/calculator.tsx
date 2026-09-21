@@ -77,7 +77,7 @@ import {
 } from "@/lib/costs";
 import { DEFAULT_TAX_RATE, TAX_RATE_GROUPS, TAX_RATE_OPTIONS } from "@/lib/tax-brackets";
 import { careCostCompound } from "@/lib/cpi";
-import { compactMoney, money } from "@/lib/utils";
+import { compactMoney, money, moneyCents } from "@/lib/utils";
 import { CHART, PIE_COLORS } from "@/lib/palette";
 import {
   AALTCI_MEAN_CLAIM_AGE,
@@ -1662,21 +1662,21 @@ export function Calculator() {
               {" "}Every wait year and care year is listed, including years after funds are depleted.
             </p>
             <div className="overflow-x-auto pb-4">
-              <table className="w-full min-w-[920px] text-sm">
+              <table className="w-full min-w-[960px] text-sm">
                 <thead>
                   <tr className="border-b border-gold text-left text-xs uppercase tracking-wide text-muted">
                     <th className="py-2 pr-2 font-semibold">Year</th>
-                    <th className="py-2 pr-2 font-semibold">Status</th>
-                    <th className="py-2 pr-2 text-right font-semibold">Annual cost</th>
                     {policy.enabled ? (
-                      <>
-                        <th className="py-2 pr-2 text-right font-semibold">Insurance paid</th>
-                        <th className="py-2 pr-2 text-right font-semibold">Insurance pool at start of year</th>
-                        <th className="py-2 pr-2 text-right font-semibold">Insurance pool after claim debit</th>
-                      </>
+                      <th className="py-2 pr-2 text-right font-semibold">Insurance Benefit Pool</th>
                     ) : null}
-                    <th className="py-2 pr-2 text-right font-semibold">{policy.enabled ? "Total remaining" : "Assets remaining"}</th>
-                    <th className="py-2 text-right font-semibold">Cumulative shortfall</th>
+                    <th className="py-2 pr-2 text-right font-semibold">Annual Care Costs</th>
+                    {policy.enabled ? (
+                      <th className="py-2 pr-2 text-right font-semibold">Insurance Balance</th>
+                    ) : null}
+                    <th className="py-2 pr-2 text-right font-semibold">Countable Assets</th>
+                    <th className="py-2 pr-2 text-right font-semibold">Co-pay from Countable Assets</th>
+                    <th className="py-2 pr-2 text-right font-semibold">Total Remaining</th>
+                    <th className="py-2 text-right font-semibold">Cumulative Shortfall</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1692,23 +1692,15 @@ export function Calculator() {
                       Math.round(r.insurancePoolRemaining) <= 0;
                     const allGone = totalOutYear != null && r.year === totalOutYear;
                     const gone = insGone || allGone;
-                    const goneNote = allGone
-                      ? " · funds depleted"
-                      : insGone
-                        ? " · insurance pool depleted"
-                        : "";
+                    const assetsBeforeCopay = r.remaining + r.drawn;
                     const poolStartLabel =
-                      lifetime && policy.enabled
-                        ? "Lifetime"
-                        : money(r.insurancePoolStart);
+                      lifetime && policy.enabled ? "Lifetime" : moneyCents(r.insurancePoolStart);
                     const poolLeft =
-                      lifetime && policy.enabled
-                        ? "Lifetime"
-                        : money(r.insurancePoolRemaining);
+                      lifetime && policy.enabled ? "Lifetime" : moneyCents(r.insurancePoolRemaining);
                     const totalLabel =
                       lifetime && policy.enabled
-                        ? `${money(r.remaining)} + lifetime`
-                        : money(totalLeft);
+                        ? `${moneyCents(r.remaining)} + lifetime`
+                        : moneyCents(totalLeft);
                     const remainIdx = yearView.rows.findIndex((x) => x.year === r.year);
                     const remainTone = remainingToneAt(yearView.rows, remainIdx, policy.enabled, lifetime);
                     const remainClass = remainingToneClass(remainTone);
@@ -1724,21 +1716,20 @@ export function Calculator() {
                         key={r.year}
                         className={`border-t tabular-nums ${gone ? "border-deplete bg-cream" : "border-line text-navy"}`}
                       >
-                        <td className={cell}>
-                          {calendarYear(r.year)}{" "}
-                          <span className={`text-xs ${gone ? "font-bold amt-red" : "font-normal text-muted"}`}>Y{r.year}</span>
-                        </td>
-                        <td className={cell}>{r.status}{goneNote}</td>
-                        <td className={`${cell} text-right`}>{money(r.cost)}</td>
+                        <td className={cell}>{calendarYear(r.year)}</td>
                         {policy.enabled ? (
-                          <>
-                            <td className={`${cell} text-right`}>{money(r.insurance)}</td>
-                            <td className={`${cell} text-right`}>{poolStartLabel}</td>
-                            <td className={`${cell} text-right`}>{poolLeft}</td>
-                          </>
+                          <td className={`${cell} text-right`}>{poolStartLabel}</td>
                         ) : null}
+                        <td className={`${cell} text-right`}>{moneyCents(r.cost)}</td>
+                        {policy.enabled ? (
+                          <td className={`${cell} text-right`}>{poolLeft}</td>
+                        ) : null}
+                        <td className={`${cell} text-right`}>{moneyCents(assetsBeforeCopay)}</td>
+                        <td className={`${cell} text-right`}>{moneyCents(r.drawn)}</td>
                         <td className={`py-2 pr-2 text-right ${remainClass}`} title={remainTitle}>{totalLabel}</td>
-                        <td className={`${gone ? "py-2 font-bold amt-red" : "py-2"} text-right`}>{money(r.shortfallCumulative)}</td>
+                        <td className={`${gone ? "py-2 font-bold amt-red" : "py-2"} text-right`}>
+                          {r.shortfallCumulative ? moneyCents(r.shortfallCumulative) : "—"}
+                        </td>
                       </tr>
                     );
                   })}
@@ -1746,9 +1737,9 @@ export function Calculator() {
               </table>
               <p className="mt-2 text-xs text-muted">
                 {policy.enabled
-                  ? "The insurance pool is daily benefit × 365 × benefit period (for example $200/day × 3 years = $219,000). Wait years show that unused maximum (restated if a benefit-increase option applies). In a care year, insurance pays first up to that year’s daily maximum; the start-of-year column is the unused pool and the after-claim-debit column is the same pool after that calendar year’s insurance paid is subtracted. Total remaining is leftover insurance plus countable assets (the co-pay). "
+                  ? "Insurance Benefit Pool is daily benefit × 365 × benefit period at the start of that year (for example $200/day × 3 years = $219,000.00). Annual Care Costs are that year’s bill. Insurance Balance is the same pool after that calendar year’s covered claim is subtracted. Countable Assets are before this year’s co-pay. Co-pay from Countable Assets is what assets pay after insurance. Total Remaining is Insurance Balance plus countable assets after the co-pay. "
                   : null}
-                {policy.enabled ? "Total remaining" : "Assets remaining"} turns bold green when the pool starts declining, and bold red when it is depleted.
+                {policy.enabled ? "Total Remaining" : "Countable Assets"} turns bold green when the pool starts declining, and bold red when it is depleted.
                 The table runs through the wait until care and every modeled care year — it does not stop at year 10 or at depletion.
               </p>
             </div>
