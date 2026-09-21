@@ -19,17 +19,19 @@ function paintDark(dark: boolean) {
   if (meta) meta.setAttribute("content", dark ? "#0f1c24" : "#1b3a4b");
 }
 
-export function applyStoredTheme() {
+export function applyDaylight() {
+  paintDark(false);
   try {
-    const stored = localStorage.getItem(KEY);
-    const dark =
-      stored === "dark" ||
-      (stored !== "light" && window.matchMedia("(prefers-color-scheme: dark)").matches);
-    paintDark(dark);
-    window.dispatchEvent(new Event(THEME_EVENT));
+    localStorage.setItem(KEY, "light");
   } catch {
     /* ignore */
   }
+  window.dispatchEvent(new Event(THEME_EVENT));
+}
+
+/** @deprecated kept for callers; load is always daylight. */
+export function applyStoredTheme() {
+  applyDaylight();
 }
 
 /** Apply light/dark. persist writes aum-theme so the next visit matches. */
@@ -48,7 +50,6 @@ export function setTheme(dark: boolean, persist = true) {
 export function useDarkMode() {
   const [dark, setDark] = useState(false);
   useLayoutEffect(() => {
-    applyStoredTheme();
     const sync = () => setDark(isDarkTheme());
     sync();
     window.addEventListener(THEME_EVENT, sync);

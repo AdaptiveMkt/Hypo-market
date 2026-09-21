@@ -706,8 +706,8 @@ export function Calculator() {
     setRan(false);
     setPoolShown(false);
     setPersonalizeOpen(true);
-    if (themeBeforeIncognito.current === "light") setTheme(false);
     themeBeforeIncognito.current = null;
+    setTheme(false);
     setHypoRunId(0);
     setShowReport(false);
     setClient({ ...EMPTY_CONTACT });
@@ -734,15 +734,12 @@ export function Calculator() {
   }
   function applyIncognito(on: boolean) {
     if (on) {
-      if (themeBeforeIncognito.current == null) {
-        themeBeforeIncognito.current = isDarkTheme() ? "dark" : "light";
-      }
       setPersonalizeOpen(false);
       setTheme(true);
       return;
     }
     setPersonalizeOpen(true);
-    if (themeBeforeIncognito.current === "light") setTheme(false);
+    setTheme(false);
     themeBeforeIncognito.current = null;
   }
   useLayoutEffect(() => {

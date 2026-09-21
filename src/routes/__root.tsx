@@ -40,7 +40,7 @@ export const Route = createRootRoute({
     ],
     scripts: [
       {
-        children: `(function(){try{var t=localStorage.getItem("aum-theme");var d=t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches);if(d)document.documentElement.classList.add("dark");}catch(e){}})();`,
+        children: `(function(){try{document.documentElement.classList.remove("dark");document.documentElement.style.colorScheme="light";localStorage.setItem("aum-theme","light");}catch(e){}})();`,
       },
     ],
   }),
