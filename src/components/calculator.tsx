@@ -2325,8 +2325,10 @@ function MovableKpiGrid({
   items: { id: string; label: string; value: ReactNode }[];
 }) {
   const [order, setOrder] = useState<string[]>([]);
-  const dragId = useRef<string | null>(null);
+  const [dragging, setDragging] = useState<string | null>(null);
   const [overId, setOverId] = useState<string | null>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
+  const fromRef = useRef<string | null>(null);
 
   useEffect(() => {
     setOrder(loadKpiOrder());
@@ -2343,53 +2345,77 @@ function MovableKpiGrid({
     }
   }
 
-  function dropOn(targetId: string) {
-    const from = dragId.current;
-    if (!from || from === targetId) return;
+  function idNearest(x: number, y: number): string | null {
+    const nodes = gridRef.current?.querySelectorAll("[data-kpi-id]");
+    if (!nodes?.length) return null;
+    let best: string | null = null;
+    let bestDist = Number.POSITIVE_INFINITY;
+    nodes.forEach((node) => {
+      const id = node.getAttribute("data-kpi-id");
+      if (!id || id === fromRef.current) return;
+      const r = node.getBoundingClientRect();
+      const dx = x - (r.left + r.width / 2);
+      const dy = y - (r.top + r.height / 2);
+      const d = dx * dx + dy * dy;
+      if (d < bestDist) {
+        bestDist = d;
+        best = id;
+      }
+    });
+    return best;
+  }
+
+  function finish(x: number, y: number) {
+    const from = fromRef.current;
+    const over = idNearest(x, y);
+    fromRef.current = null;
+    setDragging(null);
+    setOverId(null);
+    if (!from || !over || from === over) return;
     const ids = shown.map((i) => i.id);
     const next = ids.filter((id) => id !== from);
-    const at = next.indexOf(targetId);
+    const at = next.indexOf(over);
     next.splice(at < 0 ? next.length : at, 0, from);
     persist(next);
-    dragId.current = null;
-    setOverId(null);
   }
 
   return (
     <div className="mb-4">
-      <p className="mb-2 text-xs text-muted">Drag a card to rearrange after this run.</p>
-      <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-        {shown.map((item) => (
-          <div
-            key={item.id}
-            draggable
-            onDragStart={(e) => {
-              dragId.current = item.id;
-              e.dataTransfer.effectAllowed = "move";
-              e.dataTransfer.setData("text/plain", item.id);
-            }}
-            onDragOver={(e) => {
-              e.preventDefault();
-              e.dataTransfer.dropEffect = "move";
-              if (overId !== item.id) setOverId(item.id);
-            }}
-            onDragLeave={() => {
-              if (overId === item.id) setOverId(null);
-            }}
-            onDrop={(e) => {
-              e.preventDefault();
-              dropOn(item.id);
-            }}
-            onDragEnd={() => {
-              dragId.current = null;
-              setOverId(null);
-            }}
-            className={`card cursor-grab px-4 py-3 active:cursor-grabbing ${overId === item.id ? "ring-2 ring-gold" : ""}`}
-          >
-            <p className="text-xs uppercase tracking-wide text-muted">{item.label}</p>
-            <p className="font-display text-xl tabular-nums text-navy">{item.value}</p>
-          </div>
-        ))}
+      <p className="mb-2 text-xs text-muted">Press and drag a card to rearrange after this run.</p>
+      <div ref={gridRef} className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+        {shown.map((item) => {
+          const active = dragging === item.id;
+          const over = overId === item.id && dragging && dragging !== item.id;
+          return (
+            <div
+              key={item.id}
+              data-kpi-id={item.id}
+              onPointerDown={(e) => {
+                if (e.button !== 0) return;
+                fromRef.current = item.id;
+                setDragging(item.id);
+                e.currentTarget.setPointerCapture(e.pointerId);
+              }}
+              onPointerMove={(e) => {
+                if (!fromRef.current) return;
+                const overNext = idNearest(e.clientX, e.clientY);
+                if (overNext !== overId) setOverId(overNext);
+              }}
+              onPointerUp={(e) => finish(e.clientX, e.clientY)}
+              onPointerCancel={() => {
+                fromRef.current = null;
+                setDragging(null);
+                setOverId(null);
+              }}
+              className={`card touch-none select-none px-4 py-3 ${
+                active ? "cursor-grabbing opacity-60" : "cursor-grab"
+              } ${over ? "ring-2 ring-gold" : ""}`}
+            >
+              <p className="text-xs uppercase tracking-wide text-muted">{item.label}</p>
+              <p className="font-display text-xl tabular-nums text-navy">{item.value}</p>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
