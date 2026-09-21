@@ -405,7 +405,7 @@ export function PdfSectionsDialog({
         <p className="mt-2 text-sm text-muted">
           {lockoutMode
             ? "This run is a Medicaid planning packet. Required legal disclaimers, sources, and how to find a qualified professional cannot be unchecked. Insurance design is not included."
-            : "Check Disclosure and Terms of Use to include that entire card. Then check any Insurance design, Partnership, tax, Medicaid, and hold-harmless titles you want. Unchecked boxes are omitted. The summary and recommendations always print. Check Year-by-year to include that table."}
+            : "Check Expand / include all optional sections to put every title in the PDF. Unchecked boxes are omitted. The summary, recommendations, and Medicaid Information always print. Then save the file to this computer."}
         </p>
         {DESIGNATION_PDF_IDS.some((id) => details[id]) ? (
           <DesignationNotice
@@ -450,7 +450,7 @@ export function PdfSectionsDialog({
             className="btn-block rounded-lg border border-gold bg-gold text-masthead hover:brightness-105"
             onClick={onConfirm}
           >
-            Download PDF with selected sections
+            Download PDF and save to this computer
           </button>
         </div>
           </>

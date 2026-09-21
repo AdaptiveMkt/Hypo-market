@@ -91,12 +91,22 @@ function wait(ms: number) {
   return new Promise((resolve) => window.setTimeout(resolve, ms));
 }
 
-async function waitForReport(timeoutMs = 10000) {
+async function waitForReport(timeoutMs = 20000) {
   const start = Date.now();
+  let lastCount = 0;
+  let stable = 0;
   while (Date.now() - start < timeoutMs) {
     const root = document.getElementById("aum-report");
-    if (root?.querySelector(".report-block")) return root;
-    await wait(60);
+    const count = root?.querySelectorAll(".report-block").length ?? 0;
+    if (root && count >= 2) {
+      if (count === lastCount) stable += 1;
+      else {
+        lastCount = count;
+        stable = 0;
+      }
+      if (stable >= 3) return root;
+    }
+    await wait(80);
   }
   throw new Error("Report is not on screen.");
 }
@@ -150,17 +160,39 @@ function findBreakY(canvas: HTMLCanvasElement, startY: number, maxY: number) {
 }
 
 function savePdfFile(pdf: jsPDF, filename: string) {
-  const blob = pdf.output("blob");
+  const blob = pdf.output("blob") as Blob;
+  return savePdfBlob(blob, filename);
+}
+
+/** Trigger a local download and keep an object URL for a Save-to-this-computer control. */
+export function savePdfBlob(blob: Blob, filename: string): string {
   const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  a.rel = "noopener";
-  a.style.display = "none";
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  window.setTimeout(() => URL.revokeObjectURL(url), 8000);
+  try {
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.rel = "noopener";
+    a.target = "_self";
+    a.style.display = "none";
+    document.body.appendChild(a);
+    a.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window }));
+    a.click();
+    a.remove();
+  } catch {
+    /* A later Save-to-this-computer click uses the same URL. */
+  }
+  return url;
+}
+
+export async function blobToPdfBase64(blob: Blob): Promise<string> {
+  const buf = await blob.arrayBuffer();
+  const bytes = new Uint8Array(buf);
+  let binary = "";
+  const chunk = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunk) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + chunk));
+  }
+  return btoa(binary);
 }
 
 function cssToCanvasY(cssY: number, rootTop: number, scale: number, canvasH: number) {
@@ -250,8 +282,154 @@ function drawStrip(
   pdf.addImage(pageCanvas.toDataURL("image/jpeg", 0.92), "JPEG", x, y, w, h);
 }
 
-/** Capture the report once, then place whole chart+caption blocks so graphics never split. */
-export async function downloadReportPdf(filename: string): Promise<{ filename: string; base64: string }> {
+const MAX_CANVAS_EDGE = 8000;
+const SLICE_CSS = 2800;
+
+const html2opts = (scale: number, extra: Record<string, unknown> = {}) => ({
+  scale,
+  useCORS: true as const,
+  backgroundColor: "#fffdf8",
+  logging: false,
+  scrollX: 0,
+  scrollY: 0,
+  imageTimeout: 15000,
+  ...extra,
+  ignoreElements: (el: Element) =>
+    el instanceof HTMLElement &&
+    (el.classList.contains("no-print") || el.closest(".no-print") != null),
+  onclone: (doc: Document, el: HTMLElement) => {
+    flattenUnsupportedColors(doc);
+    el.style.overflow = "visible";
+    el.style.height = "auto";
+    el.style.maxHeight = "none";
+    el.querySelectorAll("details").forEach((d) => {
+      const det = d as HTMLDetailsElement;
+      if (!det.classList.contains("no-print")) det.open = true;
+    });
+    el.querySelectorAll(".accordion-panel").forEach((p) => {
+      const panel = p as HTMLElement;
+      panel.style.maxHeight = "none";
+      panel.style.opacity = "1";
+      panel.style.transform = "none";
+      panel.style.overflow = "visible";
+    });
+    doc.querySelectorAll(".no-print").forEach((n) => {
+      (n as HTMLElement).style.display = "none";
+    });
+  },
+});
+
+function expandLive(root: HTMLElement) {
+  const panels = Array.from(root.querySelectorAll<HTMLElement>(".accordion-panel"));
+  const prev = panels.map((p) => ({
+    p,
+    maxH: p.style.maxHeight,
+    op: p.style.opacity,
+    ov: p.style.overflow,
+    tf: p.style.transform,
+  }));
+  panels.forEach((p) => {
+    p.style.maxHeight = "none";
+    p.style.opacity = "1";
+    p.style.overflow = "visible";
+    p.style.transform = "none";
+    p.style.pointerEvents = "auto";
+  });
+  root.querySelectorAll("details").forEach((d) => {
+    if (!d.classList.contains("no-print")) (d as HTMLDetailsElement).open = true;
+  });
+  return () => {
+    prev.forEach(({ p, maxH, op, ov, tf }) => {
+      p.style.maxHeight = maxH;
+      p.style.opacity = op;
+      p.style.overflow = ov;
+      p.style.transform = tf;
+    });
+  };
+}
+
+async function captureBlock(el: HTMLElement): Promise<HTMLCanvasElement[]> {
+  const cssH = Math.max(el.scrollHeight, el.offsetHeight, 1);
+  const cssW = Math.max(el.scrollWidth, el.offsetWidth, 320);
+  const out: HTMLCanvasElement[] = [];
+  const grab = async (y: number, h: number) => {
+    const scale = Math.min(1.15, MAX_CANVAS_EDGE / Math.max(h, 1), MAX_CANVAS_EDGE / cssW);
+    try {
+      return await html2canvas(
+        el,
+        html2opts(scale, {
+          x: 0,
+          y,
+          width: cssW,
+          height: h,
+          windowWidth: cssW,
+          windowHeight: h,
+        }),
+      );
+    } catch {
+      return await html2canvas(
+        el,
+        html2opts(Math.min(1, scale), {
+          x: 0,
+          y,
+          width: cssW,
+          height: h,
+          windowWidth: cssW,
+          windowHeight: h,
+        }),
+      );
+    }
+  };
+  if (cssH <= SLICE_CSS) {
+    out.push(await grab(0, cssH));
+    return out;
+  }
+  for (let top = 0; top < cssH; top += SLICE_CSS) {
+    const h = Math.min(SLICE_CSS, cssH - top);
+    out.push(await grab(top, h));
+  }
+  return out.filter((c) => c.width > 0 && c.height > 0);
+}
+
+function addCanvasPages(
+  pdf: jsPDF,
+  canvas: HTMLCanvasElement,
+  state: { y: number; started: boolean },
+) {
+  const pageW = pdf.internal.pageSize.getWidth();
+  const pageH = pdf.internal.pageSize.getHeight();
+  const usableW = pageW - BASE_MARGIN * 2;
+  const usableH = pageH - BASE_MARGIN - FOOTER_H - 10;
+  const pxToPt = usableW / canvas.width;
+  const remaining = () => BASE_MARGIN + usableH - state.y;
+  const newPage = () => {
+    if (state.started) pdf.addPage();
+    state.started = true;
+    state.y = BASE_MARGIN;
+  };
+  if (!state.started) newPage();
+
+  let cursor = 0;
+  while (cursor < canvas.height - 2) {
+    if (state.y > BASE_MARGIN + 8 && remaining() < 64) newPage();
+    const maxPx = Math.max(48, Math.floor(remaining() / pxToPt));
+    const sliceEnd = Math.min(
+      canvas.height,
+      findBreakY(canvas, cursor, Math.min(canvas.height, cursor + maxPx)),
+    );
+    const h = Math.max(1, sliceEnd - cursor) * pxToPt;
+    drawStrip(pdf, canvas, cursor, sliceEnd, BASE_MARGIN, state.y, usableW, h);
+    state.y += h + GAP;
+    cursor = sliceEnd;
+    if (cursor < canvas.height - 2) newPage();
+  }
+}
+
+/** Capture each report section so a full packet fits browser canvas limits, then save locally. */
+export async function downloadReportPdf(
+  filename: string,
+  onProgress?: (msg: string) => void,
+): Promise<{ filename: string; base64: string; blob: Blob; url: string }> {
   const root = await waitForReport();
   try {
     await document.fonts?.ready;
@@ -269,129 +447,25 @@ export async function downloadReportPdf(filename: string): Promise<{ filename: s
   }
   root.style.overflow = "visible";
   document.documentElement.classList.add("pdf-capture");
+  const restoreAccordions = expandLive(root);
+  window.dispatchEvent(new Event("resize"));
+  await wait(280);
 
   try {
-    await wait(80);
-    const canvas = await html2canvas(root, {
-      scale: 1.25,
-      useCORS: true,
-      backgroundColor: "#fffdf8",
-      logging: false,
-      scrollX: 0,
-      scrollY: 0,
-      windowWidth: Math.max(root.scrollWidth, 960),
-      ignoreElements: (el) =>
-        el instanceof HTMLElement &&
-        (el.classList.contains("no-print") || el.closest(".no-print") != null),
-      onclone: (doc, el) => {
-        flattenUnsupportedColors(doc);
-        const node = el as HTMLElement;
-        node.style.overflow = "visible";
-        node.style.height = "auto";
-        node.style.maxHeight = "none";
-        node.querySelectorAll("details").forEach((d) => {
-          const det = d as HTMLDetailsElement;
-          if (!det.classList.contains("no-print")) det.open = true;
-        });
-        node.querySelectorAll(".accordion-panel").forEach((p) => {
-          const el = p as HTMLElement;
-          el.style.maxHeight = "none";
-          el.style.opacity = "1";
-          el.style.transform = "none";
-          el.style.overflow = "visible";
-        });
-        doc.querySelectorAll(".no-print").forEach((n) => {
-          (n as HTMLElement).style.display = "none";
-        });
-      },
-    });
-
-    if (!canvas.width || !canvas.height) {
-      throw new Error("Could not capture the report.");
-    }
+    const blocks = Array.from(root.querySelectorAll<HTMLElement>(".report-block")).filter(
+      (el) => !el.closest(".no-print") && el.offsetHeight > 4,
+    );
+    if (!blocks.length) throw new Error("Report has no printable blocks.");
 
     const pdf = new jsPDF({ unit: "pt", format: "letter", compress: true });
     const pageW = pdf.internal.pageSize.getWidth();
     const pageH = pdf.internal.pageSize.getHeight();
-    const usableW = pageW - BASE_MARGIN * 2;
-    const usableH = pageH - BASE_MARGIN - FOOTER_H - 10;
-    const pxToPt = usableW / canvas.width;
+    const state = { y: BASE_MARGIN, started: false };
 
-    const rawBands = bandsFromBlocks(root, canvas);
-    const bands = paginateBands(rawBands.length ? rawBands : [{ start: 0, end: canvas.height, keep: false }], canvas.height);
-    let y = BASE_MARGIN;
-    let pageStarted = false;
-
-    const newPage = () => {
-      if (pageStarted) pdf.addPage();
-      pageStarted = true;
-      y = BASE_MARGIN;
-    };
-
-    const remaining = () => BASE_MARGIN + usableH - y;
-
-    if (!bands.length) {
-      throw new Error("Report has no printable blocks.");
-    }
-
-    newPage();
-
-    for (const band of bands) {
-      const sliceH = band.end - band.start;
-      const fit = autoFit({
-        pageW,
-        pageH,
-        y,
-        sliceH,
-        canvasW: canvas.width,
-        keep: band.keep,
-      });
-      if (fit.newPage) newPage();
-      const placed = fit.newPage
-        ? autoFit({
-            pageW,
-            pageH,
-            y: BASE_MARGIN,
-            sliceH,
-            canvasW: canvas.width,
-            keep: band.keep,
-          })
-        : fit;
-
-      if (band.keep) {
-        drawStrip(pdf, canvas, band.start, band.end, placed.x, placed.y, placed.w, placed.h);
-        y = placed.y + placed.h + GAP;
-        continue;
-      }
-
-      const drawH = sliceH * pxToPt;
-      if (drawH <= remaining() - 2 && !placed.newPage) {
-        drawStrip(pdf, canvas, band.start, band.end, BASE_MARGIN, y, usableW, drawH);
-        y += drawH + GAP;
-        continue;
-      }
-
-      if (y > BASE_MARGIN + 8 && drawH <= usableH) {
-        newPage();
-        drawStrip(pdf, canvas, band.start, band.end, BASE_MARGIN, y, usableW, drawH);
-        y += drawH + GAP;
-        continue;
-      }
-
-      let cursor = band.start;
-      while (cursor < band.end - 2) {
-        if (y > BASE_MARGIN + 8 && remaining() < 64) newPage();
-        const maxPx = Math.floor(remaining() / pxToPt);
-        const sliceEnd = Math.min(
-          band.end,
-          findBreakY(canvas, cursor, Math.min(band.end, cursor + maxPx)),
-        );
-        const h = Math.max(1, sliceEnd - cursor) * pxToPt;
-        drawStrip(pdf, canvas, cursor, sliceEnd, BASE_MARGIN, y, usableW, h);
-        y += h + GAP;
-        cursor = sliceEnd;
-        if (cursor < band.end - 2) newPage();
-      }
+    for (let i = 0; i < blocks.length; i++) {
+      onProgress?.(`Preparing PDF… section ${i + 1} of ${blocks.length}`);
+      const canvases = await captureBlock(blocks[i]);
+      for (const canvas of canvases) addCanvasPages(pdf, canvas, state);
     }
 
     const pages = pdf.getNumberOfPages();
@@ -401,11 +475,12 @@ export async function downloadReportPdf(filename: string): Promise<{ filename: s
       stampFooter(pdf, pageW, pageH, i, pages);
     }
 
-    savePdfFile(pdf, filename);
-    const dataUri = pdf.output("datauristring") as string;
-    const base64 = dataUri.includes(",") ? dataUri.split(",")[1]! : "";
-    return { filename, base64 };
+    const blob = pdf.output("blob") as Blob;
+    const url = savePdfBlob(blob, filename);
+    const base64 = await blobToPdfBase64(blob);
+    return { filename, base64, blob, url };
   } finally {
+    restoreAccordions();
     document.documentElement.classList.remove("pdf-capture");
     if (overlay) {
       overlay.style.overflow = overlayOverflow;

@@ -96,7 +96,6 @@ import { DISCLOSURE_CARD_TITLE } from "@/lib/disclaimer";
 import {
   ALL_DETAILS_OFF,
   ALL_DETAILS_ON,
-  CLIENT_SITTING,
   DEFAULT_DETAILS,
   DISCLOSURE_SECTION_IDS,
   isRequiredDetail,
@@ -121,7 +120,7 @@ import { pinToHeaderOnLoad, scrollToHeader } from "@/lib/scroll-header";
 import { WhatConsumersBuyPanel } from "@/components/what-consumers-buy-panel";
 import { ReportView } from "@/components/report-view";
 import { PdfSectionsDialog } from "@/components/details-picker";
-import { ContactAskDialog, ContactRequestDialog } from "@/components/pdf-delivery-dialogs";
+import { ContactAskDialog, ContactRequestDialog, PdfReadyDialog } from "@/components/pdf-delivery-dialogs";
 import { MedicaidVaCard } from "@/components/medicaid-va-card";
 import { AdvisorProfessionalFolds, DisclaimerCard } from "@/components/disclaimer-card";
 import { WelcomeCard } from "@/components/welcome-card";
@@ -224,6 +223,12 @@ export function Calculator() {
   const [showReport, setShowReport] = useState(false);
   const [printAfterOpen, setPrintAfterOpen] = useState(false);
   const [pdfPick, setPdfPick] = useState(false);
+  const [pdfReady, setPdfReady] = useState<{
+    filename: string;
+    url: string;
+    note: string;
+    next: "contact" | "done";
+  } | null>(null);
   const [premiumTouched, setPremiumTouched] = useState(false);
   const [designTouched, setDesignTouched] = useState(false);
   const [yearPage, setYearPage] = useState(0);
@@ -700,10 +705,7 @@ export function Calculator() {
     window.setTimeout(() => scrollToHeader(false), 50);
   }
   function requestPdfDownload() {
-    const packet = insuranceLocked
-      ? lockoutDetails()
-      : { ...CLIENT_SITTING, reciprocity: showReciprocity };
-    setDetails(packet);
+    setDetails((d) => withScenarioDetails(d, insuranceLocked));
     setAttachAdvisor(advisorReceivesPdf(advisor, client));
     setPdfPick(true);
   }
@@ -723,12 +725,16 @@ export function Calculator() {
     let cancelled = false;
     const t = window.setTimeout(() => {
       const name = pdfFilename(state);
-      downloadReportPdf(name)
+      downloadReportPdf(name, (msg) => {
+        if (!cancelled) setSaveMsg(msg);
+      })
         .then(async (file) => {
           if (cancelled) return;
           setPrintAfterOpen(false);
           setShowReport(false);
           const snap = mailRef.current;
+          let note = "Use Save PDF to this computer if a download did not start.";
+          let next: "contact" | "done" = "contact";
           if (advisorReceivesPdf(snap.advisor, snap.client) && snap.attachAdvisor) {
             try {
               const r = await emailAdvisorPdf({
@@ -743,35 +749,33 @@ export function Calculator() {
                   state: snap.client.state || snap.state,
                 },
               });
-              resetAll();
-              setSaveMsg(
-                r.emailed
-                  ? "PDF downloaded. A copy was emailed to the advisor from info@fundingltcmarketplace.com."
-                  : "PDF downloaded. The advisor copy could not be emailed from this environment.",
-              );
+              note = r.emailed
+                ? "A copy was emailed to the advisor from info@fundingltcmarketplace.com."
+                : "The advisor copy could not be emailed from this environment.";
             } catch {
-              resetAll();
-              setSaveMsg("PDF downloaded. The advisor copy could not be emailed.");
+              note = "The advisor copy could not be emailed.";
             }
-            window.setTimeout(() => setSaveMsg(""), 4500);
-            return;
+            next = "done";
+          } else {
+            setContactDraft({
+              name: snap.client.name,
+              phone: snap.client.phone,
+              email: snap.client.email,
+              state: snap.client.state || snap.state,
+            });
+            note = "The form was not emailed — no advisor email on this run.";
+            next = "contact";
           }
-          setContactDraft({
-            name: snap.client.name,
-            phone: snap.client.phone,
-            email: snap.client.email,
-            state: snap.client.state || snap.state,
-          });
-          setContactAsk(true);
-          setSaveMsg("PDF downloaded. The form was not emailed — no advisor email on this run.");
+          setPdfReady({ filename: file.filename, url: file.url, note, next });
+          setSaveMsg("PDF is ready. Save it to this computer.");
         })
         .catch((err) => {
           if (cancelled) return;
           setPrintAfterOpen(false);
           const msg = err instanceof Error ? err.message : "PDF could not be created.";
-          setSaveMsg(`PDF did not download. ${msg} Try again, or use your browser’s Print → Save as PDF.`);
+          setSaveMsg(`PDF did not download. ${msg} Try fewer sections, or use your browser’s Print → Save as PDF.`);
         });
-    }, 400);
+    }, 700);
     return () => {
       cancelled = true;
       window.clearTimeout(t);
@@ -2102,6 +2106,27 @@ export function Calculator() {
           filenamePreview={pdfFilename(state)}
           onCancel={() => setPdfPick(false)}
           onConfirm={runPdfDownload}
+        />,
+        document.body,
+      ) : null}
+      {pdfReady ? createPortal(
+        <PdfReadyDialog
+          open
+          filename={pdfReady.filename}
+          url={pdfReady.url}
+          note={pdfReady.note}
+          onContinue={() => {
+            const next = pdfReady.next;
+            URL.revokeObjectURL(pdfReady.url);
+            setPdfReady(null);
+            if (next === "contact") {
+              setContactAsk(true);
+            } else {
+              resetAll();
+              setSaveMsg("PDF saved. The form was reset.");
+              window.setTimeout(() => setSaveMsg(""), 3500);
+            }
+          }}
         />,
         document.body,
       ) : null}

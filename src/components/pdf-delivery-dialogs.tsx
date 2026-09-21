@@ -176,3 +176,66 @@ export function ContactRequestDialog({
     </div>
   );
 }
+
+/** After the PDF is built — a real clickable save, not a background download that browsers may block. */
+export function PdfReadyDialog({
+  open,
+  filename,
+  url,
+  note,
+  onContinue,
+}: {
+  open: boolean;
+  filename: string;
+  url: string;
+  note?: string;
+  onContinue: () => void;
+}) {
+  if (!open || !url) return null;
+  return (
+    <div
+      className="fixed inset-0 z-[70] flex items-start justify-center overflow-y-auto bg-navy/55 p-4 pt-16"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="pdf-ready-title"
+    >
+      <div className="card-xl w-full max-w-lg bg-paper p-4 shadow-[var(--shadow-card)] md:p-5">
+        <h2 id="pdf-ready-title" className="font-display text-xl text-navy">
+          Your PDF is ready
+        </h2>
+        <p className="mt-2 text-sm text-muted">
+          Save it on this computer. Your browser may also have started a download — if it did
+          not, use the button below.
+        </p>
+        <p className="mt-3 break-all rounded-lg border border-teal/40 bg-cream/40 px-3 py-2 text-sm text-navy">
+          {filename}
+        </p>
+        {note ? <p className="mt-2 text-sm text-navy">{note}</p> : null}
+        <div className="mt-4 stack-actions">
+          <a
+            href={url}
+            download={filename}
+            className="btn-block rounded-lg border border-gold bg-gold text-center text-masthead hover:brightness-105"
+          >
+            Save PDF to this computer
+          </a>
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-block rounded-lg border border-navy bg-navy text-center text-cream hover:bg-teal"
+          >
+            Open PDF
+          </a>
+          <button
+            type="button"
+            className="btn-block rounded-lg border border-card-border text-navy hover:bg-cream"
+            onClick={onContinue}
+          >
+            Continue
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
