@@ -245,7 +245,6 @@ export function Calculator() {
   const [ran, setRan] = useState(false);
   const [poolShown, setPoolShown] = useState(false);
   const [dockOpen, setDockOpen] = useState(true);
-  const [openMedicaidOnRun, setOpenMedicaidOnRun] = useState(false);
   const [hypoRunId, setHypoRunId] = useState(0);
   const [client, setClient] = useState<ContactParty>({ ...EMPTY_CONTACT });
   const [advisor, setAdvisor] = useState<AdvisorParty>({ ...EMPTY_ADVISOR });
@@ -676,7 +675,6 @@ export function Calculator() {
     setDesignTouched(false);
     setRan(false);
     setPoolShown(false);
-    setOpenMedicaidOnRun(false);
     setHypoRunId(0);
     setShowReport(false);
     setClient({ ...EMPTY_CONTACT });
@@ -852,9 +850,8 @@ export function Calculator() {
       return;
     }
     const locked = insuranceLockedOut(pool);
-    setOpenMedicaidOnRun(locked);
     setHypoRunId((n) => n + 1);
-    setDetails(locked ? lockoutDetails() : withScenarioDetails({ ...ALL_DETAILS_OFF, yearByYear: true, partnership: true }, false));
+    setDetails(locked ? lockoutDetails() : withScenarioDetails({ ...ALL_DETAILS_OFF, yearByYear: true, partnership: true, medicaidLtc: true }, false));
     setRan(true);
     setYearPage(0);
     if (locked) {
@@ -869,7 +866,7 @@ export function Calculator() {
     setDetails(
       insuranceLocked
         ? lockoutDetails()
-        : { ...ALL_DETAILS_ON, medicaidLtc: false, reciprocity: showReciprocity },
+        : { ...ALL_DETAILS_ON, medicaidLtc: true, reciprocity: showReciprocity },
     );
     setShowReport(true);
   }
@@ -1990,8 +1987,22 @@ export function Calculator() {
             </>
           ) : null}
 
-          {insuranceLocked ? (
-            <MedicaidVaCard key={`medicaid-${hypoRunId}`} state={state} policy={policy} medicaid={medicaid} veteran={veteran} onVeteranChange={setVeteran} defaultOpen={openMedicaidOnRun} pdfChecked={details.medicaidLtc} onPdfChange={(v) => setDetail("medicaidLtc", v)} pdfLocked={insuranceLocked} />
+          {ran ? (
+            <MedicaidVaCard
+              key={`medicaid-${hypoRunId}`}
+              state={state}
+              policy={policy}
+              medicaid={medicaid}
+              veteran={veteran}
+              onVeteranChange={setVeteran}
+              preservation={pImpact}
+              issueState={effectiveIssue || state}
+              preferTap={preferTap}
+              defaultOpen={true}
+              pdfChecked={details.medicaidLtc}
+              onPdfChange={(v) => setDetail("medicaidLtc", v)}
+              pdfLocked
+            />
           ) : null}
 
           {insuranceLocked ? (

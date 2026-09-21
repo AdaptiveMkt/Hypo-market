@@ -95,7 +95,7 @@ export function DetailsPicker({
           <span>
             Client sitting (recommended)
             <span className="mt-0.5 block text-xs font-normal text-muted">
-              Allocation, care options, compare insurance, year-by-year, and State Partnership. Medicaid & VA only if countable assets are below the suitability floor.
+              Allocation, care options, compare insurance, year-by-year, State Partnership, and Medicaid Information.
               Not the full packet.
             </span>
           </span>
@@ -136,9 +136,7 @@ export function DetailsPicker({
           Optional sections — expand only if selected
         </p>
         <p className="mt-1 text-xs text-muted">
-          Suggested order: numbers first, then insurance design, then Medicaid. Turn on
-          Medicaid long-term care <em>or</em> Educational for rules — both together
-          repeats some eligibility text.
+          Suggested order: numbers first, then insurance design, then Medicaid Information.
           {!policyEnabled
             ? ` Insurance design, Partnership, riders, ${TAX_SECTION_LABEL}, and claims history stay hidden until Include insurance in the run is checked.`
             : ""}
@@ -161,8 +159,8 @@ export function DetailsPicker({
                       s.id === "eduHypo",
                   )
                 : policyEnabled
-                  ? g.items.filter((s) => s.id !== "medicaidLtc" && (showReciprocity || s.id !== "reciprocity"))
-                  : g.items.filter((s) => !isInsuranceDetail(s.id) && s.id !== "medicaidLtc" && s.id !== "reciprocity")
+                  ? g.items.filter((s) => showReciprocity || s.id !== "reciprocity")
+                  : g.items.filter((s) => !isInsuranceDetail(s.id) && s.id !== "reciprocity")
             );
             if (!items.length) return null;
             return (

@@ -1638,11 +1638,6 @@ export function ReportView({
               </tbody>
             </table>
           </div>
-          {preservation.paragraphs.map((para) => (
-            <p key={para.slice(0, 56)} className="mb-2 text-sm leading-relaxed">
-              {para}
-            </p>
-          ))}
           <h3 className="mb-2 mt-4 font-display text-base text-navy">
             Original programs — California, Connecticut, Indiana, New York
           </h3>
@@ -1776,18 +1771,18 @@ export function ReportView({
         </section>
         ) : null}
 
-        {details.medicaidLtc ? (
         <section className="report-block">
-          <TitleCollapse title="Medicaid & VA" className="mt-0" defaultOpen={insuranceLocked}>
+          <TitleCollapse title="Medicaid Information" className="mt-0" defaultOpen>
             <MedicaidVaBody
               state={state}
               policy={policy}
               medicaid={medicaid}
               veteran={veteran}
+              preservation={preservation}
+              issueState={reciprocity.issueState}
             />
           </TitleCollapse>
         </section>
-        ) : null}
 
         {insuranceLocked || details.dhContact || details.dhLicense ? (
         <section className="report-block">
@@ -2315,11 +2310,11 @@ export function ReportView({
               still counted. California does not join the national reciprocity compact.
               Indiana/New York total asset protection is in-state only. Asset spend-down and
               income spend-down are different tests. Medicaid figures for{" "}
-              <StateName name={state} /> are on the Medicaid & VA card — they are not repeated here.
+              <StateName name={state} /> are in Medicaid Information — they are not repeated here.
               This is current-rule planning only: it does not assume Medicaid will still be
               solvent or that any Partnership disregard or other Medicaid benefit will remain
               the same — solvency and benefits may be adjusted by legislation, regulation, or
-              other government action.
+              other government action. Full Medicaid Information is in that section of this report.
               </p>
             </TitleCollapse>
             <TitleCollapse title={TAX_SECTION_LABEL}>

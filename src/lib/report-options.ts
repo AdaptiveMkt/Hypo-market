@@ -37,7 +37,7 @@ export const DETAIL_GROUPS = [
       { id: "compareHealth", label: "Compare health insurance types" },
       { id: "sensitivity", label: "Hypothesis sensitivity" },
       { id: "confidence", label: "Model confidence scores" },
-      { id: "medicaidLtc", label: "Medicaid & VA" },
+      { id: "medicaidLtc", label: "Medicaid Information" },
       { id: "edu", label: "How CPI is calculated (educational notes)" },
     ],
   },
@@ -102,7 +102,7 @@ export const DETAIL_HINTS: Record<DetailId, string> = {
   reciprocity: "Whether a Partnership policy issued in one state is honored for Medicaid in another.",
   tax: "Federal eligible-premium deduction, state credits, and IRC §1035 exchanges.",
   confidence: "Grades this run’s inputs — not the chance of needing care.",
-  medicaidLtc: "Medicaid long-term care, QIT, MAPT, spend-down, exemptions, and VA if selected.",
+  medicaidLtc: "Medicaid long-term care rules, spend-down, Partnership disregard, solvency notes, and VA if selected. Always included in View and PDF.",
   edu: "How CPI is calculated and remaining educational notes that are not Medicaid/VA.",
   eduHypo: "The Disclosure and Terms of Use card shell and opening paragraph.",
   dhMayDo: "What you may do with this hypothetical.",
@@ -177,6 +177,7 @@ export const REQUIRED_DETAIL_IDS: DetailId[] = [
   "dhHoldHarmless",
   "dhFiduciary",
   "dhNotLegal",
+  "medicaidLtc",
 ];
 
 export function withRequiredDetails(d: DetailFlags): DetailFlags {
@@ -260,7 +261,7 @@ export const CLIENT_SITTING: DetailFlags = {
   compareIns: true,
   yearByYear: true,
   partnership: true,
-  medicaidLtc: false,
+  medicaidLtc: true,
   dhDesignation: true,
 };
 

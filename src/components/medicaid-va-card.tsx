@@ -13,6 +13,8 @@ import {
   type MedicaidProfile,
 } from "@/lib/medicaid";
 import { medicaidProtectStrategies } from "@/lib/medicaid-protect";
+import { assetProtectionLimits, type PreservationImpact } from "@/lib/partnership";
+import { reciprocityOutcome } from "@/lib/reciprocity";
 import { incomeLimitNotes, maptRules } from "@/lib/mapt";
 import { ssiAssetLimitsForLtc } from "@/lib/ssi-2026";
 import { SRC } from "@/lib/sources";
@@ -49,12 +51,18 @@ export function MedicaidVaBody({
   medicaid,
   veteran,
   onVeteranChange,
+  preservation,
+  issueState,
+  preferTap = true,
 }: {
   state: string;
   policy: LtcPolicy;
   medicaid: MedicaidProfile;
   veteran: boolean;
   onVeteranChange?: (on: boolean) => void;
+  preservation?: PreservationImpact;
+  issueState?: string;
+  preferTap?: boolean;
 }) {
   const ltc = medicaidLtcOverview(state);
   const ssi = ssiAssetLimitsForLtc(state);
@@ -64,6 +72,8 @@ export function MedicaidVaBody({
   const protect = medicaidProtectStrategies(state);
   const vaElig = vaBenefitsEligibility();
   const aa = vaAidAttendance();
+  const ceiling = assetProtectionLimits(state, medicaid.individualLimit);
+  const recip = reciprocityOutcome(issueState || state, state, policy, preferTap);
 
   return (
     <div className="space-y-1 text-sm text-muted">
@@ -93,6 +103,16 @@ export function MedicaidVaBody({
       </p>
 
       <p><LinkedCopy text={ltc.lead} /></p>
+
+      {preservation?.paragraphs.length ? (
+        <Fold title="This run — remaining assets and Medicaid spend-down">
+          {preservation.paragraphs.map((p) => (
+            <p key={p.slice(0, 56)} className="mb-2 leading-relaxed">
+              <LinkedCopy text={p} />
+            </p>
+          ))}
+        </Fold>
+      ) : null}
 
       <Step n="1" label="What Medicaid long-term care can pay" />
       <Fold title="Covered settings">
@@ -199,6 +219,20 @@ export function MedicaidVaBody({
           is current-rule planning only — it does not assume Medicaid will still be solvent
           or that the Partnership benefit will remain the same.
         </p>
+        <Fold title={ceiling.title}>
+          <ul className="list-disc space-y-1 pl-4">
+            {ceiling.bullets.map((b) => (
+              <li key={b.slice(0, 48)}><LinkedCopy text={b} /></li>
+            ))}
+          </ul>
+        </Fold>
+        <Fold title={recip.title}>
+          <ul className="list-disc space-y-1 pl-4">
+            {recip.bullets.map((b) => (
+              <li key={b.slice(0, 48)}><LinkedCopy text={b} /></li>
+            ))}
+          </ul>
+        </Fold>
       </Fold>
       <Fold title={mapt.title}>
         <p className="mb-2">
@@ -309,6 +343,9 @@ export function MedicaidVaCard({
   medicaid,
   veteran,
   onVeteranChange,
+  preservation,
+  issueState,
+  preferTap,
   pdfChecked,
   onPdfChange,
   defaultOpen = false,
@@ -319,6 +356,9 @@ export function MedicaidVaCard({
   medicaid: MedicaidProfile;
   veteran: boolean;
   onVeteranChange?: (on: boolean) => void;
+  preservation?: PreservationImpact;
+  issueState?: string;
+  preferTap?: boolean;
   pdfChecked?: boolean;
   onPdfChange?: (on: boolean) => void;
   defaultOpen?: boolean;
@@ -327,7 +367,7 @@ export function MedicaidVaCard({
   return (
     <div id="medicaid-va-card" className="mt-5 scroll-mt-28 card-xl px-4 py-2 lg:scroll-mt-8">
       <TitleCollapse
-        title="Medicaid & VA"
+        title="Medicaid Information"
         className="mt-0"
         defaultOpen={defaultOpen}
         hint="Click the title to view coverage, eligibility, spend-down, protection options, and VA (if selected)."
@@ -341,6 +381,9 @@ export function MedicaidVaCard({
           medicaid={medicaid}
           veteran={veteran}
           onVeteranChange={onVeteranChange}
+          preservation={preservation}
+          issueState={issueState}
+          preferTap={preferTap}
         />
       </TitleCollapse>
     </div>

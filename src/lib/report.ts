@@ -17,9 +17,7 @@ import {
   type Projection,
 } from "./calc";
 import { SETTING_LABELS, type CareSetting } from "./costs";
-import { preservationImpact, medicaidEligibilityImpact } from "./partnership";
 import { stateLtcTaxBreak } from "./ltc-tax";
-import { spendDownRules, eligibilityRules, MEDICAID_FUTURE_QUALIFIER, MEDICAID_PAYS_CAVEAT } from "./medicaid";
 
 export const SAVE_KEY = "aum-scenario-v2";
 
@@ -205,40 +203,14 @@ export function analysisNarrative(opts: ReportOpts): string {
   paras.push(
     `A planning figure for discussion — not a quote — is a recommended target premium of ${money(premium)} per year (the lesser of 2.5% of countable assets or 7% of income; max for traditional long-term care insurance). Premiums vary by age, health, marital status, and state of issue.`,
   );
-  const impact = preservationImpact({
-    state: s.state,
-    policy: s.policy,
-    partnershipOn: Boolean(opts.partnershipOn),
-    preferTap: opts.preferTap !== false,
-    benefitsPaid: result.insuranceTotal,
-    remainingWithPolicy: result.endPool,
-    remainingNoPolicy: selfFunded.endPool,
-  });
-  for (const para of impact.paragraphs) paras.push(para);
-  paras.push(
-    `Asset-protection ceiling: the disregard equals benefits actually paid, not premiums and not unused maximum (except qualifying IN/NY total-asset designs). Income is still counted toward the care bill. Estate recovery uses the same dollar ceiling. ${MEDICAID_PAYS_CAVEAT}`,
-  );
-  paras.push(eligibilityRules(s.state).bullets[0].body);
-  paras.push(
-    eligibilityRules(s.state).bullets
-      .slice(1, 4)
-      .map((b) => `${b.heading}: ${b.body}`)
-      .join(" "),
-  );
   paras.push(
     `Tax: there is no general federal LTC credit — only an age-capped deduction (2026: $500 to $6,200) after the 7.5% AGI medical floor if you itemize. A credit cuts tax dollar-for-dollar; a deduction only lowers taxable income. ${stateLtcTaxBreak(s.state).detail} This is not tax advice.`,
   );
-  paras.push(spendDownRules(s.state, impact.medicaidLimit).bullets[0]);
-  paras.push(spendDownRules(s.state, impact.medicaidLimit).bullets[3]);
-  paras.push(
-    `Reciprocity: the insurance contract follows the insured in every state. Medicaid asset disregard follows only when both the issue state and the Medicaid state participate in the Partnership compact. California does not join that compact either direction. Indiana/New York total asset protection is in-state; a DRA state that honors the policy would apply dollar-for-dollar only. No-program states cannot grant a disregard. Compact membership and the Medicaid asset disregard may later be changed or ended; this model does not assume Medicaid will remain solvent or that today’s disregard will still apply when care is needed. ${MEDICAID_PAYS_CAVEAT}`,
-  );
-  paras.push(MEDICAID_FUTURE_QUALIFIER);
   paras.push(
     `Care costs in this model compound at ${s.cpi.toFixed(1)}% (BLS CPI is a consumer market basket, not an LTC price index). Insurance riders — level, simple, or compound — grow only the daily/monthly max and are not re-priced here. Compare those riders in the inflation section. Designs compared include no policy, traditional level, traditional with inflation, traditional with Partnership, and asset-based hybrid.`,
   );
   paras.push(
-    `The projections section below lists each model year. Confirm figures with a qualified long-term care insurance representative or a financial advisor who holds an LTC designation such as CLTC or LTCP. Considering Medicaid planning: contact a qualified Medicaid or elder-care planning attorney. Not a determination of Medicaid eligibility. ${MEDICAID_PAYS_CAVEAT}`,
+    `The projections section below lists each model year. Confirm figures with a qualified long-term care insurance representative or a financial advisor who holds an LTC designation such as CLTC or LTCP. Medicaid long-term care rules, spend-down, Partnership disregard, and solvency notes for this run are in the Medicaid Information section — not in this summary.`,
   );
 
   return paras.join("\n\n");
@@ -318,7 +290,7 @@ export function recommendationsNarrative(opts: ReportOpts): string[] {
     `A Medicaid Asset Protection Trust is irrevocable, generally needs a 60-month look-back, and does not pay care during that wait. Income from the trust is still countable. Pairing a Partnership or traditional policy for the near term with attorney-drafted MAPT planning is a discussion item — this model does not create a trust.`,
   );
   recs.push(
-    `Confirm ${s.state} Medicaid CSRA, home-equity, income limits, QIT, and look-back rules with a qualified Medicaid or elder-care planning attorney. This model is not a determination of eligibility. ${MEDICAID_FUTURE_QUALIFIER}`,
+    `Confirm ${s.state} Medicaid CSRA, home-equity, income limits, QIT, and look-back rules with a qualified Medicaid or elder-care planning attorney. This model is not a determination of eligibility. See Medicaid Information for spend-down, Partnership, and solvency notes.`,
   );
   recs.push(
     "Re-run the model when assets, health, marital status, or the state where care would be received change. Premiums vary by age, health, marital status, and state of issue.",
