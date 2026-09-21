@@ -1653,68 +1653,6 @@ export function Calculator() {
 
           {!insuranceLocked ? (
             <>
-          {pie.length > 0 ? (
-            <ViewFold title="Asset allocation" hint={`${DETAIL_HINTS.allocation} View more details.`} checked={details.allocation} onPdf={(v) => setDetail("allocation", v)}>
-              <div className="grid min-w-0 grid-cols-1 gap-6 lg:grid-cols-2">
-                <div className="chart-page min-w-0 w-full">
-                  <p className="mb-2 text-sm font-semibold text-navy">Asset allocation</p>
-                  <ChartRegion title="Asset allocation" summary="Countable sleeves in this run. Names are listed under the pie." className="mx-auto h-52 w-full max-w-[16rem]">
-                    <ResponsiveContainer width="100%" height="100%" debounce={50} minWidth={0} minHeight={180}>
-                      <PieChart margin={{ top: 4, right: 4, bottom: 4, left: 4 }}>
-                        <Pie data={pieShown} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={0} outerRadius={narrow ? 78 : 88} isAnimationActive={false} label={false} labelLine={false}>
-                          {pieShown.map((s) => <Cell key={s.name} fill={s.color} />)}
-                        </Pie>
-                        <Tooltip formatter={(v) => money(Number(v) || 0)} />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  </ChartRegion>
-                  <SleeveLegend items={pieShown} />
-                </div>
-                <div className="chart-page min-w-0 w-full pb-6">
-                  <p className="mb-2 text-sm font-semibold text-navy">
-                    Asset utilization over time in {state ? <StateName name={state} /> : "the selected state"}
-                  </p>
-                  <ChartRegion title={`Asset utilization over time in ${state || "the selected state"}`} summary="Care bills versus remaining countable assets. The remaining line turns red at shortfall." className="h-56 w-full sm:h-64">
-                    <ResponsiveContainer width="100%" height="100%" debounce={50} minWidth={0} minHeight={200}>
-                      <ComposedChart data={chartData} margin={{ top: 8, right: 8, left: 0, bottom: 8 }}>
-                        <CartesianGrid stroke={CHART.grid} strokeDasharray="3 3" />
-                        <XAxis dataKey="label" interval={chartTickInterval(chartData.length, narrow)} angle={narrow ? -32 : 0} textAnchor={narrow ? "end" : "middle"} height={narrow ? 44 : 28} tick={{ fill: CHART.tick, fontSize: narrow ? 10 : 11 }} />
-                        <YAxis tickFormatter={(v) => compactMoney(Number(v) || 0)} tick={{ fill: CHART.tick, fontSize: 10 }} width={narrow ? 40 : 52} />
-                        <Tooltip formatter={(v) => money(Number(v) || 0)} />
-                        <Bar dataKey="cost" name={`${SETTING_SHORT[activeSetting]} bill`} fill={CHART.cost} isAnimationActive={false} />
-                        {policy.enabled ? <Bar dataKey="insurance" name="Insurance paid" fill={CHART.insurance} isAnimationActive={false} /> : null}
-                        <Line type="monotone" dataKey="remainingNavy" name="Assets remaining" stroke={CHART.remaining} strokeWidth={2} dot={false} connectNulls={false} isAnimationActive={false} />
-                        <Line type="monotone" dataKey="remainingRed" name="Shortfall" stroke={CHART.shortfall} strokeWidth={2.5} dot={false} connectNulls={false} isAnimationActive={false} />
-                      </ComposedChart>
-                    </ResponsiveContainer>
-                  </ChartRegion>
-                  <ul className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs text-navy">
-                    <li className="flex items-center gap-1.5"><span className="inline-block size-2.5 rounded-sm" style={{ background: CHART.cost }} /> {SETTING_SHORT[activeSetting]} bill</li>
-                    {policy.enabled ? <li className="flex items-center gap-1.5"><span className="inline-block size-2.5 rounded-sm" style={{ background: CHART.insurance }} /> Insurance paid</li> : null}
-                    <li className="flex items-center gap-1.5"><span className="inline-block size-2.5 rounded-full" style={{ background: CHART.remaining }} /> Assets remaining</li>
-                    <li className="flex items-center gap-1.5"><span className="inline-block size-2.5 rounded-full" style={{ background: CHART.shortfall }} /> Shortfall</li>
-                  </ul>
-                </div>
-              </div>
-            </ViewFold>
-          ) : null}
-
-          <ViewFold title="Compare long-term care options" hint={`${DETAIL_HINTS.compareCare} View more details.`} checked={details.compareCare} onPdf={(v) => setDetail("compareCare", v)}>
-            <div className="grid gap-3">
-              {careCompare.map((row) => (
-                <article key={row.setting} className="rounded-lg border border-line px-3 py-3">
-                  <p className="font-display text-base text-navy">{SETTING_LABELS[row.setting]}</p>
-                  <dl className="mt-2 grid gap-1.5 text-sm">
-                    <div className="flex justify-between gap-3"><dt className="text-muted">Today’s annual cost</dt><dd className="tabular-nums">{money(row.today)}</dd></div>
-                    <div className="flex justify-between gap-3"><dt className="text-muted">First-year bill in this run</dt><dd className="tabular-nums">{money(row.proj.firstCost)}</dd></div>
-                    <div className="flex justify-between gap-3"><dt className="text-muted">Assets remaining</dt><dd className="tabular-nums">{money(row.proj.endPool)}</dd></div>
-                    <div className="flex justify-between gap-3"><dt className="text-muted">Shortfall</dt><dd className="tabular-nums">{row.proj.shortfallTotal ? money(row.proj.shortfallTotal) : "None"}</dd></div>
-                  </dl>
-                </article>
-              ))}
-            </div>
-          </ViewFold>
-
           <ViewFold title="Year by year projection" hint={`${DETAIL_HINTS.yearByYear} View more details.`} defaultOpen checked={details.yearByYear} onPdf={(v) => setDetail("yearByYear", v)}>
             <p className="mb-3 text-sm text-muted">
               {yearRowsShown.length} years modeled
@@ -1831,6 +1769,68 @@ export function Calculator() {
                 ) : null}
               </div>
             ) : null}
+          </ViewFold>
+
+          {pie.length > 0 ? (
+            <ViewFold title="Asset allocation" hint={`${DETAIL_HINTS.allocation} View more details.`} checked={details.allocation} onPdf={(v) => setDetail("allocation", v)}>
+              <div className="grid min-w-0 grid-cols-1 gap-6 lg:grid-cols-2">
+                <div className="chart-page min-w-0 w-full">
+                  <p className="mb-2 text-sm font-semibold text-navy">Asset allocation</p>
+                  <ChartRegion title="Asset allocation" summary="Countable sleeves in this run. Names are listed under the pie." className="mx-auto h-52 w-full max-w-[16rem]">
+                    <ResponsiveContainer width="100%" height="100%" debounce={50} minWidth={0} minHeight={180}>
+                      <PieChart margin={{ top: 4, right: 4, bottom: 4, left: 4 }}>
+                        <Pie data={pieShown} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={0} outerRadius={narrow ? 78 : 88} isAnimationActive={false} label={false} labelLine={false}>
+                          {pieShown.map((s) => <Cell key={s.name} fill={s.color} />)}
+                        </Pie>
+                        <Tooltip formatter={(v) => money(Number(v) || 0)} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </ChartRegion>
+                  <SleeveLegend items={pieShown} />
+                </div>
+                <div className="chart-page min-w-0 w-full pb-6">
+                  <p className="mb-2 text-sm font-semibold text-navy">
+                    Asset utilization over time in {state ? <StateName name={state} /> : "the selected state"}
+                  </p>
+                  <ChartRegion title={`Asset utilization over time in ${state || "the selected state"}`} summary="Care bills versus remaining countable assets. The remaining line turns red at shortfall." className="h-56 w-full sm:h-64">
+                    <ResponsiveContainer width="100%" height="100%" debounce={50} minWidth={0} minHeight={200}>
+                      <ComposedChart data={chartData} margin={{ top: 8, right: 8, left: 0, bottom: 8 }}>
+                        <CartesianGrid stroke={CHART.grid} strokeDasharray="3 3" />
+                        <XAxis dataKey="label" interval={chartTickInterval(chartData.length, narrow)} angle={narrow ? -32 : 0} textAnchor={narrow ? "end" : "middle"} height={narrow ? 44 : 28} tick={{ fill: CHART.tick, fontSize: narrow ? 10 : 11 }} />
+                        <YAxis tickFormatter={(v) => compactMoney(Number(v) || 0)} tick={{ fill: CHART.tick, fontSize: 10 }} width={narrow ? 40 : 52} />
+                        <Tooltip formatter={(v) => money(Number(v) || 0)} />
+                        <Bar dataKey="cost" name={`${SETTING_SHORT[activeSetting]} bill`} fill={CHART.cost} isAnimationActive={false} />
+                        {policy.enabled ? <Bar dataKey="insurance" name="Insurance paid" fill={CHART.insurance} isAnimationActive={false} /> : null}
+                        <Line type="monotone" dataKey="remainingNavy" name="Assets remaining" stroke={CHART.remaining} strokeWidth={2} dot={false} connectNulls={false} isAnimationActive={false} />
+                        <Line type="monotone" dataKey="remainingRed" name="Shortfall" stroke={CHART.shortfall} strokeWidth={2.5} dot={false} connectNulls={false} isAnimationActive={false} />
+                      </ComposedChart>
+                    </ResponsiveContainer>
+                  </ChartRegion>
+                  <ul className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs text-navy">
+                    <li className="flex items-center gap-1.5"><span className="inline-block size-2.5 rounded-sm" style={{ background: CHART.cost }} /> {SETTING_SHORT[activeSetting]} bill</li>
+                    {policy.enabled ? <li className="flex items-center gap-1.5"><span className="inline-block size-2.5 rounded-sm" style={{ background: CHART.insurance }} /> Insurance paid</li> : null}
+                    <li className="flex items-center gap-1.5"><span className="inline-block size-2.5 rounded-full" style={{ background: CHART.remaining }} /> Assets remaining</li>
+                    <li className="flex items-center gap-1.5"><span className="inline-block size-2.5 rounded-full" style={{ background: CHART.shortfall }} /> Shortfall</li>
+                  </ul>
+                </div>
+              </div>
+            </ViewFold>
+          ) : null}
+
+          <ViewFold title="Compare long-term care options" hint={`${DETAIL_HINTS.compareCare} View more details.`} checked={details.compareCare} onPdf={(v) => setDetail("compareCare", v)}>
+            <div className="grid gap-3">
+              {careCompare.map((row) => (
+                <article key={row.setting} className="rounded-lg border border-line px-3 py-3">
+                  <p className="font-display text-base text-navy">{SETTING_LABELS[row.setting]}</p>
+                  <dl className="mt-2 grid gap-1.5 text-sm">
+                    <div className="flex justify-between gap-3"><dt className="text-muted">Today’s annual cost</dt><dd className="tabular-nums">{money(row.today)}</dd></div>
+                    <div className="flex justify-between gap-3"><dt className="text-muted">First-year bill in this run</dt><dd className="tabular-nums">{money(row.proj.firstCost)}</dd></div>
+                    <div className="flex justify-between gap-3"><dt className="text-muted">Assets remaining</dt><dd className="tabular-nums">{money(row.proj.endPool)}</dd></div>
+                    <div className="flex justify-between gap-3"><dt className="text-muted">Shortfall</dt><dd className="tabular-nums">{row.proj.shortfallTotal ? money(row.proj.shortfallTotal) : "None"}</dd></div>
+                  </dl>
+                </article>
+              ))}
+            </div>
           </ViewFold>
 
           {policy.enabled && insuranceCompare.length > 0 ? (
