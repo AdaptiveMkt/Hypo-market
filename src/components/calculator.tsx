@@ -1620,29 +1620,18 @@ export function Calculator() {
               items={[
                 ...(featureRow
                   ? [
-                      { id: "col-year", label: "Year", value: String(calendarYear(featureRow.year)) },
-                      { id: "status", label: "Status", value: <RedAmt>{featureRow.status}</RedAmt> },
-                      {
-                        id: "col-assets",
-                        label: "Countable Assets (net after tax)",
-                        value: moneyCents(featureRow.remainingNetStart),
-                      },
+                      { id: "col-year", group: "column" as const, label: "Year", value: String(calendarYear(featureRow.year)) },
+                      { id: "col-assets", group: "column" as const, label: "Countable Assets (net after tax)", value: moneyCents(featureRow.remainingNetStart) },
                     ]
                   : []),
-                { id: "claim-assets", label: "Countable assets at claim (net after tax)", value: <RedAmt>{moneyCents(result.startPoolNet)}</RedAmt> },
                 ...(policy.enabled && featureRow
-                  ? [
-                      {
-                        id: "col-pool",
-                        label: "Insurance Benefit Pool",
-                        value: lifetime ? "Lifetime" : moneyCents(featureRow.insurancePoolStart),
-                      },
-                    ]
+                  ? [{ id: "col-pool", group: "column" as const, label: "Insurance Benefit Pool", value: lifetime ? "Lifetime" : moneyCents(featureRow.insurancePoolStart) }]
                   : []),
                 ...(featureRow
                   ? [
                       {
                         id: "col-total",
+                        group: "column" as const,
                         label: "Total Remaining",
                         value:
                           policy.enabled && lifetime
@@ -1653,36 +1642,20 @@ export function Calculator() {
                                   : featureRow.remainingNet,
                               ),
                       },
-                      {
-                        id: "col-cost",
-                        label: "Annual Care Costs* (est)",
-                        value: <RedAmt>{moneyCents(featureRow.cost)}</RedAmt>,
-                      },
+                      { id: "col-cost", group: "column" as const, label: "Annual Care Costs* (est)", value: <RedAmt>{moneyCents(featureRow.cost)}</RedAmt> },
                     ]
                   : []),
                 ...(policy.enabled && featureRow
                   ? [
-                      {
-                        id: "col-benefits",
-                        label: "Insurance Benefits",
-                        value: moneyCents(featureRow.insurance),
-                      },
-                      {
-                        id: "col-benefits-total",
-                        label: "Insurance Benefits (this run)",
-                        value: <RedAmt>{moneyCents(result.insuranceTotal)}</RedAmt>,
-                      },
-                      {
-                        id: "col-balance",
-                        label: "Insurance Balance",
-                        value: lifetime ? "Lifetime" : moneyCents(featureRow.insurancePoolRemaining),
-                      },
+                      { id: "col-benefits", group: "column" as const, label: "Insurance Benefits", value: moneyCents(featureRow.insurance) },
+                      { id: "col-balance", group: "column" as const, label: "Insurance Balance", value: lifetime ? "Lifetime" : moneyCents(featureRow.insurancePoolRemaining) },
                     ]
                   : []),
                 ...(featureRow
                   ? [
                       {
                         id: "col-copay",
+                        group: "column" as const,
                         label: "Co-pay from Countable Assets",
                         value: (
                           <span className={featureRow.drawn > 0 ? "font-bold amt-red" : ""}>
@@ -1692,15 +1665,33 @@ export function Calculator() {
                       },
                       {
                         id: "col-shortfall",
+                        group: "column" as const,
                         label: "Cumulative Shortfall",
-                        value: featureRow.shortfallCumulative ? (
-                          <RedAmt>{moneyCents(featureRow.shortfallCumulative)}</RedAmt>
-                        ) : (
-                          "—"
-                        ),
+                        value: featureRow.shortfallCumulative ? <RedAmt>{moneyCents(featureRow.shortfallCumulative)}</RedAmt> : "—",
                       },
                     ]
                   : []),
+                ...(featureRow
+                  ? [{ id: "status", group: "more" as const, label: "Status", value: <RedAmt>{featureRow.status}</RedAmt> }]
+                  : []),
+                { id: "claim-assets", group: "more" as const, label: "Countable assets at claim (net after tax)", value: <RedAmt>{moneyCents(result.startPoolNet)}</RedAmt> },
+                { id: "assets-today", group: "more" as const, label: "Countable assets today", value: moneyCents(pool) },
+                { id: "first-cost", group: "more" as const, label: "First-year care cost", value: moneyCents(result.firstCost) },
+                ...(policy.enabled
+                  ? [
+                      { id: "col-benefits-total", group: "more" as const, label: "Insurance Benefits (this run)", value: <RedAmt>{moneyCents(result.insuranceTotal)}</RedAmt> },
+                      { id: "ltc-purchase", group: "more" as const, label: "LTC pool at purchase", value: result.lifetimeBenefit ? "Lifetime" : moneyCents(insToday) },
+                      { id: "ltc-claim", group: "more" as const, label: "LTC benefits at claim", value: result.lifetimeBenefit ? "Lifetime" : moneyCents(insClaim) },
+                    ]
+                  : []),
+                {
+                  id: "combined-today",
+                  group: "more" as const,
+                  label: policy.enabled ? "Combined pool today (assets + LTC)" : "Countable pool today",
+                  value: policy.enabled && result.lifetimeBenefit ? `${money(pool)} + lifetime` : moneyCents(combinedToday),
+                },
+                { id: "end-assets", group: "more" as const, label: "Assets remaining (end of run)", value: <RedAmt>{moneyCents(result.endPool)}</RedAmt> },
+                { id: "end-short", group: "more" as const, label: "Unpaid shortfall (end of run)", value: <RedAmt>{result.shortfallTotal ? moneyCents(result.shortfallTotal) : "None"}</RedAmt> },
               ]}
             />
             <div className="mt-2 stack-actions md:grid-cols-2">
@@ -2342,7 +2333,7 @@ function MoneyField({ id, value, onChange, compact }: { id: string; value: numbe
 }
 
 const KPI_ORDER_KEY = "aum-kpi-order";
-const KPI_HIDDEN_KEY = "aum-kpi-hidden";
+const KPI_SELECTED_KEY = "aum-kpi-selected";
 
 function loadKpiList(key: string): string[] {
   try {
@@ -2374,13 +2365,16 @@ function sortKpis<T extends { id: string }>(items: T[], order: string[]): T[] {
   });
 }
 
-function MovableKpiGrid({
-  items,
-}: {
-  items: { id: string; label: string; value: ReactNode }[];
-}) {
+type HypoCardItem = {
+  id: string;
+  label: string;
+  value: ReactNode;
+  group: "column" | "more";
+};
+
+function MovableKpiGrid({ items }: { items: HypoCardItem[] }) {
   const [order, setOrder] = useState<string[]>([]);
-  const [hidden, setHidden] = useState<string[]>([]);
+  const [selected, setSelected] = useState<string[] | null>(null);
   const [dragging, setDragging] = useState<string | null>(null);
   const [overId, setOverId] = useState<string | null>(null);
   const gridRef = useRef<HTMLDivElement>(null);
@@ -2388,16 +2382,17 @@ function MovableKpiGrid({
 
   useEffect(() => {
     setOrder(loadKpiList(KPI_ORDER_KEY));
-    setHidden(loadKpiList(KPI_HIDDEN_KEY));
+    const stored = localStorage.getItem(KPI_SELECTED_KEY);
+    setSelected(stored ? loadKpiList(KPI_SELECTED_KEY) : null);
   }, []);
 
+  const columnItems = useMemo(() => items.filter((i) => i.group === "column"), [items]);
+  const moreItems = useMemo(() => items.filter((i) => i.group === "more"), [items]);
+  const columnIds = useMemo(() => columnItems.map((i) => i.id), [columnItems]);
+  const chosen = selected ?? columnIds;
   const visibleItems = useMemo(
-    () => sortKpis(items.filter((i) => !hidden.includes(i.id)), order),
-    [items, order, hidden],
-  );
-  const hiddenItems = useMemo(
-    () => items.filter((i) => hidden.includes(i.id)),
-    [items, hidden],
+    () => sortKpis(items.filter((i) => chosen.includes(i.id)), order),
+    [items, order, chosen],
   );
 
   function persistOrder(next: string[]) {
@@ -2405,16 +2400,13 @@ function MovableKpiGrid({
     saveKpiList(KPI_ORDER_KEY, next);
   }
 
-  function hide(id: string) {
-    const nextHidden = hidden.includes(id) ? hidden : [...hidden, id];
-    setHidden(nextHidden);
-    saveKpiList(KPI_HIDDEN_KEY, nextHidden);
+  function persistSelected(next: string[]) {
+    setSelected(next);
+    saveKpiList(KPI_SELECTED_KEY, next);
   }
 
-  function restore(id?: string) {
-    const nextHidden = id ? hidden.filter((h) => h !== id) : [];
-    setHidden(nextHidden);
-    saveKpiList(KPI_HIDDEN_KEY, nextHidden);
+  function toggle(id: string) {
+    persistSelected(chosen.includes(id) ? chosen.filter((x) => x !== id) : [...chosen, id]);
   }
 
   function idNearest(x: number, y: number): string | null {
@@ -2451,11 +2443,41 @@ function MovableKpiGrid({
     persistOrder(next);
   }
 
+  function Chip({ item }: { item: HypoCardItem }) {
+    const on = chosen.includes(item.id);
+    return (
+      <button
+        type="button"
+        aria-pressed={on}
+        onClick={() => toggle(item.id)}
+        className={`rounded-full border px-2.5 py-1 text-left text-[11px] leading-snug ${
+          on ? "border-gold bg-gold text-masthead" : "border-line text-muted hover:border-navy hover:text-navy"
+        }`}
+      >
+        {item.label}
+      </button>
+    );
+  }
+
   return (
     <div className="mb-4">
-      <p className="mb-2 text-xs text-muted">
-        Cards match the year-by-year columns. Press and drag to rearrange. Use × to remove a card you do not need.
-      </p>
+      <p className="text-xs font-semibold uppercase tracking-wide text-muted">Select year-by-year columns</p>
+      <div className="mt-2 flex flex-wrap gap-1.5">
+        {columnItems.map((item) => (
+          <Chip key={item.id} item={item} />
+        ))}
+      </div>
+      {moreItems.length ? (
+        <>
+          <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-muted">More (if you want them)</p>
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {moreItems.map((item) => (
+              <Chip key={item.id} item={item} />
+            ))}
+          </div>
+        </>
+      ) : null}
+      <p className="mt-3 mb-2 text-xs text-muted">Selected cards appear below. Drag to rearrange. × removes from this view.</p>
       <div ref={gridRef} className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
         {visibleItems.map((item) => {
           const active = dragging === item.id;
@@ -2494,7 +2516,7 @@ function MovableKpiGrid({
                 onPointerDown={(e) => e.stopPropagation()}
                 onClick={(e) => {
                   e.stopPropagation();
-                  hide(item.id);
+                  toggle(item.id);
                 }}
               >
                 ×
@@ -2505,27 +2527,6 @@ function MovableKpiGrid({
           );
         })}
       </div>
-      {hiddenItems.length ? (
-        <div className="mt-2 flex flex-wrap items-center gap-2">
-          <button
-            type="button"
-            className="rounded-lg border border-navy px-3 py-1.5 text-xs text-navy"
-            onClick={() => restore()}
-          >
-            Restore removed cards
-          </button>
-          {hiddenItems.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              className="rounded-lg border border-line px-2 py-1 text-xs text-muted hover:text-navy"
-              onClick={() => restore(item.id)}
-            >
-              + {item.label}
-            </button>
-          ))}
-        </div>
-      ) : null}
     </div>
   );
 }
