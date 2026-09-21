@@ -1638,6 +1638,9 @@ export function Calculator() {
                       : `End of the run — total assets are not fully depleted in the modeled years. Last care year shown is ${calendarYear(depletionRow.year)}.`
                   : undefined,
                 more: "Other figures from this run, if you want them on the Ready card.",
+                cumulative: yearRowsShown.at(-1)
+                  ? `Running totals through ${calendarYear(yearRowsShown.at(-1)!.year)} — care cost = insurance paid + co-pay from assets + unpaid shortfall.`
+                  : undefined,
               }}
               items={[
                 ...(featureRow
@@ -1753,6 +1756,75 @@ export function Calculator() {
                         group: "depletion" as const,
                         label: "Care cost − insurance (copay + unpaid) · end",
                         value: <RedAmt>{moneyCents(Math.max(0, depletionRow.costCumulative - depletionRow.insuranceCumulative))}</RedAmt>,
+                      },
+                    ]
+                  : []),
+                ...(yearRowsShown.at(-1)
+                  ? [
+                      {
+                        id: "cum-through",
+                        group: "cumulative" as const,
+                        label: "Cumulative through",
+                        value: String(calendarYear(yearRowsShown.at(-1)!.year)),
+                      },
+                      {
+                        id: "cum-cost",
+                        group: "cumulative" as const,
+                        label: "Total cumulative care cost",
+                        value: <RedAmt>{moneyCents(yearRowsShown.at(-1)!.costCumulative)}</RedAmt>,
+                      },
+                      ...(policy.enabled
+                        ? [
+                            {
+                              id: "cum-ins",
+                              group: "cumulative" as const,
+                              label: "Accumulative insurance paid",
+                              value: moneyCents(yearRowsShown.at(-1)!.insuranceCumulative),
+                            },
+                          ]
+                        : []),
+                      {
+                        id: "cum-copay",
+                        group: "cumulative" as const,
+                        label: "Accumulative co-pay from countable assets",
+                        value: (
+                          <span className={yearRowsShown.at(-1)!.drawnCumulative > 0 ? "font-bold amt-red" : ""}>
+                            {yearRowsShown.at(-1)!.drawnCumulative > 0
+                              ? moneyCents(-yearRowsShown.at(-1)!.drawnCumulative)
+                              : moneyCents(0)}
+                          </span>
+                        ),
+                      },
+                      {
+                        id: "cum-short",
+                        group: "cumulative" as const,
+                        label: "Cumulative unpaid shortfall",
+                        value: yearRowsShown.at(-1)!.shortfallCumulative ? (
+                          <RedAmt>{moneyCents(yearRowsShown.at(-1)!.shortfallCumulative)}</RedAmt>
+                        ) : (
+                          "—"
+                        ),
+                      },
+                      {
+                        id: "cum-gap",
+                        group: "cumulative" as const,
+                        label: "Care cost − insurance (copay + unpaid)",
+                        value: (
+                          <RedAmt>
+                            {moneyCents(
+                              Math.max(
+                                0,
+                                yearRowsShown.at(-1)!.costCumulative - yearRowsShown.at(-1)!.insuranceCumulative,
+                              ),
+                            )}
+                          </RedAmt>
+                        ),
+                      },
+                      {
+                        id: "cum-premium",
+                        group: "cumulative" as const,
+                        label: "Premium paid (this run)",
+                        value: moneyCents(result.premiumTotal),
                       },
                     ]
                   : []),
@@ -2480,7 +2552,7 @@ type HypoCardItem = {
   id: string;
   label: string;
   value: ReactNode;
-  group: "column" | "depletion" | "more";
+  group: "column" | "depletion" | "cumulative" | "more";
 };
 
 function MovableKpiGrid({
@@ -2488,7 +2560,7 @@ function MovableKpiGrid({
   captions,
 }: {
   items: HypoCardItem[];
-  captions?: { column?: string; depletion?: string; more?: string };
+  captions?: { column?: string; depletion?: string; cumulative?: string; more?: string };
 }) {
   const [order, setOrder] = useState<string[]>([]);
   const [selected, setSelected] = useState<string[] | null>(null);
@@ -2505,6 +2577,7 @@ function MovableKpiGrid({
 
   const columnItems = useMemo(() => items.filter((i) => i.group === "column"), [items]);
   const depletionItems = useMemo(() => items.filter((i) => i.group === "depletion"), [items]);
+  const cumulativeItems = useMemo(() => items.filter((i) => i.group === "cumulative"), [items]);
   const moreItems = useMemo(() => items.filter((i) => i.group === "more"), [items]);
   const columnIds = useMemo(() => columnItems.map((i) => i.id), [columnItems]);
   const chosen = selected ?? columnIds;
@@ -2592,6 +2665,17 @@ function MovableKpiGrid({
           {captions?.depletion ? <p className="mt-1 text-xs text-muted">{captions.depletion}</p> : null}
           <div className="mt-2 flex flex-wrap gap-1.5">
             {depletionItems.map((item) => (
+              <Chip key={item.id} item={item} />
+            ))}
+          </div>
+        </>
+      ) : null}
+      {cumulativeItems.length ? (
+        <>
+          <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-muted">Cumulative</p>
+          {captions?.cumulative ? <p className="mt-1 text-xs text-muted">{captions.cumulative}</p> : null}
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {cumulativeItems.map((item) => (
               <Chip key={item.id} item={item} />
             ))}
           </div>
