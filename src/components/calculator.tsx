@@ -452,14 +452,14 @@ export function Calculator() {
   const depletedWhen = depletionCalendar(yearView.rows, yearDepleted, MODEL_START_YEAR);
   const firstClaimRow = yearView.rows.find((r) => r.status === "Care year") ?? lastCareRow;
   const featureRow = firstClaimRow;
-  const bothDepletedRow =
+  const endRunRow =
     yearView.rows.find((r) => {
       const insLeft = policy.enabled && !lifetime ? Math.max(0, r.insurancePoolRemaining) : 0;
-      const insDone = !policy.enabled || lifetime || insLeft <= 0;
-      return (r.status === "Care year" || r.status === "After care") && r.remainingNet <= 0 && insDone;
+      const total = r.remainingNet + insLeft;
+      return (r.status === "Care year" || r.status === "After care") && total <= 0;
     }) ?? null;
-  const depletionRow = bothDepletedRow ?? depletedRow ?? lastCareRow;
-  const fundsFullyDepleted = Boolean(bothDepletedRow);
+  const depletionRow = endRunRow ?? depletedRow ?? lastCareRow;
+  const fundsFullyDepleted = Boolean(endRunRow);
   const yearPageSize = 10;
   const yearPages = Math.max(1, Math.ceil(yearRowsShown.length / yearPageSize));
   const yearSlice = yearRowsShown.slice(yearPage * yearPageSize, (yearPage + 1) * yearPageSize);
@@ -1628,33 +1628,33 @@ export function Calculator() {
             <MovableKpiGrid
               captions={{
                 column: featureRow
-                  ? `First year of claim (${calendarYear(featureRow.year)}).`
+                  ? `Beginning of the run — claim starts in ${calendarYear(featureRow.year)}.`
                   : undefined,
                 depletion: depletionRow
                   ? fundsFullyDepleted
-                    ? `Insurance benefits and net countable assets are depleted in ${calendarYear(depletionRow.year)}.`
+                    ? `End of the run — total assets (insurance benefits + net countable assets) are depleted in ${calendarYear(depletionRow.year)}.`
                     : lifetime
-                      ? `Net countable assets are depleted in ${calendarYear(depletionRow.year)}. Lifetime insurance benefits are still in force in this model.`
-                      : `Not fully depleted in the modeled years — ${calendarYear(depletionRow.year)} is the last care year shown.`
+                      ? `End of the run — net countable assets are depleted in ${calendarYear(depletionRow.year)}. Lifetime insurance benefits are still in force in this model.`
+                      : `End of the run — total assets are not fully depleted in the modeled years. Last care year shown is ${calendarYear(depletionRow.year)}.`
                   : undefined,
                 more: "Other figures from this run, if you want them on the Ready card.",
               }}
               items={[
                 ...(featureRow
                   ? [
-                      { id: "col-year", group: "column" as const, label: "Year", value: String(calendarYear(featureRow.year)) },
-                      { id: "col-assets", group: "column" as const, label: "Countable Assets (net after tax)", value: moneyCents(featureRow.remainingNetStart) },
+                      { id: "col-year", group: "column" as const, label: "Beginning of the run", value: String(calendarYear(featureRow.year)) },
+                      { id: "col-assets", group: "column" as const, label: "Countable Assets (net after tax) · beginning", value: moneyCents(featureRow.remainingNetStart) },
                     ]
                   : []),
                 ...(policy.enabled && featureRow
-                  ? [{ id: "col-pool", group: "column" as const, label: "Insurance Benefit Pool", value: lifetime ? "Lifetime" : moneyCents(featureRow.insurancePoolStart) }]
+                  ? [{ id: "col-pool", group: "column" as const, label: "Insurance Benefit Pool · beginning", value: lifetime ? "Lifetime" : moneyCents(featureRow.insurancePoolStart) }]
                   : []),
                 ...(featureRow
                   ? [
                       {
                         id: "col-total",
                         group: "column" as const,
-                        label: "Total Remaining",
+                        label: "Total Remaining · beginning",
                         value:
                           policy.enabled && lifetime
                             ? `${moneyCents(featureRow.remainingNet)} + lifetime`
@@ -1664,13 +1664,13 @@ export function Calculator() {
                                   : featureRow.remainingNet,
                               ),
                       },
-                      { id: "col-cost", group: "column" as const, label: "Annual Care Costs* (est)", value: <RedAmt>{moneyCents(featureRow.cost)}</RedAmt> },
+                      { id: "col-cost", group: "column" as const, label: "Annual Care Costs* (est) · beginning", value: <RedAmt>{moneyCents(featureRow.cost)}</RedAmt> },
                     ]
                   : []),
                 ...(policy.enabled && featureRow
                   ? [
-                      { id: "col-benefits", group: "column" as const, label: "Insurance Benefits", value: moneyCents(featureRow.insurance) },
-                      { id: "col-balance", group: "column" as const, label: "Insurance Balance", value: lifetime ? "Lifetime" : moneyCents(featureRow.insurancePoolRemaining) },
+                      { id: "col-benefits", group: "column" as const, label: "Insurance Benefits · beginning", value: moneyCents(featureRow.insurance) },
+                      { id: "col-balance", group: "column" as const, label: "Insurance Balance · beginning", value: lifetime ? "Lifetime" : moneyCents(featureRow.insurancePoolRemaining) },
                     ]
                   : []),
                 ...(featureRow
@@ -1678,7 +1678,7 @@ export function Calculator() {
                       {
                         id: "col-copay",
                         group: "column" as const,
-                        label: "Co-pay from Countable Assets",
+                        label: "Co-pay from Countable Assets · beginning",
                         value: (
                           <span className={featureRow.drawn > 0 ? "font-bold amt-red" : ""}>
                             {featureRow.drawn > 0 ? moneyCents(-featureRow.drawn) : moneyCents(0)}
@@ -1688,27 +1688,27 @@ export function Calculator() {
                       {
                         id: "col-shortfall",
                         group: "column" as const,
-                        label: "Cumulative Shortfall",
+                        label: "Cumulative Shortfall · beginning",
                         value: featureRow.shortfallCumulative ? <RedAmt>{moneyCents(featureRow.shortfallCumulative)}</RedAmt> : "—",
                       },
                     ]
                   : []),
                 ...(depletionRow
                   ? [
-                      { id: "dep-year", group: "depletion" as const, label: "Year", value: String(calendarYear(depletionRow.year)) },
-                      { id: "dep-status", group: "depletion" as const, label: "Status", value: <RedAmt>{depletionRow.status}</RedAmt> },
-                      { id: "dep-assets", group: "depletion" as const, label: "Countable Assets (net after tax)", value: moneyCents(depletionRow.remainingNetStart) },
+                      { id: "dep-year", group: "depletion" as const, label: "End of the run", value: String(calendarYear(depletionRow.year)) },
+                      { id: "dep-status", group: "depletion" as const, label: "Status · end", value: <RedAmt>{depletionRow.status}</RedAmt> },
+                      { id: "dep-assets", group: "depletion" as const, label: "Countable Assets (net after tax) · end", value: moneyCents(depletionRow.remainingNetStart) },
                     ]
                   : []),
                 ...(policy.enabled && depletionRow
-                  ? [{ id: "dep-pool", group: "depletion" as const, label: "Insurance Benefit Pool", value: lifetime ? "Lifetime" : moneyCents(depletionRow.insurancePoolStart) }]
+                  ? [{ id: "dep-pool", group: "depletion" as const, label: "Insurance Benefit Pool · end", value: lifetime ? "Lifetime" : moneyCents(depletionRow.insurancePoolStart) }]
                   : []),
                 ...(depletionRow
                   ? [
                       {
                         id: "dep-total",
                         group: "depletion" as const,
-                        label: "Total Remaining",
+                        label: "Total Remaining · end",
                         value:
                           policy.enabled && lifetime
                             ? `${moneyCents(depletionRow.remainingNet)} + lifetime`
@@ -1718,13 +1718,13 @@ export function Calculator() {
                                   : depletionRow.remainingNet,
                               ),
                       },
-                      { id: "dep-cost", group: "depletion" as const, label: "Annual Care Costs* (est)", value: <RedAmt>{moneyCents(depletionRow.cost)}</RedAmt> },
+                      { id: "dep-cost", group: "depletion" as const, label: "Annual Care Costs* (est) · end", value: <RedAmt>{moneyCents(depletionRow.cost)}</RedAmt> },
                     ]
                   : []),
                 ...(policy.enabled && depletionRow
                   ? [
-                      { id: "dep-benefits", group: "depletion" as const, label: "Insurance Benefits", value: moneyCents(depletionRow.insurance) },
-                      { id: "dep-balance", group: "depletion" as const, label: "Insurance Balance", value: lifetime ? "Lifetime" : moneyCents(depletionRow.insurancePoolRemaining) },
+                      { id: "dep-benefits", group: "depletion" as const, label: "Insurance Benefits · end", value: moneyCents(depletionRow.insurance) },
+                      { id: "dep-balance", group: "depletion" as const, label: "Insurance Balance · end", value: lifetime ? "Lifetime" : moneyCents(depletionRow.insurancePoolRemaining) },
                     ]
                   : []),
                 ...(depletionRow
@@ -1732,7 +1732,7 @@ export function Calculator() {
                       {
                         id: "dep-copay",
                         group: "depletion" as const,
-                        label: "Co-pay from Countable Assets",
+                        label: "Co-pay from Countable Assets · end",
                         value: (
                           <span className={depletionRow.drawn > 0 ? "font-bold amt-red" : ""}>
                             {depletionRow.drawn > 0 ? moneyCents(-depletionRow.drawn) : moneyCents(0)}
@@ -1742,7 +1742,7 @@ export function Calculator() {
                       {
                         id: "dep-shortfall",
                         group: "depletion" as const,
-                        label: "Cumulative Shortfall",
+                        label: "Cumulative Shortfall · end",
                         value: depletionRow.shortfallCumulative ? <RedAmt>{moneyCents(depletionRow.shortfallCumulative)}</RedAmt> : "—",
                       },
                     ]
@@ -2541,7 +2541,7 @@ function MovableKpiGrid({
 
   return (
     <div className="mb-4">
-      <p className="text-xs font-semibold uppercase tracking-wide text-muted">Select year-by-year columns · first year of claim</p>
+      <p className="text-xs font-semibold uppercase tracking-wide text-muted">Beginning of the run</p>
       {captions?.column ? <p className="mt-1 text-xs text-muted">{captions.column}</p> : null}
       <div className="mt-2 flex flex-wrap gap-1.5">
         {columnItems.map((item) => (
@@ -2550,7 +2550,7 @@ function MovableKpiGrid({
       </div>
       {depletionItems.length ? (
         <>
-          <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-muted">When insurance benefits and net countable assets are depleted</p>
+          <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-muted">End of the run</p>
           {captions?.depletion ? <p className="mt-1 text-xs text-muted">{captions.depletion}</p> : null}
           <div className="mt-2 flex flex-wrap gap-1.5">
             {depletionItems.map((item) => (
