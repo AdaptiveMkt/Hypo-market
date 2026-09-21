@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { NaicSuitabilityForm } from "@/components/naic-suitability-form";
 
 export const Route = createFileRoute("/suitability")({
@@ -9,6 +9,7 @@ export const Route = createFileRoute("/suitability")({
 });
 
 function SuitabilityPage() {
+  const navigate = useNavigate();
   return (
     <main id="main-content" className="mx-auto max-w-3xl space-y-5 px-4 py-8 sm:px-6" tabIndex={-1}>
       <section className="card-xl p-5">
@@ -24,7 +25,7 @@ function SuitabilityPage() {
         </p>
       </section>
       <section className="card-xl p-5">
-        <NaicSuitabilityForm />
+        <NaicSuitabilityForm onClose={() => void navigate({ to: "/" })} />
       </section>
     </main>
   );

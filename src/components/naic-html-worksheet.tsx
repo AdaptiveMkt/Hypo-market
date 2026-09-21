@@ -68,7 +68,7 @@ export function HtmlWorksheetDialog({ onClose }: { onClose: () => void }) {
             You do not have to answer the income and asset questions. They’re intended to make sure you’ve thought about how you’ll pay premiums and the cost of care your insurance doesn’t cover. If you don’t want to answer these questions, understand that a company might refuse to insure you.
           </p>
           <div className="mt-4">
-            <NaicSuitabilityForm />
+            <NaicSuitabilityForm onClose={onClose} />
           </div>
         </div>
       </div>

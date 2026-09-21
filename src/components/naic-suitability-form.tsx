@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { STATE_NAMES } from "@/lib/costs";
 import {
   ASSET_BANDS,
@@ -24,10 +24,24 @@ function toggle(list: string[], value: string, on: boolean) {
   return list.filter((x) => x !== value);
 }
 
-export function NaicSuitabilityForm() {
+export function NaicSuitabilityForm({ onClose }: { onClose?: () => void } = {}) {
   const [form, setForm] = useState<SuitabilityForm>(() => loadSuitabilityDraft());
   const [status, setStatus] = useState("");
   const [busy, setBusy] = useState(false);
+  const [hidden, setHidden] = useState(false);
+
+  function close() {
+    if (onClose) onClose();
+    else setHidden(true);
+  }
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") close();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
 
   function patch(partial: Partial<SuitabilityForm>) {
     setForm((f) => {
@@ -60,8 +74,30 @@ export function NaicSuitabilityForm() {
     printFilledWorksheetPdf(form);
   }
 
+  if (hidden) {
+    return (
+      <button
+        type="button"
+        onClick={() => setHidden(false)}
+        className="min-h-11 rounded-lg border border-navy px-4 py-2 text-sm font-semibold text-navy hover:bg-cream"
+      >
+        Reopen worksheet
+      </button>
+    );
+  }
+
   return (
-    <form onSubmit={onSubmit} className="space-y-5 text-sm text-muted">
+    <form onSubmit={onSubmit} className="relative space-y-5 text-sm text-muted">
+      <div className="flex items-start justify-end">
+        <button
+          type="button"
+          onClick={close}
+          aria-label="Close worksheet"
+          className="inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-lg border border-navy bg-paper px-3 text-base font-bold text-navy hover:bg-cream"
+        >
+          (X)
+        </button>
+      </div>
       <p>
         Educational copy of the{" "}
         <strong className="text-navy">Long-Term Care Insurance Personal Worksheet</strong>{" "}
@@ -354,6 +390,13 @@ export function NaicSuitabilityForm() {
           className="min-h-11 rounded-lg border border-navy px-4 py-2 font-semibold text-navy hover:bg-cream"
         >
           Print
+        </button>
+        <button
+          type="button"
+          onClick={close}
+          className="min-h-11 rounded-lg border border-navy px-4 py-2 font-semibold text-navy hover:bg-cream"
+        >
+          Close
         </button>
       </div>
       {status ? <p className="text-sm text-navy">{status}</p> : null}
