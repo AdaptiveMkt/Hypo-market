@@ -875,7 +875,7 @@ export function ReportView({
               </p>
             ) : null}
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[920px] text-sm">
+              <table className="w-full min-w-[1080px] text-sm">
                 <thead>
                   <tr className="text-left text-xs uppercase tracking-wide text-muted">
                     <th className="py-2 pr-2">Year</th>
@@ -885,7 +885,8 @@ export function ReportView({
                       <>
                         <th className="py-2 pr-2 text-right">Ins. on claim</th>
                         <th className="py-2 pr-2 text-right">Ins. paid (arrears)</th>
-                        <th className="py-2 pr-2 text-right">Insurance benefit pool</th>
+                        <th className="py-2 pr-2 text-right">Insurance pool at start of year</th>
+                        <th className="py-2 pr-2 text-right">Insurance pool after claim debit</th>
                         <th className="py-2 pr-2 text-right">Premium</th>
                       </>
                     ) : null}
@@ -973,6 +974,9 @@ export function ReportView({
                             {r.insurancePaid ? money(r.insurancePaid) : "—"}
                           </td>
                           <td className={`${cell} text-right`}>
+                            {result.lifetimeBenefit ? "Lifetime" : money(r.insurancePoolStart)}
+                          </td>
+                          <td className={`${cell} text-right`}>
                             {result.lifetimeBenefit ? "Lifetime" : money(r.insurancePoolRemaining)}
                           </td>
                           <td className={`${cell} text-right`}>
@@ -1018,7 +1022,7 @@ export function ReportView({
             if not, $14,000 × 3 years is $42,000 cumulative unpaid. If insurance covers the
             year, assets are not drawn for care.
             {policy.enabled
-              ? " Reimbursement cash still posts in arrears in the “Ins. paid (arrears)” column."
+              ? " The insurance pool is daily benefit × 365 × benefit period. A care year starts with the unused pool and ends after that calendar year’s insurance paid is debited. Reimbursement cash still posts in arrears in the “Ins. paid (arrears)” column."
               : " With no policy, the full annual cost is amortized from assets until they run out."}
           </p>
           <p className="mt-3 text-sm">

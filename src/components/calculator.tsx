@@ -1662,7 +1662,7 @@ export function Calculator() {
               {" "}Every wait year and care year is listed, including years after funds are depleted.
             </p>
             <div className="overflow-x-auto pb-4">
-              <table className="w-full min-w-[720px] text-sm">
+              <table className="w-full min-w-[920px] text-sm">
                 <thead>
                   <tr className="border-b border-gold text-left text-xs uppercase tracking-wide text-muted">
                     <th className="py-2 pr-2 font-semibold">Year</th>
@@ -1671,7 +1671,8 @@ export function Calculator() {
                     {policy.enabled ? (
                       <>
                         <th className="py-2 pr-2 text-right font-semibold">Insurance paid</th>
-                        <th className="py-2 pr-2 text-right font-semibold">Insurance benefit pool</th>
+                        <th className="py-2 pr-2 text-right font-semibold">Insurance pool at start of year</th>
+                        <th className="py-2 pr-2 text-right font-semibold">Insurance pool after claim debit</th>
                       </>
                     ) : null}
                     <th className="py-2 pr-2 text-right font-semibold">{policy.enabled ? "Total remaining" : "Assets remaining"}</th>
@@ -1696,6 +1697,10 @@ export function Calculator() {
                       : insGone
                         ? " · insurance pool depleted"
                         : "";
+                    const poolStartLabel =
+                      lifetime && policy.enabled
+                        ? "Lifetime"
+                        : money(r.insurancePoolStart);
                     const poolLeft =
                       lifetime && policy.enabled
                         ? "Lifetime"
@@ -1727,7 +1732,8 @@ export function Calculator() {
                         <td className={`${cell} text-right`}>{money(r.cost)}</td>
                         {policy.enabled ? (
                           <>
-                            <td className={`${cell} text-right`}>{money(r.insurancePaid)}</td>
+                            <td className={`${cell} text-right`}>{money(r.insurance)}</td>
+                            <td className={`${cell} text-right`}>{poolStartLabel}</td>
                             <td className={`${cell} text-right`}>{poolLeft}</td>
                           </>
                         ) : null}
@@ -1740,7 +1746,7 @@ export function Calculator() {
               </table>
               <p className="mt-2 text-xs text-muted">
                 {policy.enabled
-                  ? "Insurance benefit pool is the unused LTC maximum. It is shown through the wait years (and grows if a benefit-increase option is selected), then declines as the claim is paid first. Total remaining is that leftover insurance pool plus countable assets (the co-pay after insurance). "
+                  ? "The insurance pool is daily benefit × 365 × benefit period (for example $200/day × 3 years = $219,000). Wait years show that unused maximum (restated if a benefit-increase option applies). In a care year, insurance pays first up to that year’s daily maximum; the start-of-year column is the unused pool and the after-claim-debit column is the same pool after that calendar year’s insurance paid is subtracted. Total remaining is leftover insurance plus countable assets (the co-pay). "
                   : null}
                 {policy.enabled ? "Total remaining" : "Assets remaining"} turns bold green when the pool starts declining, and bold red when it is depleted.
                 The table runs through the wait until care and every modeled care year — it does not stop at year 10 or at depletion.

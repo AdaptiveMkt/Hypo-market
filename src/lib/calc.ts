@@ -711,6 +711,7 @@ export type YearRow = {
   gapAfterInsurance: number;
   shortfallCumulative: number;
   dailyBenefitThen: number;
+  insurancePoolStart: number;
   insurancePoolRemaining: number;
   remainingTaxable: number;
   remainingIra: number;
@@ -800,11 +801,10 @@ export function project(opts: {
   const careEnd = careEndYear(opts.delay, opts.duration);
   const horizon = projectionHorizon(opts.delay, opts.duration);
   const lifetime = !hybrid && opts.policy.benefitYears >= 50;
-  let benefitDaysLeft = opts.policy.enabled && !hybrid
-    ? lifetime
-      ? 1e9
-      : opts.policy.benefitYears * 365
-    : 0;
+  let tradPool =
+    opts.policy.enabled && !hybrid && !lifetime
+      ? opts.policy.dailyBenefit * 365 * opts.policy.benefitYears
+      : 0;
   let careYearIndex = 0;
   let benefitPoolAtClaim: number | null = null;
   let priorAccrual = 0;
@@ -833,6 +833,7 @@ export function project(opts: {
     const cost = inCare ? base * Math.pow(1 + cpi, Math.max(0, y - 1)) : 0;
     let dailyThen = 0;
     let insurance = 0;
+    let poolStart = 0;
     let poolBeforeDraw = 0;
 
     if (hybrid) {
@@ -843,6 +844,7 @@ export function project(opts: {
         opts.policy.inflationMethod,
       );
       dailyThen = (monthlyThen * 12) / 365;
+      poolStart = dollarPool;
       poolBeforeDraw = dollarPool;
       if (inCare && dollarPool > 0 && cost > 0) {
         careYearIndex += 1;
@@ -859,14 +861,31 @@ export function project(opts: {
         opts.policy.benefitInflationPct,
         opts.policy.inflationMethod,
       );
-      poolBeforeDraw = benefitDaysLeft * dailyThen;
-      if (inCare && opts.policy.enabled && benefitDaysLeft > 0 && cost > 0) {
+      const dailyPrev =
+        yearsElapsed <= 0
+          ? opts.policy.dailyBenefit
+          : inflateDaily(
+              opts.policy.dailyBenefit,
+              yearsElapsed - 1,
+              opts.policy.benefitInflationPct,
+              opts.policy.inflationMethod,
+            );
+      if (opts.policy.enabled && !lifetime) {
+        if (!inCare && y < careStart) {
+          tradPool = dailyThen * 365 * opts.policy.benefitYears;
+        } else if (inCare && dailyPrev > 0 && dailyThen !== dailyPrev) {
+          tradPool *= dailyThen / dailyPrev;
+        }
+      }
+      poolStart = lifetime ? 0 : tradPool;
+      poolBeforeDraw = poolStart;
+      if (inCare && opts.policy.enabled && cost > 0 && (lifetime || tradPool > 0)) {
         careYearIndex += 1;
         const elim = careYearIndex === 1 ? opts.policy.elimDays : 0;
-        const insurableDays = Math.max(0, Math.min(365 - elim, benefitDaysLeft));
-        const dailyCost = cost / 365;
-        insurance = Math.min(dailyThen, dailyCost) * insurableDays;
-        benefitDaysLeft -= insurableDays;
+        const frac = Math.max(0, (365 - elim) / 365);
+        const annualCap = dailyThen * 365 * frac;
+        insurance = Math.min(cost, annualCap, lifetime ? Number.POSITIVE_INFINITY : tradPool);
+        if (!lifetime) tradPool = Math.max(0, tradPool - insurance);
       }
     }
 
@@ -931,7 +950,7 @@ export function project(opts: {
     const poolLeft = hybrid
       ? dollarPool
       : opts.policy.enabled && !lifetime
-        ? Math.max(0, benefitDaysLeft) * dailyThen
+        ? Math.max(0, tradPool)
         : 0;
     const exhausted = Boolean(inCare && opts.policy.enabled && !lifetime && poolLeft <= 0);
     const insurancePaid = inCare ? (exhausted ? 0 : priorAccrual) : 0;
@@ -950,6 +969,7 @@ export function project(opts: {
       gapAfterInsurance,
       shortfallCumulative: shortfallTotal,
       dailyBenefitThen: opts.policy.enabled ? dailyThen : 0,
+      insurancePoolStart: opts.policy.enabled && !lifetime ? poolStart : 0,
       insurancePoolRemaining: poolLeft,
       remainingTaxable: taxable,
       remainingIra: ira,

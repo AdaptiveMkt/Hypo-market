@@ -86,7 +86,7 @@ export const DETAIL_HINTS: Record<DetailId, string> = {
   compareCare: "How long the combined pool lasts versus home care, assisted living, and nursing.",
   compareHealth: "Major medical, Medicare A/B/C/D, Medigap, Medicaid, and long-term care insurance — what each pays.",
   allocation: "Sleeves, pie chart, recommended target premium, and utilization over time.",
-  yearByYear: "Year-by-year through the wait until care and every modeled care year — not cut off at year 10 or at depletion.",
+  yearByYear: "Year-by-year through the wait until care and every modeled care year — insurance pool at start of year and after that year’s claim debit.",
   nationalHistory: "National median cost chart and 5- and 10-year snapshots.",
   compareIns: "Traditional reimbursement vs this run — insurance first, then assets.",
   fundingOptions: "How traditional, Partnership, hybrid, and other options typically pay care.",
