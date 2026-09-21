@@ -976,19 +976,20 @@ export function Calculator() {
           onOpenChange={(open) => {
             applyIncognito(!open);
           }}
-          hint="Shown in full when this page opens. Incognito collapses this card and switches to dark mode."
+          hint="Daylight shows this card. Incognito Mode collapses it and switches the site to dark mode."
           extra={
             <button
               type="button"
               className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-lg bg-black px-4 text-sm font-semibold text-white hover:bg-neutral-900"
               aria-pressed={!personalizeOpen}
               aria-controls="personalize-asset-model"
+              aria-label={personalizeOpen ? "Incognito Mode" : "Customize"}
               onClick={(e) => {
                 e.stopPropagation();
                 applyIncognito(personalizeOpen);
               }}
             >
-              Incognito
+              {personalizeOpen ? "Incognito Mode" : "Customize"}
             </button>
           }
         >
