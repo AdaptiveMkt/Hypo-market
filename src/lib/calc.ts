@@ -611,6 +611,26 @@ export function careEndYear(delay: number, duration: number) {
   return careStartYear(delay) + Math.max(1, Math.round(duration)) - 1;
 }
 
+/**
+ * How many year-by-year rows to produce.
+ * Covers the wait until claim plus every care year — never a 10-year cap.
+ * Age 40, 41 years to claim, 10 years of care → 52 modeled years.
+ */
+export function projectionHorizon(delay: number, duration: number) {
+  const careEnd = careEndYear(delay, duration);
+  const wait = Math.max(0, Math.round(Number(delay) || 0));
+  const careYears = Math.max(1, Math.round(Number(duration) || 0));
+  const span = wait + careYears + (wait > 0 ? 1 : 0);
+  return Math.max(careEnd, span, 10);
+}
+
+/** Thin out chart year labels so a 40–60 year run stays readable. */
+export function chartTickInterval(pointCount: number, compact = false) {
+  const target = compact ? 8 : 12;
+  if (pointCount <= target) return compact ? 1 : 0;
+  return Math.max(1, Math.ceil(pointCount / target) - 1);
+}
+
 export function csvMilestones(
   premium: number,
   csv: CsvProjection,
@@ -778,7 +798,7 @@ export function project(opts: {
   let premiumTotal = hybrid ? singlePaid : 0;
   const careStart = careStartYear(opts.delay);
   const careEnd = careEndYear(opts.delay, opts.duration);
-  const horizon = Math.max(careEnd, 10);
+  const horizon = projectionHorizon(opts.delay, opts.duration);
   const lifetime = !hybrid && opts.policy.benefitYears >= 50;
   let benefitDaysLeft = opts.policy.enabled && !hybrid
     ? lifetime
@@ -788,6 +808,7 @@ export function project(opts: {
   let careYearIndex = 0;
   let benefitPoolAtClaim: number | null = null;
   let priorAccrual = 0;
+  let poolAtCareEnd: number | null = null;
 
   for (let y = 1; y <= horizon; y++) {
     growHoldings(holdings, taxRate);
@@ -935,6 +956,7 @@ export function project(opts: {
       payPath,
       claimPhase,
     });
+    if (y === careEnd) poolAtCareEnd = p;
   }
 
   const depletedYear = !opts.policy.enabled
@@ -947,7 +969,7 @@ export function project(opts: {
   const shortfallStartYear = rows.find((r) => r.shortfall > 0)?.year ?? null;
   const face = hybrid ? specifiedFaceAmount({ ...opts.policy, enabled: true }) : 0;
   const ltcPaidFromBucket = hybrid ? face * opts.policy.leverage - dollarPool : 0;
-  const endPool = sumHoldings(holdings);
+  const endPool = poolAtCareEnd ?? sumHoldings(holdings);
   let residualDeathBenefit = 0;
   if (hybrid) {
     const residualBase = opts.policy.kind === "hybridLife" ? face : singlePaid;
@@ -986,6 +1008,39 @@ export function project(opts: {
     heirsTotal: endPool + residualDeathBenefit,
     singlePremiumPaid: singlePaid,
   };
+}
+
+export function combinedRemaining(
+  row: YearRow,
+  policyEnabled: boolean,
+  lifetime: boolean,
+): number {
+  if (!policyEnabled || lifetime) return row.remaining;
+  return row.remaining + Math.max(0, row.insurancePoolRemaining);
+}
+
+export type RemainingTone = "steady" | "drawing" | "depleted";
+
+export function remainingToneAt(
+  rows: YearRow[],
+  index: number,
+  policyEnabled: boolean,
+  lifetime: boolean,
+): RemainingTone {
+  const row = rows[index];
+  if (!row) return "steady";
+  const left = combinedRemaining(row, policyEnabled, lifetime);
+  if (left <= 0.5) return "depleted";
+  if (index <= 0) return "steady";
+  const prev = combinedRemaining(rows[index - 1], policyEnabled, lifetime);
+  if (left + 0.5 < prev) return "drawing";
+  return "steady";
+}
+
+export function remainingToneClass(tone: RemainingTone): string {
+  if (tone === "depleted") return "font-bold amt-red";
+  if (tone === "drawing") return "font-bold amt-green";
+  return "";
 }
 
 export const MONTH_NAMES = [

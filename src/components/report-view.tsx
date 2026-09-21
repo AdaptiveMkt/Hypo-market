@@ -25,6 +25,7 @@ import {
   ASSET_FIELDS,
   DEFAULT_ASSET_ROIS,
   csvMilestones,
+  chartTickInterval,
   depletionCalendar,
   formatYearsLast,
   holdingsFrom,
@@ -43,6 +44,8 @@ import {
   type LtcPolicy,
   type PolicyKind,
   type Projection,
+  remainingToneAt,
+  remainingToneClass,
 } from "@/lib/calc";
 import { LinkedClaimCard } from "@/components/linked-claim-card";
 import { linkedClaimScenarios, linkedCopy } from "@/lib/linked-products";
@@ -251,8 +254,7 @@ export function ReportView({
   const iraBal = Number(assets.ira) || 0;
   const homeEquity = Number(assets.home) || 0;
   const spouseExcluded = Number(assets.excludable) || 0;
-  const yearRows =
-    depletedYear != null ? result.rows.filter((r) => r.year <= depletedYear) : result.rows;
+  const yearRows = result.rows;
   const laterYearCount =
     depletedYear != null ? result.rows.filter((r) => r.year > depletedYear).length : 0;
   const depletedWhen = depletionCalendar(result.rows, depletedYear, MODEL_START_YEAR);
@@ -859,8 +861,17 @@ export function ReportView({
                 {policy.enabled
                   ? " after insurance paid first and countable assets were drawn as co-pay"
                   : " with no policy — assets paid the bill"}
-                . The {laterYearCount} later year{laterYearCount === 1 ? "" : "s"} after
-                that are collapsed on the calculator and omitted here.
+                . The remaining {laterYearCount} year{laterYearCount === 1 ? "" : "s"} of this
+                run still appear below so the full wait-until-care plus care-duration window
+                stays visible.
+              </p>
+            ) : idx === 0 ? (
+              <p className="mb-2 text-sm text-muted">
+                {yearRows.length} years modeled
+                {delay > 0
+                  ? ` (${delay} year${delay === 1 ? "" : "s"} until care, then ${duration} care year${duration === 1 ? "" : "s"})`
+                  : ` · ${duration} care year${duration === 1 ? "" : "s"}`}
+                . Every wait year and care year is listed.
               </p>
             ) : null}
             <div className="overflow-x-auto">
@@ -922,6 +933,20 @@ export function ReportView({
                       : insGone
                         ? " · insurance pool depleted"
                         : "";
+                    const remainIdx = result.rows.findIndex((x) => x.year === r.year);
+                    const remainTone = remainingToneAt(
+                      result.rows,
+                      remainIdx,
+                      policy.enabled,
+                      Boolean(result.lifetimeBenefit),
+                    );
+                    const remainClass = remainingToneClass(remainTone);
+                    const remainTitle =
+                      remainTone === "depleted"
+                        ? "Funds depleted"
+                        : remainTone === "drawing"
+                          ? "Funds drawing down"
+                          : undefined;
                     const cell = gone ? "py-2 pr-2 font-bold amt-red" : "py-2 pr-2";
                     return (
                     <tr key={r.year} className={`border-t tabular-nums ${gone ? "bg-cream" : "border-line"}`}>
@@ -956,9 +981,9 @@ export function ReportView({
                         </>
                       ) : null}
                       <td className={`${cell} text-right`}>{r.drawn ? money(r.drawn) : "—"}</td>
-                      <td className={`${cell} text-right`}>{money(r.remaining)}</td>
+                      <td className={`${policy.enabled ? cell : `py-2 pr-2 ${remainClass}`} text-right`} title={policy.enabled ? undefined : remainTitle}>{money(r.remaining)}</td>
                       {policy.enabled ? (
-                        <td className={`${cell} text-right`}>
+                        <td className={`py-2 pr-2 text-right ${remainClass}`} title={remainTitle}>
                           {result.lifetimeBenefit
                             ? `${money(r.remaining)} + lifetime`
                             : money(totalLeft)}
@@ -1104,7 +1129,7 @@ export function ReportView({
             <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={chartData} margin={{ top: 12, right: 12, left: 4, bottom: 52 }}>
                 <CartesianGrid stroke="#d9cfc0" strokeDasharray="3 3" />
-                <XAxis dataKey="label" tick={{ fill: "#5c6b73", fontSize: 11 }} />
+                <XAxis dataKey="label" interval={chartTickInterval(chartData.length)} tick={{ fill: "#5c6b73", fontSize: 11 }} />
                 <YAxis
                   tick={{ fill: "#5c6b73", fontSize: 12 }}
                   tickFormatter={(v: number) => `$${(v / 1000).toFixed(0)}k`}

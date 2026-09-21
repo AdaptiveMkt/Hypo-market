@@ -33,6 +33,7 @@
   --color-card-border: #0072b2;
   --color-accent: #0072b2;
   --color-amount: #d55e00;
+  --color-remain-draw: #009e73;
   --color-link: #0000ee;
   --color-chart-grid: #8f8068;
   --color-chart-tick: #536168;
@@ -67,6 +68,7 @@ html.dark {
   --color-card-border: #56b4e9;
   --color-accent: #56b4e9;
   --color-amount: #ff9f4a;
+  --color-remain-draw: #5fd4a8;
   --color-link: #8ab4ff;
   --color-chart-grid: #6a818c;
   --color-chart-tick: #9aadb6;
@@ -444,6 +446,16 @@ html.dark {
   .amt-red {
     font-weight: 700;
   }
+  .amt-green {
+    color: var(--color-remain-draw);
+    font-weight: 700;
+  }
+  .tabular-nums.font-bold.amt-green:not(a *),
+  .tabular-nums .amt-green,
+  td.amt-green,
+  td.font-bold.amt-green {
+    color: var(--color-remain-draw);
+  }
   .pct-red {
     color: var(--color-amount);
     font-weight: 400;
@@ -501,6 +513,13 @@ html.pdf-capture .no-print {
   display: none !important;
 }
 
+html.pdf-capture .amt-green,
+html.pdf-capture td.amt-green,
+html.pdf-capture .tabular-nums.font-bold.amt-green {
+  color: #009e73 !important;
+  -webkit-text-fill-color: #009e73 !important;
+}
+
 html.pdf-capture a[data-source-href],
 html.pdf-capture .source-link {
   color: #0000ee !important;
@@ -556,6 +575,7 @@ html.pdf-capture .recharts-wrapper {
     --color-card-border: #0072b2;
     --color-accent: #0072b2;
     --color-amount: #9a4500;
+    --color-remain-draw: #009e73;
     --color-link: #0000ee;
     --color-chart-grid: #8f8068;
     --color-chart-tick: #536168;
@@ -590,6 +610,14 @@ html.pdf-capture .recharts-wrapper {
     transform: none !important;
     color: var(--color-amount) !important;
     -webkit-text-fill-color: var(--color-amount) !important;
+  }
+
+  .amt-green,
+  td.amt-green,
+  .tabular-nums.font-bold.amt-green {
+    animation: none !important;
+    color: var(--color-remain-draw) !important;
+    -webkit-text-fill-color: var(--color-remain-draw) !important;
   }
 
   #aum-report {

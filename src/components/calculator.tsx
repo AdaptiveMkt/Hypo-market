@@ -54,6 +54,9 @@ import {
   weightedRoiPct,
   yearsPoolLasts,
   careStartYear,
+  chartTickInterval,
+  remainingToneAt,
+  remainingToneClass,
   type AssetRois,
   type Assets,
   type InflationMethod,
@@ -432,14 +435,20 @@ export function Calculator() {
     result.firstCost,
   );
   const yearDepleted = yearView.depletedYear;
-  const yearRowsShown =
-    yearDepleted != null ? yearView.rows.filter((r) => r.year <= yearDepleted) : yearView.rows;
+  const yearRowsShown = yearView.rows;
+  const lastCareRow =
+    [...yearView.rows].reverse().find((r) => r.status === "Care year") ?? yearView.rows.at(-1) ?? null;
   const depletedRow =
-    yearDepleted != null ? yearView.rows.find((r) => r.year === yearDepleted) ?? null : yearView.rows.at(-1) ?? null;
+    yearDepleted != null
+      ? yearView.rows.find((r) => r.year === yearDepleted) ?? lastCareRow
+      : lastCareRow;
   const depletedWhen = depletionCalendar(yearView.rows, yearDepleted, MODEL_START_YEAR);
   const yearPageSize = 10;
   const yearPages = Math.max(1, Math.ceil(yearRowsShown.length / yearPageSize));
   const yearSlice = yearRowsShown.slice(yearPage * yearPageSize, (yearPage + 1) * yearPageSize);
+  const carePage = Math.max(0, Math.floor((careStart - 1) / yearPageSize));
+  const yearSliceStart = yearPage * yearPageSize + 1;
+  const yearSliceEnd = Math.min(yearRowsShown.length, (yearPage + 1) * yearPageSize);
   const insOutYear =
     policy.enabled && !lifetime
       ? yearView.rows.find((r) => r.status === "Care year" && r.insurancePoolRemaining <= 0)?.year ?? null
@@ -1620,7 +1629,7 @@ export function Calculator() {
                     <ResponsiveContainer width="100%" height="100%" debounce={50} minWidth={0} minHeight={200}>
                       <ComposedChart data={chartData} margin={{ top: 8, right: 8, left: 0, bottom: 8 }}>
                         <CartesianGrid stroke={CHART.grid} strokeDasharray="3 3" />
-                        <XAxis dataKey="label" interval={narrow ? 1 : 0} angle={narrow ? -32 : 0} textAnchor={narrow ? "end" : "middle"} height={narrow ? 44 : 28} tick={{ fill: CHART.tick, fontSize: narrow ? 10 : 11 }} />
+                        <XAxis dataKey="label" interval={chartTickInterval(chartData.length, narrow)} angle={narrow ? -32 : 0} textAnchor={narrow ? "end" : "middle"} height={narrow ? 44 : 28} tick={{ fill: CHART.tick, fontSize: narrow ? 10 : 11 }} />
                         <YAxis tickFormatter={(v) => compactMoney(Number(v) || 0)} tick={{ fill: CHART.tick, fontSize: 10 }} width={narrow ? 40 : 52} />
                         <Tooltip formatter={(v) => money(Number(v) || 0)} />
                         <Bar dataKey="cost" name={`${SETTING_SHORT[activeSetting]} bill`} fill={CHART.cost} isAnimationActive={false} />
@@ -1658,6 +1667,13 @@ export function Calculator() {
           </ViewFold>
 
           <ViewFold title="Year by year projection" hint={`${DETAIL_HINTS.yearByYear} View more details.`} defaultOpen checked={details.yearByYear} onPdf={(v) => setDetail("yearByYear", v)}>
+            <p className="mb-3 text-sm text-muted">
+              {yearRowsShown.length} years modeled
+              {delay > 0
+                ? ` — ${delay} year${delay === 1 ? "" : "s"} until care starts (Y${careStart}), then ${Math.max(1, duration)} care year${Math.max(1, duration) === 1 ? "" : "s"} through Y${careStart + Math.max(1, duration) - 1}.`
+                : ` — ${Math.max(1, duration)} care year${Math.max(1, duration) === 1 ? "" : "s"} starting now.`}
+              {" "}Every wait year and care year is listed, including years after funds are depleted.
+            </p>
             <div className="overflow-x-auto pb-4">
               <table className="w-full min-w-[720px] text-sm">
                 <thead>
@@ -1701,6 +1717,15 @@ export function Calculator() {
                       lifetime && policy.enabled
                         ? `${money(r.remaining)} + lifetime`
                         : money(totalLeft);
+                    const remainIdx = yearView.rows.findIndex((x) => x.year === r.year);
+                    const remainTone = remainingToneAt(yearView.rows, remainIdx, policy.enabled, lifetime);
+                    const remainClass = remainingToneClass(remainTone);
+                    const remainTitle =
+                      remainTone === "depleted"
+                        ? "Funds depleted"
+                        : remainTone === "drawing"
+                          ? "Funds drawing down"
+                          : undefined;
                     const cell = gone ? "py-2 pr-2 font-bold amt-red" : "py-2 pr-2";
                     return (
                       <tr
@@ -1719,24 +1744,42 @@ export function Calculator() {
                             <td className={`${cell} text-right`}>{poolLeft}</td>
                           </>
                         ) : null}
-                        <td className={`${cell} text-right`}>{totalLabel}</td>
+                        <td className={`py-2 pr-2 text-right ${remainClass}`} title={remainTitle}>{totalLabel}</td>
                         <td className={`${gone ? "py-2 font-bold amt-red" : "py-2"} text-right`}>{money(r.shortfallCumulative)}</td>
                       </tr>
                     );
                   })}
                 </tbody>
               </table>
-              {policy.enabled ? (
-                <p className="mt-2 text-xs text-muted">
-                  Insurance benefit pool is the unused LTC maximum. It is shown through the wait years (and grows if a benefit-increase option is selected), then declines as the claim is paid first. Total remaining is that leftover insurance pool plus countable assets (the co-pay after insurance).
-                </p>
-              ) : null}
+              <p className="mt-2 text-xs text-muted">
+                {policy.enabled
+                  ? "Insurance benefit pool is the unused LTC maximum. It is shown through the wait years (and grows if a benefit-increase option is selected), then declines as the claim is paid first. Total remaining is that leftover insurance pool plus countable assets (the co-pay after insurance). "
+                  : null}
+                {policy.enabled ? "Total remaining" : "Assets remaining"} turns bold green when the pool starts declining, and bold red when it is depleted.
+                The table runs through the wait until care and every modeled care year — it does not stop at year 10 or at depletion.
+              </p>
             </div>
             {yearPages > 1 ? (
               <div className="mt-3 stack-actions">
                 <button type="button" className="btn-block rounded-lg border border-navy text-navy disabled:opacity-40" disabled={yearPage <= 0} onClick={() => setYearPage((p) => Math.max(0, p - 1))}>Previous years</button>
-                <p className="text-center text-xs text-muted">Page {yearPage + 1} of {yearPages} · {yearPageSize} years per page</p>
+                <p className="text-center text-xs text-muted">
+                  {yearRowsShown.length} years modeled
+                  {delay > 0
+                    ? ` (${delay} until care, then ${Math.max(1, duration)} care year${Math.max(1, duration) === 1 ? "" : "s"})`
+                    : ` · ${Math.max(1, duration)} care year${Math.max(1, duration) === 1 ? "" : "s"}`}
+                  {" "}· page {yearPage + 1} of {yearPages} · years {yearSliceStart}–{yearSliceEnd}
+                </p>
                 <button type="button" className="btn-block rounded-lg border border-navy text-navy disabled:opacity-40" disabled={yearPage >= yearPages - 1} onClick={() => setYearPage((p) => Math.min(yearPages - 1, p + 1))}>Next years</button>
+                {carePage > 0 ? (
+                  <button
+                    type="button"
+                    className="btn-block rounded-lg border border-navy text-navy"
+                    onClick={() => setYearPage(carePage)}
+                    disabled={yearPage === carePage}
+                  >
+                    Skip to first care year (Y{careStart})
+                  </button>
+                ) : null}
               </div>
             ) : null}
           </ViewFold>
