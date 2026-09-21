@@ -946,7 +946,9 @@ export function ReportView({
                         </td>
                       ) : null}
                       <td className={`${cell} text-right`}>{moneyCents(assetsBeforeCopay)}</td>
-                      <td className={`${cell} text-right ${r.drawn ? "font-bold amt-red" : ""}`}>{moneyCents(r.drawn)}</td>
+                      <td className={`${cell} text-right ${r.drawn ? "font-bold amt-red" : ""}`}>
+                        {r.drawn > 0 ? moneyCents(-r.drawn) : moneyCents(0)}
+                      </td>
                       <td className={`py-2 pr-2 text-right ${remainClass}`} title={remainTitle}>
                         {result.lifetimeBenefit
                           ? `${moneyCents(r.remaining)} + lifetime`
