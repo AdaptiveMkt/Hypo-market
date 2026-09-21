@@ -119,7 +119,7 @@ import {
   naicLockoutSpoken,
 } from "@/lib/naic-suitability";
 import { playCeleste } from "@/lib/celeste";
-import { section2IndustrySpoken } from "@/lib/voice-cues";
+import { section1AssetsSpoken, section2IndustrySpoken } from "@/lib/voice-cues";
 import { pinToHeaderOnLoad, scrollToHeader } from "@/lib/scroll-header";
 import { WhatConsumersBuyPanel } from "@/components/what-consumers-buy-panel";
 import { ReportView } from "@/components/report-view";
@@ -1095,7 +1095,10 @@ export function Calculator() {
             <button
               type="button"
               className="flex min-h-12 w-full items-center justify-center rounded-lg bg-gold px-3 py-2.5 text-center text-base font-semibold leading-snug text-masthead hover:brightness-105"
-              onClick={() => setPoolShown(true)}
+              onClick={() => {
+                setPoolShown(true);
+                void playCeleste(section1AssetsSpoken(pool));
+              }}
             >
               Calculate Countable Assets
             </button>

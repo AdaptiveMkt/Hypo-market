@@ -1,5 +1,19 @@
 import { fiveYearIssueBand, typicalBuyerHints } from "./calc";
 
+function spokenDollars(n: number) {
+  const amount = Math.abs(Math.round(Number(n) || 0)).toLocaleString("en-US");
+  return `${amount} dollars`;
+}
+
+/** Spoken after Calculate Countable Assets in Section 1. */
+export function section1AssetsSpoken(pool: number): string {
+  return (
+    `Great. You have completed section 1, and your countable assets are ${spokenDollars(pool)}. ` +
+    `Now let's move to section 2, where you can let us know where and when you think you might need care. ` +
+    `This is subjective, but will help in the preparation of this hypothetical report.`
+  );
+}
+
 /** Spoken script for the Section 2 industry-average box after Age today is entered. */
 export function section2IndustrySpoken(ageToday: number): string {
   const hints = typicalBuyerHints(ageToday);
