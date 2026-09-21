@@ -461,6 +461,9 @@ html.dark {
     font-weight: 700;
     white-space: nowrap;
   }
+  h3.red-wave {
+    white-space: normal;
+  }
   .red-wave > span {
     display: inline-block;
     will-change: transform, color;

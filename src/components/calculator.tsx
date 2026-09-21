@@ -1294,7 +1294,17 @@ export function Calculator() {
               </div>
             </div>
             <div className="mt-4 rounded-lg border border-gold bg-cream px-4 py-3">
-              <h3 className="font-display text-lg text-navy">How much insurance to protect assets at claim</h3>
+              <h3 className="red-wave font-display text-lg font-bold whitespace-normal">
+                {(() => {
+                  const words = "How much insurance to protect assets at claim".split(" ");
+                  return words.map((word, i) => (
+                    <span key={`${word}-${i}`} style={{ animationDelay: `${i * 0.12}s` }}>
+                      {word}
+                      {i < words.length - 1 ? "\u00a0" : ""}
+                    </span>
+                  ));
+                })()}
+              </h3>
               <p className="mt-1 text-sm text-muted">
                 Uses this run’s countable assets, age today, years until claim, care setting, inflation, and how long care may last.
                 You set the share of countable assets (net after tax at claim) you want left after the modeled care years.
