@@ -119,7 +119,7 @@ import {
   naicLockoutSpoken,
 } from "@/lib/naic-suitability";
 import { playCeleste } from "@/lib/celeste";
-import { section1AssetsSpoken, section2IndustrySpoken } from "@/lib/voice-cues";
+import { section1AssetsSpoken, section2IndustrySpoken, section2ProtectSpoken } from "@/lib/voice-cues";
 import { pinToHeaderOnLoad, scrollToHeader } from "@/lib/scroll-header";
 import { WhatConsumersBuyPanel } from "@/components/what-consumers-buy-panel";
 import { ReportView } from "@/components/report-view";
@@ -276,6 +276,7 @@ export function Calculator() {
   const [warnFlash, setWarnFlash] = useState(false);
   const insuranceWasSuitable = useRef<boolean | null>(null);
   const spokenAgeBand = useRef<string | null>(null);
+  const spokenProtectDuration = useRef<number | null>(null);
 
   useEffect(() => {
     pinToHeaderOnLoad();
@@ -380,6 +381,29 @@ export function Calculator() {
     }, 650);
     return () => window.clearTimeout(t);
   }, [ageToday, naicUnlocked]);
+
+  useEffect(() => {
+    if (!naicUnlocked || !duration || ageToday < MIN_AGE_TODAY || !state || !setting) {
+      if (!duration) spokenProtectDuration.current = null;
+      return;
+    }
+    if (spokenProtectDuration.current === duration) return;
+    const t = window.setTimeout(() => {
+      spokenProtectDuration.current = duration;
+      void playCeleste(
+        section2ProtectSpoken({
+          pool,
+          ageToday,
+          delay,
+          claimAge,
+          protectPct,
+          settingLabel: SETTING_LABELS[activeSetting],
+          size: protectSize,
+        }),
+      );
+    }, 700);
+    return () => window.clearTimeout(t);
+  }, [duration, naicUnlocked, ageToday, state, setting, delay, claimAge, protectPct, pool, protectSize, activeSetting]);
 
   const baseArgs = {
     pool,
@@ -705,6 +729,7 @@ export function Calculator() {
     setCpiOverride(null);
     setAgeToday(0);
     spokenAgeBand.current = null;
+    spokenProtectDuration.current = null;
     setClaimAge(AALTCI_MEAN_CLAIM_AGE);
     setClaimAgeTouched(false);
     setDuration(0);
