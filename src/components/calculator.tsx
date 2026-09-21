@@ -112,14 +112,13 @@ import {
   NAIC_LOCKOUT_ASSETS,
   NAIC_SUITABILITY_BANNER,
   NAIC_SUITABILITY_MEETS,
-  NAIC_SUITABILITY_MEETS_SPOKEN,
   NAIC_SUITABILITY_WARN,
   insuranceLockedOut,
   insuranceNeedsWarning,
   naicLockoutSpoken,
 } from "@/lib/naic-suitability";
-import { playCeleste } from "@/lib/celeste";
-import { section1AssetsSpoken, section2IndustrySpoken, section2ProtectSpoken } from "@/lib/voice-cues";
+import { CuePopup, type CueMessage } from "@/components/cue-popup";
+import { section1AssetsMessage, section2IndustryMessage, section2ProtectMessage } from "@/lib/voice-cues";
 import { pinToHeaderOnLoad, scrollToHeader } from "@/lib/scroll-header";
 import { WhatConsumersBuyPanel } from "@/components/what-consumers-buy-panel";
 import { ReportView } from "@/components/report-view";
@@ -277,6 +276,7 @@ export function Calculator() {
   const insuranceWasSuitable = useRef<boolean | null>(null);
   const spokenAgeBand = useRef<string | null>(null);
   const spokenProtectDuration = useRef<number | null>(null);
+  const [cue, setCue] = useState<CueMessage | null>(null);
 
   useEffect(() => {
     pinToHeaderOnLoad();
@@ -353,7 +353,7 @@ export function Calculator() {
     } else {
       setPolicy((prev) => (prev.enabled ? prev : { ...prev, enabled: true }));
       setPartnershipOn(true);
-      if (was === false) void playCeleste(NAIC_SUITABILITY_MEETS_SPOKEN);
+      if (was === false) setCue({ title: "NAIC suitability", body: NAIC_SUITABILITY_MEETS });
     }
     insuranceWasSuitable.current = insuranceSuitable;
   }, [insuranceSuitable]);
@@ -377,7 +377,7 @@ export function Calculator() {
     if (!band || spokenAgeBand.current === band) return;
     const t = window.setTimeout(() => {
       spokenAgeBand.current = band;
-      void playCeleste(section2IndustrySpoken(ageToday));
+      setCue({ title: "Industry averages for your age", body: section2IndustryMessage(ageToday) });
     }, 650);
     return () => window.clearTimeout(t);
   }, [ageToday, naicUnlocked]);
@@ -390,8 +390,9 @@ export function Calculator() {
     if (spokenProtectDuration.current === duration) return;
     const t = window.setTimeout(() => {
       spokenProtectDuration.current = duration;
-      void playCeleste(
-        section2ProtectSpoken({
+      setCue({
+        title: "How much insurance to protect assets at claim",
+        body: section2ProtectMessage({
           pool,
           ageToday,
           delay,
@@ -400,7 +401,7 @@ export function Calculator() {
           settingLabel: SETTING_LABELS[activeSetting],
           size: protectSize,
         }),
-      );
+      });
     }, 700);
     return () => window.clearTimeout(t);
   }, [duration, naicUnlocked, ageToday, state, setting, delay, claimAge, protectPct, pool, protectSize, activeSetting]);
@@ -730,6 +731,7 @@ export function Calculator() {
     setAgeToday(0);
     spokenAgeBand.current = null;
     spokenProtectDuration.current = null;
+    setCue(null);
     setClaimAge(AALTCI_MEAN_CLAIM_AGE);
     setClaimAgeTouched(false);
     setDuration(0);
@@ -935,7 +937,7 @@ export function Calculator() {
           : list.length === 2
             ? `${list[0]} and ${list[1]}`
             : `${list.slice(0, -1).join(", ")}, and ${list[list.length - 1]}`;
-      void playCeleste(`Please enter ${join} before running the hypothetical.`);
+      setCue({ title: "Need more information", body: `Please enter ${join} before running the hypothetical.` });
       return;
     }
     const locked = insuranceLockedOut(pool);
@@ -944,7 +946,7 @@ export function Calculator() {
     setRan(true);
     setYearPage(0);
     if (locked) {
-      void playCeleste(naicLockoutSpoken(state));
+      setCue({ title: "Insurance may not be suitable", body: naicLockoutSpoken(state) });
       window.setTimeout(() => scrollToId("medicaid-va-card"), 80);
     } else {
       window.setTimeout(() => scrollToId("results"), 80);
@@ -1124,7 +1126,7 @@ export function Calculator() {
               className="flex min-h-12 w-full items-center justify-center rounded-lg bg-gold px-3 py-2.5 text-center text-base font-semibold leading-snug text-masthead hover:brightness-105"
               onClick={() => {
                 setPoolShown(true);
-                void playCeleste(section1AssetsSpoken(pool));
+                setCue({ title: "Section 1 complete", body: section1AssetsMessage(pool) });
               }}
             >
               Calculate Countable Assets
@@ -2599,6 +2601,7 @@ export function Calculator() {
         />,
         document.body,
       ) : null}
+      {cue ? <CuePopup cue={cue} onClose={() => setCue(null)} /> : null}
     </div>
   );
 }

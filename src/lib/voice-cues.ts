@@ -1,5 +1,6 @@
 import { fiveYearIssueBand, typicalBuyerHints } from "./calc";
 import type { ProtectAssetsSize } from "./protect-assets";
+import { money } from "./utils";
 
 function spokenDollars(n: number) {
   const amount = Math.abs(Math.round(Number(n) || 0)).toLocaleString("en-US");
@@ -10,6 +11,14 @@ function spokenDollars(n: number) {
 export function section1AssetsSpoken(pool: number): string {
   return (
     `Great. You have completed section 1, and your countable assets are ${spokenDollars(pool)}. ` +
+    `Now let's move to section 2, where you can let us know where and when you think you might need care. ` +
+    `This is subjective, but will help in the preparation of this hypothetical report.`
+  );
+}
+
+export function section1AssetsMessage(pool: number): string {
+  return (
+    `Great. You have completed section 1, and your countable assets are ${money(pool)}. ` +
     `Now let's move to section 2, where you can let us know where and when you think you might need care. ` +
     `This is subjective, but will help in the preparation of this hypothetical report.`
   );
@@ -29,8 +38,17 @@ export function section2IndustrySpoken(ageToday: number): string {
   );
 }
 
-/** Spoken after years of care is selected — matches the protect-assets card. */
-export function section2ProtectSpoken(opts: {
+export function section2IndustryMessage(ageToday: number): string {
+  const hints = typicalBuyerHints(ageToday);
+  const band = fiveYearIssueBand(ageToday) ?? "your age";
+  return (
+    `Based on industry averages at your age bracket (${band}), this hypo defaults traditional benefits to ` +
+    `${hints.daily}/day, a ${hints.period} period, a ${hints.elim} wait, and ${hints.inflation}. ` +
+    `You can change any field in Section 3.`
+  );
+}
+
+type ProtectOpts = {
   pool: number;
   ageToday: number;
   delay: number;
@@ -38,19 +56,27 @@ export function section2ProtectSpoken(opts: {
   protectPct: number;
   settingLabel: string;
   size: ProtectAssetsSize;
-}): string {
+};
+
+function protectLead(opts: ProtectOpts, dollars: (n: number) => string) {
   const s = opts.size;
   const when =
     opts.delay === 0
       ? "this year"
       : `${opts.delay} year${opts.delay === 1 ? "" : "s"}`;
   const years = `${s.careYears} year${s.careYears === 1 ? "" : "s"}`;
-  const lead =
-    `If you have ${spokenDollars(opts.pool)} countable assets today at age ${opts.ageToday}, ` +
+  return (
+    `If you have ${dollars(opts.pool)} countable assets today at age ${opts.ageToday}, ` +
     `and care is expected in ${when} at age ${opts.claimAge}, ` +
-    `this model projects about ${spokenDollars(s.assetsAtClaimNet)} countable assets, net after tax, at claim. ` +
-    `To protect ${opts.protectPct} percent of that nest egg, ${spokenDollars(s.protectDollars)}, ` +
-    `through ${years} of ${opts.settingLabel.toLowerCase()}, about ${spokenDollars(s.careTotal)} of inflated care costs, `;
+    `this model projects about ${dollars(s.assetsAtClaimNet)} countable assets, net after tax, at claim. ` +
+    `To protect ${opts.protectPct} percent of that nest egg, ${dollars(s.protectDollars)}, ` +
+    `through ${years} of ${opts.settingLabel.toLowerCase()}, about ${dollars(s.careTotal)} of inflated care costs, `
+  );
+}
+
+function protectBody(opts: ProtectOpts, dollars: (n: number) => string) {
+  const s = opts.size;
+  const lead = protectLead(opts, dollars);
   if (s.alreadyProtected) {
     return (
       lead +
@@ -63,18 +89,26 @@ export function section2ProtectSpoken(opts: {
     : `for ${s.benefitYears} year${s.benefitYears === 1 ? "" : "s"}`;
   const inflate =
     s.dailyToday !== s.dailyAtClaim
-      ? ` about ${spokenDollars(s.dailyAtClaim)} a day at claim if benefits inflate with the age-based default.`
+      ? ` about ${dollars(s.dailyAtClaim)} a day at claim if benefits inflate with the age-based default.`
       : ".";
-  const pool =
-    s.lifetime
-      ? `${spokenDollars(s.annualCapAtClaim)} a year, lifetime`
-      : spokenDollars(s.poolNeeded);
+  const pool = s.lifetime
+    ? `${dollars(s.annualCapAtClaim)} a year, lifetime`
+    : dollars(s.poolNeeded);
   return (
     lead +
-    `consider a traditional reimbursement design of about ${spokenDollars(s.dailyToday)} a day ${period} purchased today,` +
+    `consider a traditional reimbursement design of about ${dollars(s.dailyToday)} a day ${period} purchased today,` +
     inflate +
     ` That is a pool of about ${pool}. ` +
-    `Assets would be asked to co-pay up to ${spokenDollars(s.spendable)}. ` +
+    `Assets would be asked to co-pay up to ${dollars(s.spendable)}. ` +
     `Not a quote. Underwriting, state, and riders change what can actually be issued.`
   );
+}
+
+/** Spoken after years of care is selected — matches the protect-assets card. */
+export function section2ProtectSpoken(opts: ProtectOpts): string {
+  return protectBody(opts, spokenDollars);
+}
+
+export function section2ProtectMessage(opts: ProtectOpts): string {
+  return protectBody(opts, money);
 }
