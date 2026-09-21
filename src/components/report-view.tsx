@@ -875,7 +875,7 @@ export function ReportView({
               </p>
             ) : null}
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[640px] table-fixed text-sm">
+              <table className="w-full min-w-[720px] table-fixed text-sm">
                 <thead>
                   <tr className="text-[11px] font-semibold leading-tight text-muted">
                     <th className="w-[3.25rem] py-2 px-1 text-center align-bottom">Year</th>
@@ -887,6 +887,7 @@ export function ReportView({
                     <th className="py-2 px-1 text-center align-bottom">Annual Care<br />Costs* <span className="normal-case font-medium">(est)</span></th>
                     {policy.enabled ? (
                       <>
+                        <th className="py-2 px-1 text-center align-bottom">Insurance<br />Benefits</th>
                         <th className="py-2 px-1 text-center align-bottom">Insurance<br />Balance</th>
                         <th className="py-2 px-1 text-center align-bottom">Co-pay from<br />Countable Assets</th>
                       </>
@@ -951,9 +952,12 @@ export function ReportView({
                       </td>
                       <td className={`${cell} ${r.cost ? "font-bold amt-red" : ""}`}>{moneyCents(r.cost)}</td>
                       {policy.enabled ? (
-                        <td className={cell}>
-                          {result.lifetimeBenefit ? "Lifetime" : moneyCents(r.insurancePoolRemaining)}
-                        </td>
+                        <>
+                          <td className={cell}>{moneyCents(r.insurance)}</td>
+                          <td className={cell}>
+                            {result.lifetimeBenefit ? "Lifetime" : moneyCents(r.insurancePoolRemaining)}
+                          </td>
+                        </>
                       ) : null}
                       <td className={`${cell} ${r.drawn ? "font-bold amt-red" : ""}`}>
                         {r.drawn > 0 ? moneyCents(-r.drawn) : moneyCents(0)}

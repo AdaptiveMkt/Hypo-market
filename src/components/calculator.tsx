@@ -1620,6 +1620,7 @@ export function Calculator() {
               items={[
                 ...(featureRow
                   ? [
+                      { id: "col-year", label: "Year", value: String(calendarYear(featureRow.year)) },
                       { id: "status", label: "Status", value: <RedAmt>{featureRow.status}</RedAmt> },
                       {
                         id: "col-assets",
@@ -1661,6 +1662,16 @@ export function Calculator() {
                   : []),
                 ...(policy.enabled && featureRow
                   ? [
+                      {
+                        id: "col-benefits",
+                        label: "Insurance Benefits",
+                        value: moneyCents(featureRow.insurance),
+                      },
+                      {
+                        id: "col-benefits-total",
+                        label: "Insurance Benefits (this run)",
+                        value: <RedAmt>{moneyCents(result.insuranceTotal)}</RedAmt>,
+                      },
                       {
                         id: "col-balance",
                         label: "Insurance Balance",
@@ -1711,7 +1722,7 @@ export function Calculator() {
               {" "}Every wait year and care year is listed, including years after funds are depleted.
             </p>
             <div className="overflow-x-auto pb-4">
-              <table className="w-full min-w-[640px] table-fixed text-sm">
+              <table className="w-full min-w-[720px] table-fixed text-sm">
                 <thead>
                   <tr className="border-b border-gold text-[11px] font-semibold leading-tight text-muted">
                     <th className="w-[3.25rem] py-2 px-1 text-center align-bottom">Year</th>
@@ -1723,6 +1734,7 @@ export function Calculator() {
                     <th className="py-2 px-1 text-center align-bottom">Annual Care<br />Costs* <span className="normal-case font-medium">(est)</span></th>
                     {policy.enabled ? (
                       <>
+                        <th className="py-2 px-1 text-center align-bottom">Insurance<br />Benefits</th>
                         <th className="py-2 px-1 text-center align-bottom">Insurance<br />Balance</th>
                         <th className="py-2 px-1 text-center align-bottom">Co-pay from<br />Countable Assets</th>
                       </>
@@ -1777,7 +1789,10 @@ export function Calculator() {
                         <td className={`py-2 px-1 text-center ${remainClass}`} title={remainTitle}>{totalLabel}</td>
                         <td className={`${cell} ${r.cost ? "font-bold amt-red" : ""}`}>{moneyCents(r.cost)}</td>
                         {policy.enabled ? (
-                          <td className={cell}>{poolLeft}</td>
+                          <>
+                            <td className={cell}>{moneyCents(r.insurance)}</td>
+                            <td className={cell}>{poolLeft}</td>
+                          </>
                         ) : null}
                         <td className={`${cell} ${r.drawn ? "font-bold amt-red" : ""}`}>
                           {r.drawn > 0 ? moneyCents(-r.drawn) : moneyCents(0)}
