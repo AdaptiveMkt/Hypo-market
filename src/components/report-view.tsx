@@ -878,18 +878,18 @@ export function ReportView({
               <table className="w-full min-w-[640px] table-fixed text-sm">
                 <thead>
                   <tr className="text-[11px] font-semibold leading-tight text-muted">
-                    <th className="w-[3.25rem] py-2 pr-2 text-left align-bottom">Year</th>
+                    <th className="w-[3.25rem] py-2 px-1 text-center align-bottom">Year</th>
                     {policy.enabled ? (
-                      <th className="py-2 pr-2 text-right align-bottom">Insurance<br />Benefit Pool</th>
+                      <th className="py-2 px-1 text-center align-bottom">Insurance<br />Benefit Pool</th>
                     ) : null}
-                    <th className="py-2 pr-2 text-right align-bottom">Annual Care<br />Costs</th>
+                    <th className="py-2 px-1 text-center align-bottom">Annual Care<br />Costs</th>
                     {policy.enabled ? (
-                      <th className="py-2 pr-2 text-right align-bottom">Insurance<br />Balance</th>
+                      <th className="py-2 px-1 text-center align-bottom">Insurance<br />Balance</th>
                     ) : null}
-                    <th className="py-2 pr-2 text-right align-bottom">Countable<br />Assets</th>
-                    <th className="py-2 pr-2 text-right align-bottom">Co-pay from<br />Countable Assets</th>
-                    <th className="py-2 pr-2 text-right align-bottom">Total<br />Remaining</th>
-                    <th className="py-2 text-right align-bottom">Cumulative<br />Shortfall</th>
+                    <th className="py-2 px-1 text-center align-bottom">Countable<br />Assets</th>
+                    <th className="py-2 px-1 text-center align-bottom">Co-pay from<br />Countable Assets</th>
+                    <th className="py-2 px-1 text-center align-bottom">Total<br />Remaining</th>
+                    <th className="py-2 px-1 text-center align-bottom">Cumulative<br />Shortfall</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -930,31 +930,31 @@ export function ReportView({
                         : remainTone === "drawing"
                           ? "Funds drawing down"
                           : undefined;
-                    const cell = gone ? "py-2 pr-2 font-bold amt-red" : "py-2 pr-2";
+                    const cell = gone ? "py-2 px-1 text-center font-bold amt-red" : "py-2 px-1 text-center";
                     return (
                     <tr key={r.year} className={`border-t tabular-nums ${gone ? "bg-cream" : "border-line"}`}>
                       <td className={cell}>{calendarYear(r.year)}</td>
                       {policy.enabled ? (
-                        <td className={`${cell} text-right`}>
+                        <td className={cell}>
                           {result.lifetimeBenefit ? "Lifetime" : moneyCents(r.insurancePoolStart)}
                         </td>
                       ) : null}
-                      <td className={`${cell} text-right ${r.cost ? "font-bold amt-red" : ""}`}>{moneyCents(r.cost)}</td>
+                      <td className={`${cell} ${r.cost ? "font-bold amt-red" : ""}`}>{moneyCents(r.cost)}</td>
                       {policy.enabled ? (
-                        <td className={`${cell} text-right`}>
+                        <td className={cell}>
                           {result.lifetimeBenefit ? "Lifetime" : moneyCents(r.insurancePoolRemaining)}
                         </td>
                       ) : null}
-                      <td className={`${cell} text-right`}>{moneyCents(assetsBeforeCopay)}</td>
-                      <td className={`${cell} text-right ${r.drawn ? "font-bold amt-red" : ""}`}>
+                      <td className={cell}>{moneyCents(assetsBeforeCopay)}</td>
+                      <td className={`${cell} ${r.drawn ? "font-bold amt-red" : ""}`}>
                         {r.drawn > 0 ? moneyCents(-r.drawn) : moneyCents(0)}
                       </td>
-                      <td className={`py-2 pr-2 text-right ${remainClass}`} title={remainTitle}>
+                      <td className={`py-2 px-1 text-center ${remainClass}`} title={remainTitle}>
                         {result.lifetimeBenefit
                           ? `${moneyCents(r.remaining)} + lifetime`
                           : moneyCents(totalLeft)}
                       </td>
-                      <td className={`py-2 text-right ${r.shortfallCumulative ? "text-deplete" : ""}`}>
+                      <td className={`py-2 px-1 text-center ${r.shortfallCumulative ? "text-deplete" : ""}`}>
                         {r.shortfallCumulative ? moneyCents(r.shortfallCumulative) : "—"}
                       </td>
                     </tr>
