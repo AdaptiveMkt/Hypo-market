@@ -9,34 +9,11 @@ export function WelcomeCard() {
   const [status, setStatus] = useState("");
 
   useEffect(() => {
-    let cancelled = false;
-    let playing = false;
-    const off = watchCeleste((s) => {
-      playing = s === "playing";
+    return watchCeleste((s) => {
+      const playing = s === "playing";
       setSpeaking(playing);
       setStatus(playing ? "Celeste is reading the welcome…" : "");
     });
-
-    function start() {
-      if (cancelled) return;
-      void playCelesteScript(WELCOME_SPOKEN);
-    }
-
-    const t = window.setTimeout(start, 350);
-
-    function onGesture() {
-      if (!playing) start();
-    }
-    window.addEventListener("pointerdown", onGesture, { once: true });
-    window.addEventListener("keydown", onGesture, { once: true });
-
-    return () => {
-      cancelled = true;
-      window.clearTimeout(t);
-      window.removeEventListener("pointerdown", onGesture);
-      window.removeEventListener("keydown", onGesture);
-      off();
-    };
   }, []);
 
   return (
@@ -65,7 +42,7 @@ export function WelcomeCard() {
         </button>
       </div>
       <p className="mt-2 text-xs text-muted" aria-live="polite">
-        {status || "Celeste reads this welcome when the page loads. Disclaimer and privacy are in the footer."}
+        {status || "Tap Hear welcome if you want Celeste to read this. Disclaimer and privacy are in the footer."}
       </p>
     </section>
   );
