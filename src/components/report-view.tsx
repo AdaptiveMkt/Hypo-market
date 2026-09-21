@@ -969,6 +969,25 @@ export function ReportView({
                     );
                   })}
                 </tbody>
+                <tfoot>
+                  <tr className="border-t-2 border-gold tabular-nums">
+                    <td className="py-2 px-1 text-center font-semibold">End of run</td>
+                    <td className="py-2 px-1 text-center">—</td>
+                    {policy.enabled ? <td className="py-2 px-1 text-center">—</td> : null}
+                    <td className="py-2 px-1 text-center">—</td>
+                    <td className="py-2 px-1 text-center font-bold amt-red">
+                      {moneyCents(yearRows.at(-1)?.costCumulative ?? 0)}
+                    </td>
+                    {policy.enabled ? (
+                      <>
+                        <td className="py-2 px-1 text-center">—</td>
+                        <td className="py-2 px-1 text-center">—</td>
+                      </>
+                    ) : null}
+                    <td className="py-2 px-1 text-center">—</td>
+                    <td className="py-2 px-1 text-center">—</td>
+                  </tr>
+                </tfoot>
               </table>
             </div>
           </section>
