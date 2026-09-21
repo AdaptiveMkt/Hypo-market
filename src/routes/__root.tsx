@@ -42,6 +42,13 @@ export const Route = createRootRoute({
       {
         children: `(function(){try{document.documentElement.classList.remove("dark");document.documentElement.style.colorScheme="light";localStorage.setItem("aum-theme","light");}catch(e){}})();`,
       },
+      {
+        async: true,
+        src: "https://www.googletagmanager.com/gtag/js?id=G-C34YXPEQM1",
+      },
+      {
+        children: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-C34YXPEQM1');`,
+      },
     ],
   }),
   component: Root,
