@@ -3,6 +3,11 @@
 import { useEffect, useState } from "react";
 
 const KEY = "aum-theme";
+const EVENT = "aum-theme";
+
+export function isDarkTheme() {
+  return document.documentElement.classList.contains("dark");
+}
 
 export function applyStoredTheme() {
   try {
@@ -10,10 +15,23 @@ export function applyStoredTheme() {
     const dark =
       stored === "dark" ||
       (stored !== "light" && window.matchMedia("(prefers-color-scheme: dark)").matches);
-    document.documentElement.classList.toggle("dark", dark);
+    setTheme(dark, false);
   } catch {
     /* ignore */
   }
+}
+
+/** Apply light/dark. persist writes aum-theme so the next visit matches. */
+export function setTheme(dark: boolean, persist = true) {
+  document.documentElement.classList.toggle("dark", dark);
+  if (persist) {
+    try {
+      localStorage.setItem(KEY, dark ? "dark" : "light");
+    } catch {
+      /* ignore */
+    }
+  }
+  window.dispatchEvent(new Event(EVENT));
 }
 
 export function ThemeToggle() {
@@ -21,18 +39,14 @@ export function ThemeToggle() {
 
   useEffect(() => {
     applyStoredTheme();
-    setDark(document.documentElement.classList.contains("dark"));
+    const sync = () => setDark(isDarkTheme());
+    sync();
+    window.addEventListener(EVENT, sync);
+    return () => window.removeEventListener(EVENT, sync);
   }, []);
 
   function toggle() {
-    const next = !document.documentElement.classList.contains("dark");
-    document.documentElement.classList.toggle("dark", next);
-    try {
-      localStorage.setItem(KEY, next ? "dark" : "light");
-    } catch {
-      /* ignore */
-    }
-    setDark(next);
+    setTheme(!isDarkTheme());
   }
 
   return (

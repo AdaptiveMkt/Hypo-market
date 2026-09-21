@@ -88,6 +88,7 @@ import {
 } from "@/lib/claim-age";
 import { typicalLinkedBuyerHints, typicalPremiumHint } from "@/lib/what-consumers-buy";
 import { TitleCollapse } from "@/components/accordion";
+import { isDarkTheme, setTheme } from "@/components/theme-toggle";
 import { StateName, Pct } from "@/components/state-name";
 import { Cite, CopyrightMark, LinkedCopy } from "@/components/source-links";
 import { SRC } from "@/lib/sources";
@@ -224,6 +225,7 @@ export function Calculator() {
   const [printAfterOpen, setPrintAfterOpen] = useState(false);
   const [pdfPick, setPdfPick] = useState(false);
   const [personalizeOpen, setPersonalizeOpen] = useState(true);
+  const themeBeforeIncognito = useRef<"light" | "dark" | null>(null);
   const [pdfReady, setPdfReady] = useState<{
     filename: string;
     url: string;
@@ -682,6 +684,8 @@ export function Calculator() {
     setRan(false);
     setPoolShown(false);
     setPersonalizeOpen(true);
+    if (themeBeforeIncognito.current === "light") setTheme(false);
+    themeBeforeIncognito.current = null;
     setHypoRunId(0);
     setShowReport(false);
     setClient({ ...EMPTY_CONTACT });
@@ -705,6 +709,19 @@ export function Calculator() {
       /* ignore */
     }
     window.setTimeout(() => scrollToHeader(false), 50);
+  }
+  function applyIncognito(on: boolean) {
+    if (on) {
+      if (themeBeforeIncognito.current == null) {
+        themeBeforeIncognito.current = isDarkTheme() ? "dark" : "light";
+      }
+      setPersonalizeOpen(false);
+      setTheme(true);
+      return;
+    }
+    setPersonalizeOpen(true);
+    if (themeBeforeIncognito.current === "light") setTheme(false);
+    themeBeforeIncognito.current = null;
   }
   function requestPdfDownload() {
     setDetails((d) => withScenarioDetails(d, insuranceLocked));
@@ -953,8 +970,10 @@ export function Calculator() {
           className=""
           defaultOpen
           open={personalizeOpen}
-          onOpenChange={setPersonalizeOpen}
-          hint="Shown in full when this page opens. Incognito collapses this card."
+          onOpenChange={(open) => {
+            applyIncognito(!open);
+          }}
+          hint="Shown in full when this page opens. Incognito collapses this card and switches to dark mode."
           extra={
             <button
               type="button"
@@ -963,7 +982,7 @@ export function Calculator() {
               aria-controls="personalize-asset-model"
               onClick={(e) => {
                 e.stopPropagation();
-                setPersonalizeOpen((v) => !v);
+                applyIncognito(personalizeOpen);
               }}
             >
               Incognito
