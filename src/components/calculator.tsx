@@ -1670,6 +1670,7 @@ export function Calculator() {
                 ...(policy.enabled && featureRow
                   ? [
                       { id: "col-benefits", group: "column" as const, label: "Insurance Benefits · beginning", value: moneyCents(featureRow.insurance) },
+                      { id: "col-benefits-cum", group: "column" as const, label: "Accumulative insurance paid · beginning", value: moneyCents(featureRow.insuranceCumulative) },
                       { id: "col-balance", group: "column" as const, label: "Insurance Balance · beginning", value: lifetime ? "Lifetime" : moneyCents(featureRow.insurancePoolRemaining) },
                     ]
                   : []),
@@ -1724,6 +1725,7 @@ export function Calculator() {
                 ...(policy.enabled && depletionRow
                   ? [
                       { id: "dep-benefits", group: "depletion" as const, label: "Insurance Benefits · end", value: moneyCents(depletionRow.insurance) },
+                      { id: "dep-benefits-cum", group: "depletion" as const, label: "Accumulative insurance paid · end", value: moneyCents(depletionRow.insuranceCumulative) },
                       { id: "dep-balance", group: "depletion" as const, label: "Insurance Balance · end", value: lifetime ? "Lifetime" : moneyCents(depletionRow.insurancePoolRemaining) },
                     ]
                   : []),

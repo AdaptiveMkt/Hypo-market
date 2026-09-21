@@ -704,6 +704,7 @@ export type YearRow = {
   cost: number;
   insurance: number;
   insurancePaid: number;
+  insuranceCumulative: number;
   premium: number;
   drawn: number;
   remaining: number;
@@ -959,6 +960,7 @@ export function project(opts: {
       cost,
       insurance,
       insurancePaid,
+      insuranceCumulative: insuranceTotal,
       premium,
       drawn: copay,
       remaining: p,
