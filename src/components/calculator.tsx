@@ -1,7 +1,7 @@
 "use client";
 
 import { createPortal } from "react-dom";
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   Bar,
   CartesianGrid,
@@ -723,6 +723,9 @@ export function Calculator() {
     if (themeBeforeIncognito.current === "light") setTheme(false);
     themeBeforeIncognito.current = null;
   }
+  useLayoutEffect(() => {
+    if (!personalizeOpen) setTheme(true);
+  }, [personalizeOpen]);
   function requestPdfDownload() {
     setDetails((d) => withScenarioDetails(d, insuranceLocked));
     setAttachAdvisor(advisorReceivesPdf(advisor, client));

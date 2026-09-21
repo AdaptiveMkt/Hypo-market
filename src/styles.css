@@ -45,6 +45,7 @@
 
 html.dark {
   color-scheme: dark;
+  background-color: #12191d;
   --color-navy: #d4e6ee;
   --color-teal: #56b4e9;
   --color-gold: #d4b56a;
@@ -75,6 +76,41 @@ html.dark {
   --shadow-card: 0 8px 24px rgb(0 0 0 / 0.35);
 }
 
+@layer theme {
+  html.dark,
+  html.dark:root,
+  :root.dark {
+    --color-navy: #d4e6ee;
+    --color-teal: #56b4e9;
+    --color-gold: #d4b56a;
+    --color-cream: #12191d;
+    --color-paper: #182228;
+    --color-ink: #e8eef1;
+    --color-muted: #9aadb6;
+    --color-line: #6a818c;
+    --color-good: #56b4e9;
+    --color-warn: #e69f00;
+    --color-deplete: #ff9f4a;
+    --color-bg: #12191d;
+    --color-fg: #e8eef1;
+    --color-surface: #1c282f;
+    --color-primary: #d4b56a;
+    --color-border: #6a818c;
+    --color-masthead: #0f1c24;
+    --color-masthead-fg: #f6f1e8;
+    --color-gold-ink: #d4b56a;
+    --color-card: #182228;
+    --color-card-border: #56b4e9;
+    --color-accent: #56b4e9;
+    --color-amount: #ff9f4a;
+    --color-remain-draw: #5fd4a8;
+    --color-link: #8ab4ff;
+    --color-chart-grid: #6a818c;
+    --color-chart-tick: #9aadb6;
+    --shadow-card: 0 8px 24px rgb(0 0 0 / 0.35);
+  }
+}
+
 @layer base {
   button:not(:disabled),
   [role="button"]:not(:disabled) {
@@ -103,6 +139,12 @@ html.dark {
     -webkit-touch-callout: none;
     overflow-x: clip;
     overflow-wrap: break-word;
+  }
+
+  html.dark,
+  html.dark body {
+    background-color: var(--color-bg);
+    color: var(--color-fg);
   }
 
   a.source-link,

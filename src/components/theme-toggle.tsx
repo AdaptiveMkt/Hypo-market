@@ -1,12 +1,22 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 
 const KEY = "aum-theme";
-const EVENT = "aum-theme";
+export const THEME_EVENT = "aum-theme";
 
 export function isDarkTheme() {
   return document.documentElement.classList.contains("dark");
+}
+
+function paintDark(dark: boolean) {
+  const root = document.documentElement;
+  root.classList.toggle("dark", dark);
+  root.classList.add("antialiased");
+  root.style.colorScheme = dark ? "dark" : "light";
+  document.body?.classList.toggle("dark", dark);
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute("content", dark ? "#0f1c24" : "#1b3a4b");
 }
 
 export function applyStoredTheme() {
@@ -15,7 +25,8 @@ export function applyStoredTheme() {
     const dark =
       stored === "dark" ||
       (stored !== "light" && window.matchMedia("(prefers-color-scheme: dark)").matches);
-    setTheme(dark, false);
+    paintDark(dark);
+    window.dispatchEvent(new Event(THEME_EVENT));
   } catch {
     /* ignore */
   }
@@ -23,7 +34,7 @@ export function applyStoredTheme() {
 
 /** Apply light/dark. persist writes aum-theme so the next visit matches. */
 export function setTheme(dark: boolean, persist = true) {
-  document.documentElement.classList.toggle("dark", dark);
+  paintDark(dark);
   if (persist) {
     try {
       localStorage.setItem(KEY, dark ? "dark" : "light");
@@ -31,19 +42,23 @@ export function setTheme(dark: boolean, persist = true) {
       /* ignore */
     }
   }
-  window.dispatchEvent(new Event(EVENT));
+  window.dispatchEvent(new Event(THEME_EVENT));
 }
 
-export function ThemeToggle() {
+export function useDarkMode() {
   const [dark, setDark] = useState(false);
-
-  useEffect(() => {
+  useLayoutEffect(() => {
     applyStoredTheme();
     const sync = () => setDark(isDarkTheme());
     sync();
-    window.addEventListener(EVENT, sync);
-    return () => window.removeEventListener(EVENT, sync);
+    window.addEventListener(THEME_EVENT, sync);
+    return () => window.removeEventListener(THEME_EVENT, sync);
   }, []);
+  return dark;
+}
+
+export function ThemeToggle() {
+  const dark = useDarkMode();
 
   function toggle() {
     setTheme(!isDarkTheme());

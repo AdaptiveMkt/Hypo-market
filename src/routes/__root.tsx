@@ -1,9 +1,11 @@
+"use client";
+
 import { createRootRoute, HeadContent, Link, Outlet, Scripts } from "@tanstack/react-router";
 import { AuthProvider } from "@/lib/auth/provider";
 import { PreviewHostBridge } from "@/components/preview-host-bridge";
 import { ScrollToHeaderOnLoad } from "@/components/scroll-to-header";
 import { ContentGuard } from "@/components/content-guard";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { ThemeToggle, useDarkMode } from "@/components/theme-toggle";
 import { VoiceControls } from "@/components/voice-controls";
 import { HypoChatbot } from "@/components/hypo-chatbot";
 import { DisclosureTermsLink } from "@/components/disclosure-link";
@@ -36,13 +38,19 @@ export const Route = createRootRoute({
         href: "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650&family=Source+Sans+3:wght@400;600;700&display=swap",
       },
     ],
+    scripts: [
+      {
+        children: `(function(){try{var t=localStorage.getItem("aum-theme");var d=t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches);if(d)document.documentElement.classList.add("dark");}catch(e){}})();`,
+      },
+    ],
   }),
   component: Root,
 });
 
 function Root() {
+  const dark = useDarkMode();
   return (
-    <html lang="en" className="antialiased" suppressHydrationWarning>
+    <html lang="en" className={dark ? "antialiased dark" : "antialiased"} suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>
