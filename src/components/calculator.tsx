@@ -223,6 +223,7 @@ export function Calculator() {
   const [showReport, setShowReport] = useState(false);
   const [printAfterOpen, setPrintAfterOpen] = useState(false);
   const [pdfPick, setPdfPick] = useState(false);
+  const [personalizeOpen, setPersonalizeOpen] = useState(true);
   const [pdfReady, setPdfReady] = useState<{
     filename: string;
     url: string;
@@ -680,6 +681,7 @@ export function Calculator() {
     setDesignTouched(false);
     setRan(false);
     setPoolShown(false);
+    setPersonalizeOpen(true);
     setHypoRunId(0);
     setShowReport(false);
     setClient({ ...EMPTY_CONTACT });
@@ -946,8 +948,31 @@ export function Calculator() {
     <div className="min-w-0 max-w-full overflow-x-clip">
       <WelcomeCard />
       <section className="mt-4 card-xl min-w-0 p-4 md:p-5">
-        <TitleCollapse title="Personalize Asset Model (optional input)" className="">
-          <PartyFields idPrefix="client" party={client} onChange={(partial) => setClient((p) => ({ ...p, ...partial }))} />
+        <TitleCollapse
+          title="Personalize Asset Model (optional input)"
+          className=""
+          defaultOpen
+          open={personalizeOpen}
+          onOpenChange={setPersonalizeOpen}
+          hint="Shown in full when this page opens. Incognito collapses this card."
+          extra={
+            <button
+              type="button"
+              className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-lg bg-black px-4 text-sm font-semibold text-white hover:bg-neutral-900"
+              aria-pressed={!personalizeOpen}
+              aria-controls="personalize-asset-model"
+              onClick={(e) => {
+                e.stopPropagation();
+                setPersonalizeOpen((v) => !v);
+              }}
+            >
+              Incognito
+            </button>
+          }
+        >
+          <div id="personalize-asset-model">
+            <PartyFields idPrefix="client" party={client} onChange={(partial) => setClient((p) => ({ ...p, ...partial }))} />
+          </div>
         </TitleCollapse>
       </section>
 

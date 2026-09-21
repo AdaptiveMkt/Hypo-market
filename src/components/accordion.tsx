@@ -84,6 +84,9 @@ export function TitleCollapse({
   onPdfChange,
   pdfLocked = false,
   openOnHash,
+  open: openProp,
+  onOpenChange,
+  extra,
 }: {
   title: ReactNode;
   children: ReactNode;
@@ -94,8 +97,17 @@ export function TitleCollapse({
   onPdfChange?: (checked: boolean) => void;
   pdfLocked?: boolean;
   openOnHash?: string;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  extra?: ReactNode;
 }) {
-  const [open, setOpen] = useState(defaultOpen);
+  const [internalOpen, setInternalOpen] = useState(defaultOpen);
+  const controlled = openProp !== undefined;
+  const open = controlled ? openProp : internalOpen;
+  function setOpen(next: boolean) {
+    if (!controlled) setInternalOpen(next);
+    onOpenChange?.(next);
+  }
   useEffect(() => {
     if (!openOnHash) return;
     const openFromHash = (e?: Event) => {
@@ -141,12 +153,19 @@ export function TitleCollapse({
       <span className="whitespace-nowrap">{pdfLocked ? "Required in PDF" : "Add to PDF"}</span>
     </label>
   ) : undefined;
+  const trailing =
+    extra || pdfBox ? (
+      <div className="flex flex-wrap items-center gap-2">
+        {extra}
+        {pdfBox}
+      </div>
+    ) : undefined;
   return (
     <Accordion
       open={open}
-      onToggle={() => setOpen((v) => !v)}
+      onToggle={() => setOpen(!open)}
       className={className}
-      trailing={pdfBox}
+      trailing={trailing}
       panelClassName="border-t border-line pt-2"
       summary={
         <span className="block">
