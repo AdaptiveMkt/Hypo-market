@@ -119,6 +119,7 @@ import {
   naicLockoutSpoken,
 } from "@/lib/naic-suitability";
 import { playCeleste } from "@/lib/celeste";
+import { section2IndustrySpoken } from "@/lib/voice-cues";
 import { pinToHeaderOnLoad, scrollToHeader } from "@/lib/scroll-header";
 import { WhatConsumersBuyPanel } from "@/components/what-consumers-buy-panel";
 import { ReportView } from "@/components/report-view";
@@ -274,6 +275,7 @@ export function Calculator() {
   const [yearKind, setYearKind] = useState<PolicyKind>("traditional");
   const [warnFlash, setWarnFlash] = useState(false);
   const insuranceWasSuitable = useRef<boolean | null>(null);
+  const spokenAgeBand = useRef<string | null>(null);
 
   useEffect(() => {
     pinToHeaderOnLoad();
@@ -362,6 +364,20 @@ export function Calculator() {
     const t = window.setTimeout(() => setWarnFlash(false), 4500);
     return () => window.clearTimeout(t);
   }, [insuranceWarn, pool]);
+
+  useEffect(() => {
+    if (ageToday < MIN_AGE_TODAY) {
+      spokenAgeBand.current = null;
+      return;
+    }
+    const band = fiveYearIssueBand(ageToday);
+    if (!band || spokenAgeBand.current === band) return;
+    const t = window.setTimeout(() => {
+      spokenAgeBand.current = band;
+      void playCeleste(section2IndustrySpoken(ageToday));
+    }, 650);
+    return () => window.clearTimeout(t);
+  }, [ageToday]);
 
   const baseArgs = {
     pool,
@@ -686,6 +702,7 @@ export function Calculator() {
     setSettingNeeded(false);
     setCpiOverride(null);
     setAgeToday(0);
+    spokenAgeBand.current = null;
     setClaimAge(AALTCI_MEAN_CLAIM_AGE);
     setClaimAgeTouched(false);
     setDuration(0);
