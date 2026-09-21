@@ -975,7 +975,7 @@ export function ReportView({
             if not, $14,000 × 3 years is $42,000 cumulative unpaid. If insurance covers the
             year, assets are not drawn for care.
             {policy.enabled
-              ? " Insurance Benefit Pool is daily benefit × 365 × benefit period at the start of the year. Insurance Balance is that pool after the calendar year’s covered claim is subtracted. Countable Assets are before this year’s co-pay. Total Remaining is Insurance Balance plus assets after co-pay."
+              ? " Insurance Benefit Pool is daily benefit × 365 × benefit period at the start of the year. Insurance pays first up to daily × 365 that year; a bill at or under that maximum has $0 co-pay while the pool lasts. Insurance Balance is the pool after that calendar year’s covered claim is subtracted. Countable Assets are before this year’s co-pay. Total Remaining is Insurance Balance plus assets after co-pay."
               : " With no policy, the full annual cost is amortized from assets until they run out."}
           </p>
           <p className="mt-3 text-sm">

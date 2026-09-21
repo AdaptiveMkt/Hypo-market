@@ -805,7 +805,6 @@ export function project(opts: {
     opts.policy.enabled && !hybrid && !lifetime
       ? opts.policy.dailyBenefit * 365 * opts.policy.benefitYears
       : 0;
-  let careYearIndex = 0;
   let benefitPoolAtClaim: number | null = null;
   let priorAccrual = 0;
   let poolAtCareEnd: number | null = null;
@@ -847,10 +846,7 @@ export function project(opts: {
       poolStart = dollarPool;
       poolBeforeDraw = dollarPool;
       if (inCare && dollarPool > 0 && cost > 0) {
-        careYearIndex += 1;
-        const elim = careYearIndex === 1 ? opts.policy.elimDays : 0;
-        const frac = Math.max(0, (365 - elim) / 365);
-        const annualCap = monthlyThen * 12 * frac;
+        const annualCap = monthlyThen * 12;
         insurance = Math.min(cost, annualCap, dollarPool);
         dollarPool -= insurance;
       }
@@ -880,10 +876,7 @@ export function project(opts: {
       poolStart = lifetime ? 0 : tradPool;
       poolBeforeDraw = poolStart;
       if (inCare && opts.policy.enabled && cost > 0 && (lifetime || tradPool > 0)) {
-        careYearIndex += 1;
-        const elim = careYearIndex === 1 ? opts.policy.elimDays : 0;
-        const frac = Math.max(0, (365 - elim) / 365);
-        const annualCap = dailyThen * 365 * frac;
+        const annualCap = dailyThen * 365;
         insurance = Math.min(cost, annualCap, lifetime ? Number.POSITIVE_INFINITY : tradPool);
         if (!lifetime) tradPool = Math.max(0, tradPool - insurance);
       }
