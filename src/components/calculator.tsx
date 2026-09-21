@@ -1645,7 +1645,7 @@ export function Calculator() {
               items={[
                 ...(featureRow
                   ? [
-                      { id: "col-year", group: "column" as const, label: "Beginning of the run", value: String(calendarYear(featureRow.year)) },
+                      { id: "col-year", group: "column" as const, label: "Beginning of the run", value: String(calendarYear(featureRow.year)), amount: calendarYear(featureRow.year) },
                       { id: "col-assets", group: "column" as const, label: "Countable Assets (net after tax) · beginning", value: moneyCents(featureRow.remainingNetStart) },
                     ]
                   : []),
@@ -1667,13 +1667,13 @@ export function Calculator() {
                                   : featureRow.remainingNet,
                               ),
                       },
-                      { id: "col-cost", group: "column" as const, label: "Annual Care Costs* (est) · beginning", value: <RedAmt>{moneyCents(featureRow.cost)}</RedAmt> },
+                      { id: "col-cost", group: "column" as const, label: "Annual Care Costs* (est) · beginning", value: <RedAmt>{moneyCents(featureRow.cost)}</RedAmt>, amount: featureRow.cost },
                     ]
                   : []),
                 ...(policy.enabled && featureRow
                   ? [
-                      { id: "col-benefits", group: "column" as const, label: "Insurance Benefits · beginning", value: moneyCents(featureRow.insurance) },
-                      { id: "col-benefits-cum", group: "column" as const, label: "Accumulative insurance paid · beginning", value: moneyCents(featureRow.insuranceCumulative) },
+                      { id: "col-benefits", group: "column" as const, label: "Insurance Benefits · beginning", value: moneyCents(featureRow.insurance), amount: featureRow.insurance },
+                      { id: "col-benefits-cum", group: "column" as const, label: "Accumulative insurance paid · beginning", value: moneyCents(featureRow.insuranceCumulative), amount: featureRow.insuranceCumulative },
                       { id: "col-balance", group: "column" as const, label: "Insurance Balance · beginning", value: lifetime ? "Lifetime" : moneyCents(featureRow.insurancePoolRemaining) },
                     ]
                   : []),
@@ -1699,9 +1699,9 @@ export function Calculator() {
                   : []),
                 ...(depletionRow
                   ? [
-                      { id: "dep-year", group: "depletion" as const, label: "End of the run", value: String(calendarYear(depletionRow.year)) },
+                      { id: "dep-year", group: "depletion" as const, label: "End of the run", value: String(calendarYear(depletionRow.year)), amount: calendarYear(depletionRow.year) },
                       { id: "dep-status", group: "depletion" as const, label: "Status · end", value: <RedAmt>{depletionRow.status}</RedAmt> },
-                      { id: "dep-assets", group: "depletion" as const, label: "Countable Assets (net after tax) · end", value: moneyCents(depletionRow.remainingNetStart) },
+                      { id: "dep-assets", group: "depletion" as const, label: "Countable Assets (net after tax) · end", value: moneyCents(depletionRow.remainingNetStart), amount: depletionRow.remainingNet },
                     ]
                   : []),
                 ...(policy.enabled && depletionRow
@@ -1723,13 +1723,13 @@ export function Calculator() {
                               ),
                       },
                       { id: "dep-cost", group: "depletion" as const, label: "Annual Care Costs* (est) · end", value: <RedAmt>{moneyCents(depletionRow.cost)}</RedAmt> },
-                      { id: "dep-cost-cum", group: "depletion" as const, label: "Total cumulative care cost · end", value: <RedAmt>{moneyCents(depletionRow.costCumulative)}</RedAmt> },
+                      { id: "dep-cost-cum", group: "depletion" as const, label: "Total cumulative care cost · end", value: <RedAmt>{moneyCents(depletionRow.costCumulative)}</RedAmt>, amount: depletionRow.costCumulative },
                     ]
                   : []),
                 ...(policy.enabled && depletionRow
                   ? [
                       { id: "dep-benefits", group: "depletion" as const, label: "Insurance Benefits · end", value: moneyCents(depletionRow.insurance) },
-                      { id: "dep-benefits-cum", group: "depletion" as const, label: "Accumulative insurance paid · end", value: moneyCents(depletionRow.insuranceCumulative) },
+                      { id: "dep-benefits-cum", group: "depletion" as const, label: "Accumulative insurance paid · end", value: moneyCents(depletionRow.insuranceCumulative), amount: depletionRow.insuranceCumulative },
                       { id: "dep-balance", group: "depletion" as const, label: "Insurance Balance · end", value: lifetime ? "Lifetime" : moneyCents(depletionRow.insurancePoolRemaining) },
                     ]
                   : []),
@@ -1739,6 +1739,7 @@ export function Calculator() {
                         id: "dep-copay",
                         group: "depletion" as const,
                         label: "Accumulative co-pay from countable assets · end",
+                        amount: depletionRow.drawnCumulative,
                         value: (
                           <span className={depletionRow.drawnCumulative > 0 ? "font-bold amt-red" : ""}>
                             {depletionRow.drawnCumulative > 0 ? moneyCents(-depletionRow.drawnCumulative) : moneyCents(0)}
@@ -1749,12 +1750,14 @@ export function Calculator() {
                         id: "dep-shortfall",
                         group: "depletion" as const,
                         label: "Cumulative Shortfall · end",
+                        amount: depletionRow.shortfallCumulative,
                         value: depletionRow.shortfallCumulative ? <RedAmt>{moneyCents(depletionRow.shortfallCumulative)}</RedAmt> : "—",
                       },
                       {
                         id: "dep-gap",
                         group: "depletion" as const,
                         label: "Care cost − insurance (copay + unpaid) · end",
+                        amount: Math.max(0, depletionRow.costCumulative - depletionRow.insuranceCumulative),
                         value: <RedAmt>{moneyCents(Math.max(0, depletionRow.costCumulative - depletionRow.insuranceCumulative))}</RedAmt>,
                       },
                     ]
@@ -1766,12 +1769,14 @@ export function Calculator() {
                         group: "cumulative" as const,
                         label: "Cumulative through",
                         value: String(calendarYear(yearRowsShown.at(-1)!.year)),
+                        amount: calendarYear(yearRowsShown.at(-1)!.year),
                       },
                       {
                         id: "cum-cost",
                         group: "cumulative" as const,
                         label: "Total cumulative care cost",
                         value: <RedAmt>{moneyCents(yearRowsShown.at(-1)!.costCumulative)}</RedAmt>,
+                        amount: yearRowsShown.at(-1)!.costCumulative,
                       },
                       ...(policy.enabled
                         ? [
@@ -1780,6 +1785,7 @@ export function Calculator() {
                               group: "cumulative" as const,
                               label: "Accumulative insurance paid",
                               value: moneyCents(yearRowsShown.at(-1)!.insuranceCumulative),
+                              amount: yearRowsShown.at(-1)!.insuranceCumulative,
                             },
                           ]
                         : []),
@@ -1787,6 +1793,7 @@ export function Calculator() {
                         id: "cum-copay",
                         group: "cumulative" as const,
                         label: "Accumulative co-pay from countable assets",
+                        amount: yearRowsShown.at(-1)!.drawnCumulative,
                         value: (
                           <span className={yearRowsShown.at(-1)!.drawnCumulative > 0 ? "font-bold amt-red" : ""}>
                             {yearRowsShown.at(-1)!.drawnCumulative > 0
@@ -1799,6 +1806,7 @@ export function Calculator() {
                         id: "cum-short",
                         group: "cumulative" as const,
                         label: "Cumulative unpaid shortfall",
+                        amount: yearRowsShown.at(-1)!.shortfallCumulative,
                         value: yearRowsShown.at(-1)!.shortfallCumulative ? (
                           <RedAmt>{moneyCents(yearRowsShown.at(-1)!.shortfallCumulative)}</RedAmt>
                         ) : (
@@ -1809,6 +1817,10 @@ export function Calculator() {
                         id: "cum-gap",
                         group: "cumulative" as const,
                         label: "Care cost − insurance (copay + unpaid)",
+                        amount: Math.max(
+                          0,
+                          yearRowsShown.at(-1)!.costCumulative - yearRowsShown.at(-1)!.insuranceCumulative,
+                        ),
                         value: (
                           <RedAmt>
                             {moneyCents(
@@ -1830,10 +1842,10 @@ export function Calculator() {
                   : []),
                 { id: "claim-assets", group: "more" as const, label: "Countable assets at claim (net after tax)", value: <RedAmt>{moneyCents(result.startPoolNet)}</RedAmt> },
                 { id: "assets-today", group: "more" as const, label: "Countable assets today", value: moneyCents(pool) },
-                { id: "first-cost", group: "more" as const, label: "First-year care cost", value: moneyCents(result.firstCost) },
+                { id: "first-cost", group: "more" as const, label: "First-year care cost", value: moneyCents(result.firstCost), amount: result.firstCost },
                 ...(policy.enabled
                   ? [
-                      { id: "col-benefits-total", group: "more" as const, label: "Insurance Benefits (this run)", value: <RedAmt>{moneyCents(result.insuranceTotal)}</RedAmt> },
+                      { id: "col-benefits-total", group: "more" as const, label: "Insurance Benefits (this run)", value: <RedAmt>{moneyCents(result.insuranceTotal)}</RedAmt>, amount: result.insuranceTotal },
                       { id: "ltc-purchase", group: "more" as const, label: "LTC pool at purchase", value: result.lifetimeBenefit ? "Lifetime" : moneyCents(insToday) },
                       { id: "ltc-claim", group: "more" as const, label: "LTC benefits at claim", value: result.lifetimeBenefit ? "Lifetime" : moneyCents(insClaim) },
                     ]
@@ -1844,8 +1856,8 @@ export function Calculator() {
                   label: policy.enabled ? "Combined pool today (assets + LTC)" : "Countable pool today",
                   value: policy.enabled && result.lifetimeBenefit ? `${money(pool)} + lifetime` : moneyCents(combinedToday),
                 },
-                { id: "end-assets", group: "more" as const, label: "Assets remaining (end of run)", value: <RedAmt>{moneyCents(result.endPool)}</RedAmt> },
-                { id: "end-short", group: "more" as const, label: "Unpaid shortfall (end of run)", value: <RedAmt>{result.shortfallTotal ? moneyCents(result.shortfallTotal) : "None"}</RedAmt> },
+                { id: "end-assets", group: "more" as const, label: "Assets remaining (end of run)", value: <RedAmt>{moneyCents(result.endPool)}</RedAmt>, amount: result.endPool },
+                { id: "end-short", group: "more" as const, label: "Unpaid shortfall (end of run)", value: <RedAmt>{result.shortfallTotal ? moneyCents(result.shortfallTotal) : "None"}</RedAmt>, amount: result.shortfallTotal },
               ]}
             />
             <div className="mt-2 stack-actions md:grid-cols-2">
@@ -2515,8 +2527,38 @@ function MoneyField({ id, value, onChange, compact }: { id: string; value: numbe
   return <StepperField id={id} value={value} onChange={onChange} step={1000} min={0} prefix="$" compact={compact} />;
 }
 
-const KPI_ORDER_KEY = "aum-kpi-order";
-const KPI_SELECTED_KEY = "aum-kpi-selected";
+const KPI_ORDER_KEY = "aum-kpi-order-v3";
+const KPI_SELECTED_KEY = "aum-kpi-selected-v3";
+
+const DEFAULT_READY_CARD_IDS = [
+  "col-year",
+  "combined-today",
+  "col-cost",
+  "dep-year",
+  "col-total",
+  "dep-cost",
+  "dep-cost-cum",
+  "dep-benefits-cum",
+  "dep-copay",
+];
+
+const READY_DUP_FAMILIES: string[][] = [
+  ["dep-benefits-cum", "cum-ins", "col-benefits-total"],
+  ["dep-cost-cum", "cum-cost"],
+  ["dep-copay", "cum-copay"],
+  ["dep-shortfall", "cum-short", "end-short"],
+  ["col-cost", "first-cost"],
+  ["col-benefits", "col-benefits-cum"],
+  ["dep-gap", "cum-gap"],
+  ["col-year", "cum-through"],
+  ["dep-assets", "end-assets"],
+];
+
+function sameReadyAmount(a: number | string | undefined, b: number | string | undefined) {
+  if (a == null || b == null) return false;
+  if (typeof a === "number" && typeof b === "number") return Math.round(a * 100) === Math.round(b * 100);
+  return String(a) === String(b);
+}
 
 function loadKpiList(key: string): string[] {
   try {
@@ -2553,7 +2595,22 @@ type HypoCardItem = {
   label: string;
   value: ReactNode;
   group: "column" | "depletion" | "cumulative" | "more";
+  amount?: number | string;
 };
+
+function dropDuplicateReadyCards(items: HypoCardItem[]) {
+  const byId = new Map(items.map((i) => [i.id, i]));
+  const drop = new Set<string>();
+  for (const family of READY_DUP_FAMILIES) {
+    const present = family.map((id) => byId.get(id)).filter((i): i is HypoCardItem => Boolean(i));
+    if (present.length < 2) continue;
+    const keep = present[0];
+    for (const extra of present.slice(1)) {
+      if (sameReadyAmount(keep.amount, extra.amount)) drop.add(extra.id);
+    }
+  }
+  return items.filter((i) => !drop.has(i.id));
+}
 
 function MovableKpiGrid({
   items,
@@ -2570,20 +2627,25 @@ function MovableKpiGrid({
   const fromRef = useRef<string | null>(null);
 
   useEffect(() => {
-    setOrder(loadKpiList(KPI_ORDER_KEY));
+    const storedOrder = loadKpiList(KPI_ORDER_KEY);
+    setOrder(storedOrder.length ? storedOrder : [...DEFAULT_READY_CARD_IDS]);
     const stored = localStorage.getItem(KPI_SELECTED_KEY);
     setSelected(stored ? loadKpiList(KPI_SELECTED_KEY) : null);
   }, []);
 
-  const columnItems = useMemo(() => items.filter((i) => i.group === "column"), [items]);
-  const depletionItems = useMemo(() => items.filter((i) => i.group === "depletion"), [items]);
-  const cumulativeItems = useMemo(() => items.filter((i) => i.group === "cumulative"), [items]);
-  const moreItems = useMemo(() => items.filter((i) => i.group === "more"), [items]);
-  const columnIds = useMemo(() => columnItems.map((i) => i.id), [columnItems]);
-  const chosen = selected ?? columnIds;
+  const uniqueItems = useMemo(() => dropDuplicateReadyCards(items), [items]);
+  const columnItems = useMemo(() => uniqueItems.filter((i) => i.group === "column"), [uniqueItems]);
+  const depletionItems = useMemo(() => uniqueItems.filter((i) => i.group === "depletion"), [uniqueItems]);
+  const cumulativeItems = useMemo(() => uniqueItems.filter((i) => i.group === "cumulative"), [uniqueItems]);
+  const moreItems = useMemo(() => uniqueItems.filter((i) => i.group === "more"), [uniqueItems]);
+  const defaultIds = useMemo(
+    () => DEFAULT_READY_CARD_IDS.filter((id) => uniqueItems.some((i) => i.id === id)),
+    [uniqueItems],
+  );
+  const chosen = selected ?? defaultIds;
   const visibleItems = useMemo(
-    () => sortKpis(items.filter((i) => chosen.includes(i.id)), order),
-    [items, order, chosen],
+    () => sortKpis(uniqueItems.filter((i) => chosen.includes(i.id)), order.length ? order : defaultIds),
+    [uniqueItems, order, chosen, defaultIds],
   );
 
   function persistOrder(next: string[]) {
@@ -2598,6 +2660,11 @@ function MovableKpiGrid({
 
   function toggle(id: string) {
     persistSelected(chosen.includes(id) ? chosen.filter((x) => x !== id) : [...chosen, id]);
+  }
+
+  function resetView() {
+    persistSelected(defaultIds);
+    persistOrder(defaultIds);
   }
 
   function idNearest(x: number, y: number): string | null {
@@ -2694,7 +2761,16 @@ function MovableKpiGrid({
           </div>
         </>
       ) : null}
-      <p className="mt-3 mb-2 text-xs text-muted">Selected cards appear below. Drag to rearrange. × removes from this view.</p>
+      <div className="mt-3 mb-2 flex flex-wrap items-center justify-between gap-2">
+        <p className="text-xs text-muted">Selected cards appear below. Drag to rearrange. × removes from this view.</p>
+        <button
+          type="button"
+          className="rounded-lg border border-navy px-3 py-1.5 text-xs text-navy hover:bg-cream"
+          onClick={resetView}
+        >
+          Reset cards to default
+        </button>
+      </div>
       <div ref={gridRef} className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
         {visibleItems.map((item) => {
           const active = dragging === item.id;
