@@ -450,6 +450,7 @@ export function Calculator() {
       ? yearView.rows.find((r) => r.year === yearDepleted) ?? lastCareRow
       : lastCareRow;
   const depletedWhen = depletionCalendar(yearView.rows, yearDepleted, MODEL_START_YEAR);
+  const featureRow = depletedRow ?? lastCareRow;
   const yearPageSize = 10;
   const yearPages = Math.max(1, Math.ceil(yearRowsShown.length / yearPageSize));
   const yearSlice = yearRowsShown.slice(yearPage * yearPageSize, (yearPage + 1) * yearPageSize);
@@ -1617,46 +1618,76 @@ export function Calculator() {
             </div>
             <MovableKpiGrid
               items={[
-                ...(depletedRow
+                ...(featureRow
                   ? [
-                      { id: "status", label: "Status", value: <RedAmt>{depletedRow.status}</RedAmt> },
-                      { id: "claim-assets", label: "Countable assets at claim (net after tax)", value: <RedAmt>{money(result.startPoolNet)}</RedAmt> },
-                      { id: "depleted-cost", label: "Annual cost", value: <RedAmt>{money(depletedRow.cost)}</RedAmt> },
-                      ...(policy.enabled
-                        ? [{ id: "depleted-ins", label: "Insurance paid", value: <RedAmt>{money(depletedRow.insurancePaid)}</RedAmt> }]
-                        : []),
-                      { id: "depleted-assets", label: "Assets remaining", value: <RedAmt>{money(depletedRow.remaining)}</RedAmt> },
-                      { id: "depleted-short", label: "Unpaid shortfall", value: <RedAmt>{depletedRow.shortfallCumulative ? money(depletedRow.shortfallCumulative) : "None"}</RedAmt> },
+                      { id: "status", label: "Status", value: <RedAmt>{featureRow.status}</RedAmt> },
+                      {
+                        id: "col-assets",
+                        label: "Countable Assets (net after tax)",
+                        value: moneyCents(featureRow.remainingNetStart),
+                      },
                     ]
-                  : [
-                      { id: "claim-assets", label: "Countable assets at claim (net after tax)", value: <RedAmt>{money(result.startPoolNet)}</RedAmt> },
-                    ]),
-                { id: "assets-today", label: "Countable assets today", value: money(pool) },
-                ...(policy.enabled
-                  ? [{ id: "ltc-purchase", label: "LTC pool at purchase", value: result.lifetimeBenefit ? "Lifetime" : money(insToday) }]
                   : []),
-                {
-                  id: "combined-today",
-                  label: policy.enabled ? "Combined pool today (assets + LTC)" : "Countable pool today",
-                  value: policy.enabled && result.lifetimeBenefit ? `${money(pool)} + lifetime` : money(combinedToday),
-                },
-                {
-                  id: "pool-exhausted",
-                  label: `Combined pool exhausted · ${SETTING_SHORT[activeSetting]} (today)`,
-                  value: formatYearsLast(yearsToday),
-                },
-                ...(policy.enabled
-                  ? [{ id: "ltc-claim", label: "LTC benefits at claim", value: result.lifetimeBenefit ? "Lifetime" : money(insClaim) }]
-                  : []),
-                { id: "first-cost", label: "First-year care cost", value: money(result.firstCost) },
-                { id: "end-assets", label: "Assets remaining", value: <RedAmt>{money(result.endPool)}</RedAmt> },
-                { id: "end-short", label: "Unpaid shortfall", value: <RedAmt>{result.shortfallTotal ? money(result.shortfallTotal) : "None"}</RedAmt> },
-                ...(policy.enabled && !insuranceLocked
+                { id: "claim-assets", label: "Countable assets at claim (net after tax)", value: <RedAmt>{moneyCents(result.startPoolNet)}</RedAmt> },
+                ...(policy.enabled && featureRow
                   ? [
-                      { id: "ins-first", label: "Insurance pays first · assets remaining", value: <RedAmt>{money(result.endPool)}</RedAmt> },
-                      { id: "self-fund", label: "Same years with no policy · remaining", value: <RedAmt>{money(selfFunded.endPool)}</RedAmt> },
-                      { id: "ins-total", label: "Insurance paid (benefits)", value: <RedAmt>{money(result.insuranceTotal)}</RedAmt> },
-                      { id: "short-after", label: "Shortfall after insurance", value: <RedAmt>{result.shortfallTotal ? money(result.shortfallTotal) : "None"}</RedAmt> },
+                      {
+                        id: "col-pool",
+                        label: "Insurance Benefit Pool",
+                        value: lifetime ? "Lifetime" : moneyCents(featureRow.insurancePoolStart),
+                      },
+                    ]
+                  : []),
+                ...(featureRow
+                  ? [
+                      {
+                        id: "col-total",
+                        label: "Total Remaining",
+                        value:
+                          policy.enabled && lifetime
+                            ? `${moneyCents(featureRow.remainingNet)} + lifetime`
+                            : moneyCents(
+                                policy.enabled
+                                  ? featureRow.remainingNet + Math.max(0, featureRow.insurancePoolRemaining)
+                                  : featureRow.remainingNet,
+                              ),
+                      },
+                      {
+                        id: "col-cost",
+                        label: "Annual Care Costs* (est)",
+                        value: <RedAmt>{moneyCents(featureRow.cost)}</RedAmt>,
+                      },
+                    ]
+                  : []),
+                ...(policy.enabled && featureRow
+                  ? [
+                      {
+                        id: "col-balance",
+                        label: "Insurance Balance",
+                        value: lifetime ? "Lifetime" : moneyCents(featureRow.insurancePoolRemaining),
+                      },
+                    ]
+                  : []),
+                ...(featureRow
+                  ? [
+                      {
+                        id: "col-copay",
+                        label: "Co-pay from Countable Assets",
+                        value: (
+                          <span className={featureRow.drawn > 0 ? "font-bold amt-red" : ""}>
+                            {featureRow.drawn > 0 ? moneyCents(-featureRow.drawn) : moneyCents(0)}
+                          </span>
+                        ),
+                      },
+                      {
+                        id: "col-shortfall",
+                        label: "Cumulative Shortfall",
+                        value: featureRow.shortfallCumulative ? (
+                          <RedAmt>{moneyCents(featureRow.shortfallCumulative)}</RedAmt>
+                        ) : (
+                          "—"
+                        ),
+                      },
                     ]
                   : []),
               ]}
@@ -2296,14 +2327,23 @@ function MoneyField({ id, value, onChange, compact }: { id: string; value: numbe
 }
 
 const KPI_ORDER_KEY = "aum-kpi-order";
+const KPI_HIDDEN_KEY = "aum-kpi-hidden";
 
-function loadKpiOrder(): string[] {
+function loadKpiList(key: string): string[] {
   try {
-    const raw = localStorage.getItem(KPI_ORDER_KEY);
+    const raw = localStorage.getItem(key);
     const parsed = raw ? JSON.parse(raw) : [];
     return Array.isArray(parsed) ? parsed.filter((x): x is string => typeof x === "string") : [];
   } catch {
     return [];
+  }
+}
+
+function saveKpiList(key: string, ids: string[]) {
+  try {
+    localStorage.setItem(key, JSON.stringify(ids));
+  } catch {
+    /* ignore quota */
   }
 }
 
@@ -2325,24 +2365,41 @@ function MovableKpiGrid({
   items: { id: string; label: string; value: ReactNode }[];
 }) {
   const [order, setOrder] = useState<string[]>([]);
+  const [hidden, setHidden] = useState<string[]>([]);
   const [dragging, setDragging] = useState<string | null>(null);
   const [overId, setOverId] = useState<string | null>(null);
   const gridRef = useRef<HTMLDivElement>(null);
   const fromRef = useRef<string | null>(null);
 
   useEffect(() => {
-    setOrder(loadKpiOrder());
+    setOrder(loadKpiList(KPI_ORDER_KEY));
+    setHidden(loadKpiList(KPI_HIDDEN_KEY));
   }, []);
 
-  const shown = useMemo(() => sortKpis(items, order), [items, order]);
+  const visibleItems = useMemo(
+    () => sortKpis(items.filter((i) => !hidden.includes(i.id)), order),
+    [items, order, hidden],
+  );
+  const hiddenItems = useMemo(
+    () => items.filter((i) => hidden.includes(i.id)),
+    [items, hidden],
+  );
 
-  function persist(next: string[]) {
+  function persistOrder(next: string[]) {
     setOrder(next);
-    try {
-      localStorage.setItem(KPI_ORDER_KEY, JSON.stringify(next));
-    } catch {
-      /* ignore quota */
-    }
+    saveKpiList(KPI_ORDER_KEY, next);
+  }
+
+  function hide(id: string) {
+    const nextHidden = hidden.includes(id) ? hidden : [...hidden, id];
+    setHidden(nextHidden);
+    saveKpiList(KPI_HIDDEN_KEY, nextHidden);
+  }
+
+  function restore(id?: string) {
+    const nextHidden = id ? hidden.filter((h) => h !== id) : [];
+    setHidden(nextHidden);
+    saveKpiList(KPI_HIDDEN_KEY, nextHidden);
   }
 
   function idNearest(x: number, y: number): string | null {
@@ -2372,18 +2429,20 @@ function MovableKpiGrid({
     setDragging(null);
     setOverId(null);
     if (!from || !over || from === over) return;
-    const ids = shown.map((i) => i.id);
+    const ids = visibleItems.map((i) => i.id);
     const next = ids.filter((id) => id !== from);
     const at = next.indexOf(over);
     next.splice(at < 0 ? next.length : at, 0, from);
-    persist(next);
+    persistOrder(next);
   }
 
   return (
     <div className="mb-4">
-      <p className="mb-2 text-xs text-muted">Press and drag a card to rearrange after this run.</p>
+      <p className="mb-2 text-xs text-muted">
+        Cards match the year-by-year columns. Press and drag to rearrange. Use × to remove a card you do not need.
+      </p>
       <div ref={gridRef} className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-        {shown.map((item) => {
+        {visibleItems.map((item) => {
           const active = dragging === item.id;
           const over = overId === item.id && dragging && dragging !== item.id;
           return (
@@ -2392,6 +2451,7 @@ function MovableKpiGrid({
               data-kpi-id={item.id}
               onPointerDown={(e) => {
                 if (e.button !== 0) return;
+                if ((e.target as HTMLElement | null)?.closest("[data-kpi-remove]")) return;
                 fromRef.current = item.id;
                 setDragging(item.id);
                 e.currentTarget.setPointerCapture(e.pointerId);
@@ -2407,16 +2467,50 @@ function MovableKpiGrid({
                 setDragging(null);
                 setOverId(null);
               }}
-              className={`card touch-none select-none px-4 py-3 ${
+              className={`card relative touch-none select-none px-4 py-3 pr-10 ${
                 active ? "cursor-grabbing opacity-60" : "cursor-grab"
               } ${over ? "ring-2 ring-gold" : ""}`}
             >
+              <button
+                type="button"
+                data-kpi-remove
+                className="absolute right-1.5 top-1.5 inline-flex size-8 items-center justify-center rounded-md text-lg leading-none text-muted hover:bg-cream hover:text-navy"
+                aria-label={`Remove ${item.label}`}
+                onPointerDown={(e) => e.stopPropagation()}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  hide(item.id);
+                }}
+              >
+                ×
+              </button>
               <p className="text-xs uppercase tracking-wide text-muted">{item.label}</p>
               <p className="font-display text-xl tabular-nums text-navy">{item.value}</p>
             </div>
           );
         })}
       </div>
+      {hiddenItems.length ? (
+        <div className="mt-2 flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            className="rounded-lg border border-navy px-3 py-1.5 text-xs text-navy"
+            onClick={() => restore()}
+          >
+            Restore removed cards
+          </button>
+          {hiddenItems.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              className="rounded-lg border border-line px-2 py-1 text-xs text-muted hover:text-navy"
+              onClick={() => restore(item.id)}
+            >
+              + {item.label}
+            </button>
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }
