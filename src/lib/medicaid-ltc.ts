@@ -3,6 +3,8 @@ import {
   eligibilityRules,
   medicaidProfile,
   spendDownRules,
+  MEDICAID_FUTURE_QUALIFIER,
+  MEDICAID_PAYS_CAVEAT,
 } from "./medicaid";
 import { partnershipInfo } from "./partnership";
 import { MMMNA_2026 } from "./mapt";
@@ -53,7 +55,7 @@ export function medicaidLtcOverview(state: string) {
 
   return {
     title: `Medicaid long-term care in ${state}`,
-    lead: `${state} Medicaid can pay nursing-facility care, and often home- and community-based (HCBS) waiver services, after functional need, residency, resources, and income tests are met. Assisted living is covered only if the state has a waiver or specialized program — it is not automatic. This is educational planning, not a determination of eligibility.`,
+    lead: `${state} Medicaid can pay nursing-facility care, and often home- and community-based (HCBS) waiver services, after functional need, residency, resources, and income tests are met. Assisted living is covered only if the state has a waiver or specialized program — it is not automatic. This is educational planning, not a determination of eligibility. ${MEDICAID_PAYS_CAVEAT}`,
     covers: [
       "Nursing facility (institutional Medicaid) after a nursing-home level of care.",
       "HCBS waivers / home care when the state offers them and a slot is available — wait lists are common.",
@@ -70,7 +72,7 @@ export function medicaidLtcOverview(state: string) {
         : `Medically needy path: excess income is reduced by incurred medical / LTC bills. MNIL ${spend.mnil ?? "confirm locally"}; period ${spend.mnPeriod ?? "confirm locally"}.`,
     ],
     lookBack,
-    nam: "After eligibility, remaining countable income (after a small personal-needs allowance and any community-spouse income allowance) is paid to the facility as the NAM — the resident’s share of cost. Medicaid pays the rest of the allowed rate. Insurance benefits that pay the facility reduce what Medicaid (and the NAM) must cover.",
+    nam: `After eligibility, remaining countable income (after a small personal-needs allowance and any community-spouse income allowance) is paid to the facility as the NAM — the resident’s share of cost. Medicaid pays the rest of the allowed rate. Insurance benefits that pay the facility reduce what Medicaid (and the NAM) must cover. ${MEDICAID_PAYS_CAVEAT}`,
     partnership:
       pInfo.kind === "none"
         ? `${state} is not modeled as a Partnership state in this tool. A tax-qualified policy still pays claims; it does not, by itself, raise the Medicaid resource limit.`
@@ -81,6 +83,7 @@ export function medicaidLtcOverview(state: string) {
             : `${state} participates in the DRA Partnership compact. Benefits paid on a qualifying tax-qualified policy can be disregarded dollar-for-dollar at Medicaid. The insurance contract travels; the Medicaid disregard generally follows only in compact states.`,
     estate:
       "Most states file an estate-recovery claim against the probate estate (often including the home after both spouses have died) for Medicaid LTC paid. Partnership-protected assets may still face recovery rules — confirm with counsel.",
+    futureNote: MEDICAID_FUTURE_QUALIFIER,
     impoverishment: spousalImpoverishment(state),
     eligibility: elig,
     spendTitle: spend.title,

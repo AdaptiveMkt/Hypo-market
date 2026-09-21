@@ -9,6 +9,7 @@ import type { LtcPolicy } from "@/lib/calc";
 import { medicaidLtcOverview } from "@/lib/medicaid-ltc";
 import {
   eligibilityRules,
+  MEDICAID_FUTURE_QUALIFIER,
   type MedicaidProfile,
 } from "@/lib/medicaid";
 import { medicaidProtectStrategies } from "@/lib/medicaid-protect";
@@ -86,6 +87,9 @@ export function MedicaidVaBody({
         Read in this order: what Medicaid pays, whether you could qualify, this state’s
         numbers, how spend-down works, then ways to protect remaining assets. VA notes appear
         last if the wartime box is checked.
+      </p>
+      <p className="mb-2 text-xs leading-relaxed text-muted">
+        <LinkedCopy text={MEDICAID_FUTURE_QUALIFIER} />
       </p>
 
       <p><LinkedCopy text={ltc.lead} /></p>
@@ -191,7 +195,9 @@ export function MedicaidVaBody({
         <p>{ltc.partnership}</p>
         <p className="mt-2 text-xs">
           Partnership can protect assets equal to benefits paid, without a five-year wait on
-          those paid benefits. It does not replace the income test or a QIT.
+          those paid benefits. It does not replace the income test or a QIT. That disregard
+          is current-rule planning only — it does not assume Medicaid will still be solvent
+          or that the Partnership benefit will remain the same.
         </p>
       </Fold>
       <Fold title={mapt.title}>

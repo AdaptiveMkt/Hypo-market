@@ -50,7 +50,7 @@ export const HOLD_HARMLESS_PARAS = [
   },
   {
     heading: "Not legal advice",
-    body: "Nothing on this site, in a View report, or in a PDF is legal advice. No attorney-client relationship is formed with Adaptive Marketing Group, Funding LTC Marketplace, or anyone solely because you used this model. Medicaid, Partnership, spend-down, QIT, MAPT, homestead, VA, SSI, estate-recovery, and tax-qualified LTC rules are summaries of publicly described programs; they are not an opinion of counsel and are not a substitute for advice from a lawyer licensed in the state whose law applies. Only that lawyer can apply the law to your facts. Do not gift, retitle, spend down, or file a claim based only on this hypothetical.",
+    body: "Nothing on this site, in a View report, or in a PDF is legal advice. No attorney-client relationship is formed with Adaptive Marketing Group, Funding LTC Marketplace, or anyone solely because you used this model. Medicaid, Partnership, spend-down, QIT, MAPT, homestead, VA, SSI, estate-recovery, and tax-qualified LTC rules are summaries of publicly described programs; they are not an opinion of counsel and are not a substitute for advice from a lawyer licensed in the state whose law applies. Only that lawyer can apply the law to your facts. Do not gift, retitle, spend down, or file a claim based only on this hypothetical. This model does not assume Medicaid will still be solvent, or that any Medicaid benefit will remain the same — solvency and benefits may be adjusted by legislation, regulation, or other government action.",
   },
   {
     heading: "Contact the appropriate professional",
@@ -158,7 +158,7 @@ export const TERMS_LIABILITY_SECTIONS = [
   },
   {
     heading: "Not a public-benefits determination",
-    body: "Nothing on this site is a determination of Medicaid, SSI, Medicare, VA pension, Aid and Attendance, disability compensation, or tax eligibility or amount. Partnership “protected” assets, CSRA, QIT, MAPT, spend-down, SSI resource limits, and VA MAPR/compensation tables are educational summaries of published rules. Only the relevant agency, a court, or a qualified attorney or VSO can apply those rules to a household. Do not spend down, gift, or file a claim solely on this model.",
+    body: "Nothing on this site is a determination of Medicaid, SSI, Medicare, VA pension, Aid and Attendance, disability compensation, or tax eligibility or amount. Partnership “protected” assets, CSRA, QIT, MAPT, spend-down, SSI resource limits, and VA MAPR/compensation tables are educational summaries of published rules. This model does not assume Medicaid will still be solvent, or that any Medicaid benefit, payment rate, eligibility test, or Partnership disregard will remain the same when care is needed; Congress, CMS, the state legislature, or the state Medicaid agency may reduce, increase, delay, restructure, or otherwise adjust the program through legislation, regulation, budget action, or other government action. Only the relevant agency, a court, or a qualified attorney or VSO can apply those rules to a household. Do not spend down, gift, or file a claim solely on this model.",
   },
   {
     heading: "Sources, dates, and no duty to update",

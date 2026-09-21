@@ -116,7 +116,7 @@ export function millerTrustMedicaidImpact(state: string) {
       },
       {
         heading: "After eligibility — NAM",
-        body: "Once Medicaid starts, the trustee still distributes income: personal-needs allowance, community-spouse MMMNA if due, then the nursing facility or waiver providers (the NAM). Medicaid pays the rest of the allowed rate. The family does not keep the surplus income.",
+        body: "Once Medicaid starts, the trustee still distributes income: personal-needs allowance, community-spouse MMMNA if due, then the nursing facility or waiver providers (the NAM). Medicaid pays the rest of the allowed rate only if the program is then still solvent and still covering that setting at the rate then in force. The family does not keep the surplus income. Solvency and the benefit may be adjusted by legislation, regulation, or other government action.",
       },
       {
         heading: "At death",

@@ -2316,6 +2316,10 @@ export function ReportView({
               Indiana/New York total asset protection is in-state only. Asset spend-down and
               income spend-down are different tests. Medicaid figures for{" "}
               <StateName name={state} /> are on the Medicaid & VA card — they are not repeated here.
+              This is current-rule planning only: it does not assume Medicaid will still be
+              solvent or that any Partnership disregard or other Medicaid benefit will remain
+              the same — solvency and benefits may be adjusted by legislation, regulation, or
+              other government action.
               </p>
             </TitleCollapse>
             <TitleCollapse title={TAX_SECTION_LABEL}>

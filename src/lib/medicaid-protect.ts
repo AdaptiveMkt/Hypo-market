@@ -7,7 +7,7 @@ export function medicaidProtectStrategies(state: string) {
   const p = medicaidProfile(state);
   return {
     title: `Medicaid asset-protection strategies in ${state}`,
-    summary: `Shown only because this run requested them. These are educational planning notes for ${state}, not a recommendation and not a determination of eligibility. A qualified Medicaid or elder-care planning attorney must design any transfer, trust, or annuity. Transfers for less than fair market value can trigger a 60-month look-back penalty.`,
+    summary: `Shown only because this run requested them. These are educational planning notes for ${state}, not a recommendation and not a determination of eligibility. A qualified Medicaid or elder-care planning attorney must design any transfer, trust, or annuity. Transfers for less than fair market value can trigger a 60-month look-back penalty. This model does not assume Medicaid will still be solvent or that any Medicaid benefit will remain the same — solvency and benefits may be adjusted by legislation, regulation, or other government action.`,
     bullets: [
       {
         heading: "Partnership long-term care insurance",

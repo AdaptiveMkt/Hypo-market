@@ -108,7 +108,7 @@ const CORE: KnowledgeChunk[] = [
     url: "https://www.medicaid.gov/medicaid/long-term-services-supports/medicaid-long-term-services-supports-ltss-benefits/long-term-care-partnership-program",
     aaltci: false,
     text:
-      "Medicaid LTC is means-tested. Countable assets generally spend down to a small individual limit (often about $2,000; couples both applying about $3,000). CSRA, MMMNA, and home-equity caps are in the CMCS Dec. 9, 2025 bulletin and Medicaid.gov spousal-impoverishment page; they vary by state. DRA Partnership can protect assets equal to benefits paid (dollar-for-dollar) in participating states; original CA/CT/IN/NY programs differ. Reciprocity is not automatic. Confirm with an elder-law attorney.",
+      "Medicaid LTC is means-tested. Countable assets generally spend down to a small individual limit (often about $2,000; couples both applying about $3,000). CSRA, MMMNA, and home-equity caps are in the CMCS Dec. 9, 2025 bulletin and Medicaid.gov spousal-impoverishment page; they vary by state. DRA Partnership can protect assets equal to benefits paid (dollar-for-dollar) in participating states; original CA/CT/IN/NY programs differ. Reciprocity is not automatic. Confirm with an elder-law attorney. This is current-rule planning only: it does not assume Medicaid will still be solvent or that the benefit will remain the same — solvency and benefits may be adjusted by legislation, regulation, or other government action.",
   },
   {
     id: "va",

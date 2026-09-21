@@ -113,7 +113,7 @@ export function reciprocityOutcome(
     "Connecticut, Indiana, and New York filed federal state-plan amendments to reciprocate with DRA neighbors on a dollar-for-dollar basis. New Partnership sales in New York have been paused in recent years; existing NY Partnership policies can still be used.",
   );
   bullets.push(
-    "Confirm certification, the Partnership disclosure, and both states’ current compact status with a licensed representative. This is educational, not a Medicaid determination.",
+    "Confirm certification, the Partnership disclosure, and both states’ current compact status with a licensed representative. This is educational, not a Medicaid determination. Compact membership and any Medicaid asset disregard may later be changed or ended by legislation, regulation, or other government action; this model does not assume Medicaid will remain solvent or that today’s disregard will still apply when care is needed.",
   );
 
   const title =

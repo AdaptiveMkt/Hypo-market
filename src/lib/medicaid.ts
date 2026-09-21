@@ -1,5 +1,13 @@
 /** 2026 long-term care Medicaid planning figures. Educational — not an eligibility determination. */
 
+/** Qualify Medicaid planning copy: future solvency and benefit levels are not assumed. */
+export const MEDICAID_FUTURE_QUALIFIER =
+  "This hypothetical does not assume Medicaid will still be solvent, or that any Medicaid benefit, payment rate, eligibility test, resource or income limit, covered setting, personal-needs allowance, or Partnership asset disregard will remain the same when care is needed. Congress, CMS, the state legislature, or the state Medicaid agency may reduce, increase, delay, restructure, or otherwise adjust the program through legislation, regulation, budget action, or other government action. Figures here are today’s published planning rules only — confirm current law at planning and again at application with a qualified Medicaid or elder-care planning attorney.";
+
+/** Short clause for sentences that say Medicaid “pays” or that assets must spend down first. */
+export const MEDICAID_PAYS_CAVEAT =
+  "That is current-rule planning only: it does not assume Medicaid will still be solvent or that the benefit will remain the same — solvency and benefits may be adjusted by legislation, regulation, or other government action.";
+
 export type MedicaidProfile = {
   individualLimit: number;
   coupleLimit: number;
@@ -254,10 +262,10 @@ export function spendDownRules(state: string, individualLimit: number): SpendDow
   const mnil = MNIL[state] ?? null;
 
   const bullets = [
-    `Asset spend-down: countable resources above ${state}’s applicant limit (this model uses ${formatUsd(individualLimit)} for a single LTC applicant) generally must be spent on care, exempt items, or otherwise reduced before Medicaid pays. Partnership disregard, if any, is subtracted first.`,
+    `Asset spend-down: countable resources above ${state}’s applicant limit (this model uses ${formatUsd(individualLimit)} for a single LTC applicant) generally must be spent on care, exempt items, or otherwise reduced before Medicaid pays. Partnership disregard, if any, is subtracted first. ${MEDICAID_PAYS_CAVEAT}`,
     `Exempt examples still sit outside spend-down: homestead (subject to the home-equity cap unless a spouse or dependent child lives there), one vehicle, household goods, burial funds, and a community spouse’s CSRA.`,
     `Look-back is generally 60 months. Gifts and under-market transfers in that window can create a penalty period. Buying a Partnership policy is not a gift.`,
-    `Once on institutional Medicaid, remaining countable income (after personal-needs allowance, often about $30–$160, and any community-spouse income allowance) is paid toward the facility. Medicaid pays the rest of the allowed rate.`,
+    `Once on institutional Medicaid, remaining countable income (after personal-needs allowance, often about $30–$160, and any community-spouse income allowance) is paid toward the facility. Medicaid pays the rest of the allowed rate. ${MEDICAID_PAYS_CAVEAT}`,
   ];
 
   if (pathway === "income-cap") {
@@ -278,7 +286,7 @@ export function spendDownRules(state: string, individualLimit: number): SpendDow
     "Income spend-down and asset spend-down are different. Partnership and this calculator’s “spend-down still” figure are about countable assets. They do not replace the income test.",
   );
   bullets.push(
-    `Confirm current ${state} Institutional Care / waiver rules with an elder-law or Medicaid specialist. This is not a determination of eligibility.`,
+    `Confirm current ${state} Institutional Care / waiver rules with an elder-law or Medicaid specialist. This is not a determination of eligibility. ${MEDICAID_FUTURE_QUALIFIER}`,
   );
 
   const title =
@@ -319,7 +327,7 @@ export function eligibilityRules(state: string): EligibilityRules {
     bullets: [
       {
         heading: "Not automatic",
-        body: `Medicaid long-term care in ${state} is a five-part test: functional need, categorical status, residency, countable resources, and countable income. A Partnership policy can raise how many assets may be kept. It does not skip any other test, and this model is not a determination of eligibility.`,
+        body: `Medicaid long-term care in ${state} is a five-part test: functional need, categorical status, residency, countable resources, and countable income. A Partnership policy can raise how many assets may be kept. It does not skip any other test, and this model is not a determination of eligibility. ${MEDICAID_PAYS_CAVEAT}`,
       },
       {
         heading: "Functional / medical need",
@@ -343,11 +351,11 @@ export function eligibilityRules(state: string): EligibilityRules {
       },
       {
         heading: "After eligibility — NAM and estate recovery",
-        body: "Once on institutional Medicaid, remaining countable income (after a personal-needs allowance, often about $30–$160 / month, and any community-spouse income allowance) is paid toward the facility as the NAM — Medicaid pays the rest of the allowed rate. States may recover from the estate after death, usually including the homestead, unless a spouse or qualifying child is protected. Partnership-designated assets are generally shielded from recovery only up to benefits actually paid (or designated TAP assets in IN/NY).",
+        body: `Once on institutional Medicaid, remaining countable income (after a personal-needs allowance, often about $30–$160 / month, and any community-spouse income allowance) is paid toward the facility as the NAM — Medicaid pays the rest of the allowed rate. ${MEDICAID_PAYS_CAVEAT} States may recover from the estate after death, usually including the homestead, unless a spouse or qualifying child is protected. Partnership-designated assets are generally shielded from recovery only up to benefits actually paid (or designated TAP assets in IN/NY).`,
       },
       {
         heading: "Considering Medicaid planning",
-        body: `Contact a qualified Medicaid or elder-care planning attorney in ${state}. Confirm CSRA, home-equity, QIT, MNIL, look-back, and estate-recovery rules with that attorney. This is educational only.`,
+        body: `Contact a qualified Medicaid or elder-care planning attorney in ${state}. Confirm CSRA, home-equity, QIT, MNIL, look-back, and estate-recovery rules with that attorney. This is educational only. ${MEDICAID_FUTURE_QUALIFIER}`,
       },
     ],
   };

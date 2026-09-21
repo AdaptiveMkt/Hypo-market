@@ -1,4 +1,4 @@
-import { spendDownRules } from "./medicaid";
+import { spendDownRules, MEDICAID_PAYS_CAVEAT } from "./medicaid";
 import { medicaidProtectStrategies } from "./medicaid-protect";
 import { isLinkedKind, type LtcPolicy } from "./calc";
 import { linkedPayoutNotes } from "./linked-products";
@@ -39,7 +39,7 @@ export function payoutThenSpendDown(
         },
         {
           heading: "When both are gone",
-          body: `Rows collapse after combined funds are depleted (insurance pool and countable assets). Unpaid shortfall after that is the modeled gap Medicaid, family, or other payers would face. Medicaid still generally requires countable assets down to about ${individualLimit.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 })} for a single applicant in ${state}, after any Partnership disregard.`,
+          body: `Rows collapse after combined funds are depleted (insurance pool and countable assets). Unpaid shortfall after that is the modeled gap Medicaid, family, or other payers would face — if Medicaid is then still solvent and still paying under the rules then in force. Medicaid still generally requires countable assets down to about ${individualLimit.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 })} for a single applicant in ${state}, after any Partnership disregard. ${MEDICAID_PAYS_CAVEAT}`,
         },
       ]
     : [
@@ -49,7 +49,7 @@ export function payoutThenSpendDown(
         },
         {
           heading: "After assets are depleted",
-          body: `Unpaid shortfall continues if care is still needed. Medicaid in ${state} still applies income tests (QIT or medically needy spend-down) and the applicant resource limit of about ${individualLimit.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 })}. Insurance is not modeled here — include a policy to see insurance-first, then assets.`,
+          body: `Unpaid shortfall continues if care is still needed. Medicaid in ${state} still applies income tests (QIT or medically needy spend-down) and the applicant resource limit of about ${individualLimit.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 })} — if Medicaid is then still solvent and still administering those tests under the rules then in force. Insurance is not modeled here — include a policy to see insurance-first, then assets. ${MEDICAID_PAYS_CAVEAT}`,
         },
       ];
 
