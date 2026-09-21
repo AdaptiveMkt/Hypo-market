@@ -240,7 +240,7 @@ export type LtcPolicy = {
 
 export const DAILY_BENEFIT_MIN = 150;
 export const DAILY_BENEFIT_MAX = 800;
-export const DAILY_BENEFIT_STEP = 50;
+export const DAILY_BENEFIT_STEP = 10;
 export const ASSET_BASED_MONTHLY_PCT = 0.02;
 export const LINKED_MONTHLY_MIN = 3000;
 export const LINKED_MONTHLY_STEP = 1000;
