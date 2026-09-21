@@ -1317,6 +1317,7 @@ export function Calculator() {
                 </p>
               </div>
             </div>
+            {naicUnlocked ? (
             <div className="mt-4 rounded-lg border border-gold bg-cream px-4 py-3">
               <h3 className="red-wave font-display text-lg font-bold whitespace-normal">
                 {(() => {
@@ -1399,6 +1400,7 @@ export function Calculator() {
                 </div>
               )}
             </div>
+            ) : null}
             <div className="mt-4 stack-actions">
               {missingRun.length ? (
                 <p className="w-full min-w-0 text-sm font-semibold leading-snug text-deplete" role="status">
