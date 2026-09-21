@@ -1720,12 +1720,12 @@ export function Calculator() {
                         {policy.enabled ? (
                           <td className={`${cell} text-right`}>{poolStartLabel}</td>
                         ) : null}
-                        <td className={`${cell} text-right`}>{moneyCents(r.cost)}</td>
+                        <td className={`${cell} text-right ${r.cost ? "font-bold amt-red" : ""}`}>{moneyCents(r.cost)}</td>
                         {policy.enabled ? (
                           <td className={`${cell} text-right`}>{poolLeft}</td>
                         ) : null}
                         <td className={`${cell} text-right`}>{moneyCents(assetsBeforeCopay)}</td>
-                        <td className={`${cell} text-right`}>{moneyCents(r.drawn)}</td>
+                        <td className={`${cell} text-right ${r.drawn ? "font-bold amt-red" : ""}`}>{moneyCents(r.drawn)}</td>
                         <td className={`py-2 pr-2 text-right ${remainClass}`} title={remainTitle}>{totalLabel}</td>
                         <td className={`${gone ? "py-2 font-bold amt-red" : "py-2"} text-right`}>
                           {r.shortfallCumulative ? moneyCents(r.shortfallCumulative) : "—"}

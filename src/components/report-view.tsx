@@ -939,14 +939,14 @@ export function ReportView({
                           {result.lifetimeBenefit ? "Lifetime" : moneyCents(r.insurancePoolStart)}
                         </td>
                       ) : null}
-                      <td className={`${cell} text-right`}>{moneyCents(r.cost)}</td>
+                      <td className={`${cell} text-right ${r.cost ? "font-bold amt-red" : ""}`}>{moneyCents(r.cost)}</td>
                       {policy.enabled ? (
                         <td className={`${cell} text-right`}>
                           {result.lifetimeBenefit ? "Lifetime" : moneyCents(r.insurancePoolRemaining)}
                         </td>
                       ) : null}
                       <td className={`${cell} text-right`}>{moneyCents(assetsBeforeCopay)}</td>
-                      <td className={`${cell} text-right`}>{moneyCents(r.drawn)}</td>
+                      <td className={`${cell} text-right ${r.drawn ? "font-bold amt-red" : ""}`}>{moneyCents(r.drawn)}</td>
                       <td className={`py-2 pr-2 text-right ${remainClass}`} title={remainTitle}>
                         {result.lifetimeBenefit
                           ? `${moneyCents(r.remaining)} + lifetime`
