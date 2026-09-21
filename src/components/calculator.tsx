@@ -648,24 +648,6 @@ export function Calculator() {
     setAssetRois((prev) => ({ ...prev, [key]: Number.isFinite(n) ? n : 0 }));
     setPoolShown(false);
   }
-  function zeroCountableAssets() {
-    const z = { ...DEFAULT_ASSETS };
-    (Object.keys(z) as (keyof Assets)[]).forEach((k) => {
-      if (k !== "excludable" && k !== "home") z[k] = 0;
-    });
-    if (!excludeHome) z.home = 0;
-    setAssets({ ...z, excludable: assets.excludable });
-    setPoolShown(false);
-    setSaveMsg("Countable assets set to $0.");
-    window.setTimeout(() => setSaveMsg(""), 2500);
-  }
-  function defaultCountableAssets() {
-    setAssets({ ...DEFAULT_ASSETS, excludable: defaultExcludableAssets(state) });
-    setAssetRois({ ...DEFAULT_ASSET_ROIS });
-    setPoolShown(false);
-    setSaveMsg("Countable assets restored to defaults.");
-    window.setTimeout(() => setSaveMsg(""), 2500);
-  }
   function resetAll() {
     setAssets({ ...DEFAULT_ASSETS, excludable: defaultExcludableAssets("") });
     setAssetRois({ ...DEFAULT_ASSET_ROIS });
@@ -1066,20 +1048,6 @@ export function Calculator() {
             <p className="mt-3 text-sm text-muted">Countable pool is hidden until you calculate countable assets.</p>
           )}
           <div className="mt-4 grid w-full min-w-0 grid-cols-1 gap-2">
-            <button
-              type="button"
-              onClick={zeroCountableAssets}
-              className="flex min-h-11 w-full items-center justify-center rounded-lg border border-navy px-3 py-2.5 text-center text-sm font-semibold leading-snug text-navy hover:bg-cream"
-            >
-              Set countable assets to $0
-            </button>
-            <button
-              type="button"
-              onClick={defaultCountableAssets}
-              className="flex min-h-11 w-full items-center justify-center rounded-lg border border-navy px-3 py-2.5 text-center text-sm font-semibold leading-snug text-navy hover:bg-cream"
-            >
-              Set countable assets to default
-            </button>
             <button
               type="button"
               className="flex min-h-12 w-full items-center justify-center rounded-lg bg-gold px-3 py-2.5 text-center text-base font-semibold leading-snug text-masthead hover:brightness-105"
