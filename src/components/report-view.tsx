@@ -875,21 +875,21 @@ export function ReportView({
               </p>
             ) : null}
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[960px] text-sm">
+              <table className="w-full min-w-[640px] table-fixed text-sm">
                 <thead>
-                  <tr className="text-left text-xs uppercase tracking-wide text-muted">
-                    <th className="py-2 pr-2">Year</th>
+                  <tr className="text-[11px] font-semibold leading-tight text-muted">
+                    <th className="w-[3.25rem] py-2 pr-2 text-left align-bottom">Year</th>
                     {policy.enabled ? (
-                      <th className="py-2 pr-2 text-right">Insurance Benefit Pool</th>
+                      <th className="py-2 pr-2 text-right align-bottom">Insurance<br />Benefit Pool</th>
                     ) : null}
-                    <th className="py-2 pr-2 text-right">Annual Care Costs</th>
+                    <th className="py-2 pr-2 text-right align-bottom">Annual Care<br />Costs</th>
                     {policy.enabled ? (
-                      <th className="py-2 pr-2 text-right">Insurance Balance</th>
+                      <th className="py-2 pr-2 text-right align-bottom">Insurance<br />Balance</th>
                     ) : null}
-                    <th className="py-2 pr-2 text-right">Countable Assets</th>
-                    <th className="py-2 pr-2 text-right">Co-pay from Countable Assets</th>
-                    <th className="py-2 pr-2 text-right">Total Remaining</th>
-                    <th className="py-2 text-right">Cumulative Shortfall</th>
+                    <th className="py-2 pr-2 text-right align-bottom">Countable<br />Assets</th>
+                    <th className="py-2 pr-2 text-right align-bottom">Co-pay from<br />Countable Assets</th>
+                    <th className="py-2 pr-2 text-right align-bottom">Total<br />Remaining</th>
+                    <th className="py-2 text-right align-bottom">Cumulative<br />Shortfall</th>
                   </tr>
                 </thead>
                 <tbody>

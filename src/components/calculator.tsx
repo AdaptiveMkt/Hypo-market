@@ -1662,21 +1662,21 @@ export function Calculator() {
               {" "}Every wait year and care year is listed, including years after funds are depleted.
             </p>
             <div className="overflow-x-auto pb-4">
-              <table className="w-full min-w-[960px] text-sm">
+              <table className="w-full min-w-[640px] table-fixed text-sm">
                 <thead>
-                  <tr className="border-b border-gold text-left text-xs uppercase tracking-wide text-muted">
-                    <th className="py-2 pr-2 font-semibold">Year</th>
+                  <tr className="border-b border-gold text-[11px] font-semibold leading-tight text-muted">
+                    <th className="w-[3.25rem] py-2 pr-2 text-left align-bottom">Year</th>
                     {policy.enabled ? (
-                      <th className="py-2 pr-2 text-right font-semibold">Insurance Benefit Pool</th>
+                      <th className="py-2 pr-2 text-right align-bottom">Insurance<br />Benefit Pool</th>
                     ) : null}
-                    <th className="py-2 pr-2 text-right font-semibold">Annual Care Costs</th>
+                    <th className="py-2 pr-2 text-right align-bottom">Annual Care<br />Costs</th>
                     {policy.enabled ? (
-                      <th className="py-2 pr-2 text-right font-semibold">Insurance Balance</th>
+                      <th className="py-2 pr-2 text-right align-bottom">Insurance<br />Balance</th>
                     ) : null}
-                    <th className="py-2 pr-2 text-right font-semibold">Countable Assets</th>
-                    <th className="py-2 pr-2 text-right font-semibold">Co-pay from Countable Assets</th>
-                    <th className="py-2 pr-2 text-right font-semibold">Total Remaining</th>
-                    <th className="py-2 text-right font-semibold">Cumulative Shortfall</th>
+                    <th className="py-2 pr-2 text-right align-bottom">Countable<br />Assets</th>
+                    <th className="py-2 pr-2 text-right align-bottom">Co-pay from<br />Countable Assets</th>
+                    <th className="py-2 pr-2 text-right align-bottom">Total<br />Remaining</th>
+                    <th className="py-2 text-right align-bottom">Cumulative<br />Shortfall</th>
                   </tr>
                 </thead>
                 <tbody>
