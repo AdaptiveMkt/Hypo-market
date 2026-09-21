@@ -301,7 +301,7 @@ export function Calculator() {
   const pool = poolTotal(assets, excludeHome);
   const homeEquity = Number(assets.home) || 0;
   const section2Floor = NAIC_LOCKOUT_ASSETS + homeEquity;
-  const naicUnlocked = poolShown && pool > section2Floor;
+  const naicUnlocked = poolShown && pool >= section2Floor;
   const insuranceLocked = insuranceLockedOut(pool);
   const insuranceWarn = insuranceNeedsWarning(pool);
   const insuranceSuitable = !insuranceLocked;
@@ -368,7 +368,7 @@ export function Calculator() {
   }, [insuranceWarn, pool]);
 
   useEffect(() => {
-    if (ageToday < MIN_AGE_TODAY) {
+    if (!naicUnlocked || ageToday < MIN_AGE_TODAY) {
       spokenAgeBand.current = null;
       return;
     }
@@ -379,7 +379,7 @@ export function Calculator() {
       void playCeleste(section2IndustrySpoken(ageToday));
     }, 650);
     return () => window.clearTimeout(t);
-  }, [ageToday]);
+  }, [ageToday, naicUnlocked]);
 
   const baseArgs = {
     pool,
@@ -1143,7 +1143,7 @@ export function Calculator() {
             ) : (
               <p className="mt-1 text-xs leading-snug text-muted">Required to run. Must be {MIN_AGE_TODAY} or older.</p>
             )}
-            {ageToday >= MIN_AGE_TODAY && buyerHints ? (
+            {ageToday >= MIN_AGE_TODAY && buyerHints && naicUnlocked ? (
               <div className="mt-2 rounded-lg border border-line bg-cream px-3 py-2 text-xs leading-snug text-muted">
                 <p>
                   * Based on industry averages at your age bracket (
