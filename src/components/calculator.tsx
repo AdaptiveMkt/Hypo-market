@@ -1689,7 +1689,7 @@ export function Calculator() {
                       <th className="py-2 px-1 text-center align-bottom">Insurance<br />Benefit Pool</th>
                     ) : null}
                     <th className="py-2 px-1 text-center align-bottom">Total<br />Remaining</th>
-                    <th className="py-2 px-1 text-center align-bottom">Annual Care<br />Costs</th>
+                    <th className="py-2 px-1 text-center align-bottom">Annual Care<br />Costs* <span className="normal-case font-medium">(est)</span></th>
                     {policy.enabled ? (
                       <>
                         <th className="py-2 px-1 text-center align-bottom">Insurance<br />Balance</th>
@@ -1761,7 +1761,7 @@ export function Calculator() {
               </table>
               <p className="mt-2 text-xs text-muted">
                 {policy.enabled
-                  ? "Insurance Benefit Pool is daily benefit × 365 × benefit period at the start of that year (for example $200/day × 3 years = $219,000.00). Countable Assets are net after tax (deferred accounts reduced by this run’s tax rate) before this year’s co-pay. Annual Care Costs are that year’s bill. Insurance pays first up to the annual maximum (daily benefit × 365, e.g. $73,000.00). If the bill is at or under that maximum and the pool still has room, Co-pay from Countable Assets is $0.00. Any amount assets do pay is shown as a negative number. Insurance Balance is the pool after that calendar year’s covered claim is subtracted. Total Remaining is Insurance Balance plus countable assets net after tax after the co-pay. "
+                  ? "Insurance Benefit Pool is daily benefit × 365 × benefit period at the start of that year (for example $200/day × 3 years = $219,000.00). Countable Assets are net after tax (deferred accounts reduced by this run’s tax rate) before this year’s co-pay. Annual Care Costs* (est) are modeled from published median costs and this run’s inflation — not a quote. Insurance pays first up to the annual maximum (daily benefit × 365, e.g. $73,000.00). If the bill is at or under that maximum and the pool still has room, Co-pay from Countable Assets is $0.00. Any amount assets do pay is shown as a negative number. Insurance Balance is the pool after that calendar year’s covered claim is subtracted. Total Remaining is Insurance Balance plus countable assets net after tax after the co-pay. "
                   : null}
                 {policy.enabled ? "Total Remaining" : "Countable Assets"} turns bold green when the pool starts declining, and bold red when it is depleted.
                 The table runs through the wait until care and every modeled care year — it does not stop at year 10 or at depletion.

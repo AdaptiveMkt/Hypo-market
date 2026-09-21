@@ -884,7 +884,7 @@ export function ReportView({
                       <th className="py-2 px-1 text-center align-bottom">Insurance<br />Benefit Pool</th>
                     ) : null}
                     <th className="py-2 px-1 text-center align-bottom">Total<br />Remaining</th>
-                    <th className="py-2 px-1 text-center align-bottom">Annual Care<br />Costs</th>
+                    <th className="py-2 px-1 text-center align-bottom">Annual Care<br />Costs* <span className="normal-case font-medium">(est)</span></th>
                     {policy.enabled ? (
                       <>
                         <th className="py-2 px-1 text-center align-bottom">Insurance<br />Balance</th>
