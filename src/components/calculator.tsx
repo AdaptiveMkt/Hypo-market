@@ -1129,6 +1129,7 @@ export function Calculator() {
         </section>
 
       <div className="mt-4 grid min-w-0 items-start gap-4 lg:grid-cols-2">
+        {section2Unlocked ? (
         <section className="card-xl min-w-0 p-4 md:p-5" aria-label="NAIC consumer guides">
           <h2 className="mb-3 border-b-2 border-gold pb-2 font-display text-xl text-navy">NAIC Shopper’s Guide and Suitability Worksheet</h2>
           <NaicGuideCoverRow />
@@ -1140,6 +1141,7 @@ export function Calculator() {
             <NaicCardDisclaimer />
           </TitleCollapse>
         </section>
+        ) : null}
         <section className="card-xl min-w-0 p-4 md:p-5">
           <h2 className="mb-3 border-b-2 border-gold pb-2 font-display text-xl text-navy">2. Where and when care starts</h2>
           {!section2Unlocked ? (
