@@ -6,9 +6,9 @@ export const DETAIL_GROUPS = [
     heading: "See the numbers",
     hint: "Charts and shocks on this run",
     items: [
-      { id: "compareCare", label: "Compare long-term care options" },
-      { id: "allocation", label: "Asset allocation (sleeves, pie, and utilization chart)" },
       { id: "yearByYear", label: "Year-by-year projection" },
+      { id: "allocation", label: "Asset allocation (sleeves, pie, and utilization chart)" },
+      { id: "compareCare", label: "Compare long-term care options" },
     ],
   },
   {

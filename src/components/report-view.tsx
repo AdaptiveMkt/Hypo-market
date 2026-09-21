@@ -1123,7 +1123,7 @@ export function ReportView({
           <div className="report-chart h-96 w-full overflow-visible">
             <ChartRegion
               title={`Asset utilization over time in ${state}`}
-              summary="Bars show remaining countable assets each year. A hatched red area and dashed red line mark the first year countable assets hit zero. Screen readers can use the year-by-year table later in this report."
+              summary="Bars show remaining countable assets each year. A hatched red area and dashed red line mark the first year countable assets hit zero. Screen readers can use the year-by-year table above."
               className="h-96 w-full overflow-visible"
             >
             <ResponsiveContainer width="100%" height="100%">
@@ -1210,6 +1210,73 @@ export function ReportView({
               </ComposedChart>
             </ResponsiveContainer>
             </ChartRegion>
+          </div>
+        </section>
+        ) : null}
+
+        {policy.enabled && details.compareCare ? (
+        <section className="report-block break-inside-avoid">
+          <h2 className="mb-2 font-display text-xl text-navy">Compare long-term care options</h2>
+          <div className="report-chart mb-3 h-56 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <ComposedChart
+                data={careCompare.map((row) => ({
+                  label: SETTING_SHORT[row.setting],
+                  cost: Math.round(row.proj.rows.reduce((s, r) => s + r.cost, 0)),
+                  remaining: Math.round(row.proj.endPool),
+                  shortfall: Math.round(row.proj.shortfallTotal),
+                }))}
+              >
+                <CartesianGrid stroke="#d9cfc0" strokeDasharray="3 3" />
+                <XAxis dataKey="label" tick={{ fill: "#5c6b73", fontSize: 11 }} />
+                <YAxis
+                  tick={{ fill: "#5c6b73", fontSize: 12 }}
+                  tickFormatter={(v: number) => `$${(v / 1000).toFixed(0)}k`}
+                />
+                <Tooltip formatter={(v) => money(Number(v))} contentStyle={tip} />
+                <Legend />
+                <Bar dataKey="cost" name="Total care cost" fill={CHART.cost} isAnimationActive={false} />
+                <Bar dataKey="remaining" name="Assets remaining" fill={CHART.remaining} isAnimationActive={false} />
+                <Bar dataKey="shortfall" name="Shortfall" fill={CHART.shortfall} isAnimationActive={false} />
+              </ComposedChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[700px] text-sm">
+              <thead>
+                <tr className="text-left text-xs uppercase tracking-wide text-muted">
+                  <th className="py-2 pr-2">Care setting</th>
+                  <th className="py-2 pr-2 text-right">Today’s annual</th>
+                  <th className="py-2 pr-2 text-right">Pool exhausted (today)</th>
+                  <th className="py-2 pr-2 text-right">First year (inflated)</th>
+                  <th className="py-2 pr-2 text-right">Assets remaining</th>
+                  <th className="py-2 text-right">Shortfall</th>
+                </tr>
+              </thead>
+              <tbody>
+                {careCompare.map((row) => {
+                  const yearsT =
+                    policy.enabled && result.lifetimeBenefit
+                      ? Number.POSITIVE_INFINITY
+                      : yearsPoolLasts(pool + (policy.enabled && !result.lifetimeBenefit ? insToday : 0), row.today);
+                  return (
+                    <tr
+                      key={row.setting}
+                      className={`border-t border-line tabular-nums ${row.setting === setting ? "bg-cream font-semibold" : ""}`}
+                    >
+                      <td className="py-2 pr-2">{SETTING_LABELS[row.setting]}</td>
+                      <td className="py-2 pr-2 text-right">{money(row.today)}</td>
+                      <td className="py-2 pr-2 text-right">{formatYearsLast(yearsT)}</td>
+                      <td className="py-2 pr-2 text-right">{money(row.proj.firstCost)}</td>
+                      <td className="py-2 pr-2 text-right">{money(row.proj.endPool)}</td>
+                      <td className="py-2 text-right">
+                        {row.proj.shortfallTotal ? money(row.proj.shortfallTotal) : "—"}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         </section>
         ) : null}
@@ -1923,73 +1990,6 @@ export function ReportView({
             Not tax advice. Confirm with a <Cite href={SRC.cpaVerify}>CPA</Cite> or{" "}
             <Cite href={SRC.ea}>enrolled agent</Cite>.
           </p>
-        </section>
-        ) : null}
-
-        {policy.enabled && details.compareCare ? (
-        <section className="report-block break-inside-avoid">
-          <h2 className="mb-2 font-display text-xl text-navy">Compare long-term care options</h2>
-          <div className="report-chart mb-3 h-56 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <ComposedChart
-                data={careCompare.map((row) => ({
-                  label: SETTING_SHORT[row.setting],
-                  cost: Math.round(row.proj.rows.reduce((s, r) => s + r.cost, 0)),
-                  remaining: Math.round(row.proj.endPool),
-                  shortfall: Math.round(row.proj.shortfallTotal),
-                }))}
-              >
-                <CartesianGrid stroke="#d9cfc0" strokeDasharray="3 3" />
-                <XAxis dataKey="label" tick={{ fill: "#5c6b73", fontSize: 11 }} />
-                <YAxis
-                  tick={{ fill: "#5c6b73", fontSize: 12 }}
-                  tickFormatter={(v: number) => `$${(v / 1000).toFixed(0)}k`}
-                />
-                <Tooltip formatter={(v) => money(Number(v))} contentStyle={tip} />
-                <Legend />
-                <Bar dataKey="cost" name="Total care cost" fill={CHART.cost} isAnimationActive={false} />
-                <Bar dataKey="remaining" name="Assets remaining" fill={CHART.remaining} isAnimationActive={false} />
-                <Bar dataKey="shortfall" name="Shortfall" fill={CHART.shortfall} isAnimationActive={false} />
-              </ComposedChart>
-            </ResponsiveContainer>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[700px] text-sm">
-              <thead>
-                <tr className="text-left text-xs uppercase tracking-wide text-muted">
-                  <th className="py-2 pr-2">Care setting</th>
-                  <th className="py-2 pr-2 text-right">Today’s annual</th>
-                  <th className="py-2 pr-2 text-right">Pool exhausted (today)</th>
-                  <th className="py-2 pr-2 text-right">First year (inflated)</th>
-                  <th className="py-2 pr-2 text-right">Assets remaining</th>
-                  <th className="py-2 text-right">Shortfall</th>
-                </tr>
-              </thead>
-              <tbody>
-                {careCompare.map((row) => {
-                  const yearsT =
-                    policy.enabled && result.lifetimeBenefit
-                      ? Number.POSITIVE_INFINITY
-                      : yearsPoolLasts(pool + (policy.enabled && !result.lifetimeBenefit ? insToday : 0), row.today);
-                  return (
-                    <tr
-                      key={row.setting}
-                      className={`border-t border-line tabular-nums ${row.setting === setting ? "bg-cream font-semibold" : ""}`}
-                    >
-                      <td className="py-2 pr-2">{SETTING_LABELS[row.setting]}</td>
-                      <td className="py-2 pr-2 text-right">{money(row.today)}</td>
-                      <td className="py-2 pr-2 text-right">{formatYearsLast(yearsT)}</td>
-                      <td className="py-2 pr-2 text-right">{money(row.proj.firstCost)}</td>
-                      <td className="py-2 pr-2 text-right">{money(row.proj.endPool)}</td>
-                      <td className="py-2 text-right">
-                        {row.proj.shortfallTotal ? money(row.proj.shortfallTotal) : "—"}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
         </section>
         ) : null}
 
