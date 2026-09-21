@@ -2561,12 +2561,14 @@ function MovableKpiGrid({
       ) : null}
       {moreItems.length ? (
         <>
-          <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-muted">Other card options</p>
-          {captions?.more ? <p className="mt-1 text-xs text-muted">{captions.more}</p> : null}
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            {moreItems.map((item) => (
-              <Chip key={item.id} item={item} />
-            ))}
+          <div className="mt-3 border-t border-gold pt-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted">Other card options</p>
+            {captions?.more ? <p className="mt-1 text-xs text-muted">{captions.more}</p> : null}
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {moreItems.map((item) => (
+                <Chip key={item.id} item={item} />
+              ))}
+            </div>
           </div>
         </>
       ) : null}
