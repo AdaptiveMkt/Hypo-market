@@ -1616,8 +1616,9 @@ export function Calculator() {
               </p>
             </div>
             {depletedRow ? (
-              <div className="mb-4 grid gap-3 md:grid-cols-2 lg:grid-cols-5">
+              <div className="mb-4 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
                 <Kpi label="Status" value={<RedAmt>{depletedRow.status}</RedAmt>} />
+                <Kpi label="Countable assets at claim (net after tax)" value={<RedAmt>{money(result.startPoolNet)}</RedAmt>} />
                 <Kpi label="Annual cost" value={<RedAmt>{money(depletedRow.cost)}</RedAmt>} />
                 {policy.enabled ? <Kpi label="Insurance paid" value={<RedAmt>{money(depletedRow.insurancePaid)}</RedAmt>} /> : null}
                 <Kpi label="Assets remaining" value={<RedAmt>{money(depletedRow.remaining)}</RedAmt>} />
@@ -1626,7 +1627,9 @@ export function Calculator() {
             ) : null}
             <div className="mb-4 grid gap-3 md:grid-cols-2 lg:grid-cols-4">
               <Kpi label="Countable assets today" value={money(pool)} />
-              <Kpi label="Countable assets at claim (net after tax)" value={<RedAmt>{money(result.startPoolNet)}</RedAmt>} />
+              {depletedRow ? null : (
+                <Kpi label="Countable assets at claim (net after tax)" value={<RedAmt>{money(result.startPoolNet)}</RedAmt>} />
+              )}
               {policy.enabled ? <Kpi label="LTC pool at purchase" value={result.lifetimeBenefit ? "Lifetime" : money(insToday)} /> : null}
               <Kpi label={policy.enabled ? "Combined pool today (assets + LTC)" : "Countable pool today"} value={policy.enabled && result.lifetimeBenefit ? `${money(pool)} + lifetime` : money(combinedToday)} />
               <Kpi label={`Combined pool exhausted · ${SETTING_SHORT[activeSetting]} (today)`} value={formatYearsLast(yearsToday)} />
