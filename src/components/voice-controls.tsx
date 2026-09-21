@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { applyVoiceTranscript } from "@/lib/voice";
+import { setVoiceOn, useVoiceOn } from "@/lib/voice-pref";
+import { stopCeleste } from "@/lib/celeste";
 
 type SpeechRec = {
   lang: string;
@@ -28,6 +30,7 @@ export function VoiceControls({ children }: { children?: ReactNode }) {
   const [status, setStatus] = useState("");
   const [micOk, setMicOk] = useState(true);
   const recRef = useRef<SpeechRec | null>(null);
+  const voiceOn = useVoiceOn();
 
   useEffect(() => {
     setMicOk(Boolean(getRecognizer()));
@@ -43,6 +46,10 @@ export function VoiceControls({ children }: { children?: ReactNode }) {
   }
 
   function startListen() {
+    if (!voiceOn) {
+      setStatus("Voice is off. Turn Voice on to use the microphone.");
+      return;
+    }
     const Ctor = getRecognizer();
     if (!Ctor) {
       setStatus("Voice input is not available in this browser. Try Chrome or Edge.");
@@ -99,24 +106,43 @@ export function VoiceControls({ children }: { children?: ReactNode }) {
 
   return (
     <div className="w-full max-w-xl">
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
         <button
           type="button"
           className={btn}
           aria-pressed={listening}
           aria-label={listening ? "Stop voice input" : "Start voice input"}
           onClick={toggleListen}
-          disabled={!micOk && !listening}
+          disabled={!voiceOn || (!micOk && !listening)}
         >
           {listening ? "Listening…" : "Voice input"}
+        </button>
+        <button
+          type="button"
+          className={btn}
+          aria-pressed={!voiceOn}
+          aria-label={voiceOn ? "Turn all site voice off" : "Turn all site voice on"}
+          onClick={() => {
+            const next = !voiceOn;
+            if (!next) {
+              stopListen();
+              stopCeleste();
+            }
+            setVoiceOn(next);
+            setStatus(next ? "Voice on for the whole site." : "Voice off for the whole site.");
+          }}
+        >
+          {voiceOn ? "Voice off" : "Voice on"}
         </button>
         {children}
       </div>
       <p className="mt-1.5 text-left text-xs leading-snug text-masthead-fg/80" aria-live="polite">
         {status ||
-          (micOk
-            ? "Voice: say “cash 50,000”, “state Florida”, or “run hypothetical.”"
-            : "Voice input needs Chrome, Edge, or Safari.")}
+          (!voiceOn
+            ? "All voice is off. Tap Voice on to restore Celeste and the microphone."
+            : micOk
+              ? "Voice: say “cash 50,000”, “state Florida”, or “run hypothetical.”"
+              : "Voice input needs Chrome, Edge, or Safari.")}
       </p>
     </div>
   );

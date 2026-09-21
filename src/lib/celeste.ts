@@ -1,4 +1,5 @@
 import { speakHypoAssistant } from "@/lib/chatbot";
+import { isVoiceOn } from "@/lib/voice-pref";
 
 const CHUNK = 1200;
 
@@ -57,6 +58,7 @@ export function pauseCeleste() {
 }
 
 export function resumeCeleste() {
+  if (!isVoiceOn()) return;
   if (ui === "playing") return;
   if (ui === "paused") {
     paused = false;
@@ -108,6 +110,10 @@ function splitForSpeech(text: string): string[] {
 }
 
 export function playCeleste(text: string): Promise<void> {
+  if (!isVoiceOn()) {
+    setUi("idle");
+    return Promise.resolve();
+  }
   unlockSpeech();
   const g = ++gen;
   paused = false;
@@ -147,6 +153,10 @@ export function playCeleste(text: string): Promise<void> {
 }
 
 export async function playCelesteScript(text: string) {
+  if (!isVoiceOn()) {
+    setUi("idle");
+    return;
+  }
   lastScript = text;
   paused = false;
   const id = ++scriptId;

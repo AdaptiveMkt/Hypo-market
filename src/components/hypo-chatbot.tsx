@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { askHypoAssistant, speakHypoAssistant, type ChatTurn } from "@/lib/chatbot";
+import { isVoiceOn, useVoiceOn } from "@/lib/voice-pref";
 
 type Msg = ChatTurn & {
   usedAaltci?: boolean;
@@ -33,10 +34,11 @@ function getRecognizer(): (new () => SpeechRec) | null {
 }
 
 export function HypoChatbot() {
+  const voiceOn = useVoiceOn();
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
-  const [speakOn, setSpeakOn] = useState(true);
+  const [speakOn, setSpeakOn] = useState(() => isVoiceOn());
   const [speaking, setSpeaking] = useState(false);
   const [listening, setListening] = useState(false);
   const [status, setStatus] = useState("");
@@ -51,6 +53,15 @@ export function HypoChatbot() {
   const recRef = useRef<SpeechRec | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const speakGen = useRef(0);
+
+  useEffect(() => {
+    if (!voiceOn) {
+      setSpeakOn(false);
+      recRef.current?.abort();
+      setListening(false);
+      stopSpeak();
+    }
+  }, [voiceOn]);
 
   useEffect(() => {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" });
@@ -83,7 +94,7 @@ export function HypoChatbot() {
   }
 
   async function speak(text: string, usedAaltci: boolean) {
-    if (!speakOn || !text) return;
+    if (!speakOn || !voiceOn || !text) return;
     const gen = ++speakGen.current;
     setSpeaking(true);
     setStatus("Speaking…");
@@ -179,6 +190,10 @@ export function HypoChatbot() {
   }
 
   function startListen() {
+    if (!voiceOn) {
+      setStatus("Voice is off in the header.");
+      return;
+    }
     const Ctor = getRecognizer();
     if (!Ctor) {
       setStatus("Voice input needs Chrome, Edge, or Safari. You can still type.");
@@ -331,7 +346,8 @@ export function HypoChatbot() {
             <input
               type="checkbox"
               className="size-4 accent-teal"
-              checked={speakOn}
+              checked={speakOn && voiceOn}
+              disabled={!voiceOn}
               onChange={(e) => {
                 setSpeakOn(e.target.checked);
                 if (!e.target.checked) stopSpeak();

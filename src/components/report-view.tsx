@@ -72,6 +72,7 @@ import { ConfidencePanel } from "@/components/confidence-panel";
 import { IndustryInsightsPanel } from "@/components/industry-insights";
 import { ChartRegion } from "@/components/chart-region";
 import { pauseCeleste, playCelesteScript, resumeCeleste, stopCeleste, watchCeleste } from "@/lib/celeste";
+import { useVoiceOn } from "@/lib/voice-pref";
 import { LtcGlossaryList } from "@/components/ltc-glossary";
 import { SamplePolicyPack } from "@/components/sample-ltc-policy";
 import {
@@ -270,6 +271,7 @@ export function ReportView({
   };
   const premiumParts = targetPremiumParts(pool, annualIncome);
   const [voice, setVoice] = useState<"idle" | "playing" | "paused">("idle");
+  const voiceOn = useVoiceOn();
   const reportRef = useRef<HTMLDivElement>(null);
   const spoken = useMemo(() => {
     const recs = recommendations
@@ -396,7 +398,7 @@ export function ReportView({
               if (voice === "paused") resumeCeleste();
               else void playCelesteScript(spoken);
             }}
-            disabled={voice === "playing"}
+            disabled={!voiceOn || voice === "playing"}
           >
             Resume speaking
           </button>
