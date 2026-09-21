@@ -1666,16 +1666,20 @@ export function Calculator() {
                 <thead>
                   <tr className="border-b border-gold text-[11px] font-semibold leading-tight text-muted">
                     <th className="w-[3.25rem] py-2 px-1 text-center align-bottom">Year</th>
+                    <th className="py-2 px-1 text-center align-bottom">Countable<br />Assets</th>
                     {policy.enabled ? (
                       <th className="py-2 px-1 text-center align-bottom">Insurance<br />Benefit Pool</th>
                     ) : null}
+                    <th className="py-2 px-1 text-center align-bottom">Total<br />Remaining</th>
                     <th className="py-2 px-1 text-center align-bottom">Annual Care<br />Costs</th>
                     {policy.enabled ? (
-                      <th className="py-2 px-1 text-center align-bottom">Insurance<br />Balance</th>
-                    ) : null}
-                    <th className="py-2 px-1 text-center align-bottom">Countable<br />Assets</th>
-                    <th className="py-2 px-1 text-center align-bottom">Co-pay from<br />Countable Assets</th>
-                    <th className="py-2 px-1 text-center align-bottom">Total<br />Remaining</th>
+                      <>
+                        <th className="py-2 px-1 text-center align-bottom">Insurance<br />Balance</th>
+                        <th className="py-2 px-1 text-center align-bottom">Co-pay from<br />Countable Assets</th>
+                      </>
+                    ) : (
+                      <th className="py-2 px-1 text-center align-bottom">Co-pay from<br />Countable Assets</th>
+                    )}
                     <th className="py-2 px-1 text-center align-bottom">Cumulative<br />Shortfall</th>
                   </tr>
                 </thead>
@@ -1717,18 +1721,18 @@ export function Calculator() {
                         className={`border-t tabular-nums ${gone ? "border-deplete bg-cream" : "border-line text-navy"}`}
                       >
                         <td className={cell}>{calendarYear(r.year)}</td>
+                        <td className={cell}>{moneyCents(assetsBeforeCopay)}</td>
                         {policy.enabled ? (
                           <td className={cell}>{poolStartLabel}</td>
                         ) : null}
+                        <td className={`py-2 px-1 text-center ${remainClass}`} title={remainTitle}>{totalLabel}</td>
                         <td className={`${cell} ${r.cost ? "font-bold amt-red" : ""}`}>{moneyCents(r.cost)}</td>
                         {policy.enabled ? (
                           <td className={cell}>{poolLeft}</td>
                         ) : null}
-                        <td className={cell}>{moneyCents(assetsBeforeCopay)}</td>
                         <td className={`${cell} ${r.drawn ? "font-bold amt-red" : ""}`}>
                           {r.drawn > 0 ? moneyCents(-r.drawn) : moneyCents(0)}
                         </td>
-                        <td className={`py-2 px-1 text-center ${remainClass}`} title={remainTitle}>{totalLabel}</td>
                         <td className={`${gone ? "py-2 font-bold amt-red" : "py-2"} px-1 text-center`}>
                           {r.shortfallCumulative ? moneyCents(r.shortfallCumulative) : "—"}
                         </td>
