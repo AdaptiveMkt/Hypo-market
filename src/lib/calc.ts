@@ -707,6 +707,8 @@ export type YearRow = {
   premium: number;
   drawn: number;
   remaining: number;
+  remainingNet: number;
+  remainingNetStart: number;
   shortfall: number;
   gapAfterInsurance: number;
   shortfallCumulative: number;
@@ -898,9 +900,11 @@ export function project(opts: {
     }
 
     const gapAfterInsurance = Math.max(0, cost - insurance);
+    const netStart = afterTaxHoldingsValue(holdings, taxRate);
     const copay = gapAfterInsurance > 0 ? drawFromHoldings(holdings, gapAfterInsurance) : 0;
     const short = Math.max(0, gapAfterInsurance - copay);
     p = sumHoldings(holdings);
+    const remainingNet = afterTaxHoldingsValue(holdings, taxRate);
     const ira = iraAmount(holdings);
     const taxable = Math.max(0, p - ira);
     shortfallTotal += short;
@@ -958,6 +962,8 @@ export function project(opts: {
       premium,
       drawn: copay,
       remaining: p,
+      remainingNet,
+      remainingNetStart: netStart,
       shortfall: short,
       gapAfterInsurance,
       shortfallCumulative: shortfallTotal,

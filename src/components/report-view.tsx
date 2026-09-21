@@ -879,7 +879,7 @@ export function ReportView({
                 <thead>
                   <tr className="text-[11px] font-semibold leading-tight text-muted">
                     <th className="w-[3.25rem] py-2 px-1 text-center align-bottom">Year</th>
-                    <th className="py-2 px-1 text-center align-bottom">Countable<br />Assets</th>
+                    <th className="py-2 px-1 text-center align-bottom">Countable Assets<br />(net after tax)</th>
                     {policy.enabled ? (
                       <th className="py-2 px-1 text-center align-bottom">Insurance<br />Benefit Pool</th>
                     ) : null}
@@ -900,8 +900,8 @@ export function ReportView({
                   {chunk.map((r) => {
                     const insLeft = result.lifetimeBenefit ? null : Math.max(0, r.insurancePoolRemaining);
                     const totalLeft = policy.enabled
-                      ? (insLeft == null ? r.remaining : r.remaining + insLeft)
-                      : r.remaining;
+                      ? (insLeft == null ? r.remainingNet : r.remainingNet + insLeft)
+                      : r.remainingNet;
                     const insOutYear = !result.lifetimeBenefit && policy.enabled
                       ? result.rows.find((x) => x.status === "Care year" && x.insurancePoolRemaining <= 0)?.year ?? null
                       : null;
@@ -919,7 +919,7 @@ export function ReportView({
                       Math.round(r.insurancePoolRemaining) <= 0;
                     const allGone = totalOutYear != null && r.year === totalOutYear;
                     const gone = insGone || allGone;
-                    const assetsBeforeCopay = r.remaining + r.drawn;
+                    const assetsNet = r.remainingNetStart;
                     const remainIdx = result.rows.findIndex((x) => x.year === r.year);
                     const remainTone = remainingToneAt(
                       result.rows,
@@ -938,7 +938,7 @@ export function ReportView({
                     return (
                     <tr key={r.year} className={`border-t tabular-nums ${gone ? "bg-cream" : "border-line"}`}>
                       <td className={cell}>{calendarYear(r.year)}</td>
-                      <td className={cell}>{moneyCents(assetsBeforeCopay)}</td>
+                      <td className={cell}>{moneyCents(assetsNet)}</td>
                       {policy.enabled ? (
                         <td className={cell}>
                           {result.lifetimeBenefit ? "Lifetime" : moneyCents(r.insurancePoolStart)}
@@ -946,7 +946,7 @@ export function ReportView({
                       ) : null}
                       <td className={`py-2 px-1 text-center ${remainClass}`} title={remainTitle}>
                         {result.lifetimeBenefit
-                          ? `${moneyCents(r.remaining)} + lifetime`
+                          ? `${moneyCents(r.remainingNet)} + lifetime`
                           : moneyCents(totalLeft)}
                       </td>
                       <td className={`${cell} ${r.cost ? "font-bold amt-red" : ""}`}>{moneyCents(r.cost)}</td>
@@ -981,7 +981,7 @@ export function ReportView({
             if not, $14,000 × 3 years is $42,000 cumulative unpaid. If insurance covers the
             year, assets are not drawn for care.
             {policy.enabled
-              ? " Insurance Benefit Pool is daily benefit × 365 × benefit period at the start of the year. Insurance pays first up to daily × 365 that year; a bill at or under that maximum has $0 co-pay while the pool lasts. Insurance Balance is the pool after that calendar year’s covered claim is subtracted. Countable Assets are before this year’s co-pay. Total Remaining is Insurance Balance plus assets after co-pay."
+              ? " Insurance Benefit Pool is daily benefit × 365 × benefit period at the start of the year. Countable Assets are net after tax. Insurance pays first up to daily × 365 that year; a bill at or under that maximum has $0 co-pay while the pool lasts. Insurance Balance is the pool after that calendar year’s covered claim is subtracted. Total Remaining is Insurance Balance plus countable assets net after tax after co-pay."
               : " With no policy, the full annual cost is amortized from assets until they run out."}
           </p>
           <p className="mt-3 text-sm">
