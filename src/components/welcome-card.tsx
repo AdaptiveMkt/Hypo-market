@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { playCeleste, stopCeleste, watchCeleste } from "@/lib/celeste";
+import { playCelesteScript, stopCeleste, watchCeleste } from "@/lib/celeste";
 import { WELCOME_BODY, WELCOME_HEADING, WELCOME_SPOKEN } from "@/lib/welcome";
 
 export function WelcomeCard() {
@@ -9,17 +9,33 @@ export function WelcomeCard() {
   const [status, setStatus] = useState("");
 
   useEffect(() => {
+    let cancelled = false;
+    let playing = false;
     const off = watchCeleste((s) => {
-      setSpeaking(s === "playing");
-      setStatus(s === "playing" ? "Celeste is reading the welcome…" : "");
+      playing = s === "playing";
+      setSpeaking(playing);
+      setStatus(playing ? "Celeste is reading the welcome…" : "");
     });
-    const t = window.setTimeout(() => {
-      void playCeleste(WELCOME_SPOKEN);
-    }, 400);
+
+    function start() {
+      if (cancelled) return;
+      void playCelesteScript(WELCOME_SPOKEN);
+    }
+
+    const t = window.setTimeout(start, 350);
+
+    function onGesture() {
+      if (!playing) start();
+    }
+    window.addEventListener("pointerdown", onGesture, { once: true });
+    window.addEventListener("keydown", onGesture, { once: true });
+
     return () => {
+      cancelled = true;
       window.clearTimeout(t);
+      window.removeEventListener("pointerdown", onGesture);
+      window.removeEventListener("keydown", onGesture);
       off();
-      stopCeleste();
     };
   }, []);
 
@@ -31,6 +47,14 @@ export function WelcomeCard() {
       </h2>
       <p className="mt-3 text-sm leading-relaxed text-muted">{WELCOME_BODY}</p>
       <div className="mt-4 stack-actions">
+        <button
+          type="button"
+          className="btn-block rounded-lg border border-navy bg-navy text-cream hover:bg-teal disabled:opacity-50"
+          onClick={() => void playCelesteScript(WELCOME_SPOKEN)}
+          disabled={speaking}
+        >
+          Hear welcome
+        </button>
         <button
           type="button"
           className="btn-block rounded-lg border border-card-border text-navy hover:bg-cream disabled:opacity-50"
