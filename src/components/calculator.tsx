@@ -45,6 +45,7 @@ import {
   poolTotal,
   policyForCompareLane,
   project,
+  projectHoldingsForward,
   specifiedFaceAmount,
   targetPremiumParts,
   typicalBuyerHints,
@@ -78,6 +79,7 @@ import {
 import { DEFAULT_TAX_RATE, TAX_RATE_GROUPS, TAX_RATE_OPTIONS } from "@/lib/tax-brackets";
 import { careCostCompound } from "@/lib/cpi";
 import { compactMoney, money, moneyCents } from "@/lib/utils";
+import { DEFAULT_PROTECT_PCT, sizeInsuranceToProtectAssets } from "@/lib/protect-assets";
 import { CHART, PIE_COLORS } from "@/lib/palette";
 import {
   AALTCI_MEAN_CLAIM_AGE,
@@ -220,6 +222,7 @@ export function Calculator() {
   const [saveMsg, setSaveMsg] = useState("");
   const [stateNeeded, setStateNeeded] = useState(false);
   const [durationNeeded, setDurationNeeded] = useState(false);
+  const [protectPct, setProtectPct] = useState(DEFAULT_PROTECT_PCT);
   const [ageNeeded, setAgeNeeded] = useState(false);
   const [showReport, setShowReport] = useState(false);
   const [printAfterOpen, setPrintAfterOpen] = useState(false);
@@ -310,6 +313,18 @@ export function Calculator() {
   const careStart = careStartYear(delay);
   const claimCost = careCostCompound(todayCost, cpi, Math.max(0, careStart - 1));
   const claimYearLabel = calendarYear(careStart);
+  const protectSize = useMemo(() => {
+    const atClaim = projectHoldingsForward(holdings, taxRate, careStart);
+    return sizeInsuranceToProtectAssets({
+      assetsAtClaimNet: atClaim.net,
+      protectPct,
+      firstYearCost: claimCost,
+      cpiPct: cpi,
+      careYears: Math.max(1, duration || 3),
+      delayYears: Math.max(0, careStart - 1),
+      ageToday,
+    });
+  }, [holdings, taxRate, careStart, protectPct, claimCost, cpi, duration, ageToday]);
   const medicaid = useMemo(() => medicaidProfile(state), [state]);
   const netRoi = netRoiPct(roi, taxRate);
   const premiumParts = targetPremiumParts(pool, annualIncome);
@@ -621,6 +636,20 @@ export function Calculator() {
       return next;
     });
   }
+  function applyProtectDesign() {
+    if (protectSize.alreadyProtected || insuranceLocked) return;
+    const typical = typicalPurchaseForAge(ageToday || DEFAULT_AGE_TODAY);
+    patchPolicy({
+      enabled: true,
+      kind: "traditional",
+      dailyBenefit: protectSize.dailyToday,
+      benefitYears: protectSize.lifetime ? 50 : protectSize.benefitYears,
+      benefitInflationPct: typical.benefitInflationPct,
+      inflationMethod: typical.inflationMethod,
+    });
+    setRunKinds((prev) => ({ ...prev, traditional: true }));
+    setDesignTouched(true);
+  }
   function openKindTab(kind: PolicyKind) {
     setRunKinds((f) => ({ ...f, [kind]: true }));
     setKindBook((book) => {
@@ -660,6 +689,7 @@ export function Calculator() {
     setClaimAge(AALTCI_MEAN_CLAIM_AGE);
     setClaimAgeTouched(false);
     setDuration(0);
+    setProtectPct(DEFAULT_PROTECT_PCT);
     setTaxRate(DEFAULT_TAX_RATE);
     setAnnualIncome(0);
     const typical = typicalPurchaseForAge(DEFAULT_AGE_TODAY);
@@ -1265,6 +1295,78 @@ export function Calculator() {
                   {ageToday < MIN_AGE_TODAY ? "Enter age today" : delay === 0 ? "Now (this year)" : `${delay} year${delay === 1 ? "" : "s"}`}
                 </p>
               </div>
+            </div>
+            <div className="mt-4 rounded-lg border border-gold bg-cream px-4 py-3">
+              <h3 className="font-display text-lg text-navy">How much insurance to protect assets at claim</h3>
+              <p className="mt-1 text-sm text-muted">
+                Uses this run’s countable assets, age today, years until claim, care setting, inflation, and how long care may last.
+                You set the share of countable assets (net after tax at claim) you want left after the modeled care years.
+              </p>
+              <label className={`${labelClass} mt-3`} htmlFor="protect-pct">
+                Protect this share of countable assets at claim (%)
+              </label>
+              <StepperField
+                id="protect-pct"
+                value={protectPct}
+                onChange={(v) => setProtectPct(Math.min(100, Math.max(0, Number(v) || 0)))}
+                step={5}
+                min={0}
+                max={100}
+              />
+              {ageToday < MIN_AGE_TODAY || !state || !setting ? (
+                <p className="mt-2 text-sm text-muted">Enter age today, care state, and care setting to size a policy.</p>
+              ) : (
+                <div className="mt-3 space-y-2 text-sm text-navy">
+                  <p>
+                    If you have <strong className="tabular-nums">{money(pool)}</strong> countable assets today at age{" "}
+                    <strong>{ageToday}</strong>, and care is expected in{" "}
+                    <strong>{delay === 0 ? "this year" : `${delay} year${delay === 1 ? "" : "s"}`}</strong> at age{" "}
+                    <strong>{claimAge}</strong>, this model projects about{" "}
+                    <strong className="tabular-nums">{moneyCents(protectSize.assetsAtClaimNet)}</strong> countable assets
+                    (net after tax) at claim.
+                  </p>
+                  <p>
+                    To protect <strong>{protectPct}%</strong> of that nest egg (
+                    <strong className="tabular-nums">{moneyCents(protectSize.protectDollars)}</strong>
+                    ) through {protectSize.careYears} year{protectSize.careYears === 1 ? "" : "s"} of{" "}
+                    {SETTING_LABELS[activeSetting].toLowerCase()} (about{" "}
+                    <strong className="tabular-nums">{moneyCents(protectSize.careTotal)}</strong> of inflated care costs),
+                    {protectSize.alreadyProtected ? (
+                      <>
+                        {" "}assets on this run can cover the modeled bills while still leaving that share. Insurance is optional for this protection target — not a quote.
+                      </>
+                    ) : (
+                      <>
+                        {" "}consider a traditional reimbursement design of about{" "}
+                        <strong className="tabular-nums">{money(protectSize.dailyToday)}</strong>/day
+                        {protectSize.lifetime
+                          ? " with a lifetime benefit period"
+                          : ` for ${protectSize.benefitYears} year${protectSize.benefitYears === 1 ? "" : "s"}`}
+                        {" "}purchased today
+                        {protectSize.dailyToday !== protectSize.dailyAtClaim
+                          ? ` (about ${money(protectSize.dailyAtClaim)}/day at claim if benefits inflate with the age-based default)`
+                          : ""}
+                        . That is a pool of about{" "}
+                        <strong className="tabular-nums">
+                          {protectSize.lifetime ? `${money(protectSize.annualCapAtClaim)}/year, lifetime` : moneyCents(protectSize.poolNeeded)}
+                        </strong>
+                        . Assets would be asked to co-pay up to{" "}
+                        <strong className="tabular-nums">{moneyCents(protectSize.spendable)}</strong>
+                        . Not a quote — underwriting, state, and riders change what can actually be issued.
+                      </>
+                    )}
+                  </p>
+                  {!protectSize.alreadyProtected && !insuranceLocked ? (
+                    <button
+                      type="button"
+                      className="btn-block rounded-lg border border-navy bg-navy text-cream hover:bg-teal"
+                      onClick={applyProtectDesign}
+                    >
+                      Use this design in Insurance
+                    </button>
+                  ) : null}
+                </div>
+              )}
             </div>
             <div className="mt-4 stack-actions">
               {missingRun.length ? (

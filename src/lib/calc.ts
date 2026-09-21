@@ -172,6 +172,17 @@ function growHoldings(hs: Holding[], taxRate: number) {
   }
 }
 
+export function projectHoldingsForward(holdings: Holding[], taxRatePct: number, years: number) {
+  const hs = cloneHoldings(holdings);
+  const t = Math.min(1, Math.max(0, Number(taxRatePct) || 0) / 100);
+  const n = Math.max(0, Math.round(Number(years) || 0));
+  for (let i = 0; i < n; i++) growHoldings(hs, t);
+  return {
+    gross: sumHoldings(hs),
+    net: afterTaxHoldingsValue(hs, t),
+  };
+}
+
 export function poolTotal(assets: Assets, excludeHome = false) {
   return ASSET_FIELDS.reduce((sum, f) => {
     if (excludeHome && f.key === "home") return sum;
