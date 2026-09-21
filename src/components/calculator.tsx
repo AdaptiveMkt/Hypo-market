@@ -1720,6 +1720,7 @@ export function Calculator() {
                               ),
                       },
                       { id: "dep-cost", group: "depletion" as const, label: "Annual Care Costs* (est) · end", value: <RedAmt>{moneyCents(depletionRow.cost)}</RedAmt> },
+                      { id: "dep-cost-cum", group: "depletion" as const, label: "Total cumulative care cost · end", value: <RedAmt>{moneyCents(depletionRow.costCumulative)}</RedAmt> },
                     ]
                   : []),
                 ...(policy.enabled && depletionRow

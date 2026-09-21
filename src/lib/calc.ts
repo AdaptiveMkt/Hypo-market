@@ -720,6 +720,7 @@ export type YearRow = {
   remainingIra: number;
   payPath: string;
   claimPhase: string;
+  costCumulative: number;
 };
 
 export type Projection = {
@@ -799,6 +800,7 @@ export function project(opts: {
   let startPoolNet = afterTaxHoldingsValue(holdings, taxRate);
   let shortfallTotal = 0;
   let insuranceTotal = 0;
+  let costTotal = 0;
   let premiumTotal = hybrid ? singlePaid : 0;
   const careStart = careStartYear(opts.delay);
   const careEnd = careEndYear(opts.delay, opts.duration);
@@ -910,6 +912,7 @@ export function project(opts: {
     const taxable = Math.max(0, p - ira);
     shortfallTotal += short;
     insuranceTotal += insurance;
+    costTotal += cost;
 
     let payPath = "";
     let claimPhase = "";
@@ -976,6 +979,7 @@ export function project(opts: {
       remainingIra: ira,
       payPath,
       claimPhase,
+      costCumulative: costTotal,
     });
     if (y === careEnd) poolAtCareEnd = p;
   }
