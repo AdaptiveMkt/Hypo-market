@@ -299,6 +299,9 @@ export function Calculator() {
 
   const grossPool = poolTotal({ ...assets, excludable: 0 }, false);
   const pool = poolTotal(assets, excludeHome);
+  const homeEquity = Number(assets.home) || 0;
+  const section2Floor = NAIC_LOCKOUT_ASSETS + homeEquity;
+  const section2Unlocked = poolShown && pool > section2Floor;
   const insuranceLocked = insuranceLockedOut(pool);
   const insuranceWarn = insuranceNeedsWarning(pool);
   const insuranceSuitable = !insuranceLocked;
@@ -309,7 +312,6 @@ export function Calculator() {
   const roi = weightedRoiPct(holdings, false) || weightedRoiPct(holdings) || 3;
   const iraRoi = Number(assetRois.ira) || 0;
   const iraBal = Number(assets.ira) || 0;
-  const homeEquity = Number(assets.home) || 0;
   const spouseExcluded = Number(assets.excludable) || 0;
   const todayCost = annualCost(state, activeSetting);
   const careStart = careStartYear(delay);
@@ -366,7 +368,7 @@ export function Calculator() {
   }, [insuranceWarn, pool]);
 
   useEffect(() => {
-    if (ageToday < MIN_AGE_TODAY) {
+    if (!section2Unlocked || ageToday < MIN_AGE_TODAY) {
       spokenAgeBand.current = null;
       return;
     }
@@ -377,7 +379,7 @@ export function Calculator() {
       void playCeleste(section2IndustrySpoken(ageToday));
     }, 650);
     return () => window.clearTimeout(t);
-  }, [ageToday]);
+  }, [ageToday, section2Unlocked]);
 
   const baseArgs = {
     pool,
@@ -886,6 +888,13 @@ export function Calculator() {
   ];
 
   function runHypo() {
+    if (!section2Unlocked) {
+      void playCeleste(
+        section1AssetsSpoken(pool, false, section2Floor),
+      );
+      window.setTimeout(() => scrollToId("checking"), 50);
+      return;
+    }
     const missingState = !state;
     const missingSetting = !setting;
     const missingAge = ageToday < MIN_AGE_TODAY;
@@ -1097,7 +1106,8 @@ export function Calculator() {
               className="flex min-h-12 w-full items-center justify-center rounded-lg bg-gold px-3 py-2.5 text-center text-base font-semibold leading-snug text-masthead hover:brightness-105"
               onClick={() => {
                 setPoolShown(true);
-                void playCeleste(section1AssetsSpoken(pool));
+                const open = pool > NAIC_LOCKOUT_ASSETS + homeEquity;
+                void playCeleste(section1AssetsSpoken(pool, open, NAIC_LOCKOUT_ASSETS + homeEquity));
               }}
             >
               Calculate Countable Assets
@@ -1132,6 +1142,22 @@ export function Calculator() {
         </section>
         <section className="card-xl min-w-0 p-4 md:p-5">
           <h2 className="mb-3 border-b-2 border-gold pb-2 font-display text-xl text-navy">2. Where and when care starts</h2>
+          {!section2Unlocked ? (
+            <div className="rounded-lg border-2 border-deplete bg-cream px-4 py-3">
+              <p className="text-sm font-semibold text-navy">Section 2 is not available yet.</p>
+              <p className="mt-2 text-sm text-muted">
+                Countable assets must exceed {money(NAIC_LOCKOUT_ASSETS)} plus primary residence equity
+                {homeEquity ? ` of ${money(homeEquity)}` : ""} — a floor of{" "}
+                <strong className="tabular-nums text-navy">{money(section2Floor)}</strong>.
+                {poolShown ? (
+                  <> This run’s countable assets are <strong className="tabular-nums text-navy">{money(pool)}</strong>.</>
+                ) : (
+                  <> Calculate countable assets in Section 1 first.</>
+                )}
+              </p>
+            </div>
+          ) : (
+            <>
             <label className={labelClass} htmlFor="age-today">Age today <span className="font-normal text-muted">(Input Your Current Age)</span></label>
             <StepperField id="age-today" value={ageToday} onChange={applyAge} step={1} min={MIN_AGE_TODAY} max={110} placeholder="Select or Input Age" blankWhenZero />
             {ageNeeded && ageToday < MIN_AGE_TODAY ? (
@@ -1410,6 +1436,8 @@ export function Calculator() {
             </div>
             </>
             ) : null}
+            </>
+          )}
           </section>
       </div>
 

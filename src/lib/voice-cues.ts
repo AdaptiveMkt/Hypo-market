@@ -6,11 +6,20 @@ function spokenDollars(n: number) {
 }
 
 /** Spoken after Calculate Countable Assets in Section 1. */
-export function section1AssetsSpoken(pool: number): string {
+export function section1AssetsSpoken(pool: number, section2Open = true, floor = 0): string {
+  const base =
+    `Great. You have completed section 1, and your countable assets are ${spokenDollars(pool)}. `;
+  if (section2Open) {
+    return (
+      base +
+      `Now let's move to section 2, where you can let us know where and when you think you might need care. ` +
+      `This is subjective, but will help in the preparation of this hypothetical report.`
+    );
+  }
   return (
-    `Great. You have completed section 1, and your countable assets are ${spokenDollars(pool)}. ` +
-    `Now let's move to section 2, where you can let us know where and when you think you might need care. ` +
-    `This is subjective, but will help in the preparation of this hypothetical report.`
+    base +
+    `Section 2 stays closed until countable assets exceed 150,000 dollars plus the value of the house, ` +
+    `which is ${spokenDollars(floor)} on this run.`
   );
 }
 
