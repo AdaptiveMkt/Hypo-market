@@ -450,7 +450,8 @@ export function Calculator() {
       ? yearView.rows.find((r) => r.year === yearDepleted) ?? lastCareRow
       : lastCareRow;
   const depletedWhen = depletionCalendar(yearView.rows, yearDepleted, MODEL_START_YEAR);
-  const featureRow = depletedRow ?? lastCareRow;
+  const firstClaimRow = yearView.rows.find((r) => r.status === "Care year") ?? lastCareRow;
+  const featureRow = firstClaimRow;
   const yearPageSize = 10;
   const yearPages = Math.max(1, Math.ceil(yearRowsShown.length / yearPageSize));
   const yearSlice = yearRowsShown.slice(yearPage * yearPageSize, (yearPage + 1) * yearPageSize);
@@ -1617,6 +1618,11 @@ export function Calculator() {
               </p>
             </div>
             <MovableKpiGrid
+              caption={
+                featureRow
+                  ? `Figures are the first year of claim (${calendarYear(featureRow.year)}).`
+                  : undefined
+              }
               items={[
                 ...(featureRow
                   ? [
@@ -2372,7 +2378,7 @@ type HypoCardItem = {
   group: "column" | "more";
 };
 
-function MovableKpiGrid({ items }: { items: HypoCardItem[] }) {
+function MovableKpiGrid({ items, caption }: { items: HypoCardItem[]; caption?: string }) {
   const [order, setOrder] = useState<string[]>([]);
   const [selected, setSelected] = useState<string[] | null>(null);
   const [dragging, setDragging] = useState<string | null>(null);
@@ -2462,6 +2468,7 @@ function MovableKpiGrid({ items }: { items: HypoCardItem[] }) {
   return (
     <div className="mb-4">
       <p className="text-xs font-semibold uppercase tracking-wide text-muted">Select year-by-year columns</p>
+      {caption ? <p className="mt-1 text-xs text-muted">{caption}</p> : null}
       <div className="mt-2 flex flex-wrap gap-1.5">
         {columnItems.map((item) => (
           <Chip key={item.id} item={item} />
