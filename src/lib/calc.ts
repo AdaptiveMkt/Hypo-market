@@ -37,7 +37,7 @@ export type AssetRois = Record<AssetKey, number>;
 
 export const DEFAULT_ASSETS: Assets = {
   cash: 1000,
-  savings: 500_000,
+  savings: 1000,
   stocks: 1000,
   bonds: 1000,
   funds: 1000,
