@@ -452,6 +452,14 @@ export function Calculator() {
   const depletedWhen = depletionCalendar(yearView.rows, yearDepleted, MODEL_START_YEAR);
   const firstClaimRow = yearView.rows.find((r) => r.status === "Care year") ?? lastCareRow;
   const featureRow = firstClaimRow;
+  const bothDepletedRow =
+    yearView.rows.find((r) => {
+      const insLeft = policy.enabled && !lifetime ? Math.max(0, r.insurancePoolRemaining) : 0;
+      const insDone = !policy.enabled || lifetime || insLeft <= 0;
+      return (r.status === "Care year" || r.status === "After care") && r.remainingNet <= 0 && insDone;
+    }) ?? null;
+  const depletionRow = bothDepletedRow ?? depletedRow ?? lastCareRow;
+  const fundsFullyDepleted = Boolean(bothDepletedRow);
   const yearPageSize = 10;
   const yearPages = Math.max(1, Math.ceil(yearRowsShown.length / yearPageSize));
   const yearSlice = yearRowsShown.slice(yearPage * yearPageSize, (yearPage + 1) * yearPageSize);
@@ -1618,11 +1626,19 @@ export function Calculator() {
               </p>
             </div>
             <MovableKpiGrid
-              caption={
-                featureRow
-                  ? `Figures are the first year of claim (${calendarYear(featureRow.year)}).`
-                  : undefined
-              }
+              captions={{
+                column: featureRow
+                  ? `First year of claim (${calendarYear(featureRow.year)}).`
+                  : undefined,
+                depletion: depletionRow
+                  ? fundsFullyDepleted
+                    ? `Insurance benefits and net countable assets are depleted in ${calendarYear(depletionRow.year)}.`
+                    : lifetime
+                      ? `Net countable assets are depleted in ${calendarYear(depletionRow.year)}. Lifetime insurance benefits are still in force in this model.`
+                      : `Not fully depleted in the modeled years — ${calendarYear(depletionRow.year)} is the last care year shown.`
+                  : undefined,
+                more: "Other figures from this run, if you want them on the Ready card.",
+              }}
               items={[
                 ...(featureRow
                   ? [
@@ -1677,8 +1693,59 @@ export function Calculator() {
                       },
                     ]
                   : []),
-                ...(featureRow
-                  ? [{ id: "status", group: "more" as const, label: "Status", value: <RedAmt>{featureRow.status}</RedAmt> }]
+                ...(depletionRow
+                  ? [
+                      { id: "dep-year", group: "depletion" as const, label: "Year", value: String(calendarYear(depletionRow.year)) },
+                      { id: "dep-status", group: "depletion" as const, label: "Status", value: <RedAmt>{depletionRow.status}</RedAmt> },
+                      { id: "dep-assets", group: "depletion" as const, label: "Countable Assets (net after tax)", value: moneyCents(depletionRow.remainingNetStart) },
+                    ]
+                  : []),
+                ...(policy.enabled && depletionRow
+                  ? [{ id: "dep-pool", group: "depletion" as const, label: "Insurance Benefit Pool", value: lifetime ? "Lifetime" : moneyCents(depletionRow.insurancePoolStart) }]
+                  : []),
+                ...(depletionRow
+                  ? [
+                      {
+                        id: "dep-total",
+                        group: "depletion" as const,
+                        label: "Total Remaining",
+                        value:
+                          policy.enabled && lifetime
+                            ? `${moneyCents(depletionRow.remainingNet)} + lifetime`
+                            : moneyCents(
+                                policy.enabled
+                                  ? depletionRow.remainingNet + Math.max(0, depletionRow.insurancePoolRemaining)
+                                  : depletionRow.remainingNet,
+                              ),
+                      },
+                      { id: "dep-cost", group: "depletion" as const, label: "Annual Care Costs* (est)", value: <RedAmt>{moneyCents(depletionRow.cost)}</RedAmt> },
+                    ]
+                  : []),
+                ...(policy.enabled && depletionRow
+                  ? [
+                      { id: "dep-benefits", group: "depletion" as const, label: "Insurance Benefits", value: moneyCents(depletionRow.insurance) },
+                      { id: "dep-balance", group: "depletion" as const, label: "Insurance Balance", value: lifetime ? "Lifetime" : moneyCents(depletionRow.insurancePoolRemaining) },
+                    ]
+                  : []),
+                ...(depletionRow
+                  ? [
+                      {
+                        id: "dep-copay",
+                        group: "depletion" as const,
+                        label: "Co-pay from Countable Assets",
+                        value: (
+                          <span className={depletionRow.drawn > 0 ? "font-bold amt-red" : ""}>
+                            {depletionRow.drawn > 0 ? moneyCents(-depletionRow.drawn) : moneyCents(0)}
+                          </span>
+                        ),
+                      },
+                      {
+                        id: "dep-shortfall",
+                        group: "depletion" as const,
+                        label: "Cumulative Shortfall",
+                        value: depletionRow.shortfallCumulative ? <RedAmt>{moneyCents(depletionRow.shortfallCumulative)}</RedAmt> : "—",
+                      },
+                    ]
                   : []),
                 { id: "claim-assets", group: "more" as const, label: "Countable assets at claim (net after tax)", value: <RedAmt>{moneyCents(result.startPoolNet)}</RedAmt> },
                 { id: "assets-today", group: "more" as const, label: "Countable assets today", value: moneyCents(pool) },
@@ -2375,10 +2442,16 @@ type HypoCardItem = {
   id: string;
   label: string;
   value: ReactNode;
-  group: "column" | "more";
+  group: "column" | "depletion" | "more";
 };
 
-function MovableKpiGrid({ items, caption }: { items: HypoCardItem[]; caption?: string }) {
+function MovableKpiGrid({
+  items,
+  captions,
+}: {
+  items: HypoCardItem[];
+  captions?: { column?: string; depletion?: string; more?: string };
+}) {
   const [order, setOrder] = useState<string[]>([]);
   const [selected, setSelected] = useState<string[] | null>(null);
   const [dragging, setDragging] = useState<string | null>(null);
@@ -2393,6 +2466,7 @@ function MovableKpiGrid({ items, caption }: { items: HypoCardItem[]; caption?: s
   }, []);
 
   const columnItems = useMemo(() => items.filter((i) => i.group === "column"), [items]);
+  const depletionItems = useMemo(() => items.filter((i) => i.group === "depletion"), [items]);
   const moreItems = useMemo(() => items.filter((i) => i.group === "more"), [items]);
   const columnIds = useMemo(() => columnItems.map((i) => i.id), [columnItems]);
   const chosen = selected ?? columnIds;
@@ -2467,16 +2541,28 @@ function MovableKpiGrid({ items, caption }: { items: HypoCardItem[]; caption?: s
 
   return (
     <div className="mb-4">
-      <p className="text-xs font-semibold uppercase tracking-wide text-muted">Select year-by-year columns</p>
-      {caption ? <p className="mt-1 text-xs text-muted">{caption}</p> : null}
+      <p className="text-xs font-semibold uppercase tracking-wide text-muted">Select year-by-year columns · first year of claim</p>
+      {captions?.column ? <p className="mt-1 text-xs text-muted">{captions.column}</p> : null}
       <div className="mt-2 flex flex-wrap gap-1.5">
         {columnItems.map((item) => (
           <Chip key={item.id} item={item} />
         ))}
       </div>
+      {depletionItems.length ? (
+        <>
+          <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-muted">When insurance benefits and net countable assets are depleted</p>
+          {captions?.depletion ? <p className="mt-1 text-xs text-muted">{captions.depletion}</p> : null}
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {depletionItems.map((item) => (
+              <Chip key={item.id} item={item} />
+            ))}
+          </div>
+        </>
+      ) : null}
       {moreItems.length ? (
         <>
-          <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-muted">More (if you want them)</p>
+          <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-muted">Other card options</p>
+          {captions?.more ? <p className="mt-1 text-xs text-muted">{captions.more}</p> : null}
           <div className="mt-2 flex flex-wrap gap-1.5">
             {moreItems.map((item) => (
               <Chip key={item.id} item={item} />
