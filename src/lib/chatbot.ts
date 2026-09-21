@@ -143,7 +143,7 @@ export const speakHypoAssistant = createServerFn({ method: "POST" })
         },
         body: JSON.stringify({
           text: spoken,
-          voice_id: DEFAULT_TTS_VOICE,
+          voice_id: "celeste",
           language: "en",
         }),
       });

@@ -168,6 +168,10 @@ function fallback(text: string, g: number, done: () => void) {
     window.speechSynthesis?.cancel();
     const u = new SpeechSynthesisUtterance(text);
     u.lang = "en-US";
+    const voices = window.speechSynthesis?.getVoices?.() ?? [];
+    const celeste = voices.find((v) => /celeste/i.test(v.name));
+    const female = voices.find((v) => /en[-_]US/i.test(v.lang) && /female|samantha|karen|moira|zira|google us english/i.test(v.name));
+    u.voice = celeste || female || voices.find((v) => /^en/i.test(v.lang)) || null;
     u.onend = done;
     u.onerror = done;
     if (g === gen) window.speechSynthesis?.speak(u);
