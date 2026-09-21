@@ -1615,37 +1615,52 @@ export function Calculator() {
                   : "This run’s countable assets last through the years of care that were modeled."}
               </p>
             </div>
-            {depletedRow ? (
-              <div className="mb-4 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-                <Kpi label="Status" value={<RedAmt>{depletedRow.status}</RedAmt>} />
-                <Kpi label="Countable assets at claim (net after tax)" value={<RedAmt>{money(result.startPoolNet)}</RedAmt>} />
-                <Kpi label="Annual cost" value={<RedAmt>{money(depletedRow.cost)}</RedAmt>} />
-                {policy.enabled ? <Kpi label="Insurance paid" value={<RedAmt>{money(depletedRow.insurancePaid)}</RedAmt>} /> : null}
-                <Kpi label="Assets remaining" value={<RedAmt>{money(depletedRow.remaining)}</RedAmt>} />
-                <Kpi label="Unpaid shortfall" value={<RedAmt>{depletedRow.shortfallCumulative ? money(depletedRow.shortfallCumulative) : "None"}</RedAmt>} />
-              </div>
-            ) : null}
-            <div className="mb-4 grid gap-3 md:grid-cols-2 lg:grid-cols-4">
-              <Kpi label="Countable assets today" value={money(pool)} />
-              {depletedRow ? null : (
-                <Kpi label="Countable assets at claim (net after tax)" value={<RedAmt>{money(result.startPoolNet)}</RedAmt>} />
-              )}
-              {policy.enabled ? <Kpi label="LTC pool at purchase" value={result.lifetimeBenefit ? "Lifetime" : money(insToday)} /> : null}
-              <Kpi label={policy.enabled ? "Combined pool today (assets + LTC)" : "Countable pool today"} value={policy.enabled && result.lifetimeBenefit ? `${money(pool)} + lifetime` : money(combinedToday)} />
-              <Kpi label={`Combined pool exhausted · ${SETTING_SHORT[activeSetting]} (today)`} value={formatYearsLast(yearsToday)} />
-              {policy.enabled ? <Kpi label="LTC benefits at claim" value={result.lifetimeBenefit ? "Lifetime" : money(insClaim)} /> : null}
-              <Kpi label="First-year care cost" value={money(result.firstCost)} />
-              <Kpi label="Assets remaining" value={<RedAmt>{money(result.endPool)}</RedAmt>} />
-              <Kpi label="Unpaid shortfall" value={<RedAmt>{result.shortfallTotal ? money(result.shortfallTotal) : "None"}</RedAmt>} />
-            </div>
-            {policy.enabled && !insuranceLocked ? (
-              <div className="mb-4 grid gap-3 md:grid-cols-2 lg:grid-cols-4">
-                <Kpi label="Insurance pays first · assets remaining" value={<RedAmt>{money(result.endPool)}</RedAmt>} />
-                <Kpi label="Same years with no policy · remaining" value={<RedAmt>{money(selfFunded.endPool)}</RedAmt>} />
-                <Kpi label="Insurance paid (benefits)" value={<RedAmt>{money(result.insuranceTotal)}</RedAmt>} />
-                <Kpi label="Shortfall after insurance" value={<RedAmt>{result.shortfallTotal ? money(result.shortfallTotal) : "None"}</RedAmt>} />
-              </div>
-            ) : null}
+            <MovableKpiGrid
+              items={[
+                ...(depletedRow
+                  ? [
+                      { id: "status", label: "Status", value: <RedAmt>{depletedRow.status}</RedAmt> },
+                      { id: "claim-assets", label: "Countable assets at claim (net after tax)", value: <RedAmt>{money(result.startPoolNet)}</RedAmt> },
+                      { id: "depleted-cost", label: "Annual cost", value: <RedAmt>{money(depletedRow.cost)}</RedAmt> },
+                      ...(policy.enabled
+                        ? [{ id: "depleted-ins", label: "Insurance paid", value: <RedAmt>{money(depletedRow.insurancePaid)}</RedAmt> }]
+                        : []),
+                      { id: "depleted-assets", label: "Assets remaining", value: <RedAmt>{money(depletedRow.remaining)}</RedAmt> },
+                      { id: "depleted-short", label: "Unpaid shortfall", value: <RedAmt>{depletedRow.shortfallCumulative ? money(depletedRow.shortfallCumulative) : "None"}</RedAmt> },
+                    ]
+                  : [
+                      { id: "claim-assets", label: "Countable assets at claim (net after tax)", value: <RedAmt>{money(result.startPoolNet)}</RedAmt> },
+                    ]),
+                { id: "assets-today", label: "Countable assets today", value: money(pool) },
+                ...(policy.enabled
+                  ? [{ id: "ltc-purchase", label: "LTC pool at purchase", value: result.lifetimeBenefit ? "Lifetime" : money(insToday) }]
+                  : []),
+                {
+                  id: "combined-today",
+                  label: policy.enabled ? "Combined pool today (assets + LTC)" : "Countable pool today",
+                  value: policy.enabled && result.lifetimeBenefit ? `${money(pool)} + lifetime` : money(combinedToday),
+                },
+                {
+                  id: "pool-exhausted",
+                  label: `Combined pool exhausted · ${SETTING_SHORT[activeSetting]} (today)`,
+                  value: formatYearsLast(yearsToday),
+                },
+                ...(policy.enabled
+                  ? [{ id: "ltc-claim", label: "LTC benefits at claim", value: result.lifetimeBenefit ? "Lifetime" : money(insClaim) }]
+                  : []),
+                { id: "first-cost", label: "First-year care cost", value: money(result.firstCost) },
+                { id: "end-assets", label: "Assets remaining", value: <RedAmt>{money(result.endPool)}</RedAmt> },
+                { id: "end-short", label: "Unpaid shortfall", value: <RedAmt>{result.shortfallTotal ? money(result.shortfallTotal) : "None"}</RedAmt> },
+                ...(policy.enabled && !insuranceLocked
+                  ? [
+                      { id: "ins-first", label: "Insurance pays first · assets remaining", value: <RedAmt>{money(result.endPool)}</RedAmt> },
+                      { id: "self-fund", label: "Same years with no policy · remaining", value: <RedAmt>{money(selfFunded.endPool)}</RedAmt> },
+                      { id: "ins-total", label: "Insurance paid (benefits)", value: <RedAmt>{money(result.insuranceTotal)}</RedAmt> },
+                      { id: "short-after", label: "Shortfall after insurance", value: <RedAmt>{result.shortfallTotal ? money(result.shortfallTotal) : "None"}</RedAmt> },
+                    ]
+                  : []),
+              ]}
+            />
             <div className="mt-2 stack-actions md:grid-cols-2">
               <button type="button" onClick={viewAllReport} className="btn-block rounded-lg border border-gold bg-gold text-masthead hover:brightness-105">View all</button>
               <button type="button" onClick={requestPdfDownload} className="btn-block rounded-lg border border-navy bg-navy text-cream hover:bg-teal">Download PDF</button>
@@ -2280,11 +2295,102 @@ function MoneyField({ id, value, onChange, compact }: { id: string; value: numbe
   return <StepperField id={id} value={value} onChange={onChange} step={1000} min={0} prefix="$" compact={compact} />;
 }
 
-function Kpi({ label, value }: { label: string; value: ReactNode }) {
+const KPI_ORDER_KEY = "aum-kpi-order";
+
+function loadKpiOrder(): string[] {
+  try {
+    const raw = localStorage.getItem(KPI_ORDER_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed.filter((x): x is string => typeof x === "string") : [];
+  } catch {
+    return [];
+  }
+}
+
+function sortKpis<T extends { id: string }>(items: T[], order: string[]): T[] {
+  const pos = new Map(order.map((id, i) => [id, i]));
+  return [...items].sort((a, b) => {
+    const ai = pos.get(a.id);
+    const bi = pos.get(b.id);
+    if (ai == null && bi == null) return 0;
+    if (ai == null) return 1;
+    if (bi == null) return -1;
+    return ai - bi;
+  });
+}
+
+function MovableKpiGrid({
+  items,
+}: {
+  items: { id: string; label: string; value: ReactNode }[];
+}) {
+  const [order, setOrder] = useState<string[]>([]);
+  const dragId = useRef<string | null>(null);
+  const [overId, setOverId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setOrder(loadKpiOrder());
+  }, []);
+
+  const shown = useMemo(() => sortKpis(items, order), [items, order]);
+
+  function persist(next: string[]) {
+    setOrder(next);
+    try {
+      localStorage.setItem(KPI_ORDER_KEY, JSON.stringify(next));
+    } catch {
+      /* ignore quota */
+    }
+  }
+
+  function dropOn(targetId: string) {
+    const from = dragId.current;
+    if (!from || from === targetId) return;
+    const ids = shown.map((i) => i.id);
+    const next = ids.filter((id) => id !== from);
+    const at = next.indexOf(targetId);
+    next.splice(at < 0 ? next.length : at, 0, from);
+    persist(next);
+    dragId.current = null;
+    setOverId(null);
+  }
+
   return (
-    <div className="card px-4 py-3">
-      <p className="text-xs uppercase tracking-wide text-muted">{label}</p>
-      <p className="font-display text-xl tabular-nums text-navy">{value}</p>
+    <div className="mb-4">
+      <p className="mb-2 text-xs text-muted">Drag a card to rearrange after this run.</p>
+      <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+        {shown.map((item) => (
+          <div
+            key={item.id}
+            draggable
+            onDragStart={(e) => {
+              dragId.current = item.id;
+              e.dataTransfer.effectAllowed = "move";
+              e.dataTransfer.setData("text/plain", item.id);
+            }}
+            onDragOver={(e) => {
+              e.preventDefault();
+              e.dataTransfer.dropEffect = "move";
+              if (overId !== item.id) setOverId(item.id);
+            }}
+            onDragLeave={() => {
+              if (overId === item.id) setOverId(null);
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              dropOn(item.id);
+            }}
+            onDragEnd={() => {
+              dragId.current = null;
+              setOverId(null);
+            }}
+            className={`card cursor-grab px-4 py-3 active:cursor-grabbing ${overId === item.id ? "ring-2 ring-gold" : ""}`}
+          >
+            <p className="text-xs uppercase tracking-wide text-muted">{item.label}</p>
+            <p className="font-display text-xl tabular-nums text-navy">{item.value}</p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
