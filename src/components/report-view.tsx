@@ -980,12 +980,22 @@ export function ReportView({
                     </td>
                     {policy.enabled ? (
                       <>
-                        <td className="py-2 px-1 text-center">—</td>
+                        <td className="py-2 px-1 text-center">
+                          {moneyCents(yearRows.at(-1)?.insuranceCumulative ?? 0)}
+                        </td>
                         <td className="py-2 px-1 text-center">—</td>
                       </>
                     ) : null}
-                    <td className="py-2 px-1 text-center">—</td>
-                    <td className="py-2 px-1 text-center">—</td>
+                    <td className="py-2 px-1 text-center font-bold amt-red">
+                      {(yearRows.at(-1)?.drawnCumulative ?? 0) > 0
+                        ? moneyCents(-(yearRows.at(-1)?.drawnCumulative ?? 0))
+                        : moneyCents(0)}
+                    </td>
+                    <td className="py-2 px-1 text-center">
+                      {yearRows.at(-1)?.shortfallCumulative
+                        ? moneyCents(yearRows.at(-1)!.shortfallCumulative)
+                        : "—"}
+                    </td>
                   </tr>
                 </tfoot>
               </table>

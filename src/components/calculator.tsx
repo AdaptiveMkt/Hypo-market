@@ -1679,10 +1679,10 @@ export function Calculator() {
                       {
                         id: "col-copay",
                         group: "column" as const,
-                        label: "Co-pay from Countable Assets · beginning",
+                        label: "Accumulative co-pay from countable assets · beginning",
                         value: (
-                          <span className={featureRow.drawn > 0 ? "font-bold amt-red" : ""}>
-                            {featureRow.drawn > 0 ? moneyCents(-featureRow.drawn) : moneyCents(0)}
+                          <span className={featureRow.drawnCumulative > 0 ? "font-bold amt-red" : ""}>
+                            {featureRow.drawnCumulative > 0 ? moneyCents(-featureRow.drawnCumulative) : moneyCents(0)}
                           </span>
                         ),
                       },
@@ -1735,10 +1735,10 @@ export function Calculator() {
                       {
                         id: "dep-copay",
                         group: "depletion" as const,
-                        label: "Co-pay from Countable Assets · end",
+                        label: "Accumulative co-pay from countable assets · end",
                         value: (
-                          <span className={depletionRow.drawn > 0 ? "font-bold amt-red" : ""}>
-                            {depletionRow.drawn > 0 ? moneyCents(-depletionRow.drawn) : moneyCents(0)}
+                          <span className={depletionRow.drawnCumulative > 0 ? "font-bold amt-red" : ""}>
+                            {depletionRow.drawnCumulative > 0 ? moneyCents(-depletionRow.drawnCumulative) : moneyCents(0)}
                           </span>
                         ),
                       },
@@ -1747,6 +1747,12 @@ export function Calculator() {
                         group: "depletion" as const,
                         label: "Cumulative Shortfall · end",
                         value: depletionRow.shortfallCumulative ? <RedAmt>{moneyCents(depletionRow.shortfallCumulative)}</RedAmt> : "—",
+                      },
+                      {
+                        id: "dep-gap",
+                        group: "depletion" as const,
+                        label: "Care cost − insurance (copay + unpaid) · end",
+                        value: <RedAmt>{moneyCents(Math.max(0, depletionRow.costCumulative - depletionRow.insuranceCumulative))}</RedAmt>,
                       },
                     ]
                   : []),
@@ -1882,12 +1888,22 @@ export function Calculator() {
                     </td>
                     {policy.enabled ? (
                       <>
-                        <td className="py-2 px-1 text-center">—</td>
+                        <td className="py-2 px-1 text-center">
+                          {moneyCents(yearRowsShown.at(-1)?.insuranceCumulative ?? 0)}
+                        </td>
                         <td className="py-2 px-1 text-center">—</td>
                       </>
                     ) : null}
-                    <td className="py-2 px-1 text-center">—</td>
-                    <td className="py-2 px-1 text-center">—</td>
+                    <td className="py-2 px-1 text-center font-bold amt-red">
+                      {(yearRowsShown.at(-1)?.drawnCumulative ?? 0) > 0
+                        ? moneyCents(-(yearRowsShown.at(-1)?.drawnCumulative ?? 0))
+                        : moneyCents(0)}
+                    </td>
+                    <td className="py-2 px-1 text-center">
+                      {yearRowsShown.at(-1)?.shortfallCumulative
+                        ? moneyCents(yearRowsShown.at(-1)!.shortfallCumulative)
+                        : "—"}
+                    </td>
                   </tr>
                 </tfoot>
               </table>

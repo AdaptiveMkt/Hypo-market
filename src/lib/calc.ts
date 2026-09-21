@@ -721,6 +721,7 @@ export type YearRow = {
   payPath: string;
   claimPhase: string;
   costCumulative: number;
+  drawnCumulative: number;
 };
 
 export type Projection = {
@@ -801,6 +802,7 @@ export function project(opts: {
   let shortfallTotal = 0;
   let insuranceTotal = 0;
   let costTotal = 0;
+  let drawnTotal = 0;
   let premiumTotal = hybrid ? singlePaid : 0;
   const careStart = careStartYear(opts.delay);
   const careEnd = careEndYear(opts.delay, opts.duration);
@@ -913,6 +915,7 @@ export function project(opts: {
     shortfallTotal += short;
     insuranceTotal += insurance;
     costTotal += cost;
+    drawnTotal += copay;
 
     let payPath = "";
     let claimPhase = "";
@@ -980,6 +983,7 @@ export function project(opts: {
       payPath,
       claimPhase,
       costCumulative: costTotal,
+      drawnCumulative: drawnTotal,
     });
     if (y === careEnd) poolAtCareEnd = p;
   }
