@@ -13,7 +13,6 @@ import {
   type SuitabilityForm,
 } from "@/lib/naic-suitability";
 import { printFilledWorksheetPdf } from "@/components/naic-filled-worksheet";
-import { AmgName } from "@/components/source-links";
 import { submitSuitability } from "@/lib/send-suitability";
 
 const field =
@@ -67,8 +66,7 @@ export function NaicSuitabilityForm() {
         Educational copy of the{" "}
         <strong className="text-navy">Long-Term Care Insurance Personal Worksheet</strong>{" "}
         (NAIC Model Regulation #641, Appendix B / IIPRC LTC application-form standards).
-        Not a carrier application, not a quote, and not a determination of suitability by
-        <AmgName /> or Funding LTC Marketplace.{" "}
+        Not a carrier application, not a quote, and not a determination of suitability.{" "}
         <a href={NAIC_SUITABILITY_PDF} target="_blank" rel="noopener noreferrer" className="source-link" data-source-href={NAIC_SUITABILITY_PDF}>
           Official PDF
         </a>
