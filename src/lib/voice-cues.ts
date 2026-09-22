@@ -1,40 +1,12 @@
-import { fiveYearIssueBand, typicalBuyerHints } from "./calc";
+import { fiveYearIssueBand, monthlyFromDaily, typicalBuyerHints } from "./calc";
 import type { ProtectAssetsSize } from "./protect-assets";
-import { money } from "./utils";
-
-function spokenDollars(n: number) {
-  const amount = Math.abs(Math.round(Number(n) || 0)).toLocaleString("en-US");
-  return `${amount} dollars`;
-}
-
-/** Spoken after Calculate Countable Assets in Section 1. */
-export function section1AssetsSpoken(pool: number): string {
-  return (
-    `Great. You have completed section 1, and your countable assets are ${spokenDollars(pool)}. ` +
-    `Now let's move to section 2, where you can let us know where and when you think you might need care. ` +
-    `This is subjective, but will help in the preparation of this hypothetical report.`
-  );
-}
+import { money, moneyCents } from "./utils";
 
 export function section1AssetsMessage(pool: number): string {
   return (
-    `Great. You have completed section 1, and your countable assets are ${money(pool)}. ` +
-    `Now let's move to section 2, where you can let us know where and when you think you might need care. ` +
+    `Great, you have completed Section 1, and based on your input, your countable assets are ${money(pool)}, ` +
+    `now let's proceed to Section 2, where you can let us know where and when you think you might need care. ` +
     `This is subjective, but will help in the preparation of this hypothetical report.`
-  );
-}
-
-/** Spoken script for the Section 2 industry-average box after Age today is entered. */
-export function section2IndustrySpoken(ageToday: number): string {
-  const hints = typicalBuyerHints(ageToday);
-  const band = fiveYearIssueBand(ageToday);
-  const bandSpoken = band ? band.replace("–", " to ").replace("-", " to ") : "your age";
-  const inf = hints.inflation.replace("%", " percent").replace("compound", "compound inflation").replace("simple", "simple inflation");
-  return (
-    `Based on industry averages at your age bracket, ${bandSpoken}, ` +
-    `this hypothetical defaults traditional benefits to ${hints.daily.replace("$", "")} dollars a day, ` +
-    `a ${hints.period.replace("-", " ")} period, a ${hints.elim.replace("-", " ")} wait, and ${inf}. ` +
-    `You can change any field in Section 3.`
   );
 }
 
@@ -42,73 +14,60 @@ export function section2IndustryMessage(ageToday: number): string {
   const hints = typicalBuyerHints(ageToday);
   const band = fiveYearIssueBand(ageToday) ?? "your age";
   return (
-    `Based on industry averages at your age bracket (${band}), this hypo defaults traditional benefits to ` +
+    `Based on industry averages within your age bracket (${band}), this hypo defaults traditional long term care insurance benefits to ` +
     `${hints.daily}/day, a ${hints.period} period, a ${hints.elim} wait, and ${hints.inflation}. ` +
-    `You can change any field in Section 3.`
+    `* You can change any field in Section 3 to modify both the benefits shown in the hypothetical run.`
   );
 }
 
-type ProtectOpts = {
+export function section3ProtectMessage(opts: {
   pool: number;
   ageToday: number;
   delay: number;
   claimAge: number;
   protectPct: number;
   settingLabel: string;
+  cpiPct: number;
   size: ProtectAssetsSize;
-};
-
-function protectLead(opts: ProtectOpts, dollars: (n: number) => string) {
+}): string {
   const s = opts.size;
   const when =
     opts.delay === 0
       ? "this year"
-      : `${opts.delay} year${opts.delay === 1 ? "" : "s"}`;
+      : `the ${opts.delay} year${opts.delay === 1 ? "" : "s"}`;
   const years = `${s.careYears} year${s.careYears === 1 ? "" : "s"}`;
-  return (
-    `If you have ${dollars(opts.pool)} countable assets today at age ${opts.ageToday}, ` +
-    `and care is expected in ${when} at age ${opts.claimAge}, ` +
-    `this model projects about ${dollars(s.assetsAtClaimNet)} countable assets, net after tax, at claim. ` +
-    `To protect ${opts.protectPct} percent of that nest egg, ${dollars(s.protectDollars)}, ` +
-    `through ${years} of ${opts.settingLabel.toLowerCase()}, about ${dollars(s.careTotal)} of inflated care costs, `
-  );
-}
-
-function protectBody(opts: ProtectOpts, dollars: (n: number) => string) {
-  const s = opts.size;
-  const lead = protectLead(opts, dollars);
+  const monthlyToday = money(Math.round(monthlyFromDaily(s.dailyToday)));
+  const monthlyClaim = money(Math.round(monthlyFromDaily(s.dailyAtClaim)));
+  const cpi = `${Number(opts.cpiPct).toFixed(1)}%`;
+  const lead =
+    `Based on ${money(opts.pool)} countable assets today at age ${opts.ageToday}, and considering based on industry claim's experience, ` +
+    `your care needs may occur sometime within ${when} at age ${opts.claimAge}. ` +
+    `This model projects your countable assets, net after tax, at claim to be about ${moneyCents(s.assetsAtClaimNet)}. ` +
+    `To protect ${opts.protectPct} percent of that nest egg, or ${moneyCents(s.protectDollars)}, through ${years} of ` +
+    `${opts.settingLabel.toLowerCase()}, is projected to cost about ${moneyCents(s.careTotal)} inflated at ${cpi}. `;
+  const close =
+    ` If you were to proceed with insurance coverage, your rates will be based on insurance company selected, underwriting classification, state of issue, benefit designs and selected riders.\n\n` +
+    `Select “Use this insurance design” and Run hypothetical. If not, simply proceed to Run hypothetical.`;
   if (s.alreadyProtected) {
     return (
       lead +
-      `assets on this run can cover the modeled bills while still leaving that share. ` +
-      `Insurance is optional for this protection target. Not a quote.`
+      `Assets on this run can cover the modeled bills while still leaving that share. Insurance is optional for this protection target.` +
+      close
     );
   }
   const period = s.lifetime
-    ? "with a lifetime benefit period"
-    : `for ${s.benefitYears} year${s.benefitYears === 1 ? "" : "s"}`;
-  const inflate =
-    s.dailyToday !== s.dailyAtClaim
-      ? ` about ${dollars(s.dailyAtClaim)} a day at claim if benefits inflate with the age-based default.`
-      : ".";
+    ? "a lifetime benefit period"
+    : `${s.benefitYears} year${s.benefitYears === 1 ? "" : "s"} benefit period`;
   const pool = s.lifetime
-    ? `${dollars(s.annualCapAtClaim)} a year, lifetime`
-    : dollars(s.poolNeeded);
+    ? `${money(s.annualCapAtClaim)} a year, lifetime`
+    : moneyCents(s.poolNeeded);
   return (
     lead +
-    `consider a traditional reimbursement design of about ${dollars(s.dailyToday)} a day ${period} purchased today,` +
-    inflate +
-    ` That is a pool of about ${pool}. ` +
-    `Assets would be asked to co-pay up to ${dollars(s.spendable)}. ` +
-    `Not a quote. Underwriting, state, and riders change what can actually be issued.`
+    `Based on your countable assets and care needs, you might want to think about seeing if you can qualify for ` +
+    `${money(s.dailyToday)} a day and/or ${monthlyToday} monthly for ${period} purchased today, ` +
+    `which will be about ${money(s.dailyAtClaim)} a day, and/or ${monthlyClaim} monthly at the projected time of claim ` +
+    `if benefits inflate with the age-based default. That is an insurance benefit pool of coverage of about ${pool}. ` +
+    `Your assets would be used.` +
+    close
   );
-}
-
-/** Spoken after years of care is selected — matches the protect-assets card. */
-export function section2ProtectSpoken(opts: ProtectOpts): string {
-  return protectBody(opts, spokenDollars);
-}
-
-export function section2ProtectMessage(opts: ProtectOpts): string {
-  return protectBody(opts, money);
 }

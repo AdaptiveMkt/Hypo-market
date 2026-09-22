@@ -469,6 +469,16 @@ html.dark {
     will-change: transform, color;
     animation: red-wave-bob 2.8s ease-in-out 3;
   }
+  .btn-attention-red {
+    background: #b42318;
+    color: #fff7f5;
+  }
+  .btn-attention-red:hover {
+    filter: brightness(1.08);
+  }
+  .btn-blink-3 {
+    animation: btn-blink-3 0.6s ease-in-out 3;
+  }
   .text-deplete {
     animation: red-wave-color 4.5s ease-in-out 3;
   }
@@ -537,12 +547,27 @@ html.dark {
   }
 }
 
+@keyframes btn-blink-3 {
+  0%,
+  100% {
+    filter: brightness(1);
+    box-shadow: none;
+  }
+  50% {
+    filter: brightness(1.35);
+    box-shadow: 0 0 0 3px rgba(180, 35, 24, 0.45);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .red-wave > span,
   .text-deplete {
     animation: none !important;
     transform: none !important;
     color: var(--color-amount) !important;
+  }
+  .btn-blink-3 {
+    animation: none !important;
   }
   *,
   *::before,

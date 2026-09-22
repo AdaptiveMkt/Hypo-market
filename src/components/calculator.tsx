@@ -118,7 +118,7 @@ import {
   naicLockoutSpoken,
 } from "@/lib/naic-suitability";
 import { CuePopup, type CueMessage } from "@/components/cue-popup";
-import { section1AssetsMessage, section2IndustryMessage, section2ProtectMessage } from "@/lib/voice-cues";
+import { section1AssetsMessage, section2IndustryMessage, section3ProtectMessage } from "@/lib/voice-cues";
 import { pinToHeaderOnLoad, scrollToHeader } from "@/lib/scroll-header";
 import { WhatConsumersBuyPanel } from "@/components/what-consumers-buy-panel";
 import { ReportView } from "@/components/report-view";
@@ -277,6 +277,9 @@ export function Calculator() {
   const spokenAgeBand = useRef<string | null>(null);
   const spokenProtectDuration = useRef<number | null>(null);
   const [cue, setCue] = useState<CueMessage | null>(null);
+  const [section2Confirmed, setSection2Confirmed] = useState(false);
+  const [section3Confirmed, setSection3Confirmed] = useState(false);
+  const [section3Open, setSection3Open] = useState(false);
 
   useEffect(() => {
     pinToHeaderOnLoad();
@@ -301,9 +304,9 @@ export function Calculator() {
   const grossPool = poolTotal({ ...assets, excludable: 0 }, false);
   const pool = poolTotal(assets, excludeHome);
   const homeEquity = Number(assets.home) || 0;
-  const section2Floor = NAIC_LOCKOUT_ASSETS + homeEquity;
-  const naicUnlocked = poolShown && pool >= section2Floor;
-  const insuranceLocked = insuranceLockedOut(pool);
+  const countableExHome = Math.max(0, pool - (excludeHome ? 0 : homeEquity));
+  const naicUnlocked = poolShown && countableExHome >= NAIC_LOCKOUT_ASSETS;
+  const insuranceLocked = insuranceLockedOut(countableExHome);
   const insuranceWarn = insuranceNeedsWarning(pool);
   const insuranceSuitable = !insuranceLocked;
   const holdings = useMemo(
@@ -353,7 +356,6 @@ export function Calculator() {
     } else {
       setPolicy((prev) => (prev.enabled ? prev : { ...prev, enabled: true }));
       setPartnershipOn(true);
-      if (was === false) setCue({ title: "NAIC suitability", body: NAIC_SUITABILITY_MEETS });
     }
     insuranceWasSuitable.current = insuranceSuitable;
   }, [insuranceSuitable]);
@@ -367,44 +369,6 @@ export function Calculator() {
     const t = window.setTimeout(() => setWarnFlash(false), 4500);
     return () => window.clearTimeout(t);
   }, [insuranceWarn, pool]);
-
-  useEffect(() => {
-    if (!naicUnlocked || ageToday < MIN_AGE_TODAY) {
-      spokenAgeBand.current = null;
-      return;
-    }
-    const band = fiveYearIssueBand(ageToday);
-    if (!band || spokenAgeBand.current === band) return;
-    const t = window.setTimeout(() => {
-      spokenAgeBand.current = band;
-      setCue({ title: "Industry averages for your age", body: section2IndustryMessage(ageToday) });
-    }, 650);
-    return () => window.clearTimeout(t);
-  }, [ageToday, naicUnlocked]);
-
-  useEffect(() => {
-    if (!naicUnlocked || !duration || ageToday < MIN_AGE_TODAY || !state || !setting) {
-      if (!duration) spokenProtectDuration.current = null;
-      return;
-    }
-    if (spokenProtectDuration.current === duration) return;
-    const t = window.setTimeout(() => {
-      spokenProtectDuration.current = duration;
-      setCue({
-        title: "How much insurance to protect assets at claim",
-        body: section2ProtectMessage({
-          pool,
-          ageToday,
-          delay,
-          claimAge,
-          protectPct,
-          settingLabel: SETTING_LABELS[activeSetting],
-          size: protectSize,
-        }),
-      });
-    }, 700);
-    return () => window.clearTimeout(t);
-  }, [duration, naicUnlocked, ageToday, state, setting, delay, claimAge, protectPct, pool, protectSize, activeSetting]);
 
   const baseArgs = {
     pool,
@@ -693,6 +657,60 @@ export function Calculator() {
     setRunKinds((prev) => ({ ...prev, traditional: true }));
     setDesignTouched(true);
   }
+  function confirmSection2(checked: boolean) {
+    setSection2Confirmed(checked);
+    if (!checked) {
+      setSection3Open(false);
+      setSection3Confirmed(false);
+      return;
+    }
+    if (!poolShown) {
+      setSection2Confirmed(false);
+      setCue({
+        title: "Complete Section 1 first",
+        body: "Select Calculate Countable Assets in Section 1 before confirming Section 2.",
+      });
+      return;
+    }
+    if (ageToday < MIN_AGE_TODAY || !state || !setting || !duration) {
+      setSection2Confirmed(false);
+      setCue({
+        title: "Need more information",
+        body: "Please complete age today, care state, care setting, and years of care before confirming Section 2.",
+      });
+      return;
+    }
+    if (countableExHome < NAIC_LOCKOUT_ASSETS) {
+      setSection3Open(false);
+      setCue({
+        title: "Insurance may not be suitable",
+        body: naicLockoutSpoken(state),
+      });
+      return;
+    }
+    setSection3Open(true);
+    setCue({
+      title: "Industry averages for your age",
+      body: section2IndustryMessage(ageToday),
+    });
+  }
+  function confirmSection3(checked: boolean) {
+    setSection3Confirmed(checked);
+    if (!checked) return;
+    setCue({
+      title: "How much insurance to protect assets at claim",
+      body: section3ProtectMessage({
+        pool,
+        ageToday,
+        delay,
+        claimAge,
+        protectPct,
+        settingLabel: SETTING_LABELS[activeSetting],
+        cpiPct: cpi,
+        size: protectSize,
+      }),
+    });
+  }
   function openKindTab(kind: PolicyKind) {
     setRunKinds((f) => ({ ...f, [kind]: true }));
     setKindBook((book) => {
@@ -732,6 +750,9 @@ export function Calculator() {
     spokenAgeBand.current = null;
     spokenProtectDuration.current = null;
     setCue(null);
+    setSection2Confirmed(false);
+    setSection3Confirmed(false);
+    setSection3Open(false);
     setClaimAge(AALTCI_MEAN_CLAIM_AGE);
     setClaimAgeTouched(false);
     setDuration(0);
@@ -946,7 +967,6 @@ export function Calculator() {
     setRan(true);
     setYearPage(0);
     if (locked) {
-      setCue({ title: "Insurance may not be suitable", body: naicLockoutSpoken(state) });
       window.setTimeout(() => scrollToId("medicaid-va-card"), 80);
     } else {
       window.setTimeout(() => scrollToId("results"), 80);
@@ -1123,7 +1143,7 @@ export function Calculator() {
           <div className="mt-4 grid w-full min-w-0 grid-cols-1 gap-2">
             <button
               type="button"
-              className="flex min-h-12 w-full items-center justify-center rounded-lg bg-gold px-3 py-2.5 text-center text-base font-semibold leading-snug text-masthead hover:brightness-105"
+              className="btn-calc-red btn-blink-3 flex min-h-12 w-full items-center justify-center rounded-lg bg-[#b42318] px-3 py-2.5 text-center text-base font-semibold leading-snug text-white hover:brightness-110"
               onClick={() => {
                 setPoolShown(true);
                 setCue({ title: "Section 1 complete", body: section1AssetsMessage(pool) });
@@ -1147,20 +1167,7 @@ export function Calculator() {
           </div>
         </section>
 
-      <div className="mt-4 grid min-w-0 items-start gap-4 lg:grid-cols-2">
-        {naicUnlocked ? (
-        <section className="card-xl min-w-0 p-4 md:p-5" aria-label="NAIC consumer guides">
-          <h2 className="mb-3 border-b-2 border-gold pb-2 font-display text-xl text-navy">NAIC Shopper’s Guide and Suitability Worksheet</h2>
-          <NaicGuideCoverRow />
-          <div className="mt-4 grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2">
-            <NaicShopperCover framed={false} pdfChecked={details.naicGuide} onPdfChange={(v) => setDetail("naicGuide", v)} />
-            <NaicSuitabilityCover framed={false} pdfChecked={details.naicWorksheet} onPdfChange={(v) => setDetail("naicWorksheet", v)} />
-          </div>
-          <TitleCollapse title="NAIC sources and disclaimer" className="mt-3" defaultOpen={false} hint="View more details.">
-            <NaicCardDisclaimer />
-          </TitleCollapse>
-        </section>
-        ) : null}
+      <div className="mt-4 grid min-w-0 items-start gap-4">
         <section className="card-xl min-w-0 p-4 md:p-5">
           <h2 className="mb-3 border-b-2 border-gold pb-2 font-display text-xl text-navy">2. Where and when care starts</h2>
             <label className={labelClass} htmlFor="age-today">Age today <span className="font-normal text-muted">(Input Your Current Age)</span></label>
@@ -1294,6 +1301,15 @@ export function Calculator() {
                 {durationNeeded && !duration ? (
                   <p className="mt-1 text-sm font-semibold leading-snug text-deplete" role="alert">Select how many years of care to model to run the hypothetical.</p>
                 ) : <p className="mt-1 text-xs text-muted">Required to run.</p>}
+                <label className="mt-3 flex min-h-11 cursor-pointer items-start gap-2 text-sm font-semibold text-navy">
+                  <input
+                    type="checkbox"
+                    className="mt-1 size-4 accent-teal"
+                    checked={section2Confirmed}
+                    onChange={(e) => confirmSection2(e.target.checked)}
+                  />
+                  <span>Confirm Section 2 is complete</span>
+                </label>
             </div>
             {duration ? (
             <>
@@ -1421,7 +1437,7 @@ export function Calculator() {
                       className="btn-block rounded-lg border border-navy bg-navy text-cream hover:bg-teal"
                       onClick={applyProtectDesign}
                     >
-                      Use this design in Insurance
+                      Use this insurance design
                     </button>
                   ) : null}
                 </div>
@@ -1439,7 +1455,7 @@ export function Calculator() {
                   </span>
                 </p>
               ) : null}
-              <button type="button" className="btn-block rounded-lg bg-gold text-masthead hover:brightness-105" onClick={runHypo}>Run hypothetical</button>
+              <button type="button" className="btn-block btn-attention-red rounded-lg hover:brightness-110" onClick={runHypo}>Run hypothetical</button>
             </div>
             </>
             ) : null}
@@ -1447,11 +1463,30 @@ export function Calculator() {
       </div>
 
       <section className="mt-4 card-xl min-w-0 p-4 md:p-5">
-          <h2 className="mb-3 border-b-2 border-gold pb-2 font-display text-xl text-navy">3. Insurance</h2>
+          <TitleCollapse
+            title="3. Insurance"
+            className="mt-0"
+            open={section3Open}
+            onOpenChange={setSection3Open}
+            hint="Complete Section 2 to open insurance, NAIC guides, and the worksheet."
+          >
+            {section2Confirmed && countableExHome >= NAIC_LOCKOUT_ASSETS ? (
+              <div className="mb-4" aria-label="NAIC consumer guides">
+                <h3 className="mb-3 border-b-2 border-gold pb-2 font-display text-lg text-navy">NAIC Shopper’s Guide and Suitability Worksheet</h3>
+                <NaicGuideCoverRow />
+                <div className="mt-4 grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2">
+                  <NaicShopperCover framed={false} pdfChecked={details.naicGuide} onPdfChange={(v) => setDetail("naicGuide", v)} />
+                  <NaicSuitabilityCover framed={false} pdfChecked={details.naicWorksheet} onPdfChange={(v) => setDetail("naicWorksheet", v)} />
+                </div>
+                <TitleCollapse title="NAIC sources and disclaimer" className="mt-3" defaultOpen={false} hint="View more details.">
+                  <NaicCardDisclaimer />
+                </TitleCollapse>
+              </div>
+            ) : null}
             {insuranceLocked ? (
               <div className="rounded-lg border-2 border-deplete bg-cream px-4 py-3">
                 <p className="text-sm font-semibold text-navy">{NAIC_SUITABILITY_BANNER}</p>
-                <p className="mt-1 text-xs text-muted">Countable assets {money(pool)} are under {money(NAIC_LOCKOUT_ASSETS)}.</p>
+                <p className="mt-1 text-xs text-muted">Countable assets excluding the home {money(countableExHome)} are under {money(NAIC_LOCKOUT_ASSETS)}.</p>
               </div>
             ) : (
               <>
@@ -1714,6 +1749,17 @@ export function Calculator() {
                 )}
               </>
             )}
+            {!insuranceLocked ? (
+              <label className="mt-4 flex min-h-11 cursor-pointer items-start gap-2 text-sm font-semibold text-navy">
+                <input
+                  type="checkbox"
+                  className="mt-1 size-4 accent-teal"
+                  checked={section3Confirmed}
+                  onChange={(e) => confirmSection3(e.target.checked)}
+                />
+                <span>Confirm Section 3 benefit selection.</span>
+              </label>
+            ) : null}
             <div className="mt-4 stack-actions">
               {missingRun.length ? (
                 <p className="w-full min-w-0 text-sm font-semibold leading-snug text-deplete" role="status">
@@ -1725,8 +1771,9 @@ export function Calculator() {
                   </span>
                 </p>
               ) : null}
-              <button type="button" className="btn-block rounded-lg bg-gold text-masthead hover:brightness-105" onClick={runHypo}>Run hypothetical</button>
+              <button type="button" className="btn-block btn-attention-red rounded-lg hover:brightness-110" onClick={runHypo}>Run hypothetical</button>
             </div>
+          </TitleCollapse>
           </section>
 
       {ran && (
@@ -2508,7 +2555,7 @@ export function Calculator() {
                 )}
                 <div className="mobile-dock-row">
                   <button type="button" className="btn-block min-w-0 rounded-lg border border-navy text-sm text-navy" onClick={() => window.dispatchEvent(new Event("aum:open-chat"))}>Ask</button>
-                  <button type="button" className="btn-block min-w-0 rounded-lg bg-gold text-sm text-masthead" onClick={runHypo}>Run hypothetical</button>
+                  <button type="button" className="btn-block btn-attention-red min-w-0 rounded-lg text-sm hover:brightness-110" onClick={runHypo}>Run hypothetical</button>
                 </div>
               </>
             )}
