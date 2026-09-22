@@ -97,6 +97,7 @@ import { DISCLOSURE_CARD_TITLE } from "@/lib/disclaimer";
 import {
   ALL_DETAILS_OFF,
   ALL_DETAILS_ON,
+  CLIENT_SITTING,
   DEFAULT_DETAILS,
   DISCLOSURE_SECTION_IDS,
   isRequiredDetail,
@@ -123,6 +124,14 @@ import { pinToHeaderOnLoad, scrollToHeader } from "@/lib/scroll-header";
 import { WhatConsumersBuyPanel } from "@/components/what-consumers-buy-panel";
 import { ReportView } from "@/components/report-view";
 import { PdfSectionsDialog } from "@/components/details-picker";
+
+function snapshotReadyCards(): { label: string; value: string }[] {
+  if (typeof document === "undefined") return [];
+  return Array.from(document.querySelectorAll("#results [data-kpi-id]")).map((node) => ({
+    label: node.querySelector("p")?.textContent?.trim() ?? "",
+    value: node.querySelector("p.font-display")?.textContent?.trim() ?? "",
+  })).filter((card) => card.label && card.value);
+}
 import { ContactAskDialog, ContactRequestDialog, PdfReadyDialog } from "@/components/pdf-delivery-dialogs";
 import { MedicaidVaCard } from "@/components/medicaid-va-card";
 import { AdvisorProfessionalFolds, DisclaimerCard } from "@/components/disclaimer-card";
@@ -979,7 +988,7 @@ export function Calculator() {
   function executeHypo() {
     const locked = insuranceLockedOut(pool);
     setHypoRunId((n) => n + 1);
-    setDetails(locked ? lockoutDetails() : withScenarioDetails({ ...ALL_DETAILS_OFF, yearByYear: true, partnership: true, medicaidLtc: true }, false));
+    setDetails(locked ? lockoutDetails() : withScenarioDetails({ ...CLIENT_SITTING }, false));
     setRan(true);
     setYearPage(0);
     if (locked) {
@@ -1119,6 +1128,7 @@ export function Calculator() {
     reciprocity: recip,
     reciprocityExamples: recipExamples,
     veteran,
+    readyCards: snapshotReadyCards(),
     details,
     onClose: () => setShowReport(false),
     onPdf: requestPdfDownload,

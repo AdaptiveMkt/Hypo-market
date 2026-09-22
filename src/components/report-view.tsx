@@ -186,6 +186,7 @@ export function ReportView({
   reciprocityExamples,
   veteran = false,
   protectOn = false,
+  readyCards = [],
   details = ALL_DETAILS_ON,
   onClose,
   onPdf,
@@ -246,6 +247,7 @@ export function ReportView({
   reciprocityExamples: ReciprocityOutcome[];
   veteran?: boolean;
   protectOn?: boolean;
+  readyCards?: { label: string; value: string }[];
   details?: DetailFlags;
   onClose: () => void;
   onPdf: () => void;
@@ -512,6 +514,20 @@ export function ReportView({
           </div>
         </section>
 
+        {readyCards.length ? (
+          <section className="report-block">
+            <h2 className="mb-3 font-display text-xl text-navy">Your hypothetical is ready</h2>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {readyCards.map((card) => (
+                <div key={card.label} className="card px-4 py-3">
+                  <p className="text-xs uppercase tracking-wide text-muted">{card.label}</p>
+                  <p className="font-display text-xl tabular-nums text-navy">{card.value}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        ) : null}
+
         {(() => {
           const paras = summary.split("\n\n").filter(Boolean);
           const chunks: string[][] = [];
@@ -652,6 +668,14 @@ export function ReportView({
           <table className="w-full text-sm">
             <tbody>
               <Qa q="Include insurance in the run" a={policy.enabled ? "Yes" : "No"} />
+              <Qa
+                q="Insurance types in this run"
+                a={
+                  policy.enabled && insuranceCompare.length
+                    ? insuranceCompare.map((r) => r.label).join("; ")
+                    : "None — self-funded"
+                }
+              />
               <Qa q="Annual income (7% guideline)" a={annualIncome > 0 ? money(annualIncome) : "Not entered"} />
               <Qa
                 q={TARGET_PREMIUM_LABEL}

@@ -172,6 +172,7 @@ export const DISCLAIMER_HEADING_ID: Partial<Record<string, DetailId>> = {
 export type DetailFlags = Record<DetailId, boolean>;
 
 export const REQUIRED_DETAIL_IDS: DetailId[] = [
+  "yearByYear",
   "dhDesignation",
   "dhHoldHarmlessCard",
   "dhHoldHarmless",
@@ -253,13 +254,14 @@ export function allDetailsOn(d: DetailFlags) {
   return DETAIL_SECTIONS.every((s) => d[s.id]);
 }
 
-/** Numbers + one insurance card + Medicaid rules — enough for a client sitting. */
+/** Numbers, the four-structure explore card, and Medicaid — a client sitting. */
 export const CLIENT_SITTING: DetailFlags = {
   ...ALL_DETAILS_OFF,
   allocation: true,
   compareCare: true,
   compareIns: true,
   yearByYear: true,
+  hybrid: true,
   partnership: true,
   medicaidLtc: true,
   dhDesignation: true,

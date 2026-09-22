@@ -95,7 +95,7 @@ export function DetailsPicker({
           <span>
             Client sitting (recommended)
             <span className="mt-0.5 block text-xs font-normal text-muted">
-              Allocation, care options, compare insurance, year-by-year, State Partnership, and Medicaid Information.
+              Allocation, care options, compare insurance, year-by-year for each selected run, Explore Traditional, Asset-based, Annuity, and Hybrid, State Partnership, and Medicaid Information.
               Not the full packet.
             </span>
           </span>
@@ -405,7 +405,7 @@ export function PdfSectionsDialog({
         <p className="mt-2 text-sm text-muted">
           {lockoutMode
             ? "This run is a Medicaid planning packet. Required legal disclaimers, sources, and how to find a qualified professional cannot be unchecked. Insurance design is not included."
-            : "Check Expand / include all optional sections to put every title in the PDF. Unchecked boxes are omitted. The summary, recommendations, and Medicaid Information always print. Then save the file to this computer."}
+            : "Sections 1–3, the Ready cards you left on screen, and a year-by-year column report for each selected run always print. Client sitting is the default and includes Explore Traditional, Asset-based, Annuity, and Hybrid. Other checked cards print in the same order as View. Then save the file to this computer."}
         </p>
         {DESIGNATION_PDF_IDS.some((id) => details[id]) ? (
           <DesignationNotice
