@@ -1421,7 +1421,6 @@ export function Calculator() {
                 />
                 <span>Confirm Section 2 is complete</span>
               </label>
-              <button type="button" className="btn-block btn-attention-red rounded-lg hover:brightness-110" onClick={runHypo}>Run hypothetical</button>
             </div>
             </>
             ) : null}
