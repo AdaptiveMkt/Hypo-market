@@ -1368,15 +1368,6 @@ export function Calculator() {
             <p className="mt-3 text-xs text-muted">* 5-year CPI / LTC for the care selected. {fiveYearLtcBenchmarks().map((row) => `If ${row.ifLabel}, the rate is ${row.cagr.toFixed(1)}%`).join(". ")}.</p>
             <div className="mt-3 grid w-full min-w-0 grid-cols-1 gap-3 md:grid-cols-2">
               <div className="min-w-0">
-                <p className={labelClass}>Age projected at claim</p>
-                <p className="card min-w-0 w-full max-w-full px-3 py-2.5 text-base leading-snug text-navy">
-                  {ageToday < MIN_AGE_TODAY ? "Enter age today" : claimAge ? String(claimAge) : "Enter estimated age"}
-                  {ageToday >= MIN_AGE_TODAY && claimAge ? (
-                    <span className="mt-1 block text-sm font-normal text-muted">({delay === 0 ? "now" : `in ${delay} year${delay === 1 ? "" : "s"}`})</span>
-                  ) : null}
-                </p>
-              </div>
-              <div className="min-w-0">
                 <label className={labelClass} htmlFor="claim-age">Estimated age when care might be needed *</label>
                 <StepperField
                   id="claim-age"
@@ -1393,6 +1384,15 @@ export function Calculator() {
                   }}
                 />
                 <p className="mt-1 text-xs font-bold amt-red">* You can change age of claim. Currently default based on claims experience for care.</p>
+              </div>
+              <div className="min-w-0">
+                <p className={labelClass}>Age projected at claim</p>
+                <p className="card min-w-0 w-full max-w-full px-3 py-2.5 text-base leading-snug text-navy">
+                  {ageToday < MIN_AGE_TODAY ? "Enter age today" : claimAge ? String(claimAge) : "Enter estimated age"}
+                  {ageToday >= MIN_AGE_TODAY && claimAge ? (
+                    <span className="mt-1 block text-sm font-normal text-muted">({delay === 0 ? "now" : `in ${delay} year${delay === 1 ? "" : "s"}`})</span>
+                  ) : null}
+                </p>
               </div>
               <div className="min-w-0">
                 <label className={labelClass} htmlFor="delay">Care projected to start <span className="font-normal text-muted">(years from now)</span></label>
