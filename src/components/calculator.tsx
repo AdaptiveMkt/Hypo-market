@@ -56,8 +56,6 @@ import {
   yearsPoolLasts,
   careStartYear,
   chartTickInterval,
-  remainingToneAt,
-  remainingToneClass,
   type AssetRois,
   type Assets,
   type InflationMethod,
@@ -118,6 +116,8 @@ import {
   naicLockoutSpoken,
 } from "@/lib/naic-suitability";
 import { CuePopup, type CueMessage } from "@/components/cue-popup";
+import { KindYearTabs, YearByYearTable } from "@/components/year-by-year-table";
+import { KIND_TAB } from "@/lib/kind-tabs";
 import { section1AssetsMessage, section2IndustryMessage, section3ProtectMessage } from "@/lib/voice-cues";
 import { pinToHeaderOnLoad, scrollToHeader } from "@/lib/scroll-header";
 import { WhatConsumersBuyPanel } from "@/components/what-consumers-buy-panel";
@@ -195,29 +195,6 @@ function parseRider(value: string): Pick<LtcPolicy, "benefitInflationPct" | "inf
 function disabledPolicy(p: LtcPolicy): LtcPolicy {
   return { ...p, enabled: false };
 }
-
-const KIND_TAB: Record<PolicyKind, { idle: string; active: string; accent: string }> = {
-  traditional: {
-    idle: "border border-transparent bg-[#d6eaf8] text-[#1b3a4b]",
-    active: "border border-b-0 border-[#0072B2] bg-[#0072B2] text-white",
-    accent: "#0072B2",
-  },
-  assetBased: {
-    idle: "border border-transparent bg-[#fdebd0] text-[#8b3a00]",
-    active: "border border-b-0 border-[#c47a00] bg-[#E69F00] text-[#1b3a4b]",
-    accent: "#c47a00",
-  },
-  ltcAnnuity: {
-    idle: "border border-transparent bg-[#d5f5e3] text-[#005a3c]",
-    active: "border border-b-0 border-[#007a58] bg-[#009E73] text-white",
-    accent: "#007a58",
-  },
-  hybridLife: {
-    idle: "border border-transparent bg-[#f5d0e8] text-[#6b2d5b]",
-    active: "border border-b-0 border-[#a34e82] bg-[#CC79A7] text-[#1b3a4b]",
-    accent: "#a34e82",
-  },
-};
 
 export function Calculator() {
   const narrow = useNarrow();
@@ -425,9 +402,9 @@ export function Calculator() {
     [pool, state, setting, delay, duration, cpi, roi, taxRate, iraBal, iraRoi, policy, holdings],
   );
   const yearView = useMemo(() => {
-    if (!policy.enabled || yearKind === policy.kind) return result;
-    return project({ ...baseArgs, policy: policyForCompareLane(yearKind, policy, pool) });
-  }, [yearKind, result, pool, state, setting, delay, duration, cpi, roi, taxRate, iraBal, iraRoi, policy, holdings]);
+    if (!policy.enabled || yearKind === policy.kind || !runKinds[yearKind]) return result;
+    return project({ ...baseArgs, policy: policyForKind(yearKind) });
+  }, [yearKind, result, runKinds, pool, state, setting, delay, duration, cpi, roi, taxRate, iraBal, iraRoi, policy, holdings, kindBook]);
 
   const pShipInfo = partnershipInfo(state);
   const partnershipApplies = Boolean(policy.enabled && partnershipOn && policy.kind === "traditional");
@@ -495,19 +472,19 @@ export function Calculator() {
     policy.enabled && !result.lifetimeBenefit ? result.startPoolNet + insClaim : result.startPoolNet,
     result.firstCost,
   );
-  const yearDepleted = yearView.depletedYear;
-  const yearRowsShown = yearView.rows;
+  const yearDepleted = result.depletedYear;
+  const yearRowsShown = result.rows;
   const lastCareRow =
-    [...yearView.rows].reverse().find((r) => r.status === "Care year") ?? yearView.rows.at(-1) ?? null;
+    [...result.rows].reverse().find((r) => r.status === "Care year") ?? result.rows.at(-1) ?? null;
   const depletedRow =
     yearDepleted != null
-      ? yearView.rows.find((r) => r.year === yearDepleted) ?? lastCareRow
+      ? result.rows.find((r) => r.year === yearDepleted) ?? lastCareRow
       : lastCareRow;
-  const depletedWhen = depletionCalendar(yearView.rows, yearDepleted, MODEL_START_YEAR);
-  const firstClaimRow = yearView.rows.find((r) => r.status === "Care year") ?? lastCareRow;
+  const depletedWhen = depletionCalendar(result.rows, yearDepleted, MODEL_START_YEAR);
+  const firstClaimRow = result.rows.find((r) => r.status === "Care year") ?? lastCareRow;
   const featureRow = firstClaimRow;
   const endRunRow =
-    yearView.rows.find((r) => {
+    result.rows.find((r) => {
       const insLeft = policy.enabled && !lifetime ? Math.max(0, r.insurancePoolRemaining) : 0;
       const total = r.remainingNet + insLeft;
       return (r.status === "Care year" || r.status === "After care") && total <= 0;
@@ -515,25 +492,16 @@ export function Calculator() {
   const depletionRow = endRunRow ?? depletedRow ?? lastCareRow;
   const fundsFullyDepleted = Boolean(endRunRow);
   const yearPageSize = 10;
-  const yearPages = Math.max(1, Math.ceil(yearRowsShown.length / yearPageSize));
-  const yearSlice = yearRowsShown.slice(yearPage * yearPageSize, (yearPage + 1) * yearPageSize);
+  const yearTabRows = yearView.rows;
+  const yearPages = Math.max(1, Math.ceil(yearTabRows.length / yearPageSize));
+  const yearSlice = yearTabRows.slice(yearPage * yearPageSize, (yearPage + 1) * yearPageSize);
   const carePage = Math.max(0, Math.floor((careStart - 1) / yearPageSize));
   const yearSliceStart = yearPage * yearPageSize + 1;
-  const yearSliceEnd = Math.min(yearRowsShown.length, (yearPage + 1) * yearPageSize);
-  const insOutYear =
-    policy.enabled && !lifetime
-      ? yearView.rows.find((r) => r.status === "Care year" && r.insurancePoolRemaining <= 0)?.year ?? null
-      : null;
-  const totalOutYear =
-    yearView.rows.find((r) => {
-      const left =
-        policy.enabled && !lifetime ? r.remaining + Math.max(0, r.insurancePoolRemaining) : r.remaining;
-      return (r.status === "Care year" || r.status === "After care") && left <= 0;
-    })?.year ?? yearDepleted;
+  const yearSliceEnd = Math.min(yearTabRows.length, (yearPage + 1) * yearPageSize);
 
   useEffect(() => {
     setYearPage(0);
-  }, [ran, hypoRunId, yearPageSize, yearRowsShown.length]);
+  }, [ran, hypoRunId, yearPageSize, yearTabRows.length, yearKind]);
 
   const chartData = useMemo(
     () =>
@@ -2120,138 +2088,33 @@ export function Calculator() {
             <>
           <ViewFold title="Year by year projection" hint={`${DETAIL_HINTS.yearByYear} View more details.`} defaultOpen checked={details.yearByYear} onPdf={(v) => setDetail("yearByYear", v)}>
             <p className="mb-3 text-sm text-muted">
-              {yearRowsShown.length} years modeled
+              {yearTabRows.length} years modeled
               {delay > 0
                 ? ` — ${delay} year${delay === 1 ? "" : "s"} until care starts (Y${careStart}), then ${Math.max(1, duration)} care year${Math.max(1, duration) === 1 ? "" : "s"} through Y${careStart + Math.max(1, duration) - 1}.`
                 : ` — ${Math.max(1, duration)} care year${Math.max(1, duration) === 1 ? "" : "s"} starting now.`}
               {" "}Every wait year and care year is listed, including years after funds are depleted.
             </p>
-            <div className="overflow-x-auto pb-4">
-              <table className="w-full min-w-[720px] table-fixed text-sm">
-                <thead>
-                  <tr className="border-b border-gold text-[11px] font-semibold leading-tight text-muted">
-                    <th className="w-[3.25rem] py-2 px-1 text-center align-bottom">Year</th>
-                    <th className="py-2 px-1 text-center align-bottom">Countable Assets<br />(net after tax)</th>
-                    {policy.enabled ? (
-                      <th className="py-2 px-1 text-center align-bottom">Insurance<br />Benefit Pool</th>
-                    ) : null}
-                    <th className="py-2 px-1 text-center align-bottom">Total<br />Remaining</th>
-                    <th className="py-2 px-1 text-center align-bottom">Annual Care<br />Costs* <span className="normal-case font-medium">(est)</span></th>
-                    {policy.enabled ? (
-                      <>
-                        <th className="py-2 px-1 text-center align-bottom">Insurance<br />Benefits</th>
-                        <th className="py-2 px-1 text-center align-bottom">Insurance<br />Balance</th>
-                        <th className="py-2 px-1 text-center align-bottom">Co-pay from<br />Countable Assets</th>
-                      </>
-                    ) : (
-                      <th className="py-2 px-1 text-center align-bottom">Co-pay from<br />Countable Assets</th>
-                    )}
-                    <th className="py-2 px-1 text-center align-bottom">Cumulative<br />Shortfall</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {yearSlice.map((r) => {
-                    const insLeft = lifetime && policy.enabled ? null : Math.max(0, r.insurancePoolRemaining);
-                    const totalLeft = policy.enabled
-                      ? (insLeft == null ? r.remainingNet : r.remainingNet + insLeft)
-                      : r.remainingNet;
-                    const insGone =
-                      policy.enabled &&
-                      !lifetime &&
-                      r.status === "Care year" &&
-                      Math.round(r.insurancePoolRemaining) <= 0;
-                    const allGone = totalOutYear != null && r.year === totalOutYear;
-                    const gone = insGone || allGone;
-                    const assetsNet = r.remainingNetStart;
-                    const poolStartLabel =
-                      lifetime && policy.enabled ? "Lifetime" : moneyCents(r.insurancePoolStart);
-                    const poolLeft =
-                      lifetime && policy.enabled ? "Lifetime" : moneyCents(r.insurancePoolRemaining);
-                    const totalLabel =
-                      lifetime && policy.enabled
-                        ? `${moneyCents(r.remainingNet)} + lifetime`
-                        : moneyCents(totalLeft);
-                    const remainIdx = yearView.rows.findIndex((x) => x.year === r.year);
-                    const remainTone = remainingToneAt(yearView.rows, remainIdx, policy.enabled, lifetime);
-                    const remainClass = remainingToneClass(remainTone);
-                    const remainTitle =
-                      remainTone === "depleted"
-                        ? "Funds depleted"
-                        : remainTone === "drawing"
-                          ? "Funds drawing down"
-                          : undefined;
-                    const cell = gone ? "py-2 px-1 text-center font-bold amt-red" : "py-2 px-1 text-center";
-                    return (
-                      <tr
-                        key={r.year}
-                        className={`border-t tabular-nums ${gone ? "border-deplete bg-cream" : "border-line text-navy"}`}
-                      >
-                        <td className={cell}>{calendarYear(r.year)}</td>
-                        <td className={cell}>{moneyCents(assetsNet)}</td>
-                        {policy.enabled ? (
-                          <td className={cell}>{poolStartLabel}</td>
-                        ) : null}
-                        <td className={`py-2 px-1 text-center ${remainClass}`} title={remainTitle}>{totalLabel}</td>
-                        <td className={`${cell} ${r.cost ? "font-bold amt-red" : ""}`}>{moneyCents(r.cost)}</td>
-                        {policy.enabled ? (
-                          <>
-                            <td className={cell}>{moneyCents(r.insurance)}</td>
-                            <td className={cell}>{poolLeft}</td>
-                          </>
-                        ) : null}
-                        <td className={`${cell} ${r.drawn ? "font-bold amt-red" : ""}`}>
-                          {r.drawn > 0 ? moneyCents(-r.drawn) : moneyCents(0)}
-                        </td>
-                        <td className={`${gone ? "py-2 font-bold amt-red" : "py-2"} px-1 text-center`}>
-                          {r.shortfallCumulative ? moneyCents(r.shortfallCumulative) : "—"}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-                <tfoot>
-                  <tr className="border-t-2 border-gold tabular-nums">
-                    <td className="py-2 px-1 text-center font-semibold">End of run</td>
-                    <td className="py-2 px-1 text-center">—</td>
-                    {policy.enabled ? <td className="py-2 px-1 text-center">—</td> : null}
-                    <td className="py-2 px-1 text-center">—</td>
-                    <td className="py-2 px-1 text-center font-bold amt-red">
-                      {moneyCents(yearRowsShown.at(-1)?.costCumulative ?? 0)}
-                    </td>
-                    {policy.enabled ? (
-                      <>
-                        <td className="py-2 px-1 text-center">
-                          {moneyCents(yearRowsShown.at(-1)?.insuranceCumulative ?? 0)}
-                        </td>
-                        <td className="py-2 px-1 text-center">—</td>
-                      </>
-                    ) : null}
-                    <td className="py-2 px-1 text-center font-bold amt-red">
-                      {(yearRowsShown.at(-1)?.drawnCumulative ?? 0) > 0
-                        ? moneyCents(-(yearRowsShown.at(-1)?.drawnCumulative ?? 0))
-                        : moneyCents(0)}
-                    </td>
-                    <td className="py-2 px-1 text-center">
-                      {yearRowsShown.at(-1)?.shortfallCumulative
-                        ? moneyCents(yearRowsShown.at(-1)!.shortfallCumulative)
-                        : "—"}
-                    </td>
-                  </tr>
-                </tfoot>
-              </table>
-              <p className="mt-2 text-xs text-muted">
-                {policy.enabled
-                  ? "Insurance Benefit Pool is daily benefit × 365 × benefit period at the start of that year (for example $200/day × 3 years = $219,000.00). Countable Assets are net after tax (deferred accounts reduced by this run’s tax rate) before this year’s co-pay. Annual Care Costs* (est) are modeled from published median costs and this run’s inflation — not a quote. Insurance pays first up to the annual maximum (daily benefit × 365, e.g. $73,000.00). If the bill is at or under that maximum and the pool still has room, Co-pay from Countable Assets is $0.00. Any amount assets do pay is shown as a negative number. Insurance Balance is the pool after that calendar year’s covered claim is subtracted. Total Remaining is Insurance Balance plus countable assets net after tax after the co-pay. "
-                  : null}
-                {policy.enabled ? "Total Remaining" : "Countable Assets"} turns bold green when the pool starts declining, and bold red when it is depleted.
-                The table runs through the wait until care and every modeled care year — it does not stop at year 10 or at depletion.
-              </p>
-            </div>
+            {policy.enabled ? (
+              <KindYearTabs
+                kinds={STRUCTURE_OPTIONS.filter((o) => runKinds[o.key]).map((o) => o.key)}
+                active={yearKind}
+                onChange={(kind) => {
+                  setYearKind(kind);
+                  setYearPage(0);
+                }}
+              />
+            ) : null}
+            <YearByYearTable
+              rows={yearSlice}
+              allRows={yearTabRows}
+              policyEnabled={policy.enabled}
+              lifetime={Boolean(yearView.lifetimeBenefit)}
+            />
             {yearPages > 1 ? (
               <div className="mt-3 stack-actions">
                 <button type="button" className="btn-block rounded-lg border border-navy text-navy disabled:opacity-40" disabled={yearPage <= 0} onClick={() => setYearPage((p) => Math.max(0, p - 1))}>Previous years</button>
                 <p className="text-center text-xs text-muted">
-                  {yearRowsShown.length} years modeled
+                  {yearTabRows.length} years modeled
                   {delay > 0
                     ? ` (${delay} until care, then ${Math.max(1, duration)} care year${Math.max(1, duration) === 1 ? "" : "s"})`
                     : ` · ${Math.max(1, duration)} care year${Math.max(1, duration) === 1 ? "" : "s"}`}

@@ -44,10 +44,9 @@ import {
   type LtcPolicy,
   type PolicyKind,
   type Projection,
-  remainingToneAt,
-  remainingToneClass,
 } from "@/lib/calc";
 import { LinkedClaimCard } from "@/components/linked-claim-card";
+import { YearByYearTable } from "@/components/year-by-year-table";
 import { linkedClaimScenarios, linkedCopy } from "@/lib/linked-products";
 import { type MedicaidProfile } from "@/lib/medicaid";
 import { partyFilled, type AdvisorParty, type ContactParty } from "@/lib/report";
@@ -255,15 +254,28 @@ export function ReportView({
   const iraBal = Number(assets.ira) || 0;
   const homeEquity = Number(assets.home) || 0;
   const spouseExcluded = Number(assets.excludable) || 0;
-  const yearRows = result.rows;
   const laterYearCount =
     depletedYear != null ? result.rows.filter((r) => r.year > depletedYear).length : 0;
   const depletedWhen = depletionCalendar(result.rows, depletedYear, MODEL_START_YEAR);
-  const yearChunks: (typeof result.rows)[] = [];
-  for (let i = 0; i < yearRows.length; i += 5) {
-    yearChunks.push(yearRows.slice(i, i + 5));
-  }
   const lifetime = isLifetimeBenefit(policy.benefitYears);
+  const yearSets =
+    policy.enabled && insuranceCompare.length > 0
+      ? insuranceCompare.map((r) => ({
+          key: r.key,
+          label: r.label,
+          proj: r.proj,
+          enabled: true,
+          lifetime: Boolean(r.proj.lifetimeBenefit),
+        }))
+      : [
+          {
+            key: "self" as const,
+            label: "",
+            proj: result,
+            enabled: policy.enabled,
+            lifetime,
+          },
+        ];
   const tip = {
     background: "#fffdf8",
     border: "1px solid #d9cfc0",
@@ -852,159 +864,49 @@ export function ReportView({
 
 
         {details.yearByYear
-          ? yearChunks.map((chunk, idx) => (
-          <section key={`years-${idx}`} className="report-block">
+          ? yearSets.flatMap((set) => {
+              const chunks: typeof set.proj.rows[] = [];
+              for (let i = 0; i < set.proj.rows.length; i += 5) {
+                chunks.push(set.proj.rows.slice(i, i + 5));
+              }
+              const setDepleted = set.proj.depletedYear;
+              const setLater =
+                setDepleted != null ? set.proj.rows.filter((r) => r.year > setDepleted).length : 0;
+              return chunks.map((chunk, idx) => (
+          <section key={`years-${set.key}-${idx}`} className="report-block">
             <h2 className="mb-2 font-display text-xl text-navy">
-              Year-by-year projection{idx > 0 ? " (continued)" : " (View how funds are used)"}
+              Year-by-year projection{set.label ? ` — ${set.label}` : ""}{idx > 0 ? " (continued)" : " (View how funds are used)"}
             </h2>
-            {idx === 0 && laterYearCount > 0 && depletedYear != null ? (
+            {idx === 0 && setLater > 0 && setDepleted != null ? (
               <p className="mb-2 text-sm text-muted">
-                Funds depleted in {calendarYear(depletedYear)} (Y{depletedYear})
-                {policy.enabled
+                Funds depleted in {calendarYear(setDepleted)} (Y{setDepleted})
+                {set.enabled
                   ? " after insurance paid first and countable assets were drawn as co-pay"
                   : " with no policy — assets paid the bill"}
-                . The remaining {laterYearCount} year{laterYearCount === 1 ? "" : "s"} of this
+                . The remaining {setLater} year{setLater === 1 ? "" : "s"} of this
                 run still appear below so the full wait-until-care plus care-duration window
                 stays visible.
               </p>
             ) : idx === 0 ? (
               <p className="mb-2 text-sm text-muted">
-                {yearRows.length} years modeled
+                {set.proj.rows.length} years modeled
                 {delay > 0
                   ? ` (${delay} year${delay === 1 ? "" : "s"} until care, then ${duration} care year${duration === 1 ? "" : "s"})`
                   : ` · ${duration} care year${duration === 1 ? "" : "s"}`}
                 . Every wait year and care year is listed.
               </p>
             ) : null}
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[720px] table-fixed text-sm">
-                <thead>
-                  <tr className="text-[11px] font-semibold leading-tight text-muted">
-                    <th className="w-[3.25rem] py-2 px-1 text-center align-bottom">Year</th>
-                    <th className="py-2 px-1 text-center align-bottom">Countable Assets<br />(net after tax)</th>
-                    {policy.enabled ? (
-                      <th className="py-2 px-1 text-center align-bottom">Insurance<br />Benefit Pool</th>
-                    ) : null}
-                    <th className="py-2 px-1 text-center align-bottom">Total<br />Remaining</th>
-                    <th className="py-2 px-1 text-center align-bottom">Annual Care<br />Costs* <span className="normal-case font-medium">(est)</span></th>
-                    {policy.enabled ? (
-                      <>
-                        <th className="py-2 px-1 text-center align-bottom">Insurance<br />Benefits</th>
-                        <th className="py-2 px-1 text-center align-bottom">Insurance<br />Balance</th>
-                        <th className="py-2 px-1 text-center align-bottom">Co-pay from<br />Countable Assets</th>
-                      </>
-                    ) : (
-                      <th className="py-2 px-1 text-center align-bottom">Co-pay from<br />Countable Assets</th>
-                    )}
-                    <th className="py-2 px-1 text-center align-bottom">Cumulative<br />Shortfall</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {chunk.map((r) => {
-                    const insLeft = result.lifetimeBenefit ? null : Math.max(0, r.insurancePoolRemaining);
-                    const totalLeft = policy.enabled
-                      ? (insLeft == null ? r.remainingNet : r.remainingNet + insLeft)
-                      : r.remainingNet;
-                    const insOutYear = !result.lifetimeBenefit && policy.enabled
-                      ? result.rows.find((x) => x.status === "Care year" && x.insurancePoolRemaining <= 0)?.year ?? null
-                      : null;
-                    const totalOutYear =
-                      result.rows.find((x) => {
-                        const left = policy.enabled && !result.lifetimeBenefit
-                          ? x.remaining + Math.max(0, x.insurancePoolRemaining)
-                          : x.remaining;
-                        return (x.status === "Care year" || x.status === "After care") && left <= 0;
-                      })?.year ?? depletedYear;
-                    const insGone =
-                      policy.enabled &&
-                      !result.lifetimeBenefit &&
-                      r.status === "Care year" &&
-                      Math.round(r.insurancePoolRemaining) <= 0;
-                    const allGone = totalOutYear != null && r.year === totalOutYear;
-                    const gone = insGone || allGone;
-                    const assetsNet = r.remainingNetStart;
-                    const remainIdx = result.rows.findIndex((x) => x.year === r.year);
-                    const remainTone = remainingToneAt(
-                      result.rows,
-                      remainIdx,
-                      policy.enabled,
-                      Boolean(result.lifetimeBenefit),
-                    );
-                    const remainClass = remainingToneClass(remainTone);
-                    const remainTitle =
-                      remainTone === "depleted"
-                        ? "Funds depleted"
-                        : remainTone === "drawing"
-                          ? "Funds drawing down"
-                          : undefined;
-                    const cell = gone ? "py-2 px-1 text-center font-bold amt-red" : "py-2 px-1 text-center";
-                    return (
-                    <tr key={r.year} className={`border-t tabular-nums ${gone ? "bg-cream" : "border-line"}`}>
-                      <td className={cell}>{calendarYear(r.year)}</td>
-                      <td className={cell}>{moneyCents(assetsNet)}</td>
-                      {policy.enabled ? (
-                        <td className={cell}>
-                          {result.lifetimeBenefit ? "Lifetime" : moneyCents(r.insurancePoolStart)}
-                        </td>
-                      ) : null}
-                      <td className={`py-2 px-1 text-center ${remainClass}`} title={remainTitle}>
-                        {result.lifetimeBenefit
-                          ? `${moneyCents(r.remainingNet)} + lifetime`
-                          : moneyCents(totalLeft)}
-                      </td>
-                      <td className={`${cell} ${r.cost ? "font-bold amt-red" : ""}`}>{moneyCents(r.cost)}</td>
-                      {policy.enabled ? (
-                        <>
-                          <td className={cell}>{moneyCents(r.insurance)}</td>
-                          <td className={cell}>
-                            {result.lifetimeBenefit ? "Lifetime" : moneyCents(r.insurancePoolRemaining)}
-                          </td>
-                        </>
-                      ) : null}
-                      <td className={`${cell} ${r.drawn ? "font-bold amt-red" : ""}`}>
-                        {r.drawn > 0 ? moneyCents(-r.drawn) : moneyCents(0)}
-                      </td>
-                      <td className={`py-2 px-1 text-center ${r.shortfallCumulative ? "text-deplete" : ""}`}>
-                        {r.shortfallCumulative ? moneyCents(r.shortfallCumulative) : "—"}
-                      </td>
-                    </tr>
-                    );
-                  })}
-                </tbody>
-                <tfoot>
-                  <tr className="border-t-2 border-gold tabular-nums">
-                    <td className="py-2 px-1 text-center font-semibold">End of run</td>
-                    <td className="py-2 px-1 text-center">—</td>
-                    {policy.enabled ? <td className="py-2 px-1 text-center">—</td> : null}
-                    <td className="py-2 px-1 text-center">—</td>
-                    <td className="py-2 px-1 text-center font-bold amt-red">
-                      {moneyCents(yearRows.at(-1)?.costCumulative ?? 0)}
-                    </td>
-                    {policy.enabled ? (
-                      <>
-                        <td className="py-2 px-1 text-center">
-                          {moneyCents(yearRows.at(-1)?.insuranceCumulative ?? 0)}
-                        </td>
-                        <td className="py-2 px-1 text-center">—</td>
-                      </>
-                    ) : null}
-                    <td className="py-2 px-1 text-center font-bold amt-red">
-                      {(yearRows.at(-1)?.drawnCumulative ?? 0) > 0
-                        ? moneyCents(-(yearRows.at(-1)?.drawnCumulative ?? 0))
-                        : moneyCents(0)}
-                    </td>
-                    <td className="py-2 px-1 text-center">
-                      {yearRows.at(-1)?.shortfallCumulative
-                        ? moneyCents(yearRows.at(-1)!.shortfallCumulative)
-                        : "—"}
-                    </td>
-                  </tr>
-                </tfoot>
-              </table>
-            </div>
+            <YearByYearTable
+              rows={chunk}
+              allRows={set.proj.rows}
+              policyEnabled={set.enabled}
+              lifetime={set.lifetime}
+              showNote={idx === chunks.length - 1}
+            />
           </section>
-        ))
-        : null}
+              ));
+            })
+          : null}
 
         <section className="report-block pb-4">
           <p className="text-xs leading-relaxed text-muted">
