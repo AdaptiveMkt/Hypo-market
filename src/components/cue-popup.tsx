@@ -27,12 +27,11 @@ export function CuePopup({
   const closeRef = useRef<HTMLButtonElement>(null);
   const actionRef = useRef<HTMLButtonElement>(null);
 
-  function dismiss() {
-    if (cue.applyOnClose && cue.action) onAction?.(cue.action);
+  function closeOnly() {
     onClose();
   }
 
-  function runAction() {
+  function closeAndUse() {
     if (cue.action) onAction?.(cue.action);
     onClose();
   }
@@ -40,7 +39,7 @@ export function CuePopup({
   useEffect(() => {
     (cue.action ? actionRef.current : closeRef.current)?.focus();
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") dismiss();
+      if (e.key === "Escape") closeOnly();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -52,7 +51,7 @@ export function CuePopup({
     <div
       className="fixed inset-0 z-[60] flex items-center justify-center bg-navy/70 p-4"
       role="presentation"
-      onClick={dismiss}
+      onClick={closeOnly}
     >
       <div
         role="dialog"
@@ -71,7 +70,7 @@ export function CuePopup({
           <button
             ref={closeRef}
             type="button"
-            onClick={dismiss}
+            onClick={cue.applyOnClose ? closeAndUse : closeOnly}
             className="inline-flex min-h-11 min-w-24 items-center justify-center rounded-lg border border-navy bg-navy px-4 text-sm font-semibold text-cream hover:bg-teal"
           >
             {cue.closeLabel ?? "Close"}
@@ -80,7 +79,7 @@ export function CuePopup({
             <button
               ref={actionRef}
               type="button"
-              onClick={runAction}
+              onClick={closeAndUse}
               className="inline-flex min-h-11 items-center justify-center rounded-lg bg-gold px-4 text-sm font-semibold text-masthead hover:brightness-105"
             >
               {cue.actionLabel}
