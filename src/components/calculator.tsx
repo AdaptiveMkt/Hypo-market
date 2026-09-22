@@ -973,12 +973,17 @@ export function Calculator() {
       setPolicy((p) => ({ ...book[p.kind], enabled: p.enabled, kind: p.kind }));
     }
   }
-  const missingRun = [
+  const missingInputs = [
     !state ? "State where care would be received" : "",
     !setting ? "Care setting" : "",
     ageToday < MIN_AGE_TODAY ? `Age today (${MIN_AGE_TODAY}+)` : "",
     !duration ? "Years of care to model" : "",
     pool <= 0 ? "Countable assets" : "",
+  ].filter(Boolean);
+  const missingRun = [
+    ...missingInputs,
+    !section2Confirmed ? "Confirm Section 2 is complete" : "",
+    !insuranceLocked && !section3Confirmed ? "Confirm Section 3 benefit selection" : "",
   ].filter(Boolean);
   const dockNeed = [
     "Countable assets",
@@ -995,12 +1000,26 @@ export function Calculator() {
     const missingAge = ageToday < MIN_AGE_TODAY;
     const missingYears = !duration;
     const missingAssets = pool <= 0;
+    const missingSection2 = !section2Confirmed;
+    const missingSection3 = !insuranceLocked && !section3Confirmed;
     setStateNeeded(missingState);
     setSettingNeeded(missingSetting);
     setAgeNeeded(missingAge);
     setDurationNeeded(missingYears);
-    if (missingState || missingSetting || missingAge || missingYears || missingAssets) {
-      const id = missingState ? "state" : missingSetting ? "setting" : missingAge ? "age-today" : missingYears ? "duration" : "checking";
+    if (missingState || missingSetting || missingAge || missingYears || missingAssets || missingSection2 || missingSection3) {
+      const id = missingState
+        ? "state"
+        : missingSetting
+          ? "setting"
+          : missingAge
+            ? "age-today"
+            : missingYears
+              ? "duration"
+              : missingAssets
+                ? "checking"
+                : missingSection2
+                  ? "section-2-confirm"
+                  : "section-3-confirm";
       window.setTimeout(() => {
         scrollToId(id);
         (document.getElementById(id) as HTMLElement | null)?.focus();
@@ -1409,11 +1428,11 @@ export function Calculator() {
               </div>
             </div>
             <div className="mt-4 stack-actions">
-              {missingRun.length ? (
+              {missingInputs.length ? (
                 <p className="w-full min-w-0 text-sm font-semibold leading-snug text-deplete" role="status">
-                  To run, complete:
+                  To continue, complete:
                   <span className="mt-1 block font-normal text-navy">
-                    {missingRun.map((item) => (
+                    {missingInputs.map((item) => (
                       <span key={item} className="block">• {item}</span>
                     ))}
                   </span>
@@ -1421,6 +1440,7 @@ export function Calculator() {
               ) : null}
               <label className="flex min-h-11 w-full cursor-pointer items-start gap-2 text-sm font-semibold text-navy">
                 <input
+                  id="section-2-confirm"
                   type="checkbox"
                   className="mt-1 size-4 accent-teal"
                   checked={section2Confirmed}
@@ -1795,6 +1815,7 @@ export function Calculator() {
             {!insuranceLocked ? (
               <label className="mt-4 flex min-h-11 cursor-pointer items-start gap-2 text-sm font-semibold text-navy">
                 <input
+                  id="section-3-confirm"
                   type="checkbox"
                   className="mt-1 size-4 accent-teal"
                   checked={section3Confirmed}
@@ -1814,7 +1835,14 @@ export function Calculator() {
                   </span>
                 </p>
               ) : null}
-              <button type="button" className="btn-block btn-attention-red rounded-lg hover:brightness-110" onClick={runHypo}>Run hypothetical</button>
+              <button
+                type="button"
+                className="btn-block btn-attention-red rounded-lg hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
+                onClick={runHypo}
+                disabled={missingRun.length > 0}
+              >
+                Run hypothetical
+              </button>
             </div>
           </TitleCollapse>
           </section>
@@ -2598,7 +2626,14 @@ export function Calculator() {
                 )}
                 <div className="mobile-dock-row">
                   <button type="button" className="btn-block min-w-0 rounded-lg border border-navy text-sm text-navy" onClick={() => window.dispatchEvent(new Event("aum:open-chat"))}>Ask</button>
-                  <button type="button" className="btn-block btn-attention-red min-w-0 rounded-lg text-sm hover:brightness-110" onClick={runHypo}>Run hypothetical</button>
+                  <button
+                    type="button"
+                    className="btn-block btn-attention-red min-w-0 rounded-lg text-sm hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
+                    onClick={runHypo}
+                    disabled={missingRun.length > 0}
+                  >
+                    Run hypothetical
+                  </button>
                 </div>
               </>
             )}
