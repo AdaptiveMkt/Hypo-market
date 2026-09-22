@@ -408,7 +408,7 @@ export const DEFAULT_POLICY: LtcPolicy = {
 
 /** Defaults shown when Hybrid life insurance is selected. */
 export const DEFAULT_HYBRID_LIFE = {
-  monthlyBenefit: TYPICAL_MONTHLY_MAX,
+  monthlyBenefit: LINKED_MONTHLY_MIN,
   leverage: 3,
   singlePremium: DEFAULT_LINKED_SINGLE_PREMIUM,
   elimDays: TYPICAL_ELIM_DAYS,
@@ -440,10 +440,12 @@ export function seedKindPolicy(
     annualPremium: kind === "traditional" ? annualPremium : 0,
     singlePremium: linked ? DEFAULT_LINKED_SINGLE_PREMIUM : 0,
     leverage: linked ? DEFAULT_HYBRID_LIFE.leverage : 1,
-    monthlyBenefit: Math.max(
-      LINKED_MONTHLY_MIN,
-      typical.monthlyBenefit || monthlyFromDaily(typical.dailyBenefit),
-    ),
+    monthlyBenefit: linked
+      ? DEFAULT_HYBRID_LIFE.monthlyBenefit
+      : Math.max(
+          typical.monthlyBenefit || monthlyFromDaily(typical.dailyBenefit),
+          0,
+        ),
     elimDays: linked ? DEFAULT_HYBRID_LIFE.elimDays : typical.elimDays,
     residualPct: DEFAULT_HYBRID_LIFE.residualPct,
     benefitInflationPct: linked ? DEFAULT_HYBRID_LIFE.benefitInflationPct : typical.benefitInflationPct,
