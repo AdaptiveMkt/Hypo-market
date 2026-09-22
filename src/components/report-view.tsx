@@ -1748,7 +1748,7 @@ export function ReportView({
         ) : null}
 
         <section className="report-block">
-          <TitleCollapse title="Medicaid Information" className="mt-0" defaultOpen>
+          <TitleCollapse title="Medicaid Information" className="mt-0" defaultOpen={pool > NAIC_LOCKOUT_ASSETS}>
             <MedicaidVaBody
               state={state}
               policy={policy}

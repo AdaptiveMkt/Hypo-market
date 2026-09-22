@@ -2477,7 +2477,7 @@ export function Calculator() {
               preservation={pImpact}
               issueState={effectiveIssue || state}
               preferTap={preferTap}
-              defaultOpen={true}
+              defaultOpen={pool > NAIC_LOCKOUT_ASSETS}
               pdfChecked={details.medicaidLtc}
               onPdfChange={(v) => setDetail("medicaidLtc", v)}
               pdfLocked
