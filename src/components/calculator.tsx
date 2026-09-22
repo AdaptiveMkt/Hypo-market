@@ -1301,15 +1301,6 @@ export function Calculator() {
                 {durationNeeded && !duration ? (
                   <p className="mt-1 text-sm font-semibold leading-snug text-deplete" role="alert">Select how many years of care to model to run the hypothetical.</p>
                 ) : <p className="mt-1 text-xs text-muted">Required to run.</p>}
-                <label className="mt-3 flex min-h-11 cursor-pointer items-start gap-2 text-sm font-semibold text-navy">
-                  <input
-                    type="checkbox"
-                    className="mt-1 size-4 accent-teal"
-                    checked={section2Confirmed}
-                    onChange={(e) => confirmSection2(e.target.checked)}
-                  />
-                  <span>Confirm Section 2 is complete</span>
-                </label>
             </div>
             {duration ? (
             <>
@@ -1455,6 +1446,15 @@ export function Calculator() {
                   </span>
                 </p>
               ) : null}
+              <label className="flex min-h-11 w-full cursor-pointer items-start gap-2 text-sm font-semibold text-navy">
+                <input
+                  type="checkbox"
+                  className="mt-1 size-4 accent-teal"
+                  checked={section2Confirmed}
+                  onChange={(e) => confirmSection2(e.target.checked)}
+                />
+                <span>Confirm Section 2 is complete</span>
+              </label>
               <button type="button" className="btn-block btn-attention-red rounded-lg hover:brightness-110" onClick={runHypo}>Run hypothetical</button>
             </div>
             </>
