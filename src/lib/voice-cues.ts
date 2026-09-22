@@ -2,10 +2,23 @@ import { fiveYearIssueBand, monthlyFromDaily, typicalBuyerHints } from "./calc";
 import type { ProtectAssetsSize } from "./protect-assets";
 import { money, moneyCents } from "./utils";
 
-export function section1AssetsMessage(pool: number): string {
+export function section1AssetsMessage(opts: {
+  pool: number;
+  home: number;
+  excludeHome: boolean;
+}): string {
+  const home = Number(opts.home) || 0;
+  const homeNote = opts.excludeHome
+    ? home > 0
+      ? `The primary residence of ${money(home)} is exempt and is not included in that countable amount.`
+      : `You elected to exempt the primary residence from countable assets. No home equity was entered.`
+    : home > 0
+      ? `The primary residence of ${money(home)} is not exempt and is included in that countable amount.`
+      : `You did not elect to exempt the primary residence from countable assets. No home equity was entered.`;
   return (
-    `Great, you have completed Section 1, and based on your input, your countable assets are ${money(pool)}, ` +
-    `now let's proceed to Section 2, where you can let us know where and when you think you might need care. ` +
+    `Great, you have completed Section 1, and based on your input, your countable assets are ${money(opts.pool)}. ` +
+    `${homeNote} ` +
+    `Now let's proceed to Section 2, where you can let us know where and when you think you might need care. ` +
     `This is subjective, but will help in the preparation of this hypothetical report.`
   );
 }

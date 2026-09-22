@@ -1196,7 +1196,10 @@ export function Calculator() {
               className="btn-calc-red btn-blink-3 flex min-h-12 w-full items-center justify-center rounded-lg bg-[#b42318] px-3 py-2.5 text-center text-base font-semibold leading-snug text-white hover:brightness-110"
               onClick={() => {
                 setPoolShown(true);
-                setCue({ title: "Section 1 complete", body: section1AssetsMessage(pool) });
+                setCue({
+                  title: "Section 1 complete",
+                  body: section1AssetsMessage({ pool, home: homeEquity, excludeHome }),
+                });
               }}
             >
               Calculate Countable Assets
