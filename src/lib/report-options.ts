@@ -173,6 +173,8 @@ export type DetailFlags = Record<DetailId, boolean>;
 
 export const REQUIRED_DETAIL_IDS: DetailId[] = [
   "yearByYear",
+  "allocation",
+  "compareCare",
   "dhDesignation",
   "dhHoldHarmlessCard",
   "dhHoldHarmless",
