@@ -303,14 +303,15 @@ export function Calculator() {
   const [section2Confirmed, setSection2Confirmed] = useState(false);
   const [section3Confirmed, setSection3Confirmed] = useState(false);
   const [section3Open, setSection3Open] = useState(false);
+  const [alternativeRun, setAlternativeRun] = useState(false);
 
   useEffect(() => {
-    if (!section3Open) return;
+    if (!alternativeRun) return;
     const t = window.setTimeout(() => {
       document.getElementById("protect-assets-card")?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 140);
     return () => window.clearTimeout(t);
-  }, [section3Open]);
+  }, [alternativeRun]);
 
   useEffect(() => {
     pinToHeaderOnLoad();
@@ -709,6 +710,7 @@ export function Calculator() {
     if (!checked) {
       setSection3Open(false);
       setSection3Confirmed(false);
+      setAlternativeRun(false);
       return;
     }
     if (!poolShown) {
@@ -747,8 +749,9 @@ export function Calculator() {
   function confirmSection3(checked: boolean) {
     setSection3Confirmed(checked);
     if (!checked) return;
+    if (!alternativeRun) return;
     setCue({
-      title: "How much insurance to protect assets at claim",
+      title: "Alternative Run — protect assets at claim",
       body: section3ProtectMessage({
         pool,
         ageToday,
@@ -803,6 +806,7 @@ export function Calculator() {
     setSection2Confirmed(false);
     setSection3Confirmed(false);
     setSection3Open(false);
+    setAlternativeRun(false);
     setClaimAge(AALTCI_MEAN_CLAIM_AGE);
     setClaimAgeTouched(false);
     setDuration(0);
@@ -1438,10 +1442,25 @@ export function Calculator() {
             onOpenChange={setSection3Open}
             hint="Complete Section 2 to open insurance, NAIC guides, and the worksheet."
           >
+            <label className="mb-4 flex min-h-11 cursor-pointer items-start gap-2 text-sm font-semibold text-navy">
+              <input
+                type="checkbox"
+                className="mt-1 size-4 accent-teal"
+                checked={alternativeRun}
+                onChange={(e) => setAlternativeRun(e.target.checked)}
+              />
+              <span>
+                Request an Alternative Run
+                <span className="mt-0.5 block text-xs font-normal text-muted">
+                  Optional. Size a traditional design to protect a chosen share of countable assets at claim, separate from the benefits you enter below.
+                </span>
+              </span>
+            </label>
+            {alternativeRun ? (
             <div id="protect-assets-card" className="mb-4 rounded-lg border border-gold bg-cream px-4 py-3">
               <h3 className="red-wave font-display text-lg font-bold whitespace-normal">
                 {(() => {
-                  const words = "How much insurance to protect assets at claim".split(" ");
+                  const words = "Alternative Run: How much insurance to protect assets at claim".split(" ");
                   return words.map((word, i) => (
                     <span key={`${word}-${i}`} style={{ animationDelay: `${i * 0.12}s` }}>
                       {word}
@@ -1485,12 +1504,13 @@ export function Calculator() {
                       className="btn-block rounded-lg border border-navy bg-navy text-cream hover:bg-teal"
                       onClick={applyProtectDesign}
                     >
-                      Use this insurance design
+                      Use this alternative design
                     </button>
                   ) : null}
                 </div>
               )}
             </div>
+            ) : null}
             {section2Confirmed && countableExHome >= NAIC_LOCKOUT_ASSETS ? (
               <div className="mb-4" aria-label="NAIC consumer guides">
                 <h3 className="mb-3 border-b-2 border-gold pb-2 font-display text-lg text-navy">NAIC Shopper’s Guide and Suitability Worksheet</h3>

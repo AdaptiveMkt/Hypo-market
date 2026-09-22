@@ -60,7 +60,7 @@ export function section3ProtectMessage(opts: {
     `${opts.settingLabel.toLowerCase()}, is projected to cost about ${moneyCents(s.careTotal)} inflated at ${cpi}. `;
   const close =
     ` If you were to proceed with insurance coverage, your rates will be based on insurance company selected, underwriting classification, state of issue, benefit designs and selected riders.\n\n` +
-    `Select “Use this insurance design” and Run hypothetical. If not, simply proceed to Run hypothetical.`;
+    `Select “Use this alternative design” and Run hypothetical. If not, simply proceed to Run hypothetical.`;
   if (s.alreadyProtected) {
     return (
       lead +
