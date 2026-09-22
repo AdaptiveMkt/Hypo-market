@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { playCelesteScript, stopCeleste, watchCeleste } from "@/lib/celeste";
-import { useVoiceOn } from "@/lib/voice-pref";
+import { setVoiceOn, useVoiceOn } from "@/lib/voice-pref";
 import { WELCOME_BODY, WELCOME_HEADING, WELCOME_SPOKEN } from "@/lib/welcome";
 
 export function WelcomeCard() {
@@ -29,8 +29,11 @@ export function WelcomeCard() {
         <button
           type="button"
           className="btn-block rounded-lg border border-navy bg-navy text-cream hover:bg-teal disabled:opacity-50"
-          onClick={() => void playCelesteScript(WELCOME_SPOKEN)}
-          disabled={!voiceOn || speaking}
+          onClick={() => {
+            if (!voiceOn) setVoiceOn(true);
+            void playCelesteScript(WELCOME_SPOKEN);
+          }}
+          disabled={speaking}
         >
           Hear welcome
         </button>
@@ -45,9 +48,7 @@ export function WelcomeCard() {
       </div>
       <p className="mt-2 text-xs text-muted" aria-live="polite">
         {status ||
-          (!voiceOn
-            ? "Voice is off in the header. Turn Voice on to hear Celeste. Disclaimer and privacy are in the footer."
-            : "Tap Hear welcome if you want Celeste to read this. Disclaimer and privacy are in the footer.")}
+          "Voice does not start on its own. Tap Hear welcome if you want Celeste to read this. Disclaimer and privacy are in the footer."}
       </p>
     </section>
   );

@@ -7,9 +7,9 @@ const listeners = new Set<() => void>();
 
 function read(): boolean {
   try {
-    return localStorage.getItem(KEY) !== "off";
+    return localStorage.getItem(KEY) === "on";
   } catch {
-    return true;
+    return false;
   }
 }
 
@@ -36,5 +36,5 @@ export function subscribeVoice(onStoreChange: () => void) {
 }
 
 export function useVoiceOn() {
-  return useSyncExternalStore(subscribeVoice, read, () => true);
+  return useSyncExternalStore(subscribeVoice, read, () => false);
 }

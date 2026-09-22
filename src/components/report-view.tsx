@@ -73,7 +73,7 @@ import { ConfidencePanel } from "@/components/confidence-panel";
 import { IndustryInsightsPanel } from "@/components/industry-insights";
 import { ChartRegion } from "@/components/chart-region";
 import { pauseCeleste, playCelesteScript, resumeCeleste, stopCeleste, watchCeleste } from "@/lib/celeste";
-import { useVoiceOn } from "@/lib/voice-pref";
+import { setVoiceOn, useVoiceOn } from "@/lib/voice-pref";
 import { LtcGlossaryList } from "@/components/ltc-glossary";
 import { SamplePolicyPack } from "@/components/sample-ltc-policy";
 import {
@@ -296,7 +296,6 @@ export function ReportView({
 
   useEffect(() => {
     const off = watchCeleste(setVoice);
-    void playCelesteScript(spoken);
     const root = reportRef.current;
     root?.focus();
     const inert = [
@@ -316,7 +315,6 @@ export function ReportView({
       inert.forEach((n) => n?.removeAttribute("inert"));
       window.removeEventListener("keydown", onKey);
     };
-    // Read once when View opens.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const linkedScenarios = useMemo(() => {
@@ -409,19 +407,20 @@ export function ReportView({
             type="button"
             className="btn-block rounded-lg bg-navy text-cream hover:bg-teal disabled:opacity-50"
             onClick={() => {
+              if (!voiceOn) setVoiceOn(true);
               if (voice === "paused") resumeCeleste();
               else void playCelesteScript(spoken);
             }}
-            disabled={!voiceOn || voice === "playing"}
+            disabled={voice === "playing"}
           >
-            Resume speaking
+            {voice === "paused" ? "Resume speaking" : "Hear summary"}
           </button>
           <p className="col-span-full text-xs leading-snug text-muted" aria-live="polite">
             {voice === "playing"
               ? "Celeste is reading the descriptive summary and recommendations…"
               : voice === "paused"
                 ? "Paused. Resume speaking to continue."
-                : "Celeste can re-read the summary and recommendations."}
+                : "Celeste does not start on its own. Tap Hear summary if you want this read aloud."}
           </p>
             <button
               type="button"
