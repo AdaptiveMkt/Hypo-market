@@ -282,6 +282,14 @@ export function Calculator() {
   const [section3Open, setSection3Open] = useState(false);
 
   useEffect(() => {
+    if (!section3Open) return;
+    const t = window.setTimeout(() => {
+      document.getElementById("protect-assets-card")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 140);
+    return () => window.clearTimeout(t);
+  }, [section3Open]);
+
+  useEffect(() => {
     pinToHeaderOnLoad();
     const t = window.setTimeout(() => scrollToHeader(false), 200);
     return () => window.clearTimeout(t);
@@ -1351,90 +1359,6 @@ export function Calculator() {
                 </p>
               </div>
             </div>
-            {naicUnlocked ? (
-            <div className="mt-4 rounded-lg border border-gold bg-cream px-4 py-3">
-              <h3 className="red-wave font-display text-lg font-bold whitespace-normal">
-                {(() => {
-                  const words = "How much insurance to protect assets at claim".split(" ");
-                  return words.map((word, i) => (
-                    <span key={`${word}-${i}`} style={{ animationDelay: `${i * 0.12}s` }}>
-                      {word}
-                      {i < words.length - 1 ? "\u00a0" : ""}
-                    </span>
-                  ));
-                })()}
-              </h3>
-              <p className="mt-1 text-sm text-muted">
-                Uses this run’s countable assets, age today, years until claim, care setting, inflation, and how long care may last.
-                You set the share of countable assets (net after tax at claim) you want left after the modeled care years.
-              </p>
-              <label className={`${labelClass} mt-3`} htmlFor="protect-pct">
-                Protect this share of countable assets at claim (%)
-              </label>
-              <StepperField
-                id="protect-pct"
-                value={protectPct}
-                onChange={(v) => setProtectPct(Math.min(100, Math.max(0, Number(v) || 0)))}
-                step={5}
-                min={0}
-                max={100}
-              />
-              {ageToday < MIN_AGE_TODAY || !state || !setting ? (
-                <p className="mt-2 text-sm text-muted">Enter age today, care state, and care setting to size a policy.</p>
-              ) : (
-                <div className="mt-3 space-y-2 text-sm text-navy">
-                  <p>
-                    If you have <strong className="tabular-nums">{money(pool)}</strong> countable assets today at age{" "}
-                    <strong>{ageToday}</strong>, and care is expected in{" "}
-                    <strong>{delay === 0 ? "this year" : `${delay} year${delay === 1 ? "" : "s"}`}</strong> at age{" "}
-                    <strong>{claimAge}</strong>, this model projects about{" "}
-                    <strong className="tabular-nums">{moneyCents(protectSize.assetsAtClaimNet)}</strong> countable assets
-                    (net after tax) at claim.
-                  </p>
-                  <p>
-                    To protect <strong>{protectPct}%</strong> of that nest egg (
-                    <strong className="tabular-nums">{moneyCents(protectSize.protectDollars)}</strong>
-                    ) through {protectSize.careYears} year{protectSize.careYears === 1 ? "" : "s"} of{" "}
-                    {SETTING_LABELS[activeSetting].toLowerCase()} (about{" "}
-                    <strong className="tabular-nums">{moneyCents(protectSize.careTotal)}</strong> of inflated care costs),
-                    {protectSize.alreadyProtected ? (
-                      <>
-                        {" "}assets on this run can cover the modeled bills while still leaving that share. Insurance is optional for this protection target — not a quote.
-                      </>
-                    ) : (
-                      <>
-                        {" "}consider a traditional reimbursement design of about{" "}
-                        <strong className="tabular-nums">{money(protectSize.dailyToday)}</strong>/day
-                        {protectSize.lifetime
-                          ? " with a lifetime benefit period"
-                          : ` for ${protectSize.benefitYears} year${protectSize.benefitYears === 1 ? "" : "s"}`}
-                        {" "}purchased today
-                        {protectSize.dailyToday !== protectSize.dailyAtClaim
-                          ? ` (about ${money(protectSize.dailyAtClaim)}/day at claim if benefits inflate with the age-based default)`
-                          : ""}
-                        . That is a pool of about{" "}
-                        <strong className="tabular-nums">
-                          {protectSize.lifetime ? `${money(protectSize.annualCapAtClaim)}/year, lifetime` : moneyCents(protectSize.poolNeeded)}
-                        </strong>
-                        . Assets would be asked to co-pay up to{" "}
-                        <strong className="tabular-nums">{moneyCents(protectSize.spendable)}</strong>
-                        . Not a quote — underwriting, state, and riders change what can actually be issued.
-                      </>
-                    )}
-                  </p>
-                  {!protectSize.alreadyProtected && !insuranceLocked ? (
-                    <button
-                      type="button"
-                      className="btn-block rounded-lg border border-navy bg-navy text-cream hover:bg-teal"
-                      onClick={applyProtectDesign}
-                    >
-                      Use this insurance design
-                    </button>
-                  ) : null}
-                </div>
-              )}
-            </div>
-            ) : null}
             <div className="mt-4 stack-actions">
               {missingRun.length ? (
                 <p className="w-full min-w-0 text-sm font-semibold leading-snug text-deplete" role="status">
@@ -1470,6 +1394,59 @@ export function Calculator() {
             onOpenChange={setSection3Open}
             hint="Complete Section 2 to open insurance, NAIC guides, and the worksheet."
           >
+            <div id="protect-assets-card" className="mb-4 rounded-lg border border-gold bg-cream px-4 py-3">
+              <h3 className="red-wave font-display text-lg font-bold whitespace-normal">
+                {(() => {
+                  const words = "How much insurance to protect assets at claim".split(" ");
+                  return words.map((word, i) => (
+                    <span key={`${word}-${i}`} style={{ animationDelay: `${i * 0.12}s` }}>
+                      {word}
+                      {i < words.length - 1 ? "\u00a0" : ""}
+                    </span>
+                  ));
+                })()}
+              </h3>
+              <p className="mt-1 text-sm text-muted">
+                Uses this run’s countable assets, age today, years until claim, care setting, inflation, and how long care may last.
+                You set the share of countable assets (net after tax at claim) you want left after the modeled care years.
+              </p>
+              <label className={`${labelClass} mt-3`} htmlFor="protect-pct">
+                Protect this share of countable assets at claim (%)
+              </label>
+              <StepperField
+                id="protect-pct"
+                value={protectPct}
+                onChange={(v) => setProtectPct(Math.min(100, Math.max(0, Number(v) || 0)))}
+                step={5}
+                min={0}
+                max={100}
+              />
+              {ageToday < MIN_AGE_TODAY || !state || !setting ? (
+                <p className="mt-2 text-sm text-muted">Enter age today, care state, and care setting to size a policy.</p>
+              ) : (
+                <div className="mt-3 space-y-2 text-sm leading-relaxed text-navy">
+                  <p className="whitespace-pre-line">{section3ProtectMessage({
+                    pool,
+                    ageToday,
+                    delay,
+                    claimAge,
+                    protectPct,
+                    settingLabel: SETTING_LABELS[activeSetting],
+                    cpiPct: cpi,
+                    size: protectSize,
+                  })}</p>
+                  {!protectSize.alreadyProtected && !insuranceLocked ? (
+                    <button
+                      type="button"
+                      className="btn-block rounded-lg border border-navy bg-navy text-cream hover:bg-teal"
+                      onClick={applyProtectDesign}
+                    >
+                      Use this insurance design
+                    </button>
+                  ) : null}
+                </div>
+              )}
+            </div>
             {section2Confirmed && countableExHome >= NAIC_LOCKOUT_ASSETS ? (
               <div className="mb-4" aria-label="NAIC consumer guides">
                 <h3 className="mb-3 border-b-2 border-gold pb-2 font-display text-lg text-navy">NAIC Shopper’s Guide and Suitability Worksheet</h3>
