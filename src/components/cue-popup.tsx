@@ -6,6 +6,8 @@ import { createPortal } from "react-dom";
 export type CueMessage = {
   title: string;
   body: string;
+  closeLabel?: string;
+  applyOnClose?: boolean;
   actionLabel?: string;
   actionHint?: string;
   onAction?: () => void;
@@ -21,10 +23,15 @@ export function CuePopup({
   const closeRef = useRef<HTMLButtonElement>(null);
   const actionRef = useRef<HTMLButtonElement>(null);
 
+  function dismiss() {
+    if (cue.applyOnClose) cue.onAction?.();
+    onClose();
+  }
+
   useEffect(() => {
     (cue.onAction ? actionRef.current : closeRef.current)?.focus();
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") dismiss();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -36,7 +43,7 @@ export function CuePopup({
     <div
       className="fixed inset-0 z-[60] flex items-center justify-center bg-navy/70 p-4"
       role="presentation"
-      onClick={onClose}
+      onClick={dismiss}
     >
       <div
         role="dialog"
@@ -55,10 +62,10 @@ export function CuePopup({
           <button
             ref={closeRef}
             type="button"
-            onClick={onClose}
+            onClick={dismiss}
             className="inline-flex min-h-11 min-w-24 items-center justify-center rounded-lg border border-navy bg-navy px-4 text-sm font-semibold text-cream hover:bg-teal"
           >
-            Close
+            {cue.closeLabel ?? "Close"}
           </button>
           {cue.onAction && cue.actionLabel ? (
             <button

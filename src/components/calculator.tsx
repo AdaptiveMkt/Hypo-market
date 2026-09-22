@@ -712,6 +712,8 @@ export function Calculator() {
       title: "Industry averages for your age",
       body: section2IndustryMessage(ageToday),
       actionHint: "* Select these benefits for insurance run.",
+      closeLabel: "Close and Use",
+      applyOnClose: true,
       actionLabel: "Use this Options",
       onAction: applyIndustryOptions,
     });
