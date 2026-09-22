@@ -722,10 +722,10 @@ export function Calculator() {
       title: "Industry averages for your age",
       body: section2IndustryMessage(ageToday),
       actionHint: "* Select these benefits for insurance run.",
-      closeLabel: "Close and Use",
-      applyOnClose: true,
       actionLabel: "Use this Options",
       action: "industry",
+      secondaryLabel: `RUN ${protectPct}% Co-Pay ALTERNATIVE`,
+      secondaryAction: "copay-alt",
     });
   }
   function confirmSection3(checked: boolean) {
@@ -976,6 +976,25 @@ export function Calculator() {
     "Years of care",
   ];
 
+  function executeHypo() {
+    const locked = insuranceLockedOut(pool);
+    setHypoRunId((n) => n + 1);
+    setDetails(locked ? lockoutDetails() : withScenarioDetails({ ...ALL_DETAILS_OFF, yearByYear: true, partnership: true, medicaidLtc: true }, false));
+    setRan(true);
+    setYearPage(0);
+    if (locked) {
+      window.setTimeout(() => scrollToId("medicaid-va-card"), 80);
+    } else {
+      window.setTimeout(() => scrollToId("results"), 80);
+    }
+  }
+  function runCopayAlternative() {
+    setAlternativeRun(true);
+    setSection3Open(true);
+    setSection3Confirmed(true);
+    if (!protectSize.alreadyProtected && !insuranceLocked) applyProtectDesign();
+    executeHypo();
+  }
   function runHypo() {
     const missingState = !state;
     const missingSetting = !setting;
@@ -1016,16 +1035,7 @@ export function Calculator() {
       setCue({ title: "Need more information", body: `Please enter ${join} before running the hypothetical.` });
       return;
     }
-    const locked = insuranceLockedOut(pool);
-    setHypoRunId((n) => n + 1);
-    setDetails(locked ? lockoutDetails() : withScenarioDetails({ ...ALL_DETAILS_OFF, yearByYear: true, partnership: true, medicaidLtc: true }, false));
-    setRan(true);
-    setYearPage(0);
-    if (locked) {
-      window.setTimeout(() => scrollToId("medicaid-va-card"), 80);
-    } else {
-      window.setTimeout(() => scrollToId("results"), 80);
-    }
+    executeHypo();
   }
 
   function viewAllReport() {
@@ -2618,6 +2628,7 @@ export function Calculator() {
           onAction={(id) => {
             if (id === "industry") applyIndustryOptions();
             if (id === "protect") applyProtectDesign();
+            if (id === "copay-alt") runCopayAlternative();
           }}
         />
       ) : null}

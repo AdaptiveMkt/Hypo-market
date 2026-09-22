@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 
-export type CueActionId = "industry" | "protect";
+export type CueActionId = "industry" | "protect" | "copay-alt";
 
 export type CueMessage = {
   title: string;
@@ -13,6 +13,8 @@ export type CueMessage = {
   actionLabel?: string;
   actionHint?: string;
   action?: CueActionId;
+  secondaryLabel?: string;
+  secondaryAction?: CueActionId;
 };
 
 export function CuePopup({
@@ -66,23 +68,37 @@ export function CuePopup({
         </h2>
         <p className="mt-3 text-sm leading-relaxed text-navy whitespace-pre-line">{cue.body}</p>
         {cue.actionHint ? <p className="mt-4 text-xs font-semibold text-navy">{cue.actionHint}</p> : null}
-        <div className={`mt-4 flex flex-wrap items-center ${cue.action ? "justify-between" : "justify-end"} gap-2`}>
-          <button
-            ref={closeRef}
-            type="button"
-            onClick={cue.applyOnClose ? closeAndUse : closeOnly}
-            className="inline-flex min-h-11 min-w-24 items-center justify-center rounded-lg border border-navy bg-navy px-4 text-sm font-semibold text-cream hover:bg-teal"
-          >
-            {cue.closeLabel ?? "Close"}
-          </button>
-          {cue.action && cue.actionLabel ? (
+        <div className="mt-4 flex flex-col gap-2">
+          <div className={`flex flex-wrap items-center ${cue.action ? "justify-between" : "justify-end"} gap-2`}>
             <button
-              ref={actionRef}
+              ref={closeRef}
               type="button"
-              onClick={closeAndUse}
-              className="inline-flex min-h-11 items-center justify-center rounded-lg bg-gold px-4 text-sm font-semibold text-masthead hover:brightness-105"
+              onClick={cue.applyOnClose ? closeAndUse : closeOnly}
+              className="inline-flex min-h-11 min-w-24 items-center justify-center rounded-lg border border-navy bg-navy px-4 text-sm font-semibold text-cream hover:bg-teal"
             >
-              {cue.actionLabel}
+              {cue.closeLabel ?? "Close"}
+            </button>
+            {cue.action && cue.actionLabel ? (
+              <button
+                ref={actionRef}
+                type="button"
+                onClick={closeAndUse}
+                className="inline-flex min-h-11 items-center justify-center rounded-lg bg-gold px-4 text-sm font-semibold text-masthead hover:brightness-105"
+              >
+                {cue.actionLabel}
+              </button>
+            ) : null}
+          </div>
+          {cue.secondaryAction && cue.secondaryLabel ? (
+            <button
+              type="button"
+              onClick={() => {
+                onAction?.(cue.secondaryAction!);
+                onClose();
+              }}
+              className="inline-flex min-h-11 w-full items-center justify-center rounded-lg border border-teal bg-teal px-4 text-center text-sm font-semibold text-cream hover:brightness-105"
+            >
+              {cue.secondaryLabel}
             </button>
           ) : null}
         </div>
