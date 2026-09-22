@@ -196,6 +196,29 @@ function disabledPolicy(p: LtcPolicy): LtcPolicy {
   return { ...p, enabled: false };
 }
 
+const KIND_TAB: Record<PolicyKind, { idle: string; active: string; accent: string }> = {
+  traditional: {
+    idle: "border border-transparent bg-[#d6eaf8] text-[#1b3a4b]",
+    active: "border border-b-0 border-[#0072B2] bg-[#0072B2] text-white",
+    accent: "#0072B2",
+  },
+  assetBased: {
+    idle: "border border-transparent bg-[#fdebd0] text-[#8b3a00]",
+    active: "border border-b-0 border-[#c47a00] bg-[#E69F00] text-[#1b3a4b]",
+    accent: "#c47a00",
+  },
+  ltcAnnuity: {
+    idle: "border border-transparent bg-[#d5f5e3] text-[#005a3c]",
+    active: "border border-b-0 border-[#007a58] bg-[#009E73] text-white",
+    accent: "#007a58",
+  },
+  hybridLife: {
+    idle: "border border-transparent bg-[#f5d0e8] text-[#6b2d5b]",
+    active: "border border-b-0 border-[#a34e82] bg-[#CC79A7] text-[#1b3a4b]",
+    accent: "#a34e82",
+  },
+};
+
 export function Calculator() {
   const narrow = useNarrow();
   const [assets, setAssets] = useState<Assets>(() => ({
@@ -1488,16 +1511,18 @@ export function Calculator() {
                       <div className="flex min-w-0 flex-wrap gap-1 border-b border-gold bg-cream px-2 pt-1">
                         {STRUCTURE_OPTIONS.map((o) => {
                           const active = policy.kind === o.key;
+                          const tab = KIND_TAB[o.key];
                           return (
                             <div
                               key={o.key}
                               className={`flex min-w-0 flex-1 items-center gap-1.5 rounded-t-lg px-2 py-1 ${
-                                active ? "border border-b-0 border-gold bg-paper text-navy" : "text-muted"
+                                active ? tab.active : tab.idle
                               }`}
                             >
                               <input
                                 type="checkbox"
-                                className="size-4 shrink-0 accent-teal"
+                                className="size-4 shrink-0"
+                                style={{ accentColor: tab.accent }}
                                 checked={!!runKinds[o.key]}
                                 aria-label={`Include ${o.label} in the run`}
                                 onChange={(e) => {
