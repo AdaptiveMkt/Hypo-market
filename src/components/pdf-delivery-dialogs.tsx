@@ -216,6 +216,15 @@ export function PdfReadyDialog({
             href={url}
             download={filename}
             className="btn-block rounded-lg border border-gold bg-gold text-center text-masthead hover:brightness-105"
+            onClick={(e) => {
+              e.preventDefault();
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = filename;
+              document.body.appendChild(a);
+              a.click();
+              window.setTimeout(() => a.remove(), 0);
+            }}
           >
             Save PDF to this computer
           </a>

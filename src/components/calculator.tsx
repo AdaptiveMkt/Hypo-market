@@ -246,6 +246,10 @@ export function Calculator() {
     note: string;
     next: "contact" | "done";
   } | null>(null);
+  const [pdfError, setPdfError] = useState("");
+  const pdfJob = useRef(0);
+  const pdfNameState = useRef(state);
+  pdfNameState.current = state;
   const [premiumTouched, setPremiumTouched] = useState(false);
   const [designTouched, setDesignTouched] = useState(false);
   const [yearPage, setYearPage] = useState(0);
@@ -867,6 +871,7 @@ export function Calculator() {
     return () => window.removeEventListener("aum-download-pdf", requestPdfDownload);
   }, [insuranceLocked, showReciprocity]);
   function runPdfDownload() {
+    setPdfError("");
     setPdfPick(false);
     setShowReport(true);
     setPrintAfterOpen(true);
@@ -875,18 +880,18 @@ export function Calculator() {
 
   useEffect(() => {
     if (!showReport || !printAfterOpen) return;
-    let cancelled = false;
+    const job = ++pdfJob.current;
     const t = window.setTimeout(() => {
-      const name = pdfFilename(state);
+      const name = pdfFilename(pdfNameState.current);
       downloadReportPdf(name, (msg) => {
-        if (!cancelled) setSaveMsg(msg);
+        if (pdfJob.current === job) setSaveMsg(msg);
       })
         .then(async (file) => {
-          if (cancelled) return;
+          if (pdfJob.current !== job) return;
           setPrintAfterOpen(false);
           setShowReport(false);
           const snap = mailRef.current;
-          let note = "Use Save PDF to this computer if a download did not start.";
+          let note = "If the file did not appear in your downloads, use Save PDF to this computer.";
           let next: "contact" | "done" = "contact";
           if (advisorReceivesPdf(snap.advisor, snap.client) && snap.attachAdvisor) {
             try {
@@ -903,10 +908,10 @@ export function Calculator() {
                 },
               });
               note = r.emailed
-                ? "A copy was emailed to the advisor from info@fundingltcmarketplace.com."
-                : "The advisor copy could not be emailed from this environment.";
+                ? "A copy was emailed to the advisor from info@fundingltcmarketplace.com. Save your copy below."
+                : "The advisor copy could not be emailed. Save your copy below.";
             } catch {
-              note = "The advisor copy could not be emailed.";
+              note = "The advisor copy could not be emailed. Save your copy below.";
             }
             next = "done";
           } else {
@@ -916,24 +921,25 @@ export function Calculator() {
               email: snap.client.email,
               state: snap.client.state || snap.state,
             });
-            note = "The form was not emailed — no advisor email on this run.";
+            note = "Save the PDF on this computer. It was not emailed — no advisor email on this run.";
             next = "contact";
           }
           setPdfReady({ filename: file.filename, url: file.url, note, next });
           setSaveMsg("PDF is ready. Save it to this computer.");
         })
         .catch((err) => {
-          if (cancelled) return;
+          if (pdfJob.current !== job) return;
           setPrintAfterOpen(false);
+          setShowReport(false);
           const msg = err instanceof Error ? err.message : "PDF could not be created.";
-          setSaveMsg(`PDF did not download. ${msg} Try fewer sections, or use your browser’s Print → Save as PDF.`);
+          setPdfError(msg);
+          setSaveMsg(`PDF did not download. ${msg}`);
         });
-    }, 700);
+    }, 400);
     return () => {
-      cancelled = true;
       window.clearTimeout(t);
     };
-  }, [showReport, printAfterOpen, state]);
+  }, [showReport, printAfterOpen]);
 
   function scrollToId(id: string) {
     const el = document.getElementById(id);
@@ -2618,6 +2624,32 @@ export function Calculator() {
           onCancel={() => setPdfPick(false)}
           onConfirm={runPdfDownload}
         />,
+        document.body,
+      ) : null}
+      {printAfterOpen ? createPortal(
+        <div className="fixed inset-0 z-[80] flex items-start justify-center bg-navy/55 p-4 pt-16" role="status">
+          <div className="card-xl w-full max-w-md bg-paper p-5">
+            <p className="font-display text-xl text-navy">Preparing your PDF</p>
+            <p className="mt-2 text-sm text-navy">{saveMsg || "Preparing PDF…"}</p>
+            <p className="mt-2 text-xs text-muted">Keep this tab open. A Save button appears when the file is ready.</p>
+          </div>
+        </div>,
+        document.body,
+      ) : null}
+      {pdfError ? createPortal(
+        <div className="fixed inset-0 z-[80] flex items-start justify-center bg-navy/55 p-4 pt-16" role="alertdialog">
+          <div className="card-xl w-full max-w-md bg-paper p-5">
+            <p className="font-display text-xl text-navy">PDF did not download</p>
+            <p className="mt-2 text-sm text-navy">{pdfError}</p>
+            <button
+              type="button"
+              className="btn-block mt-4 rounded-lg border border-gold bg-gold text-masthead"
+              onClick={() => setPdfError("")}
+            >
+              Close
+            </button>
+          </div>
+        </div>,
         document.body,
       ) : null}
       {pdfReady ? createPortal(

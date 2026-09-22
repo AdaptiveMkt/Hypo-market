@@ -167,20 +167,13 @@ function savePdfFile(pdf: jsPDF, filename: string) {
 /** Trigger a local download and keep an object URL for a Save-to-this-computer control. */
 export function savePdfBlob(blob: Blob, filename: string): string {
   const url = URL.createObjectURL(blob);
-  try {
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    a.rel = "noopener";
-    a.target = "_self";
-    a.style.display = "none";
-    document.body.appendChild(a);
-    a.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window }));
-    a.click();
-    a.remove();
-  } catch {
-    /* A later Save-to-this-computer click uses the same URL. */
-  }
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.rel = "noopener";
+  document.body.appendChild(a);
+  a.click();
+  window.setTimeout(() => a.remove(), 0);
   return url;
 }
 
@@ -353,7 +346,7 @@ async function captureBlock(el: HTMLElement): Promise<HTMLCanvasElement[]> {
   const cssW = Math.max(el.scrollWidth, el.offsetWidth, 320);
   const out: HTMLCanvasElement[] = [];
   const grab = async (y: number, h: number) => {
-    const scale = Math.min(1.15, MAX_CANVAS_EDGE / Math.max(h, 1), MAX_CANVAS_EDGE / cssW);
+    const scale = Math.min(1, MAX_CANVAS_EDGE / Math.max(h, 1), MAX_CANVAS_EDGE / cssW);
     try {
       return await html2canvas(
         el,
@@ -369,24 +362,28 @@ async function captureBlock(el: HTMLElement): Promise<HTMLCanvasElement[]> {
     } catch {
       return await html2canvas(
         el,
-        html2opts(Math.min(1, scale), {
+        html2opts(Math.min(0.75, scale), {
           x: 0,
           y,
           width: cssW,
-          height: h,
+          height: Math.min(h, 1600),
           windowWidth: cssW,
-          windowHeight: h,
+          windowHeight: Math.min(h, 1600),
         }),
       );
     }
   };
-  if (cssH <= SLICE_CSS) {
-    out.push(await grab(0, cssH));
-    return out;
-  }
-  for (let top = 0; top < cssH; top += SLICE_CSS) {
-    const h = Math.min(SLICE_CSS, cssH - top);
-    out.push(await grab(top, h));
+  try {
+    if (cssH <= SLICE_CSS) {
+      out.push(await grab(0, cssH));
+      return out.filter((c) => c.width > 0 && c.height > 0);
+    }
+    for (let top = 0; top < cssH; top += SLICE_CSS) {
+      const h = Math.min(SLICE_CSS, cssH - top);
+      out.push(await grab(top, h));
+    }
+  } catch {
+    return out.filter((c) => c.width > 0 && c.height > 0);
   }
   return out.filter((c) => c.width > 0 && c.height > 0);
 }
@@ -462,11 +459,18 @@ export async function downloadReportPdf(
     const pageH = pdf.internal.pageSize.getHeight();
     const state = { y: BASE_MARGIN, started: false };
 
+    let captured = 0;
     for (let i = 0; i < blocks.length; i++) {
       onProgress?.(`Preparing PDF… section ${i + 1} of ${blocks.length}`);
-      const canvases = await captureBlock(blocks[i]);
-      for (const canvas of canvases) addCanvasPages(pdf, canvas, state);
+      try {
+        const canvases = await captureBlock(blocks[i]);
+        for (const canvas of canvases) addCanvasPages(pdf, canvas, state);
+        captured += canvases.length;
+      } catch {
+        /* Skip a section that cannot be drawn so the rest of the file still saves. */
+      }
     }
+    if (!captured) throw new Error("No section could be drawn. Try Client sitting, then download again.");
 
     const pages = pdf.getNumberOfPages();
     for (let i = 1; i <= pages; i++) {
