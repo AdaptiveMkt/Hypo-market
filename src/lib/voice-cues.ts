@@ -80,7 +80,7 @@ export function section3ProtectMessage(opts: {
     `${money(s.dailyToday)} a day and/or ${monthlyToday} monthly for ${period} purchased today, ` +
     `which will be about ${money(s.dailyAtClaim)} a day, and/or ${monthlyClaim} monthly at the projected time of claim ` +
     `if benefits inflate with the age-based default. That is an insurance benefit pool of coverage of about ${pool}. ` +
-    `Your assets would be used.` +
+    `Your countable assets or available income would be used to pay the additional out-of-pocket health care costs.` +
     close
   );
 }
