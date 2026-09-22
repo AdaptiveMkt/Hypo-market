@@ -661,19 +661,29 @@ export function Calculator() {
   }
   function applyIndustryOptions() {
     const typical = typicalPurchaseForAge(ageToday || DEFAULT_AGE_TODAY);
-    patchPolicy({
+    const prem =
+      typicalPremiumHint(ageToday || DEFAULT_AGE_TODAY, typical.benefitInflationPct, typical.inflationMethod)
+        .amount ?? 0;
+    const book = seedKindBook(typical, prem);
+    const next = {
+      ...book.traditional,
       enabled: true,
-      kind: "traditional",
+      kind: "traditional" as const,
       dailyBenefit: typical.dailyBenefit,
       benefitYears: typical.benefitYears,
       elimDays: typical.elimDays,
       monthlyBenefit: typical.monthlyBenefit,
       benefitInflationPct: typical.benefitInflationPct,
       inflationMethod: typical.inflationMethod,
-    });
+      annualPremium: prem,
+    };
+    setKindBook({ ...book, traditional: next });
+    setPolicy(next);
+    setYearKind("traditional");
     setRunKinds((prev) => ({ ...prev, traditional: true }));
     setDesignTouched(true);
     setSection3Open(true);
+    window.setTimeout(() => scrollToId("daily"), 80);
   }
   function confirmSection2(checked: boolean) {
     setSection2Confirmed(checked);
@@ -715,7 +725,7 @@ export function Calculator() {
       closeLabel: "Close and Use",
       applyOnClose: true,
       actionLabel: "Use this Options",
-      onAction: applyIndustryOptions,
+      action: "industry",
     });
   }
   function confirmSection3(checked: boolean) {
@@ -2601,7 +2611,16 @@ export function Calculator() {
         />,
         document.body,
       ) : null}
-      {cue ? <CuePopup cue={cue} onClose={() => setCue(null)} /> : null}
+      {cue ? (
+        <CuePopup
+          cue={cue}
+          onClose={() => setCue(null)}
+          onAction={(id) => {
+            if (id === "industry") applyIndustryOptions();
+            if (id === "protect") applyProtectDesign();
+          }}
+        />
+      ) : null}
     </div>
   );
 }

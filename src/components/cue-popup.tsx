@@ -3,6 +3,8 @@
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 
+export type CueActionId = "industry" | "protect";
+
 export type CueMessage = {
   title: string;
   body: string;
@@ -10,32 +12,39 @@ export type CueMessage = {
   applyOnClose?: boolean;
   actionLabel?: string;
   actionHint?: string;
-  onAction?: () => void;
+  action?: CueActionId;
 };
 
 export function CuePopup({
   cue,
   onClose,
+  onAction,
 }: {
   cue: CueMessage;
   onClose: () => void;
+  onAction?: (id: CueActionId) => void;
 }) {
   const closeRef = useRef<HTMLButtonElement>(null);
   const actionRef = useRef<HTMLButtonElement>(null);
 
   function dismiss() {
-    if (cue.applyOnClose) cue.onAction?.();
+    if (cue.applyOnClose && cue.action) onAction?.(cue.action);
+    onClose();
+  }
+
+  function runAction() {
+    if (cue.action) onAction?.(cue.action);
     onClose();
   }
 
   useEffect(() => {
-    (cue.onAction ? actionRef.current : closeRef.current)?.focus();
+    (cue.action ? actionRef.current : closeRef.current)?.focus();
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") dismiss();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [cue, onClose]);
+  }, [cue, onClose, onAction]);
 
   if (typeof document === "undefined") return null;
 
@@ -58,7 +67,7 @@ export function CuePopup({
         </h2>
         <p className="mt-3 text-sm leading-relaxed text-navy whitespace-pre-line">{cue.body}</p>
         {cue.actionHint ? <p className="mt-4 text-xs font-semibold text-navy">{cue.actionHint}</p> : null}
-        <div className={`mt-4 flex flex-wrap items-center ${cue.onAction ? "justify-between" : "justify-end"} gap-2`}>
+        <div className={`mt-4 flex flex-wrap items-center ${cue.action ? "justify-between" : "justify-end"} gap-2`}>
           <button
             ref={closeRef}
             type="button"
@@ -67,14 +76,11 @@ export function CuePopup({
           >
             {cue.closeLabel ?? "Close"}
           </button>
-          {cue.onAction && cue.actionLabel ? (
+          {cue.action && cue.actionLabel ? (
             <button
               ref={actionRef}
               type="button"
-              onClick={() => {
-                cue.onAction?.();
-                onClose();
-              }}
+              onClick={runAction}
               className="inline-flex min-h-11 items-center justify-center rounded-lg bg-gold px-4 text-sm font-semibold text-masthead hover:brightness-105"
             >
               {cue.actionLabel}
