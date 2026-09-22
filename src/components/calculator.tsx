@@ -159,6 +159,8 @@ import { FieldPicker, StepperField } from "@/components/field-picker";
 import { FederalLtcDeductionPanel } from "@/components/federal-ltc-deduction-panel";
 import { Irc1035Panel } from "@/components/irc-1035-panel";
 import { IndustryInsightsPanel } from "@/components/industry-insights";
+import { HybridLifeOptionsPanel } from "@/components/hybrid-life-options-panel";
+import { DraPartnershipComparePanel } from "@/components/dra-partnership-compare-panel";
 import { ConfidencePanel } from "@/components/confidence-panel";
 import { LTC_INSURANCE_OPTIONS } from "@/lib/ltc-compare";
 import { LTC_RIDER_GLANCE, LTC_RIDER_INTRO } from "@/lib/ltc-riders";
@@ -2271,6 +2273,10 @@ export function Calculator() {
                   </article>
                 ))}
               </div>
+              <div className="mt-4 border-t border-gold pt-4">
+                <h3 className="mb-2 font-display text-lg text-navy">Hybrid life insurance options</h3>
+                <HybridLifeOptionsPanel policy={policy} />
+              </div>
             </ViewFold>
           ) : null}
 
@@ -2303,6 +2309,10 @@ export function Calculator() {
                     </dl>
                   </article>
                 ))}
+              </div>
+              <div className="mt-4 border-t border-gold pt-4">
+                <h3 className="mb-2 font-display text-lg text-navy">Compare DRA Partnership benefits</h3>
+                <DraPartnershipComparePanel state={state} preservation={pImpact} />
               </div>
             </ViewFold>
           ) : null}

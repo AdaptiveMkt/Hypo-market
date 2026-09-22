@@ -46,6 +46,8 @@ import {
   type Projection,
 } from "@/lib/calc";
 import { LinkedClaimCard } from "@/components/linked-claim-card";
+import { HybridLifeOptionsPanel } from "@/components/hybrid-life-options-panel";
+import { DraPartnershipComparePanel } from "@/components/dra-partnership-compare-panel";
 import { YearByYearTable } from "@/components/year-by-year-table";
 import { linkedClaimScenarios, linkedCopy } from "@/lib/linked-products";
 import { type MedicaidProfile } from "@/lib/medicaid";
@@ -1569,6 +1571,10 @@ export function ReportView({
             </table>
           </div>
           )}
+          <div className="mt-4 border-t border-gold pt-4">
+            <h3 className="mb-2 font-display text-lg text-navy">Hybrid life insurance options</h3>
+            <HybridLifeOptionsPanel policy={policy} />
+          </div>
         </section>
         ) : null}
 
@@ -1617,6 +1623,10 @@ export function ReportView({
                 <p className="tabular-nums text-muted">Spend-down {money(row.spend)}</p>
               </div>
             ))}
+          </div>
+          <div className="mt-4 border-t border-gold pt-4">
+            <h3 className="mb-2 font-display text-lg text-navy">Compare DRA Partnership benefits</h3>
+            <DraPartnershipComparePanel state={state} preservation={preservation} />
           </div>
         </section>
 
