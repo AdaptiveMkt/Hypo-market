@@ -688,6 +688,22 @@ export function Calculator() {
     setRunKinds((prev) => ({ ...prev, traditional: true }));
     setDesignTouched(true);
   }
+  function applyIndustryOptions() {
+    const typical = typicalPurchaseForAge(ageToday || DEFAULT_AGE_TODAY);
+    patchPolicy({
+      enabled: true,
+      kind: "traditional",
+      dailyBenefit: typical.dailyBenefit,
+      benefitYears: typical.benefitYears,
+      elimDays: typical.elimDays,
+      monthlyBenefit: typical.monthlyBenefit,
+      benefitInflationPct: typical.benefitInflationPct,
+      inflationMethod: typical.inflationMethod,
+    });
+    setRunKinds((prev) => ({ ...prev, traditional: true }));
+    setDesignTouched(true);
+    setSection3Open(true);
+  }
   function confirmSection2(checked: boolean) {
     setSection2Confirmed(checked);
     if (!checked) {
@@ -723,6 +739,9 @@ export function Calculator() {
     setCue({
       title: "Industry averages for your age",
       body: section2IndustryMessage(ageToday),
+      actionHint: "* Select these benefits for insurance run.",
+      actionLabel: "Use this Options",
+      onAction: applyIndustryOptions,
     });
   }
   function confirmSection3(checked: boolean) {

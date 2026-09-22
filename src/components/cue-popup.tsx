@@ -3,7 +3,13 @@
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 
-export type CueMessage = { title: string; body: string };
+export type CueMessage = {
+  title: string;
+  body: string;
+  actionLabel?: string;
+  actionHint?: string;
+  onAction?: () => void;
+};
 
 export function CuePopup({
   cue,
@@ -13,9 +19,10 @@ export function CuePopup({
   onClose: () => void;
 }) {
   const closeRef = useRef<HTMLButtonElement>(null);
+  const actionRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    closeRef.current?.focus();
+    (cue.onAction ? actionRef.current : closeRef.current)?.focus();
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
@@ -43,7 +50,8 @@ export function CuePopup({
           {cue.title}
         </h2>
         <p className="mt-3 text-sm leading-relaxed text-navy whitespace-pre-line">{cue.body}</p>
-        <div className="mt-5 flex justify-end">
+        {cue.actionHint ? <p className="mt-4 text-xs font-semibold text-navy">{cue.actionHint}</p> : null}
+        <div className={`mt-4 flex flex-wrap items-center ${cue.onAction ? "justify-between" : "justify-end"} gap-2`}>
           <button
             ref={closeRef}
             type="button"
@@ -52,6 +60,19 @@ export function CuePopup({
           >
             Close
           </button>
+          {cue.onAction && cue.actionLabel ? (
+            <button
+              ref={actionRef}
+              type="button"
+              onClick={() => {
+                cue.onAction?.();
+                onClose();
+              }}
+              className="inline-flex min-h-11 items-center justify-center rounded-lg bg-gold px-4 text-sm font-semibold text-masthead hover:brightness-105"
+            >
+              {cue.actionLabel}
+            </button>
+          ) : null}
         </div>
       </div>
     </div>,
