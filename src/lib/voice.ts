@@ -157,9 +157,9 @@ export function applyVoiceTranscript(transcript: string): VoiceApplyResult {
     return { ok: true, message: "Stopped." };
   }
   if (/\b(run( the)? (hypo|hypothetical)|run it|calculate)\b/.test(lower) || lower === "run") {
-    return clickNamed("run hypothetical")
-      ? { ok: true, message: "Running the hypothetical." }
-      : { ok: false, message: "Could not find Run hypothetical." };
+    return clickNamed("run all selected")
+      ? { ok: true, message: "Running the selected hypotheticals." }
+      : { ok: false, message: "Could not find Run All Selected." };
   }
   if (/^reset\b/.test(lower)) {
     return clickNamed("reset")

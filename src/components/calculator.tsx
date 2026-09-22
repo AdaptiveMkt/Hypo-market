@@ -964,8 +964,8 @@ export function Calculator() {
   ].filter(Boolean);
   const missingRun = [
     ...missingInputs,
-    !section2Confirmed ? "Confirm Section 2 is complete" : "",
-    !insuranceLocked && !section3Confirmed ? "Confirm Section 3 benefit selection" : "",
+    !section2Confirmed ? "Confirm Section 2 selection" : "",
+    !insuranceLocked && !section3Confirmed ? "Confirm Section 3 selection" : "",
   ].filter(Boolean);
   const dockNeed = [
     "Countable assets",
@@ -995,7 +995,7 @@ export function Calculator() {
     if (!protectSize.alreadyProtected && !insuranceLocked) applyProtectDesign();
     executeHypo();
   }
-  function runHypo() {
+  function runHypo(only?: PolicyKind) {
     const missingState = !state;
     const missingSetting = !setting;
     const missingAge = ageToday < MIN_AGE_TODAY;
@@ -1034,6 +1034,16 @@ export function Calculator() {
             : `${list.slice(0, -1).join(", ")}, and ${list[list.length - 1]}`;
       setCue({ title: "Need more information", body: `Please enter ${join} before running the hypothetical.` });
       return;
+    }
+    if (only) {
+      setRunKinds({ traditional: false, assetBased: false, ltcAnnuity: false, hybridLife: false, [only]: true });
+      setKindBook((book) => {
+        const saved = { ...book, [policy.kind]: { ...policy, kind: policy.kind, enabled: true } };
+        const next = { ...saved[only], kind: only, enabled: true };
+        setPolicy(next);
+        return { ...saved, [only]: next };
+      });
+      setYearKind(only);
     }
     executeHypo();
   }
@@ -1430,16 +1440,17 @@ export function Calculator() {
                   </span>
                 </p>
               ) : null}
-              <label className="flex min-h-11 w-full cursor-pointer items-start gap-2 text-sm font-semibold text-navy">
-                <input
-                  id="section-2-confirm"
-                  type="checkbox"
-                  className="mt-1 size-4 accent-teal"
-                  checked={section2Confirmed}
-                  onChange={(e) => confirmSection2(e.target.checked)}
-                />
-                <span>Confirm Section 2 is complete</span>
-              </label>
+              <button
+                id="section-2-confirm"
+                type="button"
+                aria-pressed={section2Confirmed}
+                className={`btn-block rounded-lg px-4 py-2.5 text-sm font-semibold hover:brightness-110 ${
+                  section2Confirmed ? "bg-teal text-cream" : "border border-navy bg-navy text-cream"
+                }`}
+                onClick={() => confirmSection2(!section2Confirmed)}
+              >
+                {section2Confirmed ? "Section 2 selection confirmed" : "Confirm Section 2 selection"}
+              </button>
             </div>
             </>
             ) : null}
@@ -1805,20 +1816,21 @@ export function Calculator() {
               </>
             )}
             {!insuranceLocked ? (
-              <label className="mt-4 flex min-h-11 cursor-pointer items-start gap-2 text-sm font-semibold text-navy">
-                <input
-                  id="section-3-confirm"
-                  type="checkbox"
-                  className="mt-1 size-4 accent-teal"
-                  checked={section3Confirmed}
-                  onChange={(e) => confirmSection3(e.target.checked)}
-                />
-                <span>Confirm Section 3 benefit selection.</span>
-              </label>
+              <button
+                id="section-3-confirm"
+                type="button"
+                aria-pressed={section3Confirmed}
+                className={`mt-4 btn-block rounded-lg px-4 py-2.5 text-sm font-semibold hover:brightness-110 ${
+                  section3Confirmed ? "bg-teal text-cream" : "border border-navy bg-navy text-cream"
+                }`}
+                onClick={() => confirmSection3(!section3Confirmed)}
+              >
+                {section3Confirmed ? "Section 3 selection confirmed" : "Confirm Section 3 selection"}
+              </button>
             ) : null}
-            <div className="mt-4 stack-actions">
+            <div id="run-kind-actions" className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
               {missingRun.length ? (
-                <p className="w-full min-w-0 text-sm font-semibold leading-snug text-deplete" role="status">
+                <p className="w-full min-w-0 text-sm font-semibold leading-snug text-deplete sm:col-span-2" role="status">
                   To run, complete:
                   <span className="mt-1 block font-normal text-navy">
                     {missingRun.map((item) => (
@@ -1827,13 +1839,32 @@ export function Calculator() {
                   </span>
                 </p>
               ) : null}
+              {(
+                [
+                  ["traditional", "Run Traditional"],
+                  ["assetBased", "Run Asset Based"],
+                  ["ltcAnnuity", "Run Annuity Care"],
+                  ["hybridLife", "Run Hybrid"],
+                ] as const
+              ).map(([kind, label]) => (
+                <button
+                  key={kind}
+                  type="button"
+                  className="btn-block rounded-lg px-3 py-2.5 text-sm font-semibold hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
+                  style={{ background: KIND_TAB[kind].accent, color: kind === "assetBased" || kind === "hybridLife" ? "#1b3a4b" : "#fff" }}
+                  onClick={() => runHypo(kind)}
+                  disabled={missingRun.length > 0}
+                >
+                  {label}
+                </button>
+              ))}
               <button
                 type="button"
-                className="btn-block btn-attention-red rounded-lg hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
-                onClick={runHypo}
+                className="btn-block btn-attention-red rounded-lg hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50 sm:col-span-2"
+                onClick={() => runHypo()}
                 disabled={missingRun.length > 0}
               >
-                Run hypothetical
+                Run All Selected
               </button>
             </div>
           </TitleCollapse>
@@ -2506,7 +2537,7 @@ export function Calculator() {
                 <button type="button" className="btn-block min-w-0 rounded-lg bg-gold text-sm text-masthead" onClick={viewAllReport}>View all</button>
                 <button type="button" className="btn-block min-w-0 rounded-lg border border-navy bg-navy text-sm text-cream" onClick={requestPdfDownload}>PDF</button>
                 <button type="button" className="btn-block min-w-0 rounded-lg border border-navy text-sm text-navy" onClick={() => scrollToId(insuranceLocked ? "medicaid-va-card" : "results")}>View results</button>
-                <button type="button" className="btn-block min-w-0 rounded-lg border border-navy text-sm text-navy" onClick={runHypo}>Run again</button>
+                <button type="button" className="btn-block min-w-0 rounded-lg border border-navy text-sm text-navy" onClick={() => runHypo()}>Run again</button>
               </div>
             ) : (
               <>
@@ -2519,15 +2550,34 @@ export function Calculator() {
                 {missingRun.length ? null : (
                   <p className="mb-2 text-center text-xs text-muted">Ready to run this hypothetical.</p>
                 )}
-                <div className="mobile-dock-row">
+                <div className="grid grid-cols-1 gap-2">
                   <button type="button" className="btn-block min-w-0 rounded-lg border border-navy text-sm text-navy" onClick={() => window.dispatchEvent(new Event("aum:open-chat"))}>Ask</button>
+                  {(
+                    [
+                      ["traditional", "Run Traditional"],
+                      ["assetBased", "Run Asset Based"],
+                      ["ltcAnnuity", "Run Annuity Care"],
+                      ["hybridLife", "Run Hybrid"],
+                    ] as const
+                  ).map(([kind, label]) => (
+                    <button
+                      key={kind}
+                      type="button"
+                      className="btn-block min-w-0 rounded-lg px-3 py-2 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50"
+                      style={{ background: KIND_TAB[kind].accent, color: kind === "assetBased" || kind === "hybridLife" ? "#1b3a4b" : "#fff" }}
+                      onClick={() => runHypo(kind)}
+                      disabled={missingRun.length > 0}
+                    >
+                      {label}
+                    </button>
+                  ))}
                   <button
                     type="button"
                     className="btn-block btn-attention-red min-w-0 rounded-lg text-sm hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
-                    onClick={runHypo}
+                    onClick={() => runHypo()}
                     disabled={missingRun.length > 0}
                   >
-                    Run hypothetical
+                    Run All Selected
                   </button>
                 </div>
               </>
