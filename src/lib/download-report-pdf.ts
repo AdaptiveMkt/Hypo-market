@@ -7,6 +7,7 @@ const MAX_MARGIN = 72;
 const BASE_MARGIN = 42;
 const GAP = 12;
 const FOOTER_H = 72;
+const CONTENT_TOP = 48;
 const FOOTER = COPYRIGHT_LINE;
 const UNSUPPORTED_COLOR = /(?:oklch|oklab|lab|lch|color-mix|color)\([^)]*\)/i;
 
@@ -62,37 +63,50 @@ function autoFit(opts: {
   return { x: (pageW - w) / 2, y: y0, w, h, newPage };
 }
 
-function stampFooter(pdf: jsPDF, pageW: number, pageH: number, page: number, pages: number) {
-  pdf.setFillColor(255, 255, 255);
-  pdf.rect(0, pageH - FOOTER_H, pageW, FOOTER_H, "F");
-  pdf.setDrawColor(196, 163, 90);
-  pdf.setLineWidth(0.6);
-  pdf.line(BASE_MARGIN, pageH - FOOTER_H, pageW - BASE_MARGIN, pageH - FOOTER_H);
-  pdf.setFont("times", "normal");
-  pdf.setFontSize(8);
-  pdf.setTextColor(36, 48, 56);
-  const terms =
-    "Disclosure and Terms of Use: educational hypothetical only. Not a quote, illustration, or advice. Full terms are at the end of this document.";
-  const lines = pdf.splitTextToSize(terms, pageW - BASE_MARGIN * 2);
-  pdf.text(lines, BASE_MARGIN, pageH - FOOTER_H + 14);
-  pdf.setFont("helvetica", "normal");
-  pdf.setFontSize(8);
-  pdf.text(FOOTER, BASE_MARGIN, pageH - 16, { align: "left" });
-  pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(9);
-  pdf.text(`Page ${page} of ${pages}`, pageW - BASE_MARGIN, pageH - 16, { align: "right" });
-}
+/** Numbers are written after the last page exists, so “Page X of Y” matches the file. */
+function stampPageNumbers(pdf: jsPDF) {
+  const pages = pdf.getNumberOfPages();
+  const pageW = pdf.internal.pageSize.getWidth();
+  const pageH = pdf.internal.pageSize.getHeight();
+  for (let i = 1; i <= pages; i++) {
+    pdf.setPage(i);
+    pdf.setFillColor(255, 255, 255);
+    pdf.rect(0, 0, pageW, CONTENT_TOP - 6, "F");
+    pdf.rect(0, pageH - FOOTER_H, pageW, FOOTER_H, "F");
+    pdf.setDrawColor(196, 163, 90);
+    pdf.setLineWidth(0.5);
+    pdf.line(BASE_MARGIN, CONTENT_TOP - 10, pageW - BASE_MARGIN, CONTENT_TOP - 10);
+    pdf.line(BASE_MARGIN, pageH - FOOTER_H, pageW - BASE_MARGIN, pageH - FOOTER_H);
 
-function stampContinuedHeader(pdf: jsPDF, pageW: number) {
-  pdf.setFont("helvetica", "normal");
-  pdf.setFontSize(8);
-  pdf.setTextColor(27, 58, 75);
-  pdf.text("Long Term Care Asset Utilization Modeling — continued", pageW / 2, BASE_MARGIN - 16, {
-    align: "center",
-  });
-  pdf.setDrawColor(196, 163, 90);
-  pdf.setLineWidth(0.4);
-  pdf.line(BASE_MARGIN, BASE_MARGIN - 10, pageW - BASE_MARGIN, BASE_MARGIN - 10);
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(8);
+    pdf.setTextColor(27, 58, 75);
+    pdf.text(
+      i === 1
+        ? "Long Term Care Asset Utilization Modeling"
+        : "Long Term Care Asset Utilization Modeling — continued",
+      BASE_MARGIN,
+      22,
+    );
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(10);
+    const label = `Page ${i} of ${pages}`;
+    pdf.text(label, pageW - BASE_MARGIN, 22, { align: "right" });
+
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(8);
+    pdf.setTextColor(36, 48, 56);
+    const terms =
+      "Disclosure and Terms of Use: educational hypothetical only. Not a quote, illustration, or advice. Full terms are at the end of this document.";
+    const lines = pdf.splitTextToSize(terms, pageW - BASE_MARGIN * 2);
+    pdf.text(lines, BASE_MARGIN, pageH - FOOTER_H + 14);
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(8);
+    pdf.text(FOOTER, BASE_MARGIN, pageH - 16);
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(10);
+    pdf.text(label, pageW - BASE_MARGIN, pageH - 16, { align: "right" });
+  }
 }
 
 function wait(ms: number) {
@@ -465,19 +479,19 @@ function addCanvasPages(
   const pageW = pdf.internal.pageSize.getWidth();
   const pageH = pdf.internal.pageSize.getHeight();
   const usableW = pageW - BASE_MARGIN * 2;
-  const usableH = pageH - BASE_MARGIN - FOOTER_H - 10;
+  const usableH = pageH - CONTENT_TOP - FOOTER_H - 8;
   const pxToPt = usableW / canvas.width;
-  const remaining = () => BASE_MARGIN + usableH - state.y;
+  const remaining = () => CONTENT_TOP + usableH - state.y;
   const newPage = () => {
     if (state.started) pdf.addPage();
     state.started = true;
-    state.y = BASE_MARGIN;
+    state.y = CONTENT_TOP;
   };
   if (!state.started) newPage();
 
   let cursor = 0;
   while (cursor < canvas.height - 2) {
-    if (state.y > BASE_MARGIN + 8 && remaining() < 64) newPage();
+    if (state.y > CONTENT_TOP + 8 && remaining() < 64) newPage();
     const maxPx = Math.max(48, Math.floor(remaining() / pxToPt));
     const sliceEnd = Math.min(
       canvas.height,
@@ -524,9 +538,7 @@ export async function downloadReportPdf(
     if (!blocks.length) throw new Error("Report has no printable blocks.");
 
     const pdf = new jsPDF({ unit: "pt", format: "letter", compress: true });
-    const pageW = pdf.internal.pageSize.getWidth();
-    const pageH = pdf.internal.pageSize.getHeight();
-    const state = { y: BASE_MARGIN, started: false };
+    const state = { y: CONTENT_TOP, started: false };
 
     let captured = 0;
     for (let i = 0; i < blocks.length; i++) {
@@ -541,12 +553,7 @@ export async function downloadReportPdf(
     }
     if (!captured) throw new Error("No section could be drawn. Try Client sitting, then download again.");
 
-    const pages = pdf.getNumberOfPages();
-    for (let i = 1; i <= pages; i++) {
-      pdf.setPage(i);
-      if (i > 1) stampContinuedHeader(pdf, pageW);
-      stampFooter(pdf, pageW, pageH, i, pages);
-    }
+    stampPageNumbers(pdf);
 
     const blob = pdf.output("blob") as Blob;
     const url = savePdfBlob(blob, filename);
