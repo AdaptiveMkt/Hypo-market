@@ -186,6 +186,7 @@ export function ReportView({
   reciprocityExamples,
   veteran = false,
   protectOn = false,
+  medicaidOpen = false,
   readyCards = [],
   details = ALL_DETAILS_ON,
   onClose,
@@ -247,6 +248,7 @@ export function ReportView({
   reciprocityExamples: ReciprocityOutcome[];
   veteran?: boolean;
   protectOn?: boolean;
+  medicaidOpen?: boolean;
   readyCards?: { label: string; value: string }[];
   details?: DetailFlags;
   onClose: () => void;
@@ -371,6 +373,7 @@ export function ReportView({
     >
       <article
         id="aum-report"
+        data-medicaid-open={medicaidOpen ? "1" : "0"}
         ref={reportRef}
         tabIndex={-1}
         className="mx-auto max-w-5xl space-y-8 bg-paper px-4 py-8 text-ink outline-none sm:px-8"
@@ -1771,8 +1774,8 @@ export function ReportView({
         </section>
         ) : null}
 
-        <section className="report-block">
-          <TitleCollapse title="Medicaid Information" className="mt-0" defaultOpen={pool > NAIC_LOCKOUT_ASSETS}>
+        <section className="report-block" data-medicaid-fold data-medicaid-open={medicaidOpen ? "1" : "0"}>
+          <TitleCollapse title="Medicaid Information" className="mt-0" defaultOpen={medicaidOpen}>
             <MedicaidVaBody
               state={state}
               policy={policy}

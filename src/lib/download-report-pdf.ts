@@ -342,6 +342,14 @@ const html2opts = (scale: number, extra: Record<string, unknown> = {}) => ({
     });
     el.querySelectorAll(".accordion-panel").forEach((p) => {
       const panel = p as HTMLElement;
+      const fold = panel.closest("[data-medicaid-fold]");
+      if (fold?.getAttribute("data-medicaid-open") === "0") {
+        panel.style.maxHeight = "0px";
+        panel.style.opacity = "0";
+        panel.style.overflow = "hidden";
+        panel.style.display = "none";
+        return;
+      }
       panel.style.maxHeight = "none";
       panel.style.opacity = "1";
       panel.style.transform = "none";
@@ -361,23 +369,35 @@ function expandLive(root: HTMLElement) {
     op: p.style.opacity,
     ov: p.style.overflow,
     tf: p.style.transform,
+    display: p.style.display,
   }));
+  const keepMedicaidClosed = root.dataset.medicaidOpen !== "1";
   panels.forEach((p) => {
+    if (keepMedicaidClosed && p.closest("[data-medicaid-fold]")) {
+      p.style.maxHeight = "0px";
+      p.style.opacity = "0";
+      p.style.overflow = "hidden";
+      p.style.display = "none";
+      p.style.transform = "none";
+      return;
+    }
     p.style.maxHeight = "none";
     p.style.opacity = "1";
     p.style.overflow = "visible";
     p.style.transform = "none";
     p.style.pointerEvents = "auto";
+    p.style.display = "";
   });
   root.querySelectorAll("details").forEach((d) => {
     if (!d.classList.contains("no-print")) (d as HTMLDetailsElement).open = true;
   });
   return () => {
-    prev.forEach(({ p, maxH, op, ov, tf }) => {
+    prev.forEach(({ p, maxH, op, ov, tf, display }) => {
       p.style.maxHeight = maxH;
       p.style.opacity = op;
       p.style.overflow = ov;
       p.style.transform = tf;
+      p.style.display = display;
     });
   };
 }

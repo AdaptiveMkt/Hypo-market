@@ -1125,6 +1125,7 @@ export function Calculator() {
     reciprocity: recip,
     reciprocityExamples: recipExamples,
     veteran,
+    medicaidOpen: countableExHome < NAIC_LOCKOUT_ASSETS,
     readyCards: snapshotReadyCards(),
     details,
     onClose: () => setShowReport(false),
@@ -2475,7 +2476,7 @@ export function Calculator() {
 
           {ran ? (
             <MedicaidVaCard
-              key={`medicaid-${hypoRunId}`}
+              key={`medicaid-${hypoRunId}-${countableExHome < NAIC_LOCKOUT_ASSETS ? "open" : "shut"}`}
               state={state}
               policy={policy}
               medicaid={medicaid}
@@ -2484,7 +2485,7 @@ export function Calculator() {
               preservation={pImpact}
               issueState={effectiveIssue || state}
               preferTap={preferTap}
-              defaultOpen={pool > NAIC_LOCKOUT_ASSETS}
+              defaultOpen={countableExHome < NAIC_LOCKOUT_ASSETS}
               pdfChecked={details.medicaidLtc}
               onPdfChange={(v) => setDetail("medicaidLtc", v)}
               pdfLocked
