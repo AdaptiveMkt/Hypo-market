@@ -14,7 +14,7 @@ export function openDisclosureCard(hash = DISCLOSURE_HASH) {
 export const HOLD_HARMLESS_TITLE = "Hold harmless — not professional advice";
 
 export const HOLD_HARMLESS_SHORT =
-  "Hold harmless: Adaptive Marketing Group does not provide tax, legal, investment, insurance, financial-planning, eldercare-planning, or Medicaid advice and do not assume a fiduciary duty. CFP® professionals cannot waive their CFP Board fiduciary duty when they provide Financial Advice. Contact the appropriate licensed professional for your individual situation. Educational hypothetical only.";
+  "Hold harmless: Adaptive Marketing Group does not provide tax, legal, investment, insurance, financial-planning, eldercare-planning, or Medicaid advice and does not assume a fiduciary duty. CFP® professionals cannot waive their CFP Board fiduciary duty when they provide Financial Advice. Contact the appropriate licensed professional for your individual situation. Educational hypothetical only.";
 
 export const HOLD_HARMLESS_ACK =
   "I have read and acknowledge the Adaptive Marketing Group hold-harmless disclaimer, including that the Publishers are not my (or my client’s) fiduciary and do not provide legal advice. This PDF is educational only and is not tax, legal, investment, insurance, financial-planning, eldercare-planning, or Medicaid advice. I will contact the appropriate licensed professional for my (or my client’s) situation, including a CERTIFIED FINANCIAL PLANNER™ professional (CFP®) where financial planning is involved. I understand a CFP® professional’s fiduciary duty under CFP Board Standard A.1 cannot be waived when they provide Financial Advice.";

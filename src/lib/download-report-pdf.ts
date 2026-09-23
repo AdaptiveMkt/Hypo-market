@@ -1,12 +1,12 @@
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
-import { COPYRIGHT_LINE, TERMS_BUTTON_LABEL } from "@/lib/disclaimer";
+import { COPYRIGHT_LINE } from "@/lib/disclaimer";
 
 const MIN_MARGIN = 36;
 const MAX_MARGIN = 72;
 const BASE_MARGIN = 42;
 const GAP = 12;
-const FOOTER_H = 56;
+const FOOTER_H = 72;
 const FOOTER = COPYRIGHT_LINE;
 const UNSUPPORTED_COLOR = /(?:oklch|oklab|lab|lch|color-mix|color)\([^)]*\)/i;
 
@@ -63,16 +63,24 @@ function autoFit(opts: {
 }
 
 function stampFooter(pdf: jsPDF, pageW: number, pageH: number, page: number, pages: number) {
+  pdf.setFillColor(255, 255, 255);
+  pdf.rect(0, pageH - FOOTER_H, pageW, FOOTER_H, "F");
   pdf.setDrawColor(196, 163, 90);
   pdf.setLineWidth(0.6);
   pdf.line(BASE_MARGIN, pageH - FOOTER_H, pageW - BASE_MARGIN, pageH - FOOTER_H);
+  pdf.setFont("times", "normal");
+  pdf.setFontSize(8);
+  pdf.setTextColor(36, 48, 56);
+  const terms =
+    "Disclosure and Terms of Use: educational hypothetical only. Not a quote, illustration, or advice. Full terms are at the end of this document.";
+  const lines = pdf.splitTextToSize(terms, pageW - BASE_MARGIN * 2);
+  pdf.text(lines, BASE_MARGIN, pageH - FOOTER_H + 14);
   pdf.setFont("helvetica", "normal");
   pdf.setFontSize(8);
-  pdf.setTextColor(27, 58, 75);
-  pdf.text(FOOTER, pageW / 2, pageH - 34, { align: "center" });
-  pdf.setFontSize(8);
-  pdf.text(TERMS_BUTTON_LABEL, BASE_MARGIN, pageH - 20, { align: "left" });
-  pdf.text(`Page ${page} of ${pages}`, pageW - BASE_MARGIN, pageH - 20, { align: "right" });
+  pdf.text(FOOTER, BASE_MARGIN, pageH - 16, { align: "left" });
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(9);
+  pdf.text(`Page ${page} of ${pages}`, pageW - BASE_MARGIN, pageH - 16, { align: "right" });
 }
 
 function stampContinuedHeader(pdf: jsPDF, pageW: number) {

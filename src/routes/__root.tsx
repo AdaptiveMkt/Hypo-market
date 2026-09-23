@@ -10,6 +10,7 @@ import { VoiceControls } from "@/components/voice-controls";
 import { HypoChatbot } from "@/components/hypo-chatbot";
 import { DisclosureTermsLink } from "@/components/disclosure-link";
 import { CopyrightMark } from "@/components/source-links";
+import { HOLD_HARMLESS_ACK, HOLD_HARMLESS_SHORT } from "@/lib/disclaimer";
 import appCss from "../styles.css?url";
 
 const APP_NAME = "Long Term Care Asset Utilization Modeling";
@@ -106,6 +107,14 @@ function Root() {
               </div>
             </header>
             <Outlet />
+            <section className="site-print-terms" aria-hidden="true">
+              <h2>Disclosure and Terms of Use</h2>
+              <p>{HOLD_HARMLESS_SHORT}</p>
+              <p>{HOLD_HARMLESS_ACK}</p>
+              <p>
+                <CopyrightMark /> Educational hypothetical only. Not a quote, illustration, or advice.
+              </p>
+            </section>
             <HypoChatbot />
             <footer className="bg-masthead px-4 py-5 text-center text-sm text-masthead-fg/70">
                 <p>

@@ -2198,13 +2198,10 @@ export function ReportView({
         </section>
         ) : null}
 
-        {disclosureSelected(details) ? (
         <section id="disclosure-terms-report" className="report-block card-xl border-2 px-4 py-2 text-sm text-muted scroll-mt-8">
-          <TitleCollapse title={DISCLOSURE_CARD_TITLE} className="mt-0" defaultOpen openOnHash="disclosure-terms-report">
-            <DisclaimerCard className="mt-2" include={details} details={details} />
-          </TitleCollapse>
-          </section>
-        ) : null}
+          <h2 className="font-display text-xl text-navy">{DISCLOSURE_CARD_TITLE}</h2>
+          <DisclaimerCard className="mt-2" />
+        </section>
 
         {details.edu ? (
         <>

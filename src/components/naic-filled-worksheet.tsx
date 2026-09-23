@@ -1,6 +1,7 @@
 "use client";
 
 import { loadSuitabilityDraft, suitabilityPairs, type SuitabilityForm } from "@/lib/naic-suitability";
+import { COPYRIGHT_LINE, HOLD_HARMLESS_SHORT } from "@/lib/disclaimer";
 
 export function FilledNaicWorksheet({ form }: { form?: SuitabilityForm }) {
   const data = form ?? (typeof window === "undefined" ? null : loadSuitabilityDraft());
@@ -37,11 +38,14 @@ export function printFilledWorksheetPdf(form: SuitabilityForm) {
     .join("");
   const html = [
     "<!DOCTYPE html><html><head><meta charset=\"utf-8\"><title>NAIC LTC Personal Worksheet</title>",
-    "<style>body{font-family:Georgia,serif;color:#1a1a1a;padding:24px;max-width:800px;margin:0 auto}h1{font-size:20px;color:#1b3a4b}p{font-size:12px;color:#555}table{width:100%;border-collapse:collapse;font-size:13px}tr{border-bottom:1px solid #d8c9a6}.xclose{position:fixed;top:12px;right:12px;min-height:44px;min-width:44px;font-weight:700;border:1px solid #1b3a4b;background:#fff;border-radius:8px;cursor:pointer}@media print{.xclose{display:none}}</style></head><body>",
+    "<style>body{font-family:Georgia,serif;color:#1a1a1a;padding:24px;max-width:800px;margin:0 auto}h1{font-size:20px;color:#1b3a4b}h2{font-size:16px;color:#1b3a4b;margin-top:28px}p{font-size:12px;color:#333}table{width:100%;border-collapse:collapse;font-size:13px}tr{border-bottom:1px solid #d8c9a6;break-inside:avoid}.xclose{position:fixed;top:12px;right:12px;min-height:44px;min-width:44px;font-weight:700;border:1px solid #1b3a4b;background:#fff;border-radius:8px;cursor:pointer}@page{size:letter;margin:0.65in 0.55in 0.8in}@media print{.xclose{display:none}@page{@bottom-right{content:\"Page \" counter(page) \" of \" counter(pages);font-size:9pt;color:#1b3a4b}}}</style></head><body>",
     "<button class=\"xclose\" type=\"button\" onclick=\"window.close()\">(X) Close</button>",
     "<h1>NAIC Long-Term Care Insurance Personal Worksheet</h1>",
     "<p>Educational HTML copy of NAIC Model Regulation #641, Appendix B. Not a carrier application or a quote. The National Association of Insurance Commissioners has not endorsed this hypothetical as an official planning tool.</p>",
     `<table>${body}</table>`,
+    "<h2>Disclosure and Terms of Use</h2>",
+    `<p>${escapeHtml(HOLD_HARMLESS_SHORT)}</p>`,
+    `<p>${escapeHtml(COPYRIGHT_LINE)} Educational hypothetical only. Not a quote, illustration, or advice.</p>`,
     "</body></html>",
   ].join("");
   const w = window.open("", "_blank", "noopener,noreferrer");
