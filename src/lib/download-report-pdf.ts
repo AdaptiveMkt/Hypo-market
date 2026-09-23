@@ -275,13 +275,50 @@ function drawStrip(
   pdf.addImage(pageCanvas.toDataURL("image/jpeg", 0.92), "JPEG", x, y, w, h);
 }
 
+const PDF_LIGHT_VARS: Record<string, string> = {
+  "--color-navy": "#1b3a4b",
+  "--color-teal": "#0072b2",
+  "--color-gold": "#c4a35a",
+  "--color-cream": "#ffffff",
+  "--color-paper": "#ffffff",
+  "--color-ink": "#243038",
+  "--color-muted": "#536168",
+  "--color-line": "#8f8068",
+  "--color-good": "#005a8c",
+  "--color-warn": "#8b3a00",
+  "--color-deplete": "#9a4500",
+  "--color-bg": "#ffffff",
+  "--color-fg": "#243038",
+  "--color-surface": "#ffffff",
+  "--color-primary": "#c4a35a",
+  "--color-border": "#8f8068",
+  "--color-masthead": "#1b3a4b",
+  "--color-masthead-fg": "#f6f1e8",
+  "--color-gold-ink": "#7a5e20",
+  "--color-card": "#ffffff",
+  "--color-card-border": "#0072b2",
+  "--color-accent": "#0072b2",
+  "--color-amount": "#9a4500",
+  "--color-remain-draw": "#009e73",
+  "--color-link": "#0000ee",
+  "--color-chart-grid": "#8f8068",
+  "--color-chart-tick": "#536168",
+};
+
+function applyPdfLight(el: HTMLElement) {
+  for (const [key, value] of Object.entries(PDF_LIGHT_VARS)) el.style.setProperty(key, value);
+  el.style.colorScheme = "light";
+  el.style.backgroundColor = "#ffffff";
+  el.style.color = "#243038";
+}
+
 const MAX_CANVAS_EDGE = 8000;
 const SLICE_CSS = 2800;
 
 const html2opts = (scale: number, extra: Record<string, unknown> = {}) => ({
   scale,
   useCORS: true as const,
-  backgroundColor: "#fffdf8",
+  backgroundColor: "#ffffff",
   logging: false,
   scrollX: 0,
   scrollY: 0,
@@ -291,6 +328,10 @@ const html2opts = (scale: number, extra: Record<string, unknown> = {}) => ({
     el instanceof HTMLElement &&
     (el.classList.contains("no-print") || el.closest(".no-print") != null),
   onclone: (doc: Document, el: HTMLElement) => {
+    doc.documentElement.classList.remove("dark");
+    doc.documentElement.classList.add("pdf-capture");
+    doc.documentElement.style.colorScheme = "light";
+    applyPdfLight(el);
     flattenUnsupportedColors(doc);
     el.style.overflow = "visible";
     el.style.height = "auto";

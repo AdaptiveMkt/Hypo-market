@@ -618,6 +618,68 @@ html.pdf-capture .recharts-wrapper {
   page-break-inside: avoid;
 }
 
+/* PDF is the daylight report, even if Incognito has the screen in dark mode.
+   White paper, dark type, and the same navy / gold / teal / orange as the view
+   so a color print and a black-and-white print stay readable. */
+html.pdf-capture,
+html.dark.pdf-capture,
+html.pdf-capture.dark {
+  color-scheme: light;
+}
+
+html.pdf-capture #aum-report,
+html.dark.pdf-capture #aum-report,
+html.pdf-capture.dark #aum-report {
+  --color-navy: #1b3a4b;
+  --color-teal: #0072b2;
+  --color-gold: #c4a35a;
+  --color-cream: #ffffff;
+  --color-paper: #ffffff;
+  --color-ink: #243038;
+  --color-muted: #536168;
+  --color-line: #8f8068;
+  --color-good: #005a8c;
+  --color-warn: #8b3a00;
+  --color-deplete: #9a4500;
+  --color-bg: #ffffff;
+  --color-fg: #243038;
+  --color-surface: #ffffff;
+  --color-primary: #c4a35a;
+  --color-border: #8f8068;
+  --color-masthead: #1b3a4b;
+  --color-masthead-fg: #f6f1e8;
+  --color-gold-ink: #7a5e20;
+  --color-card: #ffffff;
+  --color-card-border: #0072b2;
+  --color-accent: #0072b2;
+  --color-amount: #9a4500;
+  --color-remain-draw: #009e73;
+  --color-link: #0000ee;
+  --color-chart-grid: #8f8068;
+  --color-chart-tick: #536168;
+  color-scheme: light;
+  background: #ffffff !important;
+  color: #243038 !important;
+}
+
+html.pdf-capture #aum-report .red-wave,
+html.pdf-capture #aum-report .red-wave > span,
+html.pdf-capture #aum-report .text-deplete,
+html.pdf-capture #aum-report .amt-red,
+html.pdf-capture #aum-report .pct-red {
+  animation: none !important;
+  transform: none !important;
+  color: #9a4500 !important;
+  -webkit-text-fill-color: #9a4500 !important;
+}
+
+html.pdf-capture #aum-report .amt-green,
+html.pdf-capture #aum-report td.amt-green,
+html.pdf-capture #aum-report .tabular-nums.font-bold.amt-green {
+  color: #009e73 !important;
+  -webkit-text-fill-color: #009e73 !important;
+}
+
 @media print {
   .cvd-surface {
     filter: none !important;
