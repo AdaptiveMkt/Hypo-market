@@ -270,7 +270,6 @@ export function Calculator() {
   const [excludeHome, setExcludeHome] = useState(true);
   const [ran, setRan] = useState(false);
   const [poolShown, setPoolShown] = useState(false);
-  const [dockOpen, setDockOpen] = useState(true);
   const [hypoRunId, setHypoRunId] = useState(0);
   const [client, setClient] = useState<ContactParty>({ ...EMPTY_CONTACT });
   const [advisor, setAdvisor] = useState<AdvisorParty>({ ...EMPTY_ADVISOR });
@@ -982,14 +981,6 @@ export function Calculator() {
     !section2Confirmed ? "Confirm Section 2 selection" : "",
     !insuranceLocked && !section3Confirmed ? "Confirm Section 3 selection" : "",
   ].filter(Boolean);
-  const dockNeed = [
-    "Countable assets",
-    "State of Care",
-    "Care Setting",
-    "State where policy is issued",
-    "Age today",
-    "Years of care",
-  ];
 
   function executeHypo() {
     const locked = insuranceLockedOut(pool);
@@ -2536,75 +2527,6 @@ export function Calculator() {
       </div>
       <p className="mt-3 text-center text-xs text-muted"><CopyrightMark /></p>
       {saveMsg ? <p className="mt-2 text-center text-sm text-good">{saveMsg}</p> : null}
-
-      <div className="mobile-dock lg:hidden">
-        {dockOpen ? (
-          <div className="mobile-dock-card">
-            <button
-              type="button"
-              className="mobile-dock-close"
-              onClick={() => setDockOpen(false)}
-              aria-label="Close"
-            >
-              <span aria-hidden>X</span> Close
-            </button>
-            {ran ? (
-              <div className="mobile-dock-row">
-                <button type="button" className="btn-block min-w-0 rounded-lg bg-gold text-sm text-masthead" onClick={viewAllReport}>View all</button>
-                <button type="button" className="btn-block min-w-0 rounded-lg border border-navy bg-navy text-sm text-cream" onClick={requestPdfDownload}>PDF</button>
-                <button type="button" className="btn-block min-w-0 rounded-lg border border-navy text-sm text-navy" onClick={() => scrollToId(insuranceLocked ? "medicaid-va-card" : "results")}>View results</button>
-                <button type="button" className="btn-block min-w-0 rounded-lg border border-navy text-sm text-navy" onClick={() => runHypo()}>Run again</button>
-              </div>
-            ) : (
-              <>
-                <p className="mb-2 max-w-full text-center text-xs font-semibold leading-snug text-deplete">
-                  Need:
-                  {dockNeed.map((item) => (
-                    <span key={item} className="mt-0.5 block font-normal text-navy">• {item}</span>
-                  ))}
-                </p>
-                {missingRun.length ? null : (
-                  <p className="mb-2 text-center text-xs text-muted">Ready to run this hypothetical.</p>
-                )}
-                <div className="grid grid-cols-1 gap-2">
-                  <button type="button" className="btn-block min-w-0 rounded-lg border border-navy text-sm text-navy" onClick={() => window.dispatchEvent(new Event("aum:open-chat"))}>Ask</button>
-                  {(
-                    [
-                      ["traditional", "Run Traditional"],
-                      ["assetBased", "Run Asset Based"],
-                      ["ltcAnnuity", "Run Annuity Care"],
-                      ["hybridLife", "Run Hybrid"],
-                    ] as const
-                  ).map(([kind, label]) => (
-                    <button
-                      key={kind}
-                      type="button"
-                      className="btn-block min-w-0 rounded-lg px-3 py-2 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50"
-                      style={{ background: KIND_TAB[kind].accent, color: kind === "assetBased" || kind === "hybridLife" ? "#1b3a4b" : "#fff" }}
-                      onClick={() => runHypo(kind)}
-                      disabled={missingRun.length > 0}
-                    >
-                      {label}
-                    </button>
-                  ))}
-                  <button
-                    type="button"
-                    className="btn-block btn-attention-red min-w-0 rounded-lg text-sm hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
-                    onClick={() => runHypo()}
-                    disabled={missingRun.length > 0}
-                  >
-                    Run All Selected
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
-        ) : (
-          <button type="button" className="mobile-dock-reopen" onClick={() => setDockOpen(true)}>
-            Open run card
-          </button>
-        )}
-      </div>
 
       {showReport ? createPortal(<ReportView {...reportProps} />, document.body) : null}
       {pdfPick ? createPortal(

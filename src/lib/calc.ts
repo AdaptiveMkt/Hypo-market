@@ -43,7 +43,7 @@ export const DEFAULT_ASSETS: Assets = {
   funds: 1000,
   ira: 1000,
   roth: 1000,
-  home: 1000,
+  home: 225000,
   invre: 1000,
   metals: 1000,
   annuity: 1000,
