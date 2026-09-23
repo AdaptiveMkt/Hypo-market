@@ -21,11 +21,10 @@ function CopyrightTerms() {
           Copyright and terms of use
         </h2>
         <p className="text-sm text-muted">
-          Long Term Care Asset Utilization Modeling · <AmgName /> & Funding
-          LTC Marketplace
+          Long Term Care Asset Utilization Modeling · <AmgName />
         </p>
         <p className="mt-4 text-pretty">
-          © {YEAR} <AmgName /> & Funding LTC Marketplace. All rights
+          © {YEAR} <AmgName />. All rights
           reserved.
         </p>
         <p className="mt-3 text-pretty">
@@ -83,7 +82,7 @@ function CopyrightTerms() {
           </li>
         </ul>
         <p className="mt-3 text-pretty">
-          Permission for any other use requires written consent from <AmgName /> | Funding LTC Marketplace.
+          Permission for any other use requires written consent from <AmgName />.
         </p>
       </section>
 
@@ -116,7 +115,7 @@ function CopyrightTerms() {
           Liability disclosures and hold harmless
         </h2>
         <p className="text-pretty text-muted">
-          <LinkedCopy text="The following is part of these terms of use. It is intended to make clear who this model is for, what it is not, and that Adaptive Marketing Group and Funding LTC Marketplace do not assume professional or fiduciary liability for decisions made with it. It does not replace advice from a licensed professional, and it cannot waive a CFP® professional’s fiduciary duty when they provide Financial Advice." />
+          <LinkedCopy text="The following is part of these terms of use. It is intended to make clear who this model is for, what it is not, and that Adaptive Marketing Group does not assume professional or fiduciary liability for decisions made with it. It does not replace advice from a licensed professional, and it cannot waive a CFP® professional’s fiduciary duty when they provide Financial Advice." />
         </p>
         <DisclaimerCard className="mt-4" />
         {TERMS_LIABILITY_SECTIONS.map((p) => (
@@ -130,7 +129,7 @@ function CopyrightTerms() {
 
       <section className="card-xl p-5">
         <p className="text-pretty">
-          <AmgName /> & Funding LTC Marketplace
+          <AmgName />
         </p>
         <p className="mt-6">
           <Link to="/" className="font-semibold text-teal underline underline-offset-2">

@@ -214,7 +214,7 @@ export const sendTestPdfAttachment = createServerFn({ method: "POST" })
       const emailed = await sendMail({
         to: [data.to],
         reply_to: EMAIL_INBOX,
-        subject: "Test PDF attachment — Funding LTC Marketplace",
+        subject: "Test PDF attachment — Adaptive Marketing Group",
         html,
         text: `Test PDF attachment from ${EMAIL_INBOX} to ${data.to}. Open the attached PDF to confirm application/pdf attachments.`,
         attachments: [resendPdfAttachment("test-ltc-attachment.pdf", TEST_PDF_BASE64)],

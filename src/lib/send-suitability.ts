@@ -34,7 +34,7 @@ export const submitSuitability = createServerFn({ method: "POST" })
     const body = suitabilityAsText(data);
     const key = env("RESEND_API_KEY");
     const from =
-      env("RESEND_FROM") ?? "Funding LTC Marketplace <kim@adaptivesolutionsonline.com>";
+      env("RESEND_FROM") ?? "Adaptive Marketing Group <kim@adaptivesolutionsonline.com>";
 
     async function send(to: string[], subject: string, html: string, text: string, replyTo?: string) {
       if (!key) return false;
@@ -59,7 +59,7 @@ export const submitSuitability = createServerFn({ method: "POST" })
       .join("");
 
     const userHtml = `<p>Hello ${escapeHtml(data.applicantName)},</p>
-<p>We received your educational NAIC Long-Term Care Insurance Personal Worksheet. This is not a policy application and is not a carrier filing. A copy is sent only to you (the end user). Adaptive Marketing Group and Funding LTC Marketplace do not receive a copy.</p>
+<p>We received your educational NAIC Long-Term Care Insurance Personal Worksheet. This is not a policy application and is not a carrier filing. A copy is sent only to you (the end user). Adaptive Marketing Group does not receive a copy.</p>
 <ul>${htmlBody}</ul>
 <p>${escapeHtml(HOLD_HARMLESS_SHORT)}</p>
 <p>${escapeHtml(COPYRIGHT_LINE)}</p>`;
@@ -69,7 +69,7 @@ export const submitSuitability = createServerFn({ method: "POST" })
         [data.applicantEmail],
         "Your NAIC Long-Term Care Insurance Personal Worksheet",
         userHtml,
-        `Hello ${data.applicantName},\n\nWe received your educational NAIC Long-Term Care Insurance Personal Worksheet.\n\n${body}\n\nA copy is sent only to you. Adaptive Marketing Group and Funding LTC Marketplace do not receive a copy.\n\n${HOLD_HARMLESS_SHORT}\n\n${COPYRIGHT_LINE}`,
+        `Hello ${data.applicantName},\n\nWe received your educational NAIC Long-Term Care Insurance Personal Worksheet.\n\n${body}\n\nA copy is sent only to you. Adaptive Marketing Group does not receive a copy.\n\n${HOLD_HARMLESS_SHORT}\n\n${COPYRIGHT_LINE}`,
         data.applicantEmail,
       );
       return { ok: true, emailed: userSent };

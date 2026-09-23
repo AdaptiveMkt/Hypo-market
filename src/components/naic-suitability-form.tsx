@@ -59,7 +59,7 @@ export function NaicSuitabilityForm({ onClose }: { onClose?: () => void } = {}) 
       const res = await submitSuitability({ data: form });
       setStatus(
         res.emailed
-          ? "Worksheet submitted. A copy was emailed to you and to Funding LTC Marketplace."
+          ? "Worksheet submitted. A copy was emailed to you."
           : "Worksheet recorded. Email could not be sent from this environment — download or print a copy for your file.",
       );
     } catch (err) {
@@ -401,7 +401,7 @@ export function NaicSuitabilityForm({ onClose }: { onClose?: () => void } = {}) 
       </div>
       {status ? <p className="text-sm text-navy">{status}</p> : null}
       <p className="text-xs">
-        Submission emails Funding LTC Marketplace and the address you entered. This is not
+        Submission emails the address you entered. This is not
         an insurance application. A licensed producer and the issuing company apply their
         own filed suitability standards.
       </p>

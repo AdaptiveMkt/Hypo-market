@@ -286,7 +286,7 @@ export const HYPO_SOURCES: { topic: string; label: string; href: string; note: s
   },
   {
     topic: "State spend-down and Partnership notes",
-    label: "Funding LTC Marketplace — case studies",
+    label: "Long-term care case studies",
     href: "https://fundingltcmarketplace.com/case-studies.html",
     note: "Educational state notes linked from this model (including spend-down). Not a determination of eligibility.",
   },

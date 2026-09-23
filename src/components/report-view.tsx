@@ -380,7 +380,7 @@ export function ReportView({
       >
         <header className="report-block border-b-2 border-gold pb-4">
           <p className="text-xs uppercase tracking-[0.14em] text-gold-ink">
-            Funding LTC Marketplace
+            Adaptive Marketing Group
           </p>
           <h1 id="report-title" className="mt-1 font-display text-3xl text-navy">
             Long Term Care Asset Utilization Modeling

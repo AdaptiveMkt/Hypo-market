@@ -1,5 +1,5 @@
 export const COPYRIGHT_LINE =
-  "© 2026 Adaptive Marketing Group & Funding LTC Marketplace. All rights reserved.";
+  "© 2026 Adaptive Marketing Group. All rights reserved.";
 
 export const TERMS_BUTTON_LABEL = "Disclosure and Terms of Use";
 
@@ -14,15 +14,15 @@ export function openDisclosureCard(hash = DISCLOSURE_HASH) {
 export const HOLD_HARMLESS_TITLE = "Hold harmless — not professional advice";
 
 export const HOLD_HARMLESS_SHORT =
-  "Hold harmless: Adaptive Marketing Group & Funding LTC Marketplace do not provide tax, legal, investment, insurance, financial-planning, eldercare-planning, or Medicaid advice and do not assume a fiduciary duty. CFP® professionals cannot waive their CFP Board fiduciary duty when they provide Financial Advice. Contact the appropriate licensed professional for your individual situation. Educational hypothetical only.";
+  "Hold harmless: Adaptive Marketing Group does not provide tax, legal, investment, insurance, financial-planning, eldercare-planning, or Medicaid advice and do not assume a fiduciary duty. CFP® professionals cannot waive their CFP Board fiduciary duty when they provide Financial Advice. Contact the appropriate licensed professional for your individual situation. Educational hypothetical only.";
 
 export const HOLD_HARMLESS_ACK =
-  "I have read and acknowledge the Adaptive Marketing Group & Funding LTC Marketplace hold-harmless disclaimer, including that the Publishers are not my (or my client’s) fiduciary and do not provide legal advice. This PDF is educational only and is not tax, legal, investment, insurance, financial-planning, eldercare-planning, or Medicaid advice. I will contact the appropriate licensed professional for my (or my client’s) situation, including a CERTIFIED FINANCIAL PLANNER™ professional (CFP®) where financial planning is involved. I understand a CFP® professional’s fiduciary duty under CFP Board Standard A.1 cannot be waived when they provide Financial Advice.";
+  "I have read and acknowledge the Adaptive Marketing Group hold-harmless disclaimer, including that the Publishers are not my (or my client’s) fiduciary and do not provide legal advice. This PDF is educational only and is not tax, legal, investment, insurance, financial-planning, eldercare-planning, or Medicaid advice. I will contact the appropriate licensed professional for my (or my client’s) situation, including a CERTIFIED FINANCIAL PLANNER™ professional (CFP®) where financial planning is involved. I understand a CFP® professional’s fiduciary duty under CFP Board Standard A.1 cannot be waived when they provide Financial Advice.";
 
 export const HOLD_HARMLESS_PARAS = [
   {
     heading: "Who publishes this model",
-    body: "Adaptive Marketing Group and Funding LTC Marketplace (together, the “Publishers”) provide this Long Term Care Asset Utilization Modeling tool, the on-screen hypothetical, the View report, and any PDF solely as an educational illustration. By using the model or requesting a report, you agree to the following hold-harmless terms.",
+    body: "Adaptive Marketing Group (the “Publishers”) provide this Long Term Care Asset Utilization Modeling tool, the on-screen hypothetical, the View report, and any PDF solely as an educational illustration. By using the model or requesting a report, you agree to the following hold-harmless terms.",
   },
   {
     heading: "Accessibility",
@@ -42,15 +42,15 @@ export const HOLD_HARMLESS_PARAS = [
   },
   {
     heading: "Hold harmless",
-    body: "You agree to hold Adaptive Marketing Group, Funding LTC Marketplace, and their owners, officers, employees, contractors, and licensors harmless from any claim, loss, cost, or decision made in reliance on this hypothetical or any report generated from it. The Publishers have no duty to update figures after you leave the page. You — not the Publishers — are responsible for decisions about care, assets, insurance, investments, taxes, and public benefits.",
+    body: "You agree to hold Adaptive Marketing Group and its owners, officers, employees, contractors, and licensors harmless from any claim, loss, cost, or decision made in reliance on this hypothetical or any report generated from it. The Publishers have no duty to update figures after you leave the page. You — not the Publishers — are responsible for decisions about care, assets, insurance, investments, taxes, and public benefits.",
   },
   {
     heading: "No fiduciary relationship — waiver as to the Publishers",
-    body: "Use of this model, the View report, or a PDF does not create a client, advisory, or fiduciary relationship with Adaptive Marketing Group or Funding LTC Marketplace. You expressly waive any claim that the Publishers are your (or your client’s) fiduciary, investment adviser, attorney, CPA, insurance agent, or elder-care planner. The Publishers do not supervise any professional who uses this tool with a client.",
+    body: "Use of this model, the View report, or a PDF does not create a client, advisory, or fiduciary relationship with Adaptive Marketing Group. You expressly waive any claim that the Publishers are your (or your client’s) fiduciary, investment adviser, attorney, CPA, insurance agent, or elder-care planner. The Publishers do not supervise any professional who uses this tool with a client.",
   },
   {
     heading: "Not legal advice",
-    body: "Nothing on this site, in a View report, or in a PDF is legal advice. No attorney-client relationship is formed with Adaptive Marketing Group, Funding LTC Marketplace, or anyone solely because you used this model. Medicaid, Partnership, spend-down, QIT, MAPT, homestead, VA, SSI, estate-recovery, and tax-qualified LTC rules are summaries of publicly described programs; they are not an opinion of counsel and are not a substitute for advice from a lawyer licensed in the state whose law applies. Only that lawyer can apply the law to your facts. Do not gift, retitle, spend down, or file a claim based only on this hypothetical. This model does not assume Medicaid will still be solvent, or that any Medicaid benefit will remain the same — solvency and benefits may be adjusted by legislation, regulation, or other government action.",
+    body: "Nothing on this site, in a View report, or in a PDF is legal advice. No attorney-client relationship is formed with Adaptive Marketing Group or anyone solely because you used this model. Medicaid, Partnership, spend-down, QIT, MAPT, homestead, VA, SSI, estate-recovery, and tax-qualified LTC rules are summaries of publicly described programs; they are not an opinion of counsel and are not a substitute for advice from a lawyer licensed in the state whose law applies. Only that lawyer can apply the law to your facts. Do not gift, retitle, spend down, or file a claim based only on this hypothetical. This model does not assume Medicaid will still be solvent, or that any Medicaid benefit will remain the same — solvency and benefits may be adjusted by legislation, regulation, or other government action.",
   },
   {
     heading: "Contact the appropriate professional",
@@ -58,7 +58,7 @@ export const HOLD_HARMLESS_PARAS = [
   },
   {
     heading: "Investment adviser registration",
-    body: "Giving investment advice for compensation generally requires the firm to be a registered investment adviser (RIA) with the U.S. Securities and Exchange Commission or a state securities regulator, and the individual to be an investment adviser representative (IAR), unless an exemption applies. Registration is disclosed on Form ADV and can be checked on the SEC Investment Adviser Public Disclosure (IAPD) site. Brokers and registered representatives are checked on FINRA BrokerCheck. A CFP®, ChFC®, CLU®, RICP®, CLTC, or LTCP designation does not, by itself, register anyone as an investment adviser. Adaptive Marketing Group and Funding LTC Marketplace are not your RIA, IAR, or broker-dealer. Confirm current registration before relying on investment advice.",
+    body: "Giving investment advice for compensation generally requires the firm to be a registered investment adviser (RIA) with the U.S. Securities and Exchange Commission or a state securities regulator, and the individual to be an investment adviser representative (IAR), unless an exemption applies. Registration is disclosed on Form ADV and can be checked on the SEC Investment Adviser Public Disclosure (IAPD) site. Brokers and registered representatives are checked on FINRA BrokerCheck. A CFP®, ChFC®, CLU®, RICP®, CLTC, or LTCP designation does not, by itself, register anyone as an investment adviser. Adaptive Marketing Group is not your RIA, IAR, or broker-dealer. Confirm current registration before relying on investment advice.",
   },
   {
     heading: "CFP® Board Standards — fiduciary duty cannot be waived",
@@ -69,16 +69,16 @@ export const HOLD_HARMLESS_PARAS = [
 export const PRIVACY_POLICY_TITLE = "Privacy policy";
 
 export const PRIVACY_POLICY_INTRO =
-  "This privacy policy describes how Adaptive Marketing Group and Funding LTC Marketplace (the “Publishers”) handle information in connection with this Long Term Care Asset Utilization Modeling site. It is part of the terms of use. Effective September 2026.";
+  "This privacy policy describes how Adaptive Marketing Group (the “Publishers”) handle information in connection with this Long Term Care Asset Utilization Modeling site. It is part of the terms of use. Effective September 2026.";
 
 export const PRIVACY_POLICY_PARAS = [
   {
     heading: "Who we are",
-    body: "Adaptive Marketing Group and Funding LTC Marketplace operate this educational hypothetical. Policy questions: kim@adaptivesolutionsonline.com. Advisor PDF copies and contact-request forms are sent from or to info@fundingltcmarketplace.com. This is not a Notice of Privacy Practices under HIPAA. This site is an educational calculator, not a medical record, health plan, or health-care provider portal.",
+    body: "Adaptive Marketing Group operates this educational hypothetical. Policy questions: kim@adaptivesolutionsonline.com. Advisor PDF copies and contact-request forms are sent from or to info@fundingltcmarketplace.com. This is not a Notice of Privacy Practices under HIPAA. This site is an educational calculator, not a medical record, health plan, or health-care provider portal.",
   },
   {
     heading: "If no client information is submitted, none is retained",
-    body: "If you do not submit client information (no client name, email, or other client contact on the run, and no PDF or form send), no client information is collected or retained by Adaptive Marketing Group or Funding LTC Marketplace. Scenario numbers that stay in your browser or in localStorage on your device are yours. Reset or clearing site data removes that local copy.",
+    body: "If you do not submit client information (no client name, email, or other client contact on the run, and no PDF or form send), no client information is collected or retained by Adaptive Marketing Group. Scenario numbers that stay in your browser or in localStorage on your device are yours. Reset or clearing site data removes that local copy.",
   },
   {
     heading: "PDF download",
@@ -86,7 +86,7 @@ export const PRIVACY_POLICY_PARAS = [
   },
   {
     heading: "Who receives a copy of a generated report",
-    body: "The end user always downloads the PDF on their device. When both the advisor’s email and the end user’s (client) information are entered, the advisor also receives the PDF as an email attachment from info@fundingltcmarketplace.com. Adaptive Marketing Group and Funding LTC Marketplace do not keep a publisher-side archive of the PDF. If no advisor email is entered, no advisor copy is sent.",
+    body: "The end user always downloads the PDF on their device. When both the advisor’s email and the end user’s (client) information are entered, the advisor also receives the PDF as an email attachment from info@fundingltcmarketplace.com. Adaptive Marketing Group does not keep a publisher-side archive of the PDF. If no advisor email is entered, no advisor copy is sent.",
   },
   {
     heading: "What is sent when you request a PDF or submit a form",
@@ -146,7 +146,7 @@ export const TERMS_LIABILITY_SECTIONS = [
   },
   {
     heading: "No professional relationship",
-    body: "Use of this site does not create an attorney-client, accountant-client, insurance-agent, investment-adviser, broker-dealer, or fiduciary relationship with Adaptive Marketing Group or Funding LTC Marketplace. The Publishers are not appointed as your insurance producer unless you have a separate written appointment or client agreement with a licensed person — this website is not that agreement. No one is obligated to sell, underwrite, or issue a policy because you ran a scenario.",
+    body: "Use of this site does not create an attorney-client, accountant-client, insurance-agent, investment-adviser, broker-dealer, or fiduciary relationship with Adaptive Marketing Group. The Publishers are not appointed as your insurance producer unless you have a separate written appointment or client agreement with a licensed person — this website is not that agreement. No one is obligated to sell, underwrite, or issue a policy because you ran a scenario.",
   },
   {
     heading: "Not an insurance illustration, quote, or solicitation",
@@ -174,11 +174,11 @@ export const TERMS_LIABILITY_SECTIONS = [
   },
   {
     heading: "Limitation of liability",
-    body: "To the maximum extent permitted by law, Adaptive Marketing Group, Funding LTC Marketplace, and their owners, officers, employees, contractors, and licensors are not liable for any indirect, incidental, special, consequential, exemplary, or punitive damages, or for lost profits, lost data, lost eligibility, increased premiums, denied claims, or spend-down decisions, arising out of or related to the use of this model or any report, even if advised of the possibility. Direct damages, if any are allowed, are limited to the amount you paid the Publishers to use this website (often zero). Some jurisdictions do not allow certain limitations; those that cannot be limited by law remain.",
+    body: "To the maximum extent permitted by law, Adaptive Marketing Group and its owners, officers, employees, contractors, and licensors are not liable for any indirect, incidental, special, consequential, exemplary, or punitive damages, or for lost profits, lost data, lost eligibility, increased premiums, denied claims, or spend-down decisions, arising out of or related to the use of this model or any report, even if advised of the possibility. Direct damages, if any are allowed, are limited to the amount you paid the Publishers to use this website (often zero). Some jurisdictions do not allow certain limitations; those that cannot be limited by law remain.",
   },
   {
     heading: "Indemnification",
-    body: "You agree to indemnify and hold harmless Adaptive Marketing Group, Funding LTC Marketplace, and their owners, officers, employees, contractors, and licensors from claims, losses, costs, and reasonable attorneys’ fees arising from your use of the model, your sharing of a report, your removal or alteration of disclaimers, or your presentation of outputs as advice, a quote, an illustration, or an eligibility determination.",
+    body: "You agree to indemnify and hold harmless Adaptive Marketing Group and its owners, officers, employees, contractors, and licensors from claims, losses, costs, and reasonable attorneys’ fees arising from your use of the model, your sharing of a report, your removal or alteration of disclaimers, or your presentation of outputs as advice, a quote, an illustration, or an eligibility determination.",
   },
   {
     heading: "Governing law",

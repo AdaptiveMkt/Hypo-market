@@ -11,7 +11,7 @@ export type SmtpPublicStatus = {
 
 /** Step 1 — email attachment settings for the advisor PDF copy. */
 
-export const EMAIL_FROM_NAME = "Funding LTC Marketplace";
+export const EMAIL_FROM_NAME = "Adaptive Marketing Group";
 export const EMAIL_FROM_ADDRESS = "info@fundingltcmarketplace.com";
 export const EMAIL_FROM = `${EMAIL_FROM_NAME} <${EMAIL_FROM_ADDRESS}>`;
 export const EMAIL_INBOX = EMAIL_FROM_ADDRESS;

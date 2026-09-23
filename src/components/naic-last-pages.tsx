@@ -37,7 +37,7 @@ export function NaicLastPages() {
         <p className="mt-2">
           These NAIC publications are part of the source information for this hypothetical.
           They are consumer and producer education — not a quote, not an application, and
-          not <AmgName /> or Funding LTC Marketplace advice.
+          not <AmgName /> advice.
         </p>
         <ul className="mt-3 list-disc space-y-2 pl-5">
           <li>

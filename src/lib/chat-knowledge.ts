@@ -30,7 +30,7 @@ const CORE: KnowledgeChunk[] = [
   },
   {
     id: "disclaimer",
-    label: "Hold harmless — Adaptive Marketing Group & Funding LTC Marketplace",
+    label: "Hold harmless — Adaptive Marketing Group",
     aaltci: false,
     text: HOLD_HARMLESS_SHORT,
   },

@@ -111,7 +111,7 @@ export const DETAIL_HINTS: Record<DetailId, string> = {
   dhLiability: "Limitation of liability, indemnification, governing law, and related terms.",
   dhAssumptions: "Assumptions and CareScout / Genworth cost-data notes.",
   dhSources: "Sources used in this hypothetical.",
-  dhPublish: "Who Adaptive Marketing Group and Funding LTC Marketplace are.",
+  dhPublish: "Who Adaptive Marketing Group is.",
   dhAccess: "WCAG 2.2 AA notes and that the PDF is a print picture.",
   dhNotAdvice: "Not tax, legal, investment, insurance, or Medicaid advice.",
   dhHoldHarmless: "You hold the Publishers harmless for reliance on this hypothetical.",

@@ -206,8 +206,7 @@ export function DisclaimerCard({
           ))}
         </ul>
         <p className="mt-2 text-sm text-muted">
-          Permission for any other use requires written consent from <AmgName /> | Funding
-          LTC Marketplace.
+          Permission for any other use requires written consent from <AmgName />.
         </p>
       </TitleCollapse>
       ) : null}

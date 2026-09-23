@@ -87,7 +87,7 @@ export function CopyrightMark({
 }) {
   return (
     <>
-      © 2026 <AmgName className={linkClass} /> & Funding LTC Marketplace. All rights
+      © 2026 <AmgName className={linkClass} /> & Adaptive Marketing Group. All rights
       reserved.
     </>
   );
