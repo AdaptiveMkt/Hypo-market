@@ -384,14 +384,18 @@ export function ReportView({
         <section className="report-block" data-pdf-break-after="1">
           <div className="overflow-hidden rounded-xl border border-line bg-paper">
             <img
-              src="/cover/logo.jpg"
+              src="/cover/logo.jpg?v=2"
               alt="Preserve Your Assets — Long-Term Care Hypothetical"
-              className="mx-auto h-32 w-full max-w-xl object-contain"
+              width={1529}
+              height={423}
+              className="mx-auto block h-auto w-full max-w-lg"
             />
             <img
-              src="/cover/photo.jpg"
-              alt="A couple at the kitchen table reviewing a long-term care plan"
-              className="h-64 w-full object-cover object-center"
+              src="/cover/photo.jpg?v=2"
+              alt="A couple in their mid-50s reviewing a plan together"
+              width={1792}
+              height={1008}
+              className="block h-auto w-full"
             />
             <div className="px-4 py-4 text-center">
               <p className="text-xs uppercase tracking-[0.16em] text-gold-ink">Educational hypothetical</p>
@@ -403,9 +407,11 @@ export function ReportView({
                 · {duration} years modeled · {new Date().toLocaleDateString("en-US")}
               </p>
               <img
-                src="/cover/graphic.jpg"
+                src="/cover/graphic.jpg?v=2"
                 alt="A home, protected assets, and community care, connected"
-                className="mx-auto mt-3 h-32 w-full max-w-lg object-contain"
+                width={1469}
+                height={401}
+                className="mx-auto mt-3 block h-auto w-full max-w-xl"
               />
             </div>
           </div>
