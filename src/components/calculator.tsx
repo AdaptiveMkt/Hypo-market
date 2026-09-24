@@ -1026,6 +1026,12 @@ export function Calculator() {
     setDetails(locked ? lockoutDetails() : withScenarioDetails({ ...CLIENT_SITTING }, false));
     setRan(true);
     setYearPage(0);
+    setPdfError("");
+    setPdfPick(false);
+    setAttachAdvisor(advisorReceivesPdf(advisor, client));
+    setShowReport(true);
+    setPrintAfterOpen(true);
+    setSaveMsg("Preparing PDF…");
     if (locked) {
       window.setTimeout(() => scrollToId("medicaid-va-card"), 80);
     } else {
