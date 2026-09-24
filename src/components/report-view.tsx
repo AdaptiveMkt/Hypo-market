@@ -824,7 +824,7 @@ export function ReportView({
           <h2 className="mb-3 font-display text-xl text-navy">
             {policy.enabled ? "4. How the pool and policy are used" : "4. How the pool is used"}
           </h2>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="pdf-kpi-grid grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <Kpi label="Countable assets today" value={money(pool)} />
             {policy.enabled ? (
               <Kpi
@@ -2356,9 +2356,9 @@ function Qa({ q, a }: { q: ReactNode; a: ReactNode }) {
 
 function Kpi({ label, value }: { label: string; value: string }) {
   return (
-    <div className="card px-3 py-3">
+    <div className="card pdf-kpi px-3 py-3">
       <p className="text-xs uppercase tracking-wide text-muted">{label}</p>
-      <p className="font-display text-lg tabular-nums text-navy">{value}</p>
+      <p className="kpi-value font-display text-lg tabular-nums text-navy">{value}</p>
     </div>
   );
 }

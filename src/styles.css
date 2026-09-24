@@ -579,9 +579,27 @@ html.dark {
   }
 }
 
-html.pdf-capture .card,
-html.pdf-capture .card-xl {
+html.pdf-capture .pdf-kpi-grid {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: stretch !important;
+  gap: 12px !important;
+}
+
+html.pdf-capture .pdf-kpi-grid > .pdf-kpi {
+  width: calc(50% - 6px) !important;
   overflow: visible !important;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+html.pdf-capture .kpi-value {
+  display: block !important;
+  color: #9a4500 !important;
+  -webkit-text-fill-color: #9a4500 !important;
+  font-family: Georgia, "Times New Roman", serif !important;
+  font-size: 18px !important;
+  line-height: 1.35 !important;
 }
 
 html.pdf-capture #aum-report .font-display.tabular-nums,

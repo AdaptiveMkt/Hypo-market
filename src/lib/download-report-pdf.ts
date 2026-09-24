@@ -194,20 +194,32 @@ function findBreakY(canvas: HTMLCanvasElement, startY: number, maxY: number) {
   return -1;
 }
 
-function elementBreaks(el: HTMLElement, canvas: HTMLCanvasElement, cssTop: number) {
-  const scale = canvas.height / Math.max(1, el.scrollHeight || el.offsetHeight);
+function cardSpans(el: HTMLElement, scale: number, cssTop: number) {
   const rootTop = el.getBoundingClientRect().top;
-  const points = [0, canvas.height];
-  el.querySelectorAll<HTMLElement>(".card, tr, h2, h3, thead, img").forEach((node) => {
+  const spans: Array<[number, number]> = [];
+  el.querySelectorAll<HTMLElement>(".card").forEach((node) => {
+    if (node.offsetHeight < 4) return;
     const r = node.getBoundingClientRect();
     const top = Math.round((r.top - rootTop - cssTop) * scale);
     const bottom = Math.round((r.bottom - rootTop - cssTop) * scale);
-    if (bottom > 8 && top < canvas.height - 8) {
-      if (top > 8) points.push(top);
-      if (bottom < canvas.height - 8) points.push(bottom);
-    }
+    if (bottom > top + 4) spans.push([top, bottom]);
   });
-  return points.sort((a, b) => a - b);
+  return spans;
+}
+
+/** If a cut would land inside a card, move it to the top of that card. -1 means start a new page. */
+function snapSlice(
+  cursor: number,
+  target: number,
+  spans: Array<[number, number]>,
+  canvasH: number,
+) {
+  const end = Math.min(target, canvasH);
+  const hit = spans.find(([top, bottom]) => end > top + 2 && end < bottom - 2);
+  if (!hit) return end;
+  const [top] = hit;
+  if (top > cursor + 24) return top;
+  return -1;
 }
 
 function savePdfFile(pdf: jsPDF, filename: string) {
@@ -378,6 +390,17 @@ const html2opts = (scale: number, extra: Record<string, unknown> = {}) => ({
     doc.documentElement.style.colorScheme = "light";
     applyPdfLight(el);
     flattenUnsupportedColors(doc);
+    el.querySelectorAll<HTMLElement>(".kpi-value").forEach((node) => {
+      node.style.color = "#9a4500";
+      node.style.webkitTextFillColor = "#9a4500";
+      node.style.fontFamily = "Georgia, 'Times New Roman', serif";
+      node.style.fontSize = "18px";
+      node.style.lineHeight = "1.35";
+      node.style.display = "block";
+    });
+    el.querySelectorAll<HTMLElement>(".pdf-kpi, .card").forEach((node) => {
+      node.style.overflow = "visible";
+    });
     el.style.overflow = "visible";
     el.style.height = "auto";
     el.style.maxHeight = "none";
@@ -447,14 +470,14 @@ function expandLive(root: HTMLElement) {
   };
 }
 
-async function captureBlock(el: HTMLElement): Promise<{ canvas: HTMLCanvasElement; cssTop: number }[]> {
+async function captureBlock(el: HTMLElement): Promise<{ canvas: HTMLCanvasElement; cssTop: number; scale: number }[]> {
   const cssH = Math.max(el.scrollHeight, el.offsetHeight, 1);
   const cssW = Math.max(el.scrollWidth, el.offsetWidth, 320);
-  const out: { canvas: HTMLCanvasElement; cssTop: number }[] = [];
+  const out: { canvas: HTMLCanvasElement; cssTop: number; scale: number }[] = [];
   const grab = async (y: number, h: number) => {
     const scale = Math.min(1.25, MAX_CANVAS_EDGE / Math.max(h, 1), MAX_CANVAS_EDGE / cssW);
     try {
-      return await html2canvas(
+      const canvas = await html2canvas(
         el,
         html2opts(scale, {
           x: 0,
@@ -465,10 +488,12 @@ async function captureBlock(el: HTMLElement): Promise<{ canvas: HTMLCanvasElemen
           windowHeight: Math.max(h, 900),
         }),
       );
+      return { canvas, scale };
     } catch {
-      return await html2canvas(
+      const fallback = Math.min(0.75, scale);
+      const canvas = await html2canvas(
         el,
-        html2opts(Math.min(0.75, scale), {
+        html2opts(fallback, {
           x: 0,
           y,
           width: cssW,
@@ -477,16 +502,19 @@ async function captureBlock(el: HTMLElement): Promise<{ canvas: HTMLCanvasElemen
           windowHeight: Math.max(Math.min(h, 1600), 900),
         }),
       );
+      return { canvas, scale: fallback };
     }
   };
   try {
     if (cssH <= SLICE_CSS) {
-      out.push({ canvas: await grab(0, cssH), cssTop: 0 });
+      const shot = await grab(0, cssH);
+      out.push({ canvas: shot.canvas, cssTop: 0, scale: shot.scale });
       return out.filter((c) => c.canvas.width > 0 && c.canvas.height > 0);
     }
     for (let top = 0; top < cssH; top += SLICE_CSS) {
       const h = Math.min(SLICE_CSS, cssH - top);
-      out.push({ canvas: await grab(top, h), cssTop: top });
+      const shot = await grab(top, h);
+      out.push({ canvas: shot.canvas, cssTop: top, scale: shot.scale });
     }
   } catch {
     return out.filter((c) => c.canvas.width > 0 && c.canvas.height > 0);
@@ -499,7 +527,7 @@ function addCanvasPages(
   canvas: HTMLCanvasElement,
   state: { y: number; started: boolean },
   keep = false,
-  breaks: number[] = [],
+  spans: Array<[number, number]> = [],
 ) {
   const pageW = pdf.internal.pageSize.getWidth();
   const pageH = pdf.internal.pageSize.getHeight();
@@ -526,15 +554,17 @@ function addCanvasPages(
     const target = Math.min(canvas.height, cursor + maxPx);
     let sliceEnd = target;
     if (!(keep && blockH <= usableH) && target < canvas.height - 2) {
-      const safe = breaks.filter((b) => b > cursor + 48 && b <= target + 2);
-      if (safe.length) sliceEnd = safe[safe.length - 1];
-      else {
-        const gap = findBreakY(canvas, cursor, target);
-        if (gap > cursor + 48) sliceEnd = gap;
-        else if (state.y > CONTENT_TOP + 8 && (canvas.height - cursor) * pxToPt <= usableH) {
+      const snapped = snapSlice(cursor, target, spans, canvas.height);
+      if (snapped < 0) {
+        if (state.y > CONTENT_TOP + 8) {
           newPage();
           continue;
-        } else sliceEnd = target;
+        }
+        sliceEnd = target;
+      } else if (snapped <= cursor + 8) {
+        sliceEnd = target;
+      } else {
+        sliceEnd = snapped;
       }
     }
     const h = Math.max(1, sliceEnd - cursor) * pxToPt;
@@ -621,7 +651,7 @@ export async function downloadReportPdf(
             part.canvas,
             state,
             keep,
-            elementBreaks(blocks[i], part.canvas, part.cssTop),
+            cardSpans(blocks[i], part.scale, part.cssTop),
           );
         }
         if (blocks[i].dataset.pdfBreakAfter === "1" && state.started && state.y > CONTENT_TOP + 8) {
