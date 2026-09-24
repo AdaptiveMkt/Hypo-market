@@ -2203,13 +2203,6 @@ export function Calculator() {
                 { id: "end-short", group: "more" as const, label: "Unpaid shortfall (end of run)", value: <RedAmt>{result.shortfallTotal ? moneyCents(result.shortfallTotal) : "None"}</RedAmt>, amount: result.shortfallTotal },
               ]}
             />
-            {pdfUnlocked ? (
-            <div className="mt-2 stack-actions md:grid-cols-2">
-              <button type="button" onClick={viewAllReport} className="btn-block rounded-lg border border-gold bg-gold text-masthead hover:brightness-105">View all</button>
-              <button type="button" onClick={requestPdfDownload} className="btn-block rounded-lg border border-navy bg-navy text-cream hover:bg-teal">Download PDF</button>
-              <p className="col-span-full text-xs leading-snug text-muted">Open a title below to view more details. Check Add to PDF on each card you want in the download.</p>
-            </div>
-            ) : null}
           </TitleCollapse>
         </section>
 
@@ -2585,13 +2578,25 @@ export function Calculator() {
       </div>
       <div className="mt-3">
         {pdfUnlocked ? (
-        <button
-          type="button"
-          onClick={requestPdfDownload}
-          className="btn-block rounded-lg border border-navy bg-navy text-cream hover:bg-teal md:mx-auto md:max-w-xs"
-        >
-          Download PDF
-        </button>
+          <div className="mx-auto flex max-w-md flex-col gap-2">
+            <button
+              type="button"
+              onClick={viewAllReport}
+              className="btn-block rounded-lg border border-gold bg-gold text-masthead hover:brightness-105"
+            >
+              View all
+            </button>
+            <p className="text-center text-xs leading-snug text-muted">
+              Open a title above to view more details. Check Add to PDF on each card you want in the download.
+            </p>
+            <button
+              type="button"
+              onClick={requestPdfDownload}
+              className="btn-block rounded-lg border border-navy bg-navy text-cream hover:bg-teal"
+            >
+              Download PDF
+            </button>
+          </div>
         ) : null}
       </div>
       <p className="mt-3 text-center text-xs text-muted"><CopyrightMark /></p>
