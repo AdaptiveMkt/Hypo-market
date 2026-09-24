@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { StepperField } from "@/components/field-picker";
 
 export type CueActionId = "industry" | "protect" | "copay-alt";
 
@@ -24,19 +25,24 @@ export type CueMessage = {
   secondaryAction?: CueActionId;
   note?: string;
   links?: CueLink[];
+  /** When set, the notice includes a co-pay percent the visitor can change before running. */
+  copayPct?: number;
 };
 
 export function CuePopup({
   cue,
   onClose,
   onAction,
+  onCopayChange,
 }: {
   cue: CueMessage;
   onClose: () => void;
-  onAction?: (id: CueActionId) => void;
+  onAction?: (id: CueActionId, extra?: { copayPct?: number }) => void;
+  onCopayChange?: (pct: number) => void;
 }) {
   const closeRef = useRef<HTMLButtonElement>(null);
   const actionRef = useRef<HTMLButtonElement>(null);
+  const [copay, setCopay] = useState(cue.copayPct ?? 80);
 
   function closeOnly() {
     onClose();
@@ -46,6 +52,16 @@ export function CuePopup({
     if (cue.action) onAction?.(cue.action);
     onClose();
   }
+
+  function setCopayPct(n: number) {
+    const next = Math.min(100, Math.max(0, Math.round(n)));
+    setCopay(next);
+    onCopayChange?.(next);
+  }
+
+  useEffect(() => {
+    setCopay(cue.copayPct ?? 80);
+  }, [cue.copayPct, cue.title]);
 
   useEffect(() => {
     (cue.action ? actionRef.current : closeRef.current)?.focus();
@@ -115,6 +131,24 @@ export function CuePopup({
             ))}
           </ul>
         ) : null}
+        {cue.copayPct != null ? (
+          <div className="mt-4 rounded-lg border border-line bg-cream px-3 py-3">
+            <label className="text-sm font-semibold text-navy" htmlFor="cue-copay-pct">
+              Change the co-pay share, then run
+            </label>
+            <p className="mt-1 text-xs text-muted">
+              Percent of countable assets at claim you want left. The rest can pay care the insurance does not cover.
+            </p>
+            <StepperField
+              id="cue-copay-pct"
+              value={copay}
+              onChange={(raw) => setCopayPct(Number(raw) || 0)}
+              step={5}
+              min={0}
+              max={100}
+            />
+          </div>
+        ) : null}
         {cue.actionHint ? <p className="mt-4 text-xs font-semibold text-navy">{cue.actionHint}</p> : null}
         <div className="mt-4 flex flex-col gap-2">
           <div className={`flex flex-wrap items-center ${cue.action ? "justify-between" : "justify-end"} gap-2`}>
@@ -137,16 +171,16 @@ export function CuePopup({
               </button>
             ) : null}
           </div>
-          {cue.secondaryAction && cue.secondaryLabel ? (
+          {cue.secondaryAction && (cue.secondaryLabel || cue.copayPct != null) ? (
             <button
               type="button"
               onClick={() => {
-                onAction?.(cue.secondaryAction!);
+                onAction?.(cue.secondaryAction!, cue.copayPct != null ? { copayPct: copay } : undefined);
                 onClose();
               }}
               className="inline-flex min-h-11 w-full items-center justify-center rounded-lg border border-teal bg-teal px-4 text-center text-sm font-semibold text-cream hover:brightness-105"
             >
-              {cue.secondaryLabel}
+              {cue.copayPct != null ? `RUN ${copay}% Co-Pay ALTERNATIVE` : cue.secondaryLabel}
             </button>
           ) : null}
         </div>

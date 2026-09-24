@@ -767,6 +767,7 @@ export function Calculator() {
       action: "industry",
       secondaryLabel: `RUN ${protectPct}% Co-Pay ALTERNATIVE`,
       secondaryAction: "copay-alt",
+      copayPct: protectPct,
     });
   }
   function confirmSection3(checked: boolean) {
@@ -1023,11 +1024,35 @@ export function Calculator() {
       window.setTimeout(() => scrollToId("results"), 80);
     }
   }
-  function runCopayAlternative() {
+  function runCopayAlternative(pct = protectPct) {
+    const n = Math.min(100, Math.max(0, Math.round(Number(pct) || 0)));
+    setProtectPct(n);
     setAlternativeRun(true);
     setSection3Open(true);
     setSection3Confirmed(true);
-    if (!protectSize.alreadyProtected && !insuranceLocked) applyProtectDesign();
+    const atClaim = projectHoldingsForward(holdings, taxRate, careStart);
+    const sized = sizeInsuranceToProtectAssets({
+      assetsAtClaimNet: atClaim.net,
+      protectPct: n,
+      firstYearCost: claimCost,
+      cpiPct: cpi,
+      careYears: Math.max(1, duration || 3),
+      delayYears: Math.max(0, careStart - 1),
+      ageToday,
+    });
+    if (!sized.alreadyProtected && !insuranceLocked) {
+      const typical = typicalPurchaseForAge(ageToday || DEFAULT_AGE_TODAY);
+      patchPolicy({
+        enabled: true,
+        kind: "traditional",
+        dailyBenefit: sized.dailyToday,
+        benefitYears: sized.lifetime ? 50 : sized.benefitYears,
+        benefitInflationPct: typical.benefitInflationPct,
+        inflationMethod: typical.inflationMethod,
+      });
+      setRunKinds((prev) => ({ ...prev, traditional: true }));
+      setDesignTouched(true);
+    }
     executeHypo();
   }
   function runHypo(only?: PolicyKind) {
@@ -2674,11 +2699,12 @@ export function Calculator() {
         <CuePopup
           cue={cue}
           onClose={() => setCue(null)}
-          onAction={(id) => {
+          onAction={(id, extra) => {
             if (id === "industry") applyIndustryOptions();
             if (id === "protect") applyProtectDesign();
-            if (id === "copay-alt") runCopayAlternative();
+            if (id === "copay-alt") runCopayAlternative(extra?.copayPct);
           }}
+          onCopayChange={setProtectPct}
         />
       ) : null}
     </div>
