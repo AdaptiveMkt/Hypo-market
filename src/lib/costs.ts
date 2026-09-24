@@ -59,7 +59,7 @@ export type CareSetting = "al" | "nh" | "nhs" | "home24" | "memory";
 
 export const SETTING_LABELS: Record<CareSetting, string> = {
   home24: "Home health / 24-hour home care",
-  al: "Assisted living community",
+  al: "Assisted Living Community Care",
   memory: "Memory Care Facility",
   nhs: "Nursing facility (semi-private room)",
   nh: "Nursing facility (private room)",
