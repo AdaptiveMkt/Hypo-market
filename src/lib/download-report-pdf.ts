@@ -163,22 +163,51 @@ function flattenUnsupportedColors(doc: Document) {
   dummy.remove();
 }
 
-function findBreakY(canvas: HTMLCanvasElement, startY: number, maxY: number) {
+function isBlankRow(canvas: HTMLCanvasElement, y: number) {
   const ctx = canvas.getContext("2d");
-  if (!ctx) return maxY;
-  const w = canvas.width;
-  const minY = startY + 48;
-  for (let y = Math.min(maxY, canvas.height - 1); y > minY; y -= 3) {
-    const data = ctx.getImageData(0, y, w, 1).data;
-    let ink = 0;
-    for (let i = 0; i < data.length; i += 24) {
-      const a = data[i + 3];
-      if (a < 12) continue;
-      if (data[i] < 245 || data[i + 1] < 238 || data[i + 2] < 230) ink++;
-    }
-    if (ink < 8) return y;
+  if (!ctx) return false;
+  const data = ctx.getImageData(0, y, canvas.width, 1).data;
+  let ink = 0;
+  for (let i = 0; i < data.length; i += 16) {
+    const a = data[i + 3];
+    if (a < 12) continue;
+    if (data[i] < 245 || data[i + 1] < 238 || data[i + 2] < 230) ink++;
   }
-  return Math.min(maxY, canvas.height);
+  return ink < 6;
+}
+
+/** Break only in a real gap, never through a card, a line of type, or a table row. */
+function findBreakY(canvas: HTMLCanvasElement, startY: number, maxY: number) {
+  const minY = startY + 64;
+  const limit = Math.min(maxY, canvas.height - 1);
+  let run = 0;
+  let runEnd = limit;
+  for (let y = limit; y > minY; y -= 1) {
+    if (isBlankRow(canvas, y)) {
+      if (run === 0) runEnd = y;
+      run += 1;
+      if (run >= 14) return Math.max(minY, runEnd - 6);
+    } else {
+      run = 0;
+    }
+  }
+  return -1;
+}
+
+function elementBreaks(el: HTMLElement, canvas: HTMLCanvasElement, cssTop: number) {
+  const scale = canvas.height / Math.max(1, el.scrollHeight || el.offsetHeight);
+  const rootTop = el.getBoundingClientRect().top;
+  const points = [0, canvas.height];
+  el.querySelectorAll<HTMLElement>(".card, tr, h2, h3, thead, img").forEach((node) => {
+    const r = node.getBoundingClientRect();
+    const top = Math.round((r.top - rootTop - cssTop) * scale);
+    const bottom = Math.round((r.bottom - rootTop - cssTop) * scale);
+    if (bottom > 8 && top < canvas.height - 8) {
+      if (top > 8) points.push(top);
+      if (bottom < canvas.height - 8) points.push(bottom);
+    }
+  });
+  return points.sort((a, b) => a - b);
 }
 
 function savePdfFile(pdf: jsPDF, filename: string) {
@@ -418,12 +447,12 @@ function expandLive(root: HTMLElement) {
   };
 }
 
-async function captureBlock(el: HTMLElement): Promise<HTMLCanvasElement[]> {
+async function captureBlock(el: HTMLElement): Promise<{ canvas: HTMLCanvasElement; cssTop: number }[]> {
   const cssH = Math.max(el.scrollHeight, el.offsetHeight, 1);
   const cssW = Math.max(el.scrollWidth, el.offsetWidth, 320);
-  const out: HTMLCanvasElement[] = [];
+  const out: { canvas: HTMLCanvasElement; cssTop: number }[] = [];
   const grab = async (y: number, h: number) => {
-    const scale = Math.min(1, MAX_CANVAS_EDGE / Math.max(h, 1), MAX_CANVAS_EDGE / cssW);
+    const scale = Math.min(1.25, MAX_CANVAS_EDGE / Math.max(h, 1), MAX_CANVAS_EDGE / cssW);
     try {
       return await html2canvas(
         el,
@@ -433,7 +462,7 @@ async function captureBlock(el: HTMLElement): Promise<HTMLCanvasElement[]> {
           width: cssW,
           height: h,
           windowWidth: cssW,
-          windowHeight: h,
+          windowHeight: Math.max(h, 900),
         }),
       );
     } catch {
@@ -445,24 +474,24 @@ async function captureBlock(el: HTMLElement): Promise<HTMLCanvasElement[]> {
           width: cssW,
           height: Math.min(h, 1600),
           windowWidth: cssW,
-          windowHeight: Math.min(h, 1600),
+          windowHeight: Math.max(Math.min(h, 1600), 900),
         }),
       );
     }
   };
   try {
     if (cssH <= SLICE_CSS) {
-      out.push(await grab(0, cssH));
-      return out.filter((c) => c.width > 0 && c.height > 0);
+      out.push({ canvas: await grab(0, cssH), cssTop: 0 });
+      return out.filter((c) => c.canvas.width > 0 && c.canvas.height > 0);
     }
     for (let top = 0; top < cssH; top += SLICE_CSS) {
       const h = Math.min(SLICE_CSS, cssH - top);
-      out.push(await grab(top, h));
+      out.push({ canvas: await grab(top, h), cssTop: top });
     }
   } catch {
-    return out.filter((c) => c.width > 0 && c.height > 0);
+    return out.filter((c) => c.canvas.width > 0 && c.canvas.height > 0);
   }
-  return out.filter((c) => c.width > 0 && c.height > 0);
+  return out.filter((c) => c.canvas.width > 0 && c.canvas.height > 0);
 }
 
 function addCanvasPages(
@@ -470,6 +499,7 @@ function addCanvasPages(
   canvas: HTMLCanvasElement,
   state: { y: number; started: boolean },
   keep = false,
+  breaks: number[] = [],
 ) {
   const pageW = pdf.internal.pageSize.getWidth();
   const pageH = pdf.internal.pageSize.getHeight();
@@ -490,16 +520,23 @@ function addCanvasPages(
 
   let cursor = 0;
   while (cursor < canvas.height - 2) {
-    if (!keep && state.y > CONTENT_TOP + 8 && remaining() < 64) newPage();
-    const maxPx = keep && blockH <= usableH
-      ? canvas.height
-      : Math.max(48, Math.floor(remaining() / pxToPt));
-    const sliceEnd = Math.min(
-      canvas.height,
-      keep && blockH <= usableH
-        ? canvas.height
-        : findBreakY(canvas, cursor, Math.min(canvas.height, cursor + maxPx)),
-    );
+    const room = Math.floor(remaining() / pxToPt);
+    if (state.y > CONTENT_TOP + 8 && room < 72) newPage();
+    const maxPx = keep && blockH <= usableH ? canvas.height : Math.max(72, Math.floor(remaining() / pxToPt));
+    const target = Math.min(canvas.height, cursor + maxPx);
+    let sliceEnd = target;
+    if (!(keep && blockH <= usableH) && target < canvas.height - 2) {
+      const safe = breaks.filter((b) => b > cursor + 48 && b <= target + 2);
+      if (safe.length) sliceEnd = safe[safe.length - 1];
+      else {
+        const gap = findBreakY(canvas, cursor, target);
+        if (gap > cursor + 48) sliceEnd = gap;
+        else if (state.y > CONTENT_TOP + 8 && (canvas.height - cursor) * pxToPt <= usableH) {
+          newPage();
+          continue;
+        } else sliceEnd = target;
+      }
+    }
     const h = Math.max(1, sliceEnd - cursor) * pxToPt;
     drawStrip(pdf, canvas, cursor, sliceEnd, BASE_MARGIN, state.y, usableW, h);
     state.y += h + GAP;
@@ -532,14 +569,32 @@ export async function downloadReportPdf(
   );
 
   const overlay = root.parentElement;
-  const overlayOverflow = overlay?.style.overflow ?? "";
-  const rootOverflow = root.style.overflow;
-  const overlayScroll = overlay?.scrollTop ?? 0;
+  const overlayPrev = overlay
+    ? {
+        overflow: overlay.style.overflow,
+        position: overlay.style.position,
+        height: overlay.style.height,
+        maxHeight: overlay.style.maxHeight,
+        top: overlay.style.top,
+        bottom: overlay.style.bottom,
+        scroll: overlay.scrollTop,
+      }
+    : null;
   if (overlay) {
     overlay.style.overflow = "visible";
+    overlay.style.position = "absolute";
+    overlay.style.height = "auto";
+    overlay.style.maxHeight = "none";
+    overlay.style.top = "0";
+    overlay.style.bottom = "auto";
     overlay.scrollTop = 0;
   }
+  const rootOverflow = root.style.overflow;
+  const rootHeight = root.style.height;
+  const rootMaxHeight = root.style.maxHeight;
   root.style.overflow = "visible";
+  root.style.height = "auto";
+  root.style.maxHeight = "none";
   document.documentElement.classList.add("pdf-capture");
   const restoreAccordions = expandLive(root);
   window.dispatchEvent(new Event("resize"));
@@ -558,14 +613,22 @@ export async function downloadReportPdf(
     for (let i = 0; i < blocks.length; i++) {
       onProgress?.(`Preparing PDF… section ${i + 1} of ${blocks.length}`);
       try {
-        const canvases = await captureBlock(blocks[i]);
+        const parts = await captureBlock(blocks[i]);
         const keep = blocks[i].dataset.pdfKeep === "1";
-        for (const canvas of canvases) addCanvasPages(pdf, canvas, state, keep);
+        for (const part of parts) {
+          addCanvasPages(
+            pdf,
+            part.canvas,
+            state,
+            keep,
+            elementBreaks(blocks[i], part.canvas, part.cssTop),
+          );
+        }
         if (blocks[i].dataset.pdfBreakAfter === "1" && state.started && state.y > CONTENT_TOP + 8) {
           pdf.addPage();
           state.y = CONTENT_TOP;
         }
-        captured += canvases.length;
+        captured += parts.length;
       } catch {
         /* Skip a section that cannot be drawn so the rest of the file still saves. */
       }
@@ -581,10 +644,17 @@ export async function downloadReportPdf(
   } finally {
     restoreAccordions();
     document.documentElement.classList.remove("pdf-capture");
-    if (overlay) {
-      overlay.style.overflow = overlayOverflow;
-      overlay.scrollTop = overlayScroll;
+    if (overlay && overlayPrev) {
+      overlay.style.overflow = overlayPrev.overflow;
+      overlay.style.position = overlayPrev.position;
+      overlay.style.height = overlayPrev.height;
+      overlay.style.maxHeight = overlayPrev.maxHeight;
+      overlay.style.top = overlayPrev.top;
+      overlay.style.bottom = overlayPrev.bottom;
+      overlay.scrollTop = overlayPrev.scroll;
     }
     root.style.overflow = rootOverflow;
+    root.style.height = rootHeight;
+    root.style.maxHeight = rootMaxHeight;
   }
 }
