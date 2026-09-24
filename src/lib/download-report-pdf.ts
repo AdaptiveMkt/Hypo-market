@@ -469,12 +469,14 @@ function addCanvasPages(
   pdf: jsPDF,
   canvas: HTMLCanvasElement,
   state: { y: number; started: boolean },
+  keep = false,
 ) {
   const pageW = pdf.internal.pageSize.getWidth();
   const pageH = pdf.internal.pageSize.getHeight();
   const usableW = pageW - BASE_MARGIN * 2;
   const usableH = pageH - CONTENT_TOP - FOOTER_H - 8;
   const pxToPt = usableW / canvas.width;
+  const blockH = canvas.height * pxToPt;
   const remaining = () => CONTENT_TOP + usableH - state.y;
   const newPage = () => {
     if (state.started) pdf.addPage();
@@ -482,14 +484,21 @@ function addCanvasPages(
     state.y = CONTENT_TOP;
   };
   if (!state.started) newPage();
+  if (keep && state.y > CONTENT_TOP + 8 && blockH <= usableH && blockH > remaining() - 8) {
+    newPage();
+  }
 
   let cursor = 0;
   while (cursor < canvas.height - 2) {
-    if (state.y > CONTENT_TOP + 8 && remaining() < 64) newPage();
-    const maxPx = Math.max(48, Math.floor(remaining() / pxToPt));
+    if (!keep && state.y > CONTENT_TOP + 8 && remaining() < 64) newPage();
+    const maxPx = keep && blockH <= usableH
+      ? canvas.height
+      : Math.max(48, Math.floor(remaining() / pxToPt));
     const sliceEnd = Math.min(
       canvas.height,
-      findBreakY(canvas, cursor, Math.min(canvas.height, cursor + maxPx)),
+      keep && blockH <= usableH
+        ? canvas.height
+        : findBreakY(canvas, cursor, Math.min(canvas.height, cursor + maxPx)),
     );
     const h = Math.max(1, sliceEnd - cursor) * pxToPt;
     drawStrip(pdf, canvas, cursor, sliceEnd, BASE_MARGIN, state.y, usableW, h);
@@ -539,7 +548,8 @@ export async function downloadReportPdf(
       onProgress?.(`Preparing PDF… section ${i + 1} of ${blocks.length}`);
       try {
         const canvases = await captureBlock(blocks[i]);
-        for (const canvas of canvases) addCanvasPages(pdf, canvas, state);
+        const keep = blocks[i].dataset.pdfKeep === "1";
+        for (const canvas of canvases) addCanvasPages(pdf, canvas, state, keep);
         captured += canvases.length;
       } catch {
         /* Skip a section that cannot be drawn so the rest of the file still saves. */

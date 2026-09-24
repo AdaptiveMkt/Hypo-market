@@ -859,7 +859,8 @@ export function ReportView({
           </section>
         ) : null}
 
-        <section className="report-block card px-4 py-2 text-sm text-muted">
+        <section className="report-block" data-pdf-keep="1">
+        <div className="card px-4 py-2 text-sm text-muted">
           <TitleCollapse title="Homestead" className="mt-0">
             <p>
               Homestead (when excluded) and spouse-excluded assets stay out of the countable
@@ -872,10 +873,10 @@ export function ReportView({
                 : ""}
             </p>
           </TitleCollapse>
-          </section>
+        </div>
 
         {policy.enabled ? (
-        <section className="report-block card px-4 py-4">
+        <div className="card mt-4 px-4 py-4">
           <h2 className="mb-2 font-display text-xl text-navy">Same scenario — insurance pays first</h2>
           <p className="mb-3 text-sm text-muted">
             Insurance is applied to the claim first. Assets are used only as co-pay if there
@@ -899,8 +900,9 @@ export function ReportView({
               </p>
             </div>
           </div>
-        </section>
+        </div>
         ) : null}
+        </section>
 
 
         {details.yearByYear
