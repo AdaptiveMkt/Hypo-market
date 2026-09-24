@@ -381,6 +381,35 @@ export function ReportView({
         tabIndex={-1}
         className="mx-auto max-w-5xl space-y-8 bg-paper px-4 py-8 text-ink outline-none sm:px-8"
       >
+        <section className="report-block" data-pdf-break-after="1">
+          <div className="overflow-hidden rounded-xl border border-line bg-paper">
+            <img
+              src="/cover/logo.jpg"
+              alt="Preserve Your Assets — Long-Term Care Hypothetical"
+              className="mx-auto h-32 w-full max-w-xl object-contain"
+            />
+            <img
+              src="/cover/photo.jpg"
+              alt="A couple at the kitchen table reviewing a long-term care plan"
+              className="h-64 w-full object-cover object-center"
+            />
+            <div className="px-4 py-4 text-center">
+              <p className="text-xs uppercase tracking-[0.16em] text-gold-ink">Educational hypothetical</p>
+              <p className="mt-1 font-display text-2xl text-navy">Long Term Care Asset Utilization Modeling</p>
+              <p className="mt-2 text-sm text-muted">
+                {SETTING_LABELS[setting]} in <StateName name={state} /> · care{" "}
+                {delay === 0 ? "starting now" : `in ${delay} years`}
+                {ageToday >= 18 ? ` (age ${ageToday} today → ${ageToday + delay} at claim)` : ""}
+                · {duration} years modeled · {new Date().toLocaleDateString("en-US")}
+              </p>
+              <img
+                src="/cover/graphic.jpg"
+                alt="A home, protected assets, and community care, connected"
+                className="mx-auto mt-3 h-32 w-full max-w-lg object-contain"
+              />
+            </div>
+          </div>
+        </section>
         <header className="report-block border-b-2 border-gold pb-4">
           <h1 id="report-title" className="font-display text-3xl text-navy">
             Long Term Care Asset Utilization Modeling

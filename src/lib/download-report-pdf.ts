@@ -519,6 +519,17 @@ export async function downloadReportPdf(
   } catch {
     /* ignore */
   }
+  await Promise.all(
+    Array.from(root.querySelectorAll("img")).map(
+      (img) =>
+        img.complete
+          ? Promise.resolve()
+          : new Promise<void>((resolve) => {
+              img.onload = () => resolve();
+              img.onerror = () => resolve();
+            }),
+    ),
+  );
 
   const overlay = root.parentElement;
   const overlayOverflow = overlay?.style.overflow ?? "";
@@ -550,6 +561,10 @@ export async function downloadReportPdf(
         const canvases = await captureBlock(blocks[i]);
         const keep = blocks[i].dataset.pdfKeep === "1";
         for (const canvas of canvases) addCanvasPages(pdf, canvas, state, keep);
+        if (blocks[i].dataset.pdfBreakAfter === "1" && state.started && state.y > CONTENT_TOP + 8) {
+          pdf.addPage();
+          state.y = CONTENT_TOP;
+        }
         captured += canvases.length;
       } catch {
         /* Skip a section that cannot be drawn so the rest of the file still saves. */
