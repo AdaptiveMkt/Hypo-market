@@ -1216,16 +1216,16 @@ export function Calculator() {
           extra={
             <button
               type="button"
-              className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-lg bg-black px-4 text-sm font-semibold text-white hover:bg-neutral-900"
+              className="inline-flex min-h-11 shrink-0 items-center justify-center whitespace-nowrap rounded-lg bg-black px-4 text-sm font-semibold text-white hover:bg-neutral-900"
               aria-pressed={!personalizeOpen}
               aria-controls="personalize-asset-model"
-              aria-label={personalizeOpen ? "Incognito Mode" : "Customize"}
+              aria-label={personalizeOpen ? "Incognito Mode" : "Customize In Daylight Mode"}
               onClick={(e) => {
                 e.stopPropagation();
                 applyIncognito(personalizeOpen);
               }}
             >
-              {personalizeOpen ? "Incognito Mode" : "Customize"}
+              {personalizeOpen ? "Incognito Mode" : "Customize In Daylight Mode"}
             </button>
           }
         >
