@@ -177,7 +177,7 @@ export function ContactRequestDialog({
   );
 }
 
-/** After the PDF is built — a real clickable save, not a background download that browsers may block. */
+/** After the PDF is built. No file link is on the page until the visitor clicks Save or Open. */
 export function PdfReadyDialog({
   open,
   filename,
@@ -191,7 +191,19 @@ export function PdfReadyDialog({
   note?: string;
   onContinue: () => void;
 }) {
+  const [viewing, setViewing] = useState(false);
   if (!open || !url) return null;
+
+  function saveToComputer() {
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.rel = "noopener";
+    document.body.appendChild(a);
+    a.click();
+    window.setTimeout(() => a.remove(), 0);
+  }
+
   return (
     <div
       className="fixed inset-0 z-[70] flex items-start justify-center overflow-y-auto bg-navy/55 p-4 pt-16"
@@ -204,37 +216,34 @@ export function PdfReadyDialog({
           Your PDF is ready
         </h2>
         <p className="mt-2 text-sm text-muted">
-          The PDF is ready to view. It is not saved until you choose Save PDF to this computer.
+          Nothing is downloaded until you choose Save PDF to this computer. Open PDF views it here.
         </p>
         <p className="mt-3 break-all rounded-lg border border-teal/40 bg-cream/40 px-3 py-2 text-sm text-navy">
           {filename}
         </p>
         {note ? <p className="mt-2 text-sm text-navy">{note}</p> : null}
+        {viewing ? (
+          <iframe
+            title={filename}
+            src={url}
+            className="mt-3 h-[70vh] w-full rounded-lg border border-line bg-paper"
+          />
+        ) : null}
         <div className="mt-4 stack-actions">
-          <a
-            href={url}
-            download={filename}
+          <button
+            type="button"
             className="btn-block rounded-lg border border-gold bg-gold text-center text-masthead hover:brightness-105"
-            onClick={(e) => {
-              e.preventDefault();
-              const a = document.createElement("a");
-              a.href = url;
-              a.download = filename;
-              document.body.appendChild(a);
-              a.click();
-              window.setTimeout(() => a.remove(), 0);
-            }}
+            onClick={saveToComputer}
           >
             Save PDF to this computer
-          </a>
-          <a
-            href={url}
-            target="_blank"
-            rel="noopener noreferrer"
+          </button>
+          <button
+            type="button"
             className="btn-block rounded-lg border border-navy bg-navy text-center text-cream hover:bg-teal"
+            onClick={() => setViewing((v) => !v)}
           >
-            Open PDF
-          </a>
+            {viewing ? "Hide PDF" : "Open PDF"}
+          </button>
           <button
             type="button"
             className="btn-block rounded-lg border border-card-border text-navy hover:bg-cream"
