@@ -1434,12 +1434,11 @@ export function Calculator() {
                     setClaimAge(Math.max(floor, Math.round(n)));
                   }}
                 />
-                <p className="mt-1 text-xs font-bold amt-red">
-                  * You can change age of claim. Currently default based on claims experience for care.{" "}
-                  Source:{" "}
-                  <Cite href={SRC.aaltci2024Claims}>AALTCI — 2024 LTCI claims data</Cite>
-                  {" "}(mean claim age 81). See also{" "}
-                  <Cite href={SRC.aaltciClaimAge2018}>ages when LTCI claims begin (2018)</Cite>.
+                <p className="mt-1 text-xs font-bold leading-snug amt-red">
+                  * You can change the age of claim. The default, {AALTCI_MEAN_CLAIM_AGE}, is the mean age at claim in the{" "}
+                  <Cite href={SRC.aaltci2024Claims}>AALTCI 2024 LTCI claims data</Cite>
+                  {" "}(Connecticut Partnership sample, range 31–103). Age mix:{" "}
+                  <Cite href={SRC.aaltciClaimAge2018}>AALTCI — ages when LTCI claims begin (2018)</Cite>.
                 </p>
               </div>
               <div className="min-w-0">
