@@ -72,8 +72,8 @@ function Root() {
             </a>
             <header id="page-header" className="bg-masthead text-masthead-fg">
               <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-                <p className="mb-1 text-xs uppercase tracking-[0.14em] text-gold">
-                  Hypothetical planning model
+                <p className="mb-1 text-xs tracking-[0.14em] text-gold">
+                  Long Term Care Hypothetical -Client | Family | Web Based Self Assessment
                 </p>
                 <h1 className="font-display text-2xl font-medium leading-tight sm:text-3xl lg:text-4xl">
                   Long Term Care Asset Utilization Modeling
