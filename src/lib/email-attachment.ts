@@ -15,6 +15,8 @@ export const EMAIL_FROM_NAME = "Adaptive Marketing Group";
 export const EMAIL_FROM_ADDRESS = "info@fundingltcmarketplace.com";
 export const EMAIL_FROM = `${EMAIL_FROM_NAME} <${EMAIL_FROM_ADDRESS}>`;
 export const EMAIL_INBOX = EMAIL_FROM_ADDRESS;
+/** Contact-request form. Shown on the dialog and used as the recipient. */
+export const CONTACT_EMAIL = "Info@preserve-your-assets.com";
 
 export const PDF_MIME = "application/pdf";
 export const PDF_CONTENT_DISPOSITION = "attachment";

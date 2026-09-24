@@ -2703,7 +2703,7 @@ export function Calculator() {
             resetAll();
             setSaveMsg(
               ok
-                ? "Contact request sent to info@fundingltcmarketplace.com. The form was reset."
+                ? "Contact request sent to Info@preserve-your-assets.com. The form was reset."
                 : "PDF downloaded. The contact request could not be emailed from this environment.",
             );
             window.setTimeout(() => setSaveMsg(""), 4500);

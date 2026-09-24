@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { COPYRIGHT_LINE, HOLD_HARMLESS_SHORT } from "@/lib/disclaimer";
 import {
+  CONTACT_EMAIL,
   EMAIL_FROM,
   EMAIL_INBOX,
   TEST_MAIL_TO,
@@ -169,20 +170,20 @@ export const emailAdvisorPdf = createServerFn({ method: "POST" })
 export const submitContactRequest = createServerFn({ method: "POST" })
   .validator((data: unknown) => parseContact(data))
   .handler(async ({ data }): Promise<{ ok: true; emailed: boolean }> => {
-    const html = `<p>Contact requested from the Long Term Care Asset Utilization Modeling tool.</p>
+    const html = `<p>I am requesting contact of a long term care professional in my state. Please forward me the contact information of at least 2 individuals.</p>
 <ul>
 <li>Name: ${escapeHtml(data.name)}</li>
 <li>Phone: ${escapeHtml(data.phone)}</li>
 <li>Email: ${escapeHtml(data.email)}</li>
 <li>State: ${escapeHtml(data.state)}</li>
 </ul>
-<p>Please contact this person. This is not a quote or an application.</p>
+<p>This request was sent to ${escapeHtml(CONTACT_EMAIL)}. This is not a quote or an application.</p>
 <p>${escapeHtml(HOLD_HARMLESS_SHORT)}</p>
 <p>${escapeHtml(COPYRIGHT_LINE)}</p>`;
-    const text = `Contact requested\nName: ${data.name}\nPhone: ${data.phone}\nEmail: ${data.email}\nState: ${data.state}\n\n${HOLD_HARMLESS_SHORT}\n\n${COPYRIGHT_LINE}`;
+    const text = `I am requesting contact of a long term care professional in my state. Please forward me the contact information of at least 2 individuals.\n\nName: ${data.name}\nPhone: ${data.phone}\nEmail: ${data.email}\nState: ${data.state}\n\nSent to ${CONTACT_EMAIL}.\n\n${HOLD_HARMLESS_SHORT}\n\n${COPYRIGHT_LINE}`;
     try {
       const emailed = await sendMail({
-        to: [EMAIL_INBOX],
+        to: [CONTACT_EMAIL],
         reply_to: data.email,
         subject: `Contact request — ${data.name} (${data.state})`,
         html,

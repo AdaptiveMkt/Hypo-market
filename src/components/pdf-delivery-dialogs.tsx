@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { FieldPicker } from "@/components/field-picker";
 import { STATE_NAMES } from "@/lib/costs";
 import { submitContactRequest } from "@/lib/send-report-mail";
+import { CONTACT_EMAIL } from "@/lib/email-attachment";
 
 const fieldClass =
   "w-full rounded-lg border border-line bg-paper px-3 py-2 text-navy";
@@ -34,7 +35,7 @@ export function ContactAskDialog({
           Your PDF is saved on this device. No advisor email was on this run, so no
           copy was emailed. If you would like a representative to follow up, we will
           ask for your name, phone, email, and state. That request is sent to{" "}
-          info@fundingltcmarketplace.com.
+          {CONTACT_EMAIL}.
         </p>
         <div className="mt-4 stack-actions md:grid-cols-2">
           <button
@@ -102,9 +103,13 @@ export function ContactRequestDialog({
         <h2 id="contact-form-title" className="font-display text-xl text-navy">
           Contact request
         </h2>
+        <p className="mt-2 text-sm text-navy">
+          I am requesting contact of a long term care professional in my state. Please
+          forward me the contact information of at least 2 individuals.
+        </p>
         <p className="mt-2 text-sm text-muted">
-          All four fields are required. Submit sends this request to{" "}
-          info@fundingltcmarketplace.com. This is not a quote or an application.
+          All four fields are required. Submit sends this request to {CONTACT_EMAIL}. This
+          is not a quote or an application.
         </p>
         <div className="mt-3 grid gap-3">
           <div>
