@@ -73,16 +73,27 @@ export function ContactRequestDialog({
   const [phone, setPhone] = useState(initial?.phone ?? "");
   const [email, setEmail] = useState(initial?.email ?? "");
   const [state, setState] = useState(initial?.state ?? "");
+  const [ack, setAck] = useState(false);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const place = state || "[state]";
+  const ackText = `I am requesting additional information, please send me at least two qualified professional Long term care representatives in ${place}.`;
   if (!open) return null;
 
   async function submit() {
     setError("");
+    if (!state) {
+      setError("Select a state.");
+      return;
+    }
+    if (!ack) {
+      setError("Check the box to request contact in your state.");
+      return;
+    }
     setBusy(true);
     try {
       const r = await submitContactRequest({
-        data: { name, phone, email, state },
+        data: { name, phone, email, state, acknowledged: true },
       });
       onSent(Boolean(r.emailed));
     } catch (err) {
@@ -154,16 +165,29 @@ export function ContactRequestDialog({
               placeholder="Select a state…"
               invalid={!state}
               options={STATE_NAMES.map((s) => ({ value: s, label: s }))}
-              onChange={setState}
+              onChange={(next) => {
+                setState(next);
+                setAck(false);
+              }}
             />
           </div>
+          <label className="flex items-start gap-3 text-sm text-navy">
+            <input
+              type="checkbox"
+              className="mt-1 size-4 shrink-0 accent-teal"
+              checked={ack}
+              disabled={!state}
+              onChange={(e) => setAck(e.target.checked)}
+            />
+            <span>{ackText}</span>
+          </label>
         </div>
         {error ? <p className="mt-2 text-sm font-semibold text-deplete" role="alert">{error}</p> : null}
         <div className="mt-4 stack-actions md:grid-cols-2">
           <button
             type="button"
             className="btn-block rounded-lg border border-gold bg-gold text-masthead hover:brightness-105 disabled:opacity-50"
-            disabled={busy}
+            disabled={busy || !ack}
             onClick={() => void submit()}
           >
             {busy ? "Sending…" : "Submit"}

@@ -61,6 +61,7 @@ type ContactRequest = {
   phone: string;
   email: string;
   state: string;
+  acknowledged: boolean;
 };
 
 function parseContact(raw: unknown): ContactRequest {
@@ -74,7 +75,8 @@ function parseContact(raw: unknown): ContactRequest {
   if (phone.replace(/\D/g, "").length < 10) throw new Error("Enter a phone number.");
   if (!validEmail(email)) throw new Error("Enter a valid email.");
   if (!state) throw new Error("Select a state.");
-  return { name, phone, email, state };
+  if (o.acknowledged !== true) throw new Error("Check the box to request contact in your state.");
+  return { name, phone, email, state, acknowledged: true };
 }
 
 async function sendMail(payload: {
@@ -170,17 +172,19 @@ export const emailAdvisorPdf = createServerFn({ method: "POST" })
 export const submitContactRequest = createServerFn({ method: "POST" })
   .validator((data: unknown) => parseContact(data))
   .handler(async ({ data }): Promise<{ ok: true; emailed: boolean }> => {
-    const html = `<p>I am requesting contact of a long term care professional in my state. Please forward me the contact information of at least 2 individuals.</p>
+    const ask = `I am requesting additional information, please send me at least two qualified professional Long term care representatives in ${data.state}.`;
+    const html = `<p>${escapeHtml(ask)}</p>
 <ul>
 <li>Name: ${escapeHtml(data.name)}</li>
 <li>Phone: ${escapeHtml(data.phone)}</li>
 <li>Email: ${escapeHtml(data.email)}</li>
 <li>State: ${escapeHtml(data.state)}</li>
+<li>Acknowledgement: checked</li>
 </ul>
 <p>This request was sent to ${escapeHtml(CONTACT_EMAIL)}. This is not a quote or an application.</p>
 <p>${escapeHtml(HOLD_HARMLESS_SHORT)}</p>
 <p>${escapeHtml(COPYRIGHT_LINE)}</p>`;
-    const text = `I am requesting contact of a long term care professional in my state. Please forward me the contact information of at least 2 individuals.\n\nName: ${data.name}\nPhone: ${data.phone}\nEmail: ${data.email}\nState: ${data.state}\n\nSent to ${CONTACT_EMAIL}.\n\n${HOLD_HARMLESS_SHORT}\n\n${COPYRIGHT_LINE}`;
+    const text = `${ask}\n\nName: ${data.name}\nPhone: ${data.phone}\nEmail: ${data.email}\nState: ${data.state}\nAcknowledgement: checked\n\nSent to ${CONTACT_EMAIL}.\n\n${HOLD_HARMLESS_SHORT}\n\n${COPYRIGHT_LINE}`;
     try {
       const emailed = await sendMail({
         to: [CONTACT_EMAIL],
