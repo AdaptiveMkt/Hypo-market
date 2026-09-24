@@ -748,6 +748,20 @@ export function Calculator() {
     setCue({
       title: "Industry averages for your age",
       body: section2IndustryMessage(ageToday),
+      note: "The daily amount, 3-year period, and 90-day wait follow the overall 2024 stand-alone sales mix in the 2025 Milliman LTCI Survey: average monthly maximum about $5,428 (about $178 a day, shown here in $10 steps), a 3-year period on 55.1% of sales, and an 84–100 day wait on 89.8%. Milliman does not publish that mix inside each 5-year age band. 3% compound is this model’s planning default under age 76 because it has no future-purchase-option field. Most 2024 sales used an FPO. Among automatic increases, 3% compound was 17.4%. Not a quote.",
+      links: [
+        {
+          kicker: "Source",
+          label: "2025 Milliman LTCI Survey of 2024 sales",
+          href: SRC.millimanSurvey2025,
+          external: true,
+        },
+        {
+          kicker: "On this site",
+          label: "What consumers buy — benefit mix for this age",
+          href: "#what-buyers-section2",
+        },
+      ],
       actionHint: "* Select these benefits for insurance run.",
       actionLabel: "Use this Options",
       action: "industry",
@@ -1279,7 +1293,7 @@ export function Calculator() {
               <p className="mt-1 text-xs leading-snug text-muted">Required to run. Must be {MIN_AGE_TODAY} or older.</p>
             )}
             {ageToday >= MIN_AGE_TODAY && buyerHints && naicUnlocked ? (
-              <div className="mt-2 rounded-lg border border-line bg-cream px-3 py-2 text-xs leading-snug text-muted">
+              <div id="what-buyers-section2" className="mt-2 scroll-mt-8 rounded-lg border border-line bg-cream px-3 py-2 text-xs leading-snug text-muted">
                 <p>
                   * Based on industry averages at your age bracket (
                   <span className="font-semibold text-deplete">{fiveYearIssueBand(ageToday)}</span>
@@ -1300,7 +1314,7 @@ export function Calculator() {
                   {" · "}
                   <Cite href={SRC.aaltciFacts}>AALTCI LTC facts</Cite>
                 </p>
-                <TitleCollapse title="See what industry says people are buying in long-term care benefits" className="mt-2" defaultOpen={false} hint="READ MORE.">
+                <TitleCollapse title="See what industry says people are buying in long-term care benefits" className="mt-2" defaultOpen={false} openOnHash="what-buyers-section2" hint="READ MORE.">
                   <WhatConsumersBuyPanel ageToday={ageToday} kind={policy.kind} />
                 </TitleCollapse>
               </div>
