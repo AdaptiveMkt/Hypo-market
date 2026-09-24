@@ -4,6 +4,7 @@ import {
   ASSET_FIELDS,
   csvMilestones,
   formatYearsLast,
+  fiveYearIssueBand,
   isLifetimeBenefit,
   LIFETIME_BENEFIT_MARK,
   LIFETIME_BENEFIT_NOTE,
@@ -414,7 +415,10 @@ export function buildScenarioPdf(opts: ReportOpts): Blob {
     add(
       `Benefit Increase Option (i.e., Inflation Options): ${s.policy.inflationMethod === "none" || s.policy.benefitInflationPct <= 0 ? "None (level)" : `${s.policy.benefitInflationPct}% ${s.policy.inflationMethod}`}`,
     );
-    add(`Annual premium: ${money(s.policy.annualPremium)}`);
+    add(`Annual premium: ${money(s.policy.annualPremium)}*`);
+    add(
+      `* Annual premiums based on reported: ${fiveYearIssueBand(s.ageToday ?? 0) ?? "age-band"} average premiums. Source: 2026 AALTCI Long-Term Care Insurance Price Index (https://www.aaltci.org/2026-AALTCI-Long-Term-Care-Insurance-Price-Index/).`,
+    );
     add(`Insurance pool at purchase: ${money(result.benefitPoolAtPurchase ?? 0)}`);
   }
   add("");

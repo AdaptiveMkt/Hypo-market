@@ -1790,14 +1790,10 @@ export function Calculator() {
                         <StepperField id="premium" value={policy.annualPremium || 0} prefix="$" step={100} min={0} blankWhenZero onChange={(v) => { setPremiumTouched(true); patchPolicy({ annualPremium: Number(v) || 0 }); }} />
                         {ageToday >= MIN_AGE_TODAY && typicalPremiumHint(ageToday, policy.benefitInflationPct, policy.inflationMethod).amount ? (
                           <p className="mt-1 text-xs text-muted">
-                            * Based on industry averages at your age bracket (
-                            <span className="font-semibold text-deplete">{fiveYearIssueBand(ageToday)}</span>
-                            ), most buyers’ average premium is{" "}
-                            <span className="font-semibold text-deplete">
-                              {money(typicalPremiumHint(ageToday, policy.benefitInflationPct, policy.inflationMethod).amount ?? 0)}
-                            </span>{" "}
-                            based on these benefit options.{" "}
-                            <Cite href={SRC.aaltciPrice2026}>AALTCI 2026 Price Index</Cite>
+                            * Annual premiums based on reported:{" "}
+                            <span className="font-semibold text-deplete">{fiveYearIssueBand(ageToday)}</span>{" "}
+                            average premiums.{" "}
+                            <Cite href={SRC.aaltciPrice2026}>2026 AALTCI Long-Term Care Insurance Price Index</Cite>
                           </p>
                         ) : null}
                         <label className="flex min-h-11 cursor-pointer items-center gap-2 text-sm text-navy">
