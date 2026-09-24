@@ -29,9 +29,9 @@ export function applyDaylight() {
   window.dispatchEvent(new Event(THEME_EVENT));
 }
 
-/** @deprecated kept for callers; load is always daylight. */
+/** @deprecated kept for callers; load is always incognito (dark). */
 export function applyStoredTheme() {
-  applyDaylight();
+  setTheme(true);
 }
 
 /** Apply light/dark. persist writes aum-theme so the next visit matches. */
@@ -48,7 +48,9 @@ export function setTheme(dark: boolean, persist = true) {
 }
 
 export function useDarkMode() {
-  const [dark, setDark] = useState(false);
+  const [dark, setDark] = useState(
+    () => typeof document !== "undefined" && document.documentElement.classList.contains("dark"),
+  );
   useLayoutEffect(() => {
     const sync = () => setDark(isDarkTheme());
     sync();

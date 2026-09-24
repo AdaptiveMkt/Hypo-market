@@ -241,7 +241,7 @@ export function Calculator() {
   const [showReport, setShowReport] = useState(false);
   const [printAfterOpen, setPrintAfterOpen] = useState(false);
   const [pdfPick, setPdfPick] = useState(false);
-  const [personalizeOpen, setPersonalizeOpen] = useState(true);
+  const [personalizeOpen, setPersonalizeOpen] = useState(false);
   const themeBeforeIncognito = useRef<"light" | "dark" | null>(null);
   const [pdfReady, setPdfReady] = useState<{
     filename: string;
@@ -852,9 +852,9 @@ export function Calculator() {
     setDesignTouched(false);
     setRan(false);
     setPoolShown(false);
-    setPersonalizeOpen(true);
+    setPersonalizeOpen(false);
     themeBeforeIncognito.current = null;
-    setTheme(false);
+    setTheme(true);
     setHypoRunId(0);
     setShowReport(false);
     setClient({ ...EMPTY_CONTACT });

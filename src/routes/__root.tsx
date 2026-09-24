@@ -63,7 +63,7 @@ export const Route = createRootRoute({
     ],
     scripts: [
       {
-        children: `(function(){try{document.documentElement.classList.remove("dark");document.documentElement.style.colorScheme="light";localStorage.setItem("aum-theme","light");}catch(e){}})();`,
+        children: `(function(){try{var r=document.documentElement;r.classList.add("dark","antialiased");r.style.colorScheme="dark";if(document.body)document.body.classList.add("dark");var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("content","#0f1c24");localStorage.setItem("aum-theme","dark");}catch(e){}})();`,
       },
       {
         async: true,
