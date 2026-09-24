@@ -1803,7 +1803,7 @@ export function ReportView({
           </h2>
           <p className="mb-3 text-sm text-muted">
             Long-term care has recently risen faster than medical-care CPI.{" "}
-            <Cite href={SRC.aarpLtss}>AARP</Cite> (2019–2024)
+            <Cite href={SRC.aarpLtss}>AARP PPI (March 2026)</Cite>{" "}
             found assisted living and home care up about{" "}
             <strong className="text-navy">8% a year</strong>, nursing-home private rooms about{" "}
             <strong className="text-navy">5% a year</strong>.{" "}
@@ -1817,18 +1817,18 @@ export function ReportView({
           </p>
           <div className="mb-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <div className="rounded-lg bg-cream px-3 py-3">
-              <p className="text-xs uppercase tracking-wide text-muted">AL / home 2019–24</p>
+              <p className="text-xs uppercase tracking-wide text-muted">AL / home, recent</p>
               <p className="font-display text-lg text-navy">~8% / year</p>
               <p className="text-xs text-muted">
-                <Cite href={SRC.aarpLtss}>AARP</Cite> /{" "}
+                <Cite href={SRC.aarpLtss}>AARP PPI (March 2026)</Cite> /{" "}
                 <Cite href={SRC.carescout}>CareScout</Cite> 5-year run-up
               </p>
             </div>
             <div className="rounded-lg bg-cream px-3 py-3">
-              <p className="text-xs uppercase tracking-wide text-muted">NH private 2019–24</p>
+              <p className="text-xs uppercase tracking-wide text-muted">NH private, recent</p>
               <p className="font-display text-lg text-navy">~5% / year</p>
               <p className="text-xs text-muted">
-                <Cite href={SRC.aarpLtss}>AARP</Cite>; 2025{" "}
+                <Cite href={SRC.aarpLtss}>AARP PPI (March 2026)</Cite>; 2025{" "}
                 <Cite href={SRC.carescout}>CareScout</Cite> slowed to 1–2%
               </p>
             </div>
@@ -2015,7 +2015,9 @@ export function ReportView({
           </h2>
           <p className="mb-3 text-sm text-muted">
             Annual national medians. Home health is 44 hours/week. Memory care is 25%
-            above assisted living. 2016–2021: AARP PPI / Genworth. 2023–2025: CareScout.
+            above assisted living. 2023–2025 medians: CareScout. Earlier years in the
+            10-year table are this model’s historical path and are not linked to a
+            publication older than five years.
           </p>
           <div className="grid gap-3 sm:grid-cols-2">
             {[

@@ -1336,8 +1336,6 @@ export function Calculator() {
                   <Cite href={SRC.aaltciPrice2026}>AALTCI 2026 Price Index</Cite>
                   {" · "}
                   <Cite href={SRC.naicShopper}>NAIC Shopper’s Guide</Cite>
-                  {" · "}
-                  <Cite href={SRC.aaltciFacts}>AALTCI LTC facts</Cite>
                 </p>
                 <TitleCollapse title="See what industry says people are buying in long-term care benefits" className="mt-2" defaultOpen={false} openOnHash="what-buyers-section2" hint="READ MORE.">
                   <WhatConsumersBuyPanel ageToday={ageToday} kind={policy.kind} />
@@ -1476,8 +1474,7 @@ export function Calculator() {
                 <p className="mt-1 text-xs font-bold leading-snug amt-red">
                   * You can change the age of claim. The default, {AALTCI_MEAN_CLAIM_AGE}, is the mean age at claim in the{" "}
                   <Cite href={SRC.aaltci2024Claims}>AALTCI 2024 LTCI claims data</Cite>
-                  {" "}(Connecticut Partnership sample, range 31–103). Age mix:{" "}
-                  <Cite href={SRC.aaltciClaimAge2018}>AALTCI — ages when LTCI claims begin (2018)</Cite>.
+                  {" "}(Connecticut Partnership sample, range 31–103).
                 </p>
               </div>
               <div className="min-w-0">

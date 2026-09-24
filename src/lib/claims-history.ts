@@ -65,13 +65,15 @@ export const CLAIMS_SERIES: ClaimsPoint[] = [
   },
 ];
 
-export const CLAIMS_CHART = CLAIMS_SERIES.filter((r) => r.paidB != null || r.incurredB != null).map((r) => ({
+const CLAIMS_WITHIN_FIVE_YEARS = CLAIMS_SERIES.filter((r) => r.year >= 2022);
+
+export const CLAIMS_CHART = CLAIMS_WITHIN_FIVE_YEARS.filter((r) => r.paidB != null || r.incurredB != null).map((r) => ({
   year: String(r.year),
   paid: r.paidB ?? null,
   incurred: r.incurredB ?? null,
 }));
 
-export const CLAIMANT_CHART = CLAIMS_SERIES.filter((r) => r.claimantsK != null).map((r) => ({
+export const CLAIMANT_CHART = CLAIMS_WITHIN_FIVE_YEARS.filter((r) => r.claimantsK != null).map((r) => ({
   year: String(r.year),
   claimants: r.claimantsK as number,
 }));
@@ -96,7 +98,7 @@ export const AALTCI_2024_SAMPLE = {
 
 /** Why claims start, and why applications are declined. Snapshots, not this carrier. */
 export const CLAIM_CAUSES = {
-  note: "AALTCI summarizing a Society of Actuaries new-claim cause study (home-care and facility mix). Shares are of new claims, not of claim dollars. Causes are the initial diagnosis recorded at claim start — not the only condition present.",
+  note: "Shares of new claims by the initial diagnosis recorded at claim start, not of claim dollars. Publications older than five years are not linked.",
   overall: [
     { cause: "Alzheimer’s / dementia", pct: 24, note: "Nearly 1 in 4 new claims; longest-lasting on average." },
     { cause: "Stroke", pct: 9, note: "Often facility or skilled care." },
@@ -120,7 +122,7 @@ export const CLAIM_CAUSES = {
     { age: "80 and over", pct: 59.2 },
   ],
   whenClaimsBeginNote:
-    "AALTCI 2010 LTCi Sourcebook: share of claims that had already begun, by attained age. Later AALTCI 2018 new-claim study: 25% started at 81–85, 27.2% at 86–90, 17.5% at 91+ — nearly half of new claims after age 86. Mean claim age in the 2024 Connecticut Partnership sample: 81 (range 31–103); 59% female / 41% male.",
+    "Mean claim age in the 2024 Connecticut Partnership sample: 81 (range 31–103); 59% female / 41% male. Older claim-start age mixes are not cited.",
   newClaims2018: [
     { age: "81–85", pct: 25 },
     { age: "86–90", pct: 27.2 },
@@ -148,7 +150,7 @@ export const UW_DECLINES = {
   reasons: [
     "Build (height/weight) is often the single most common hard decline on fully underwritten individual business (carrier underwriting guides, including Genworth/CareScout).",
     "Conditions that commonly close the file: insulin-treated diabetes, stroke or TIA, early cognitive change or an abnormal cognitive screen, current use of a cane/walker, and any existing ADL limitation.",
-    "Other frequent impairments: heart disease, arthritis and back pain, psychiatric illness, recent cancer treatment, and current smoking. Health Affairs / Cornell (2010 applications): diabetes and history of stroke had the largest negative effects on approval; any ADL difficulty was nearly always declined.",
+    "Other frequent impairments: heart disease, arthritis and back pain, psychiatric illness, recent cancer treatment, and current smoking.",
     "A decline is not the same as a later claim denial. After issue, tax-qualified policies pay when two of six ADLs are expected to last 90+ days or there is severe cognitive impairment needing supervision — plus the elimination period. Unlicensed family care and care outside the U.S. are commonly limited.",
   ],
 };
@@ -312,7 +314,7 @@ export const SOA_LIMRA = {
     announced: "4 Aug 2025",
     carriers: 13,
     marketShare: "about two-thirds of stand-alone LTCI",
-    note: "Update of the 2000–2016 study. Stand-alone only (hybrids may be a later study). Data were due to LIMRA 15 Sep 2025. The published report is not in this hypothetical yet — treat 2000–2016 as the latest public intercompany tables.",
+    note: "Announced 4 Aug 2025. Stand-alone only (hybrids may be a later study). Data were due to LIMRA 15 Sep 2025. The published report is not in this hypothetical yet. Studies published before September 2021 are not cited.",
   },
 };
 

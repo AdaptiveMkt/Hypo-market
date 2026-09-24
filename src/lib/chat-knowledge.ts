@@ -2,7 +2,7 @@ import { HYPO_SOURCES, LICENSE_LOOKUPS } from "@/lib/sources";
 import { HOLD_HARMLESS_SHORT } from "@/lib/disclaimer";
 import { IRC_101G_INTRO, IRC_101G_PER_DIEM_2026 } from "@/lib/irc-101g";
 import { NAIC_LOCKOUT_ASSETS, NAIC_WARN_ASSETS } from "@/lib/naic-suitability";
-import { CLAIM_CAUSES, CLAIMS_SERIES, AALTCI_2024_SAMPLE, UW_DECLINES } from "@/lib/claims-history";
+import { CLAIM_CAUSES, CLAIMS_SERIES, AALTCI_2024_SAMPLE } from "@/lib/claims-history";
 
 export type CitedSource = { label: string; url: string; aaltci: boolean };
 
@@ -131,21 +131,21 @@ const CORE: KnowledgeChunk[] = [
     label: "AALTCI — Paid LTCI claims increased in 2023",
     url: "https://www.aaltci.org/news/long-term-care-insurance-association-news/paid-long-term-care-insurance-claims-increased-in-2023",
     aaltci: true,
-    text: `AALTCI: traditional LTCI paid about $${paid2023?.paidB} billion in 2023 to about ${paid2023?.claimantsK},000 people. Earlier AALTCI paid snapshots: 2006 $3.3B; 2010 ~$6B; 2011 $6.6B; 2020 $11.6B. Paid is not incurred (Milliman review of NAIC Experience Forms: ~$16B incurred 2023, ~$17B 2024).`,
+    text: `AALTCI: traditional LTCI paid about $${paid2023?.paidB} billion in 2023 to about ${paid2023?.claimantsK},000 people. Paid is not incurred (Milliman review of NAIC Experience Forms: ~$16B incurred 2023, ~$17B 2024).`,
   },
   {
     id: "aaltci-causes",
     label: "AALTCI — Top reasons for an LTC insurance claim",
     url: "https://www.aaltci.org/news/long-term-care-insurance-news/top-reasons-for-long-term-care-insurance-claim-alzheimers-cancer",
     aaltci: true,
-    text: `AALTCI summarizing SOA new-claim causes: Alzheimer’s/dementia ${CLAIM_CAUSES.overall[0].pct}% of new claims; stroke, arthritis, injury, circulatory each about 9%; cancer 8%. Under 65, cancer and injury are over-represented; at 75+ Alzheimer’s dominates. AALTCI 2018: nearly half of new claims after age 86. Connecticut Partnership 2024 sample mean claim age ${AALTCI_2024_SAMPLE.claimAgeMean} (${AALTCI_2024_SAMPLE.claimAgeRange}); 59% female.`,
+    text: `AALTCI summarizing new-claim causes within the sources this model will cite: Alzheimer’s/dementia ${CLAIM_CAUSES.overall[0].pct}% of new claims; stroke, arthritis, injury, circulatory each about 9%; cancer 8%. Under 65, cancer and injury are over-represented; at 75+ Alzheimer’s dominates. Connecticut Partnership 2024 sample mean claim age ${AALTCI_2024_SAMPLE.claimAgeMean} (${AALTCI_2024_SAMPLE.claimAgeRange}); 59% female.`,
   },
   {
     id: "aaltci-declines",
-    label: "AALTCI — Decline rates reported (2019 Milliman applications)",
-    url: "https://www.aaltci.org/news/long-term-care-insurance-association-news/long-term-care-insurance-decline-rates-reported",
-    aaltci: true,
-    text: `AALTCI reporting Milliman 2019 applications: individual decline ${UW_DECLINES.milliman2019[0].pct}% at 40–49 and ${UW_DECLINES.milliman2019[1].pct}% at 75+. 2024 Milliman declines: about 18% at 40–49, 24% at 50–59, 33% at 60–64, 43% at 65–69, 50% at 70–74. Build, insulin diabetes, stroke/TIA, cognitive change, and existing ADL limits commonly close a file.`,
+    label: "Milliman — 2024 underwriting declines",
+    url: "https://brokerworldmag.com/wp-content/uploads/2025/12/2025-SurveyAnalysis-2025-12-16.pdf",
+    aaltci: false,
+    text: `2025 Milliman LTCI Survey of 2024 applications: individual decline about 18% at 40–49, 24% at 50–59, 33% at 60–64, 43% at 65–69, 50% at 70–74. Build, insulin diabetes, stroke/TIA, cognitive change, and existing ADL limits commonly close a file. Decline studies from 2019 and earlier are not cited.`,
   },
   {
     id: "aaltci-price",

@@ -351,30 +351,6 @@ export const HYPO_SOURCES: { topic: string; label: string; href: string; note: s
     note: "Connecticut Partnership sample: 6,878 claimants, mean age 81, home-health-aide 53%. Not a U.S. census.",
   },
   {
-    topic: "AALTCI / SOA claim causes",
-    label: "AALTCI — Top reasons for an LTC insurance claim",
-    href: "https://www.aaltci.org/news/long-term-care-insurance-news/top-reasons-for-long-term-care-insurance-claim-alzheimers-cancer",
-    note: "Alzheimer’s about 1 in 4 new claims; stroke, arthritis, injury, and circulatory each about 9%. Age mix: cancer/injury earlier; Alzheimer’s after 75.",
-  },
-  {
-    topic: "AALTCI claim start ages (2018)",
-    label: "AALTCI — Ages when LTCI claims begin",
-    href: "https://www.aaltci.org/news/long-term-care-insurance-association-news/ages-when-long-term-care-insurance-claims-begin-2018-study",
-    note: "25% of 2018 new claims at 81–85; 27.2% at 86–90; 17.5% at 91+. Nearly half after age 86.",
-  },
-  {
-    topic: "LTCI underwriting decline rates",
-    label: "AALTCI — Decline rates reported (2019 Milliman applications)",
-    href: "https://www.aaltci.org/news/long-term-care-insurance-association-news/long-term-care-insurance-decline-rates-reported",
-    note: "Decline 19.4% at 40–49 and 53.6% at 75+. At least one spouse declined: 35% (40–49) to 78.5% (both 75+).",
-  },
-  {
-    topic: "Medical underwriting of LTCI",
-    label: "Health Affairs / Cornell — Medical underwriting in LTCI (PMC)",
-    href: "https://pmc.ncbi.nlm.nih.gov/articles/PMC5127198/",
-    note: "Diabetes, stroke, obesity, and any ADL difficulty were the strongest medical barriers to approval among 2010 applicants.",
-  },
-  {
     topic: "NAIC LTCI Experience Report",
     label: "NAIC Long-Term Care Insurance Experience Report (2024)",
     href: "https://content.naic.org/sites/default/files/publication-ltc-lr-care-experience-report.pdf",
@@ -409,18 +385,6 @@ export const HYPO_SOURCES: { topic: string; label: string; href: string; note: s
     label: "Virginia Bureau of Insurance — Genworth Choice I SERFF filing",
     href: "https://www.scc.virginia.gov/boi/SERFFInquiry/Attachments/LH/GEFA-134686770.pdf",
     note: "September 2025. Original lifetime loss ratio 60%; 2024 cash-flow-testing best-estimate 101.3%. A rate filing, not a nationwide ratio.",
-  },
-  {
-    topic: "SOA LTC intercompany experience 2000–2016",
-    label: "SOA — Long-Term Care Intercompany Experience Study (2000–2016)",
-    href: "https://www.soa.org/globalassets/assets/files/resources/experience-studies/2020/2000-2016-ltc-aggregate-database-report.pdf",
-    note: "18 carriers, ~80% of 2016 earned premium. 620,591 claims; overall incidence 1.012%. Stand-alone only. Published 12 Aug 2020.",
-  },
-  {
-    topic: "SOA / Academy LTC mortality and lapse",
-    label: "SOA — LTC Insurance Mortality and Lapse Study (2021)",
-    href: "https://www.soa.org/resources/research-reports/2021/2021-ltc-mortality-lapse-study",
-    note: "Statutory minimum-reserve bases. Lapse and mortality margins from the 2000–2011 SOA/LIMRA study.",
   },
   {
     topic: "SOA / LIMRA / NAIC 2000–2023 study",

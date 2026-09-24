@@ -15,7 +15,7 @@ export const CPI_METHODS = [
   },
   {
     title: "CPI is not an LTC price index",
-    body: "Nursing facility, assisted living, and 24-hour home care are barely in the CPI basket. CareScout / Genworth cost-of-care surveys and AARP LTSS studies are the usual LTC yardsticks. Those have recently run from about 2–3% (cooler 2025 survey) to about 5–8% (2019–2024 assisted living and home care). This model lets you pick one annual rate and apply it to the selected setting.",
+    body: "Nursing facility, assisted living, and 24-hour home care are barely in the CPI basket. CareScout cost-of-care surveys and the AARP PPI March 2026 LTSS review are the yardsticks this model will cite. Recent assisted-living and home-care growth has run higher than medical CPI; CareScout’s 2025 survey cooled toward about 1–5% depending on the setting. This model lets you pick one annual rate and apply it to the selected setting.",
   },
 ];
 

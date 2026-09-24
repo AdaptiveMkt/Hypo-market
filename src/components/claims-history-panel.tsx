@@ -155,7 +155,7 @@ export function ClaimsHistoryPanel({
             </tr>
           </thead>
           <tbody>
-            {CLAIMS_SERIES.map((r) => (
+            {CLAIMS_SERIES.filter((r) => r.year >= 2022).map((r) => (
               <tr key={r.year} className="border-t border-line align-top">
                 <td className="py-2 pr-2 font-semibold tabular-nums text-navy">{r.year}</td>
                 <td className="py-2 pr-2 text-right tabular-nums">{r.paidB != null ? `$${r.paidB}B` : "—"}</td>
@@ -217,11 +217,6 @@ export function ClaimsHistoryPanel({
           </p>
           <ul className="mt-2 list-disc space-y-1 pl-5 text-muted">
             <li>
-              AALTCI 2018 survey (through 31 Dec 2017): one carrier’s largest female claim
-              $2.6 million over 20 years 9 months; largest male $1.7 million.{" "}
-              <Cite href={SRC.aaltciFacts}>AALTCI LTC facts</Cite>
-            </li>
-            <li>
               2024 CT sample max paid-to-date {money(s.paidMax)}.{" "}
               <Cite href={SRC.aaltci2024Claims}>AALTCI 2024 claims</Cite>
             </li>
@@ -271,9 +266,6 @@ export function ClaimsHistoryPanel({
               </tbody>
             </table>
           </div>
-          <p className="mt-2 text-xs text-muted">
-            <Cite href={SRC.aaltciClaimCauses}>AALTCI (SOA new-claim causes)</Cite>
-          </p>
         </div>
         <div className="card px-4 py-3 text-sm">
           <p className="font-semibold text-navy">Cause by age band</p>
@@ -304,23 +296,10 @@ export function ClaimsHistoryPanel({
               </tbody>
             </table>
           </div>
-          <p className="mt-3 font-semibold text-navy">When claims begin (age mix)</p>
+          <p className="mt-3 font-semibold text-navy">When claims begin</p>
           <p className="mt-1 text-xs text-muted">{CLAIM_CAUSES.whenClaimsBeginNote}</p>
-          <ul className="mt-2 list-disc space-y-1 pl-5 text-muted">
-            {CLAIM_CAUSES.whenClaimsBegin.map((r) => (
-              <li key={r.age}>
-                {r.age}: {r.pct}% of claims (2010 Sourcebook stock)
-              </li>
-            ))}
-            {CLAIM_CAUSES.newClaims2018.map((r) => (
-              <li key={r.age}>
-                New claims 2018, ages {r.age}: {r.pct}%
-              </li>
-            ))}
-          </ul>
           <p className="mt-2 text-xs text-muted">
-            <Cite href={SRC.aaltciClaimAge2018}>AALTCI 2018 claim-start ages</Cite> ·{" "}
-            <Cite href={SRC.aaltciFacts}>AALTCI facts / 2010 Sourcebook</Cite>
+            <Cite href={SRC.aaltci2024Claims}>AALTCI 2024 LTCI claims data</Cite>
           </p>
         </div>
       </div>
@@ -347,10 +326,8 @@ export function ClaimsHistoryPanel({
               </tbody>
             </table>
           </div>
-          <p className="mt-2 text-muted">{UW_DECLINES.milliman2019Note}</p>
           <p className="mt-2 text-xs text-muted">
-            <Cite href={SRC.millimanSurvey2025}>2025 Milliman LTCI Survey</Cite> ·{" "}
-            <Cite href={SRC.aaltciDecline2019}>AALTCI decline rates (2019 apps)</Cite>
+            <Cite href={SRC.millimanSurvey2025}>2025 Milliman LTCI Survey</Cite>
           </p>
         </div>
         <div
@@ -365,8 +342,7 @@ export function ClaimsHistoryPanel({
             ))}
           </ul>
           <p className="mt-2 text-xs text-muted">
-            <Cite href={SRC.genworthUwGuide}>Genworth / CareScout underwriting guide</Cite> ·{" "}
-            <Cite href={SRC.ltcUwPmc}>Health Affairs / Cornell (PMC)</Cite>
+            <Cite href={SRC.millimanSurvey2025}>2025 Milliman LTCI Survey</Cite>
           </p>
         </div>
       </div>
@@ -598,8 +574,7 @@ export function ClaimsHistoryPanel({
           </p>
           <p className="text-xs text-muted">
             {SOA_LIMRA.study2016.companies} carriers, {SOA_LIMRA.study2016.premiumShare}% of
-            2016 premium.{" "}
-            <Cite href={SRC.soaLtc2016}>SOA 2020 report</Cite>
+            2016 premium. Published before the five-year source window, so it is not linked.
           </p>
         </div>
         <div className="rounded-lg bg-cream px-3 py-3">
@@ -639,29 +614,13 @@ export function ClaimsHistoryPanel({
       <p className="mb-3 text-sm text-muted">{SOA_LIMRA.study2016.note}</p>
 
       <h4 className="mb-2 text-sm font-semibold text-navy">
-        Incidence rises with age (SOA 1984–2004 intercompany)
+        Incidence rises with age
       </h4>
-      <p className="mb-3 text-sm text-muted">{SOA_LIMRA.study1984.note}</p>
-      <div className="mb-4 overflow-x-auto">
-        <table className="w-full min-w-[480px] text-sm">
-          <thead>
-            <tr className="text-left text-xs uppercase tracking-wide text-muted">
-              <th className="py-2 pr-2">Attained age</th>
-              <th className="py-2 pr-2 text-right">All elimination periods</th>
-              <th className="py-2 text-right">0-day elimination</th>
-            </tr>
-          </thead>
-          <tbody>
-            {SOA_LIMRA.study1984.incidenceByAge.map((r) => (
-              <tr key={r.age} className="border-t border-line tabular-nums">
-                <td className="py-2 pr-2 font-semibold text-navy">{r.age}</td>
-                <td className="py-2 pr-2 text-right">{r.all.toFixed(2)}%</td>
-                <td className="py-2 text-right">{r.zeroDay.toFixed(2)}%</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <p className="mb-4 text-sm text-muted">
+        Intercompany incidence tables published before September 2021 are not cited.
+        The 4 Aug 2025 SOA, LIMRA, and NAIC update is the current experience-study reference,
+        and its report is not in this hypothetical yet.
+      </p>
 
       <div className="mb-4 grid gap-3 sm:grid-cols-2">
         <div className="card px-4 py-3 text-sm">
@@ -698,14 +657,8 @@ export function ClaimsHistoryPanel({
           <p className="font-semibold text-navy">Milliman survey claims + SOA/LIMRA update</p>
           <p className="mt-1 text-muted">{MILLIMAN_SURVEY_2025.note}</p>
           <p className="mt-2 text-muted">
-            {SOA_LIMRA.study2011.note}{" "}
-            <Cite href={SRC.soaLtcLapse}>SOA 2021 mortality & lapse</Cite> now
-            underpins statutory minimum reserves.
-          </p>
-          <p className="mt-2 text-muted">
-            Forthcoming: {SOA_LIMRA.forthcoming.note}{" "}
-            <Cite href={SRC.soaLimraNaic}>SOA / LIMRA / NAIC, 4 Aug 2025</Cite> ·{" "}
-            <Cite href={SRC.soaLtc2023}>data request</Cite>
+            {SOA_LIMRA.forthcoming.note}{" "}
+            <Cite href={SRC.soaLimraNaic}>SOA / LIMRA / NAIC, 4 Aug 2025</Cite>
           </p>
         </div>
       </div>
