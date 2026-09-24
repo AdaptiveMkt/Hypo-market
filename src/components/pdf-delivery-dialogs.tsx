@@ -204,8 +204,7 @@ export function PdfReadyDialog({
           Your PDF is ready
         </h2>
         <p className="mt-2 text-sm text-muted">
-          Save it on this computer. Your browser may also have started a download — if it did
-          not, use the button below.
+          The PDF is ready to view. It is not saved until you choose Save PDF to this computer.
         </p>
         <p className="mt-3 break-all rounded-lg border border-teal/40 bg-cream/40 px-3 py-2 text-sm text-navy">
           {filename}

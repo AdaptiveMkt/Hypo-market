@@ -928,7 +928,7 @@ export function Calculator() {
           setPrintAfterOpen(false);
           setShowReport(false);
           const snap = mailRef.current;
-          let note = "If the file did not appear in your downloads, use Save PDF to this computer.";
+          let note = "The file is not on this computer until you choose Save PDF to this computer.";
           let next: "contact" | "done" = "contact";
           if (advisorReceivesPdf(snap.advisor, snap.client) && snap.attachAdvisor) {
             try {

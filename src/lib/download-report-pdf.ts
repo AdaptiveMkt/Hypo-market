@@ -186,16 +186,10 @@ function savePdfFile(pdf: jsPDF, filename: string) {
   return savePdfBlob(blob, filename);
 }
 
-/** Trigger a local download and keep an object URL for a Save-to-this-computer control. */
+/** Keep an object URL for the ready dialog. The file is not saved until the visitor clicks Save. */
 export function savePdfBlob(blob: Blob, filename: string): string {
   const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  a.rel = "noopener";
-  document.body.appendChild(a);
-  a.click();
-  window.setTimeout(() => a.remove(), 0);
+  void filename;
   return url;
 }
 
