@@ -154,13 +154,14 @@ export function DetailsPicker({
               lockoutMode
                 ? g.items.filter(
                     (s) =>
-                      s.id === "medicaidLtc" ||
+                      s.id !== "dhHoldHarmlessCard" &&
+                      (s.id === "medicaidLtc" ||
                       s.id.startsWith("dh") ||
-                      s.id === "eduHypo",
+                      s.id === "eduHypo"),
                   )
                 : policyEnabled
-                  ? g.items.filter((s) => showReciprocity || s.id !== "reciprocity")
-                  : g.items.filter((s) => !isInsuranceDetail(s.id) && s.id !== "reciprocity")
+                  ? g.items.filter((s) => s.id !== "dhHoldHarmlessCard" && (showReciprocity || s.id !== "reciprocity"))
+                  : g.items.filter((s) => s.id !== "dhHoldHarmlessCard" && !isInsuranceDetail(s.id) && s.id !== "reciprocity")
             );
             if (!items.length) return null;
             return (
