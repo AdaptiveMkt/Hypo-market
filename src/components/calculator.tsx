@@ -890,15 +890,21 @@ export function Calculator() {
   useLayoutEffect(() => {
     if (!personalizeOpen) setTheme(true);
   }, [personalizeOpen]);
+  const pdfUnlocked = ran && section2Confirmed && (insuranceLocked || section3Confirmed);
   function requestPdfDownload() {
+    if (!pdfUnlocked) return;
     setDetails((d) => withScenarioDetails(d, insuranceLocked));
     setAttachAdvisor(advisorReceivesPdf(advisor, client));
     setPdfPick(true);
   }
   useEffect(() => {
+    document.documentElement.dataset.pdfReady = pdfUnlocked ? "1" : "0";
     window.addEventListener("aum-download-pdf", requestPdfDownload);
-    return () => window.removeEventListener("aum-download-pdf", requestPdfDownload);
-  }, [insuranceLocked, showReciprocity]);
+    return () => {
+      document.documentElement.dataset.pdfReady = "0";
+      window.removeEventListener("aum-download-pdf", requestPdfDownload);
+    };
+  }, [pdfUnlocked, insuranceLocked, showReciprocity]);
   function runPdfDownload() {
     setPdfError("");
     setPdfPick(false);
@@ -1291,7 +1297,7 @@ export function Calculator() {
             >
               Calculate Countable Assets
             </button>
-            {ran ? (
+            {pdfUnlocked ? (
               <div className="grid grid-cols-2 gap-2">
                 <button type="button" onClick={viewAllReport} className="flex min-h-11 items-center justify-center rounded-lg border border-gold bg-gold px-3 py-2 text-center text-sm font-semibold text-masthead hover:brightness-105">View all</button>
                 <button type="button" onClick={requestPdfDownload} className="flex min-h-11 items-center justify-center rounded-lg border border-navy bg-navy px-3 py-2 text-center text-sm font-semibold text-cream hover:bg-teal">Download PDF</button>
@@ -2195,11 +2201,13 @@ export function Calculator() {
                 { id: "end-short", group: "more" as const, label: "Unpaid shortfall (end of run)", value: <RedAmt>{result.shortfallTotal ? moneyCents(result.shortfallTotal) : "None"}</RedAmt>, amount: result.shortfallTotal },
               ]}
             />
+            {pdfUnlocked ? (
             <div className="mt-2 stack-actions md:grid-cols-2">
               <button type="button" onClick={viewAllReport} className="btn-block rounded-lg border border-gold bg-gold text-masthead hover:brightness-105">View all</button>
               <button type="button" onClick={requestPdfDownload} className="btn-block rounded-lg border border-navy bg-navy text-cream hover:bg-teal">Download PDF</button>
               <p className="col-span-full text-xs leading-snug text-muted">Open a title below to view more details. Check Add to PDF on each card you want in the download.</p>
             </div>
+            ) : null}
           </TitleCollapse>
         </section>
 
@@ -2574,6 +2582,7 @@ export function Calculator() {
         </TitleCollapse>
       </div>
       <div className="mt-3">
+        {pdfUnlocked ? (
         <button
           type="button"
           onClick={requestPdfDownload}
@@ -2581,6 +2590,7 @@ export function Calculator() {
         >
           Download PDF
         </button>
+        ) : null}
       </div>
       <p className="mt-3 text-center text-xs text-muted"><CopyrightMark /></p>
       {saveMsg ? <p className="mt-2 text-center text-sm text-good">{saveMsg}</p> : null}

@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { createRootRoute, HeadContent, Link, Outlet, Scripts } from "@tanstack/react-router";
 import { AuthProvider } from "@/lib/auth/provider";
 import { PreviewHostBridge } from "@/components/preview-host-bridge";
@@ -14,6 +15,27 @@ import { HOLD_HARMLESS_ACK, HOLD_HARMLESS_SHORT } from "@/lib/disclaimer";
 import appCss from "../styles.css?url";
 
 const APP_NAME = "Long Term Care Asset Utilization Modeling";
+
+function FooterDownloadPdf() {
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    const sync = () => setReady(document.documentElement.dataset.pdfReady === "1");
+    sync();
+    const obs = new MutationObserver(sync);
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ["data-pdf-ready"] });
+    return () => obs.disconnect();
+  }, []);
+  if (!ready) return null;
+  return (
+    <button
+      type="button"
+      className="mt-3 inline-flex min-h-11 items-center justify-center rounded-lg border border-gold bg-gold px-4 py-2 text-sm font-semibold text-masthead hover:brightness-105"
+      onClick={() => window.dispatchEvent(new Event("aum-download-pdf"))}
+    >
+      Download PDF
+    </button>
+  );
+}
 
 export const Route = createRootRoute({
   head: () => ({
@@ -121,13 +143,7 @@ function Root() {
                   <CopyrightMark linkClass="text-gold underline underline-offset-4 hover:underline" />{" "}
                   <DisclosureTermsLink className="text-gold underline-offset-4 hover:underline" />
                 </p>
-                <button
-                  type="button"
-                  className="mt-3 inline-flex min-h-11 items-center justify-center rounded-lg border border-gold bg-gold px-4 py-2 text-sm font-semibold text-masthead hover:brightness-105"
-                  onClick={() => window.dispatchEvent(new Event("aum-download-pdf"))}
-                >
-                  Download PDF
-                </button>
+                <FooterDownloadPdf />
               </footer>
           </ContentGuard>
         </AuthProvider>
