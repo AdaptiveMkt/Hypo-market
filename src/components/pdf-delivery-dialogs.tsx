@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FieldPicker } from "@/components/field-picker";
 import { STATE_NAMES } from "@/lib/costs";
 import { submitContactRequest } from "@/lib/send-report-mail";
@@ -192,6 +192,33 @@ export function PdfReadyDialog({
   onContinue: () => void;
 }) {
   const [viewing, setViewing] = useState(false);
+  const [full, setFull] = useState(false);
+  const stageRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!full) return;
+    const node = stageRef.current;
+    let entered = false;
+    if (node && !document.fullscreenElement && node.requestFullscreen) {
+      node.requestFullscreen().then(() => {
+        entered = true;
+      }).catch(() => {
+        /* The overlay still fills the page if the browser blocks full screen. */
+      });
+    }
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setFull(false);
+    }
+    function onFullChange() {
+      if (document.fullscreenElement === node) entered = true;
+      else if (entered) setFull(false);
+    }
+    window.addEventListener("keydown", onKey);
+    document.addEventListener("fullscreenchange", onFullChange);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.removeEventListener("fullscreenchange", onFullChange);
+    };
+  }, [full]);
   if (!open || !url) return null;
 
   function saveToComputer() {
@@ -202,6 +229,15 @@ export function PdfReadyDialog({
     document.body.appendChild(a);
     a.click();
     window.setTimeout(() => a.remove(), 0);
+  }
+
+  function exitFull() {
+    setFull(false);
+    if (document.fullscreenElement) {
+      document.exitFullscreen().catch(() => {
+        /* already left */
+      });
+    }
   }
 
   return (
@@ -246,6 +282,13 @@ export function PdfReadyDialog({
           </button>
           <button
             type="button"
+            className="btn-block rounded-lg border border-gold bg-gold text-center text-masthead hover:brightness-105"
+            onClick={() => setFull(true)}
+          >
+            Full screen
+          </button>
+          <button
+            type="button"
             className="btn-block rounded-lg border border-card-border text-navy hover:bg-cream"
             onClick={onContinue}
           >
@@ -253,6 +296,24 @@ export function PdfReadyDialog({
           </button>
         </div>
       </div>
+      {full ? (
+        <div
+          ref={stageRef}
+          className="fixed inset-0 z-[90] flex h-[100dvh] w-screen flex-col bg-navy"
+        >
+          <div className="flex shrink-0 items-center justify-between gap-3 px-3 py-2">
+            <p className="min-w-0 truncate text-sm text-cream">{filename}</p>
+            <button
+              type="button"
+              className="shrink-0 rounded-lg border border-gold bg-gold px-4 py-2 text-sm font-semibold text-masthead"
+              onClick={exitFull}
+            >
+              Exit full screen
+            </button>
+          </div>
+          <iframe title={filename} src={url} className="min-h-0 w-full flex-1 bg-paper" />
+        </div>
+      ) : null}
     </div>
   );
 }
