@@ -225,7 +225,7 @@ export function Calculator() {
   const [cpiOverride, setCpiOverride] = useState<number | null>(null);
   const cpi = cpiOverride ?? (setting ? fiveYearLtcCagr(setting) : DEFAULT_CARE_CPI);
   const cpiTouched = cpiOverride != null;
-  const [ageToday, setAgeToday] = useState(0);
+  const [ageToday, setAgeToday] = useState(DEFAULT_AGE_TODAY);
   const [claimAge, setClaimAge] = useState(AALTCI_MEAN_CLAIM_AGE);
   const [claimAgeTouched, setClaimAgeTouched] = useState(false);
   const delay = ageToday >= MIN_AGE_TODAY ? yearsUntilClaim(ageToday, claimAge) : 0;
@@ -825,7 +825,7 @@ export function Calculator() {
     setSetting("");
     setSettingNeeded(false);
     setCpiOverride(null);
-    setAgeToday(0);
+    setAgeToday(DEFAULT_AGE_TODAY);
     spokenAgeBand.current = null;
     spokenProtectDuration.current = null;
     setCue(null);
