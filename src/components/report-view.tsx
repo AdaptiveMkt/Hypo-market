@@ -382,10 +382,7 @@ export function ReportView({
         className="mx-auto max-w-5xl space-y-8 bg-paper px-4 py-8 text-ink outline-none sm:px-8"
       >
         <header className="report-block border-b-2 border-gold pb-4">
-          <p className="text-xs uppercase tracking-[0.14em] text-gold-ink">
-            Adaptive Marketing Group
-          </p>
-          <h1 id="report-title" className="mt-1 font-display text-3xl text-navy">
+          <h1 id="report-title" className="font-display text-3xl text-navy">
             Long Term Care Asset Utilization Modeling
           </h1>
           <p className="mt-2 text-sm text-muted">
