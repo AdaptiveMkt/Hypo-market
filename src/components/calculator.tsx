@@ -109,6 +109,7 @@ import {
 } from "@/lib/report-options";
 import {
   NAIC_LOCKOUT_ASSETS,
+  NAIC_SHOPPER_WORKSHEET_PDF,
   NAIC_SUITABILITY_BANNER,
   NAIC_SUITABILITY_MEETS,
   NAIC_SUITABILITY_WARN,
@@ -726,6 +727,20 @@ export function Calculator() {
       setCue({
         title: "Insurance may not be suitable",
         body: naicLockoutSpoken(state),
+        note: "This model’s planning screen is countable assets under $150,000, excluding the home. It is not a carrier’s filed suitability standard and not a determination of eligibility.",
+        links: [
+          {
+            kicker: "Source",
+            label: "NAIC Shopper’s Guide — Long-Term Care Insurance Personal Worksheet",
+            href: NAIC_SHOPPER_WORKSHEET_PDF,
+            external: true,
+          },
+          {
+            kicker: "On this site",
+            label: "Find a qualified professional or look up a license",
+            href: "#find-a-professional",
+          },
+        ],
       });
       return;
     }
@@ -2499,8 +2514,8 @@ export function Calculator() {
           ) : null}
 
           {insuranceLocked ? (
-            <div className="mt-5 card-xl px-4 py-2">
-              <TitleCollapse title="Find a qualified professional" className="mt-0" defaultOpen hint="Medicaid, elder-care, and estate-planning contacts — not a referral.">
+            <div id="find-a-professional" className="mt-5 scroll-mt-8 card-xl px-4 py-2">
+              <TitleCollapse title="Find a qualified professional" className="mt-0" defaultOpen openOnHash="find-a-professional" hint="Medicaid, elder-care, and estate-planning contacts — not a referral.">
                 <AdvisorProfessionalFolds details={details} onPdfChange={setDetail} lockout={insuranceLocked} />
               </TitleCollapse>
             </div>

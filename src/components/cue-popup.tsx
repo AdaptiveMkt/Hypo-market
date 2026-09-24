@@ -5,6 +5,13 @@ import { createPortal } from "react-dom";
 
 export type CueActionId = "industry" | "protect" | "copay-alt";
 
+export type CueLink = {
+  kicker?: string;
+  label: string;
+  href: string;
+  external?: boolean;
+};
+
 export type CueMessage = {
   title: string;
   body: string;
@@ -15,6 +22,8 @@ export type CueMessage = {
   action?: CueActionId;
   secondaryLabel?: string;
   secondaryAction?: CueActionId;
+  note?: string;
+  links?: CueLink[];
 };
 
 export function CuePopup({
@@ -67,6 +76,45 @@ export function CuePopup({
           {cue.title}
         </h2>
         <p className="mt-3 text-sm leading-relaxed text-navy whitespace-pre-line">{cue.body}</p>
+        {cue.note ? <p className="mt-3 text-xs leading-relaxed text-muted">{cue.note}</p> : null}
+        {cue.links?.length ? (
+          <ul className="mt-3 space-y-2 text-sm">
+            {cue.links.map((link) => (
+              <li key={link.href}>
+                {link.kicker ? <span className="font-semibold text-navy">{link.kicker}: </span> : null}
+                <a
+                  href={link.href}
+                  {...(link.external
+                    ? { target: "_blank", rel: "noopener noreferrer" }
+                    : {})}
+                  className="source-link font-semibold text-link underline underline-offset-2"
+                  onClick={
+                    link.external
+                      ? undefined
+                      : (e) => {
+                          e.preventDefault();
+                          const id = link.href.replace(/^#/, "");
+                          onClose();
+                          window.setTimeout(() => {
+                            if (window.location.hash === link.href) {
+                              window.dispatchEvent(new HashChangeEvent("hashchange"));
+                            } else {
+                              window.location.hash = link.href;
+                            }
+                            document.getElementById(id)?.scrollIntoView({
+                              behavior: "smooth",
+                              block: "start",
+                            });
+                          }, 40);
+                        }
+                  }
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        ) : null}
         {cue.actionHint ? <p className="mt-4 text-xs font-semibold text-navy">{cue.actionHint}</p> : null}
         <div className="mt-4 flex flex-col gap-2">
           <div className={`flex flex-wrap items-center ${cue.action ? "justify-between" : "justify-end"} gap-2`}>
