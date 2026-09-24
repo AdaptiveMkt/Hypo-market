@@ -34,7 +34,7 @@ export const LTC_GLOSSARY: GlossaryEntry[] = [
   {
     term: "Benefit period",
     definition:
-      "How long the policy will pay at the full daily or monthly maximum — for example 2, 3, 5 years, or lifetime. A pool-of-money design is daily × 365 × years. Using less than the daily max can stretch the period. Lifetime has no period cap in this model.",
+      "How long the policy will pay at the full daily or monthly maximum — for example 2, 3, 5 years, or lifetime*. A pool-of-money design is daily × 365 × years. Using less than the daily max can stretch the period. Lifetime* has no period cap in this model. * Lifetime long-term care insurance may not be available. Contact a licensed insurance agent in your state of residence.",
   },
   {
     term: "Benefit trigger",
@@ -194,7 +194,7 @@ export const LTC_GLOSSARY: GlossaryEntry[] = [
   {
     term: "Pool of money",
     definition:
-      "In this hypothetical, the total LTC benefit available: for traditional, daily × 365 × benefit years (or lifetime). For linked products, specified amount × leverage (and any residual death benefit separately). Countable assets are a separate pool that pays after insurance, or alone if no policy is in the run.",
+      "In this hypothetical, the total LTC benefit available: for traditional, daily × 365 × benefit years (or lifetime*). For linked products, specified amount × leverage (and any residual death benefit separately). Countable assets are a separate pool that pays after insurance, or alone if no policy is in the run. * Lifetime long-term care insurance may not be available. Contact a licensed insurance agent in your state of residence.",
   },
   {
     term: "Qualified Income Trust (QIT / Miller Trust)",

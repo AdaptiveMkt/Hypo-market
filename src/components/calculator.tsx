@@ -39,6 +39,8 @@ import {
   hybridFaceForMonthly,
   isAssetBased,
   isLifetimeBenefit,
+  LIFETIME_BENEFIT_MARK,
+  LIFETIME_BENEFIT_NOTE,
   leverageLabel,
   monthlyFromDaily,
   netRoiPct,
@@ -1713,7 +1715,7 @@ export function Calculator() {
                               {" · "}
                               LTC pool at purchase: <span className="font-semibold text-deplete">{money(poolAmt)}</span>
                               {lifetime
-                                ? ` (${money(annual)} × ${years} years of modeled care, Lifetime)`
+                                ? ` (${money(annual)} × ${years} years of modeled care, ${LIFETIME_BENEFIT_MARK})`
                                 : ` (${money(annual)} × ${years} years)`}
                             </p>
                               );
@@ -1742,7 +1744,7 @@ export function Calculator() {
                               </p>
                             ) : null}
                             {lifetime ? (
-                              <p className="mt-1 text-xs font-semibold amt-red">* This option is not available with all insurance companies.</p>
+                              <p className="mt-1 text-xs font-semibold leading-snug amt-red">{LIFETIME_BENEFIT_NOTE}</p>
                             ) : null}
                           </div>
                           <div>
@@ -1975,7 +1977,7 @@ export function Calculator() {
                   ? fundsFullyDepleted
                     ? `End of the run — total assets (insurance benefits + net countable assets) are depleted in ${calendarYear(depletionRow.year)}.`
                     : lifetime
-                      ? `End of the run — net countable assets are depleted in ${calendarYear(depletionRow.year)}. Lifetime insurance benefits are still in force in this model.`
+                      ? `End of the run — net countable assets are depleted in ${calendarYear(depletionRow.year)}. ${LIFETIME_BENEFIT_MARK} insurance benefits are still in force in this model. ${LIFETIME_BENEFIT_NOTE}`
                       : `End of the run — total assets are not fully depleted in the modeled years. Last care year shown is ${calendarYear(depletionRow.year)}.`
                   : undefined,
                 more: "Other figures from this run, if you want them on the Ready card.",
@@ -1991,7 +1993,7 @@ export function Calculator() {
                     ]
                   : []),
                 ...(policy.enabled && featureRow
-                  ? [{ id: "col-pool", group: "column" as const, label: "Insurance Benefit Pool · beginning", value: lifetime ? "Lifetime" : moneyCents(featureRow.insurancePoolStart) }]
+                  ? [{ id: "col-pool", group: "column" as const, label: "Insurance Benefit Pool · beginning", value: lifetime ? LIFETIME_BENEFIT_MARK : moneyCents(featureRow.insurancePoolStart) }]
                   : []),
                 ...(featureRow
                   ? [
@@ -2001,7 +2003,7 @@ export function Calculator() {
                         label: "Total Remaining · beginning",
                         value:
                           policy.enabled && lifetime
-                            ? `${moneyCents(featureRow.remainingNet)} + lifetime`
+                            ? `${moneyCents(featureRow.remainingNet)} + lifetime*`
                             : moneyCents(
                                 policy.enabled
                                   ? featureRow.remainingNet + Math.max(0, featureRow.insurancePoolRemaining)
@@ -2015,7 +2017,7 @@ export function Calculator() {
                   ? [
                       { id: "col-benefits", group: "column" as const, label: "Insurance Benefits · beginning", value: moneyCents(featureRow.insurance), amount: featureRow.insurance },
                       { id: "col-benefits-cum", group: "column" as const, label: "Accumulative insurance paid · beginning", value: moneyCents(featureRow.insuranceCumulative), amount: featureRow.insuranceCumulative },
-                      { id: "col-balance", group: "column" as const, label: "Insurance Balance · beginning", value: lifetime ? "Lifetime" : moneyCents(featureRow.insurancePoolRemaining) },
+                      { id: "col-balance", group: "column" as const, label: "Insurance Balance · beginning", value: lifetime ? LIFETIME_BENEFIT_MARK : moneyCents(featureRow.insurancePoolRemaining) },
                     ]
                   : []),
                 ...(featureRow
@@ -2046,7 +2048,7 @@ export function Calculator() {
                     ]
                   : []),
                 ...(policy.enabled && depletionRow
-                  ? [{ id: "dep-pool", group: "depletion" as const, label: "Insurance Benefit Pool · end", value: lifetime ? "Lifetime" : moneyCents(depletionRow.insurancePoolStart) }]
+                  ? [{ id: "dep-pool", group: "depletion" as const, label: "Insurance Benefit Pool · end", value: lifetime ? LIFETIME_BENEFIT_MARK : moneyCents(depletionRow.insurancePoolStart) }]
                   : []),
                 ...(depletionRow
                   ? [
@@ -2056,7 +2058,7 @@ export function Calculator() {
                         label: "Total Remaining · end",
                         value:
                           policy.enabled && lifetime
-                            ? `${moneyCents(depletionRow.remainingNet)} + lifetime`
+                            ? `${moneyCents(depletionRow.remainingNet)} + lifetime*`
                             : moneyCents(
                                 policy.enabled
                                   ? depletionRow.remainingNet + Math.max(0, depletionRow.insurancePoolRemaining)
@@ -2071,7 +2073,7 @@ export function Calculator() {
                   ? [
                       { id: "dep-benefits", group: "depletion" as const, label: "Insurance Benefits · end", value: moneyCents(depletionRow.insurance) },
                       { id: "dep-benefits-cum", group: "depletion" as const, label: "Accumulative insurance paid · end", value: moneyCents(depletionRow.insuranceCumulative), amount: depletionRow.insuranceCumulative },
-                      { id: "dep-balance", group: "depletion" as const, label: "Insurance Balance · end", value: lifetime ? "Lifetime" : moneyCents(depletionRow.insurancePoolRemaining) },
+                      { id: "dep-balance", group: "depletion" as const, label: "Insurance Balance · end", value: lifetime ? LIFETIME_BENEFIT_MARK : moneyCents(depletionRow.insurancePoolRemaining) },
                     ]
                   : []),
                 ...(depletionRow
@@ -2187,15 +2189,15 @@ export function Calculator() {
                 ...(policy.enabled
                   ? [
                       { id: "col-benefits-total", group: "more" as const, label: "Insurance Benefits (this run)", value: <RedAmt>{moneyCents(result.insuranceTotal)}</RedAmt>, amount: result.insuranceTotal },
-                      { id: "ltc-purchase", group: "more" as const, label: "LTC pool at purchase", value: result.lifetimeBenefit ? "Lifetime" : moneyCents(insToday) },
-                      { id: "ltc-claim", group: "more" as const, label: "LTC benefits at claim", value: result.lifetimeBenefit ? "Lifetime" : moneyCents(insClaim) },
+                      { id: "ltc-purchase", group: "more" as const, label: "LTC pool at purchase", value: result.lifetimeBenefit ? LIFETIME_BENEFIT_MARK : moneyCents(insToday) },
+                      { id: "ltc-claim", group: "more" as const, label: "LTC benefits at claim", value: result.lifetimeBenefit ? LIFETIME_BENEFIT_MARK : moneyCents(insClaim) },
                     ]
                   : []),
                 {
                   id: "combined-today",
                   group: "more" as const,
                   label: policy.enabled ? "Combined pool today (assets + LTC)" : "Countable pool today",
-                  value: policy.enabled && result.lifetimeBenefit ? `${money(pool)} + lifetime` : moneyCents(combinedToday),
+                  value: policy.enabled && result.lifetimeBenefit ? `${money(pool)} + lifetime*` : moneyCents(combinedToday),
                 },
                 { id: "end-assets", group: "more" as const, label: "Assets remaining (end of run)", value: <RedAmt>{moneyCents(result.endPool)}</RedAmt>, amount: result.endPool },
                 { id: "end-short", group: "more" as const, label: "Unpaid shortfall (end of run)", value: <RedAmt>{result.shortfallTotal ? moneyCents(result.shortfallTotal) : "None"}</RedAmt>, amount: result.shortfallTotal },
@@ -2390,7 +2392,7 @@ export function Calculator() {
                     <p className="font-display text-base text-navy">{row.label}{row.thisRun ? " · this run" : ""}</p>
                     <dl className="mt-2 grid gap-1.5 text-sm">
                       <div className="flex justify-between gap-3"><dt className="text-muted">Paid in / premium</dt><dd className="tabular-nums">{money(row.proj.premiumTotal)}</dd></div>
-                      <div className="flex justify-between gap-3"><dt className="text-muted">LTC pool at purchase</dt><dd className="tabular-nums">{row.proj.lifetimeBenefit ? "Lifetime" : money(row.proj.benefitPoolAtPurchase ?? 0)}</dd></div>
+                      <div className="flex justify-between gap-3"><dt className="text-muted">LTC pool at purchase</dt><dd className="tabular-nums">{row.proj.lifetimeBenefit ? LIFETIME_BENEFIT_MARK : money(row.proj.benefitPoolAtPurchase ?? 0)}</dd></div>
                       <div className="flex justify-between gap-3"><dt className="text-muted">Insurance paid</dt><dd className="tabular-nums">{money(row.proj.insuranceTotal)}</dd></div>
                       <div className="flex justify-between gap-3"><dt className="text-muted">Assets remaining</dt><dd className="tabular-nums">{money(row.proj.endPool)}</dd></div>
                       <div className="flex justify-between gap-3"><dt className="text-muted">Shortfall</dt><dd className="tabular-nums">{row.proj.shortfallTotal ? money(row.proj.shortfallTotal) : "None"}</dd></div>

@@ -1,4 +1,4 @@
-import { fiveYearIssueBand, monthlyFromDaily, typicalBuyerHints } from "./calc";
+import { fiveYearIssueBand, LIFETIME_BENEFIT_NOTE, monthlyFromDaily, typicalBuyerHints } from "./calc";
 import type { ProtectAssetsSize } from "./protect-assets";
 import { money, moneyCents } from "./utils";
 
@@ -69,10 +69,10 @@ export function section3ProtectMessage(opts: {
     );
   }
   const period = s.lifetime
-    ? "a lifetime benefit period"
+    ? `a lifetime* benefit period. ${LIFETIME_BENEFIT_NOTE}`
     : `${s.benefitYears} year${s.benefitYears === 1 ? "" : "s"} benefit period`;
   const pool = s.lifetime
-    ? `${money(s.annualCapAtClaim)} a year, lifetime`
+    ? `${money(s.annualCapAtClaim)} a year, lifetime*`
     : moneyCents(s.poolNeeded);
   return (
     lead +

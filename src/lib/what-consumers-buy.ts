@@ -56,11 +56,11 @@ export const WHAT_CONSUMERS_BUY_FEATURES = {
     { item: "5 years", share: "7.4%" },
     { item: "6 years", share: "20.0%" },
     { item: "7–10 years", share: "2.3%" },
-    { item: "Lifetime", share: "0.1%" },
+    { item: "Lifetime*", share: "0.1%" },
     { item: "Average (no lifetime)", share: "3.79 years" },
   ],
   benefitPeriodNote:
-    "Table 23, 2024 excluding one short-duration product. With that product included, 3-year falls to 33.2% and the average period is 2.81 years (46.7% two years or shorter). Lifetime is essentially gone from new stand-alone sales. This model defaults to 3 years — the 2024 sales mode (55.1%). Milliman does not publish period mix by issue age.",
+    "Table 23, 2024 excluding one short-duration product. With that product included, 3-year falls to 33.2% and the average period is 2.81 years (46.7% two years or shorter). Lifetime* is essentially gone from new stand-alone sales. This model defaults to 3 years — the 2024 sales mode (55.1%). Milliman does not publish period mix by issue age. * Lifetime long-term care insurance may not be available. Contact a licensed insurance agent in your state of residence.",
   inflation: [
     { item: "4.5%+ compound for life", share: "2.7%" },
     { item: "3% compound for life", share: "17.4%" },
@@ -109,7 +109,7 @@ export const WHAT_CONSUMERS_BUY_FEATURES = {
 };
 
 export const WHAT_CONSUMERS_BUY_INFORCE =
-  "In-force stand-alone policies (the claims-paying block) look different from 2024 sales: Milliman’s 2026 industry claims projection used an illustrative mix of 70% three-year / 30% lifetime, 50% 5% compound / 50% none, 90-day elimination, 60% married at issue, reimbursement 85%. Lifetime and 5% compound were common on policies issued 15–25 years ago. They are rare on policies issued last year. Do not assume the in-force mix is what a new buyer can still purchase.";
+  "In-force stand-alone policies (the claims-paying block) look different from 2024 sales: Milliman’s 2026 industry claims projection used an illustrative mix of 70% three-year / 30% lifetime*, 50% 5% compound / 50% none, 90-day elimination, 60% married at issue, reimbursement 85%. Lifetime* and 5% compound were common on policies issued 15–25 years ago. They are rare on policies issued last year. Do not assume the in-force mix is what a new buyer can still purchase. * Lifetime long-term care insurance may not be available. Contact a licensed insurance agent in your state of residence.";
 
 /** Inflation riders by age and gender — published snapshots, not a quote. */
 export const INFLATION_BY_AGE = {

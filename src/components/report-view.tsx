@@ -31,6 +31,8 @@ import {
   holdingsFrom,
   inflateDaily,
   isLifetimeBenefit,
+  LIFETIME_BENEFIT_MARK,
+  LIFETIME_BENEFIT_NOTE,
   isLinkedKind,
   leverageLabel,
   policyKindLabel,
@@ -392,6 +394,9 @@ export function ReportView({
             · {duration} years modeled ·{" "}
             {new Date().toLocaleDateString("en-US")}
           </p>
+          {lifetime ? (
+            <p className="mt-2 text-xs font-semibold leading-snug text-navy">{LIFETIME_BENEFIT_NOTE}</p>
+          ) : null}
         </header>
 
         <div
@@ -748,7 +753,7 @@ export function ReportView({
                       <Qa q="Daily benefit today" a={money(policy.dailyBenefit)} />
                       <Qa
                         q="Benefit period"
-                        a={lifetime ? "Lifetime" : `${policy.benefitYears} years`}
+                        a={lifetime ? LIFETIME_BENEFIT_MARK : `${policy.benefitYears} years`}
                       />
                       <Qa q="Elimination period" a={`${policy.elimDays} days`} />
                       <Qa
@@ -764,11 +769,11 @@ export function ReportView({
                   )}
                   <Qa
                     q="LTC pool at purchase"
-                    a={result.lifetimeBenefit ? "Lifetime" : money(result.benefitPoolAtPurchase ?? 0)}
+                    a={result.lifetimeBenefit ? LIFETIME_BENEFIT_MARK : money(result.benefitPoolAtPurchase ?? 0)}
                   />
                   <Qa
                     q="LTC pool at claim"
-                    a={result.lifetimeBenefit ? "Lifetime" : money(result.benefitPoolAtClaim ?? 0)}
+                    a={result.lifetimeBenefit ? LIFETIME_BENEFIT_MARK : money(result.benefitPoolAtClaim ?? 0)}
                   />
                 </>
               ) : null}
@@ -785,14 +790,14 @@ export function ReportView({
             {policy.enabled ? (
               <Kpi
                 label="LTC benefits at purchase"
-                value={result.lifetimeBenefit ? "Lifetime" : money(insToday)}
+                value={result.lifetimeBenefit ? LIFETIME_BENEFIT_MARK : money(insToday)}
               />
             ) : null}
             <Kpi
               label={policy.enabled ? "Combined pool today" : "Countable pool today"}
               value={
                 policy.enabled && result.lifetimeBenefit
-                  ? `${money(pool)} + lifetime`
+                  ? `${money(pool)} + lifetime*`
                   : money(combinedToday)
               }
             />
@@ -805,7 +810,7 @@ export function ReportView({
                 label="Combined pool at claim (assets net after tax)"
                 value={
                   result.lifetimeBenefit
-                    ? `${money(result.startPoolNet)} + lifetime`
+                    ? `${money(result.startPoolNet)} + lifetime*`
                     : money(combinedClaim)
                 }
               />
@@ -1519,11 +1524,11 @@ export function ReportView({
                           {money(row.proj.firstDailyBenefit)}/day
                         </td>
                         <td className="py-2 pr-2 text-right">
-                          {row.proj.lifetimeBenefit ? "Lifetime" : money(ltcClaim ?? 0)}
+                          {row.proj.lifetimeBenefit ? LIFETIME_BENEFIT_MARK : money(ltcClaim ?? 0)}
                         </td>
                         <td className="py-2 pr-2 text-right">
                           {combined == null
-                            ? `${money(row.proj.startPoolNet)} + lifetime`
+                            ? `${money(row.proj.startPoolNet)} + lifetime*`
                             : money(combined)}
                         </td>
                         <td className="py-2 pr-2 text-right">{formatYearsLast(exhausted)}</td>
@@ -1580,7 +1585,7 @@ export function ReportView({
                     <td className="py-2 pr-2 text-right">{money(row.proj.premiumTotal)}</td>
                     <td className="py-2 pr-2 text-right">
                       {row.proj.lifetimeBenefit
-                        ? "Lifetime"
+                        ? LIFETIME_BENEFIT_MARK
                         : money(row.proj.benefitPoolAtPurchase ?? 0)}
                     </td>
                     <td className="py-2 pr-2 text-right">{money(row.proj.insuranceTotal)}</td>

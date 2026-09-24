@@ -1,4 +1,6 @@
 import {
+  LIFETIME_BENEFIT_MARK,
+  LIFETIME_BENEFIT_NOTE,
   policyKindLabel,
   remainingToneAt,
   remainingToneClass,
@@ -126,18 +128,18 @@ export function YearByYearTable({
                 <td className={cell}>{calendarYear(r.year)}</td>
                 <td className={cell}>{moneyCents(r.remainingNetStart)}</td>
                 {policyEnabled ? (
-                  <td className={cell}>{lifetime ? "Lifetime" : moneyCents(r.insurancePoolStart)}</td>
+                  <td className={cell}>{lifetime ? LIFETIME_BENEFIT_MARK : moneyCents(r.insurancePoolStart)}</td>
                 ) : null}
                 <td className={`py-2 px-1 text-center ${remainClass}`} title={remainTitle}>
                   {lifetime && policyEnabled
-                    ? `${moneyCents(r.remainingNet)} + lifetime`
+                    ? `${moneyCents(r.remainingNet)} + lifetime*`
                     : moneyCents(totalLeft)}
                 </td>
                 <td className={`${cell} ${r.cost ? "font-bold amt-red" : ""}`}>{moneyCents(r.cost)}</td>
                 {policyEnabled ? (
                   <>
                     <td className={cell}>{moneyCents(r.insurance)}</td>
-                    <td className={cell}>{lifetime ? "Lifetime" : moneyCents(r.insurancePoolRemaining)}</td>
+                    <td className={cell}>{lifetime ? LIFETIME_BENEFIT_MARK : moneyCents(r.insurancePoolRemaining)}</td>
                   </>
                 ) : null}
                 <td className={`${cell} ${r.drawn ? "font-bold amt-red" : ""}`}>
@@ -183,6 +185,7 @@ export function YearByYearTable({
           : null}
         {policyEnabled ? "Total Remaining" : "Countable Assets"} turns bold green when the pool starts declining, and bold red when it is depleted.
         The table runs through the wait until care and every modeled care year — it does not stop at year 10 or at depletion.
+        {lifetime && policyEnabled ? ` ${LIFETIME_BENEFIT_NOTE}` : ""}
       </p>
       ) : null}
     </div>

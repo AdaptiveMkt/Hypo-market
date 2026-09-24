@@ -76,7 +76,7 @@ function About() {
           <li>
             The policy is treated as a <strong>pool of money at purchase</strong>:
             today’s daily benefit × 365 × the benefit period (for example $130 × 365 × 5
-            years). Lifetime has no dollar cap. If an inflation rider is selected, unused
+            years). Lifetime* has no dollar cap. * Lifetime long-term care insurance may not be available. Contact a licensed insurance agent in your state of residence. If an inflation rider is selected, unused
             days are revalued at the inflated daily amount — so the remaining insurance
             pool grows until and during the claim. Insurance paid in a year is a draw on
             that pool; leftover cost is a draw on countable assets.

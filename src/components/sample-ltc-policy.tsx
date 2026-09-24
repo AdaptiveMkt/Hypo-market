@@ -257,7 +257,7 @@ export function SampleLtcPolicy({
   const lifetime = isLifetimeBenefit(policy.benefitYears);
   const monthly = Math.round(monthlyFromDaily(policy.dailyBenefit));
   const pool = lifetime
-    ? "Lifetime (no period cap)"
+    ? "Lifetime*"
     : money(policy.dailyBenefit * 365 * policy.benefitYears);
   const linked = isLinkedKind(policy.kind);
 
@@ -360,7 +360,7 @@ export function SampleLtcPolicy({
               <li>
                 Benefit period / pool:{" "}
                 {lifetime
-                  ? "lifetime (no period cap)"
+                  ? "lifetime* (no period cap). * Lifetime long-term care insurance may not be available. Contact a licensed insurance agent in your state of residence."
                   : `${policy.benefitYears} ${policy.benefitYears === 1 ? "year" : "years"} · pool today ${pool}`}
                 .
               </li>

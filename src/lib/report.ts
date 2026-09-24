@@ -5,6 +5,8 @@ import {
   csvMilestones,
   formatYearsLast,
   isLifetimeBenefit,
+  LIFETIME_BENEFIT_MARK,
+  LIFETIME_BENEFIT_NOTE,
   isLinkedKind,
   policyKindLabel,
   netRoiPct,
@@ -188,9 +190,9 @@ export function analysisNarrative(opts: ReportOpts): string {
   } else {
     const structure = isLinkedKind(s.policy.kind)
       ? `a ${policyKindLabel(s.policy.kind).toLowerCase()} (premium ${money(s.policy.singlePremium)}, leverage ${s.policy.leverage}x)`
-      : `a traditional reimbursement policy (daily benefit ${money(s.policy.dailyBenefit)} today, benefit period ${isLifetimeBenefit(s.policy.benefitYears) ? "lifetime" : `${s.policy.benefitYears} years`}, ${s.policy.elimDays}-day elimination, inflation ${s.policy.inflationMethod === "none" || s.policy.benefitInflationPct <= 0 ? "level" : `${s.policy.benefitInflationPct}% ${s.policy.inflationMethod}`}, annual premium ${money(s.policy.annualPremium)})`;
+      : `a traditional reimbursement policy (daily benefit ${money(s.policy.dailyBenefit)} today, benefit period ${isLifetimeBenefit(s.policy.benefitYears) ? `${LIFETIME_BENEFIT_MARK}. ${LIFETIME_BENEFIT_NOTE}` : `${s.policy.benefitYears} years`}, ${s.policy.elimDays}-day elimination, inflation ${s.policy.inflationMethod === "none" || s.policy.benefitInflationPct <= 0 ? "level" : `${s.policy.benefitInflationPct}% ${s.policy.inflationMethod}`}, annual premium ${money(s.policy.annualPremium)})`;
     paras.push(
-      `This run includes ${structure}. Insurance is modeled to pay the claim first; countable assets co-pay only the leftover. LTC benefits at purchase are ${result.lifetimeBenefit ? "a lifetime maximum" : money(result.benefitPoolAtPurchase ?? 0)}. At claim they are ${result.lifetimeBenefit ? "still lifetime" : money(result.benefitPoolAtClaim ?? 0)}.`,
+      `This run includes ${structure}. Insurance is modeled to pay the claim first; countable assets co-pay only the leftover. LTC benefits at purchase are ${result.lifetimeBenefit ? `${LIFETIME_BENEFIT_MARK}. ${LIFETIME_BENEFIT_NOTE}` : money(result.benefitPoolAtPurchase ?? 0)}. At claim they are ${result.lifetimeBenefit ? LIFETIME_BENEFIT_MARK : money(result.benefitPoolAtClaim ?? 0)}.`,
     );
     paras.push(
       `The combined pool (countable assets + LTC benefits) at today's cost is ${money(combinedToday)} and is ${formatYearsLast(yearsCombinedToday)}. At claim the combined pool is ${money(combinedClaim)} against ${money(result.firstCost)} per year and is ${formatYearsLast(yearsCombinedClaim)}. Insurance paid over the modeled years is ${money(result.insuranceTotal)}. Countable assets remaining are ${money(result.endPool)}, which is ${preserved >= 0 ? money(preserved) + " higher" : money(Math.abs(preserved)) + " lower"} than if the same care had been paid from assets with no policy (${money(selfFunded.endPool)} left).`,
@@ -406,7 +408,7 @@ export function buildScenarioPdf(opts: ReportOpts): Blob {
     add("Structure: traditional reimbursement");
     add(`Daily benefit today: ${money(s.policy.dailyBenefit)}`);
     add(
-      `Benefit period: ${isLifetimeBenefit(s.policy.benefitYears) ? "Lifetime" : `${s.policy.benefitYears} years`}`,
+      `Benefit period: ${isLifetimeBenefit(s.policy.benefitYears) ? `${LIFETIME_BENEFIT_MARK}. ${LIFETIME_BENEFIT_NOTE}` : `${s.policy.benefitYears} years`}`,
     );
     add(`Elimination: ${s.policy.elimDays} days`);
     add(

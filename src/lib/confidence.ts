@@ -143,7 +143,7 @@ export function modelConfidence(opts: {
       note: policy.enabled
         ? isLinkedKind(policy.kind)
           ? `${policy.kind === "ltcAnnuity" ? "Long-term care annuity" : policy.kind === "hybridLife" ? "Hybrid life insurance" : "Asset-based / linked-benefit"} is included. Confirm the carrier illustration for leverage, residual value, and death benefit.`
-          : `${policy.dailyBenefit}/day, ${policy.benefitYears === 0 ? "lifetime" : `${policy.benefitYears}-year`} period, ${policy.benefitInflationPct}% ${policy.inflationMethod} inflation, ${policy.elimDays}-day wait.`
+          : `${policy.dailyBenefit}/day, ${policy.benefitYears >= 50 ? "lifetime*" : `${policy.benefitYears}-year`} period, ${policy.benefitInflationPct}% ${policy.inflationMethod} inflation, ${policy.elimDays}-day wait.${policy.benefitYears >= 50 ? " * Lifetime long-term care insurance may not be available. Contact a licensed insurance agent in your state of residence." : ""}`
         : "No policy in this run — assets pay the whole bill. Include a policy to score a funded design.",
     },
     {

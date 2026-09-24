@@ -578,6 +578,11 @@ export function isLifetimeBenefit(years: number) {
   return years >= 50;
 }
 
+/** Shown next to every lifetime benefit-period mention. */
+export const LIFETIME_BENEFIT_MARK = "Lifetime*";
+export const LIFETIME_BENEFIT_NOTE =
+  "* Lifetime long-term care insurance may not be available. Contact a licensed insurance agent in your state of residence.";
+
 export function isAssetBased(policy: LtcPolicy) {
   return policy.enabled && isLinkedKind(policy.kind);
 }

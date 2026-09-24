@@ -359,7 +359,7 @@ export function preservationImpact(opts: {
     );
   }
   paragraphs.push(
-    `Original programs — California and Connecticut: dollar-for-dollar only. Indiana and New York: dollar-for-dollar, with total asset protection on qualifying benefit periods (this model: NY about 3+ years, IN about 4+ years or lifetime). Confirm certification, inflation-by-age rules, reciprocity, and Medicaid with a licensed representative. Not a determination of eligibility.`,
+    `Original programs — California and Connecticut: dollar-for-dollar only. Indiana and New York: dollar-for-dollar, with total asset protection on qualifying benefit periods (this model: NY about 3+ years, IN about 4+ years or lifetime*). Confirm certification, inflation-by-age rules, reciprocity, and Medicaid with a licensed representative. Not a determination of eligibility. * Lifetime long-term care insurance may not be available. Contact a licensed insurance agent in your state of residence.`,
   );
 
   return {
