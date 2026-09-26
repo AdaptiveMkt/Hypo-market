@@ -455,6 +455,24 @@ export function FactFinder({
           <>
             <p className="text-base font-semibold text-navy">Section 1 is ready to calculate.</p>
             <p className="mt-2 text-sm text-muted">Calculate countable assets from the values you entered.</p>
+            <div className="mt-4">
+              <label className={labelClass} htmlFor="ff-agi">Adjusted gross household income today</label>
+              <StepperField
+                id="ff-agi"
+                value={annualIncome}
+                onChange={(v) => onAnnualIncome(Number(v) || 0)}
+                prefix="$"
+                commas
+                step={1000}
+                min={0}
+                blankWhenZero
+              />
+              <p className="mt-1 text-xs leading-snug text-muted">
+                {annualIncome > 0
+                  ? `Suggested traditional premium ${money(agiPremiums(annualIncome).traditionalAnnual)} (7%). Default single premium for asset-based, annuity care, and hybrid life ${money(agiPremiums(annualIncome).linkedSingle)} (2.5%).`
+                  : "Optional. 7% of this income is the suggested traditional premium. 2.5% is the default single premium for asset-based, annuity care, and hybrid life."}
+              </p>
+            </div>
             {poolShown ? <p className="mt-3 font-display text-xl text-gold-ink">Countable pool: {money(pool)}</p> : null}
             <button
               type="button"
@@ -697,24 +715,6 @@ export function FactFinder({
             <p className="text-base font-semibold text-navy">
               {insuranceLocked ? "Countable assets are under this model’s insurance screen. You can still run the hypothetical." : "Which hypothetical should run?"}
             </p>
-            <div className="mt-4">
-              <label className={labelClass} htmlFor="ff-agi">Adjusted gross household income today</label>
-              <StepperField
-                id="ff-agi"
-                value={annualIncome}
-                onChange={(v) => onAnnualIncome(Number(v) || 0)}
-                prefix="$"
-                commas
-                step={1000}
-                min={0}
-                blankWhenZero
-              />
-              <p className="mt-1 text-xs leading-snug text-muted">
-                {annualIncome > 0
-                  ? `Suggested traditional premium ${money(agiPremiums(annualIncome).traditionalAnnual)} (7%). Default single premium for asset-based, annuity care, and hybrid life ${money(agiPremiums(annualIncome).linkedSingle)} (2.5%).`
-                  : "Optional. 7% of this income is the suggested traditional premium. 2.5% is the default single premium for asset-based, annuity care, and hybrid life."}
-              </p>
-            </div>
             <div className="mt-4 grid gap-2 sm:grid-cols-2">
               {(
                 [

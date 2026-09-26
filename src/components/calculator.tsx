@@ -1733,6 +1733,15 @@ export function Calculator() {
           ) : (
             <p className="mt-3 text-sm text-muted">Countable pool is hidden until you calculate countable assets.</p>
           )}
+          <div className="mt-4">
+            <label className={labelClass} htmlFor="agi-today">Adjusted gross household income today</label>
+            <MoneyField id="agi-today" value={annualIncome} onChange={(v) => setAnnualIncome(Number(v) || 0)} compact />
+            <p className="mt-1 text-xs leading-snug text-muted">
+              {annualIncome > 0
+                ? `Suggested traditional premium ${money(Math.round(annualIncome * 0.07))} (7%). Default single premium for asset-based, annuity care, and hybrid life ${money(Math.round(annualIncome * 0.025))} (2.5%), unless a different deposit was already entered.`
+                : "Optional. If entered, 7% is the suggested traditional premium and 2.5% is the default single premium for asset-based, annuity care, and hybrid life."}
+            </p>
+          </div>
           <div className="mt-4 grid w-full min-w-0 grid-cols-1 gap-2">
             <button
               type="button"
@@ -2369,17 +2378,6 @@ export function Calculator() {
               >
                 {section3Confirmed ? "Section 3 selection confirmed" : "Confirm Section 3 selection"}
               </button>
-            ) : null}
-            {section3Confirmed || insuranceLocked ? (
-              <div className="mt-4">
-                <label className={labelClass} htmlFor="agi-today">Adjusted gross household income today</label>
-                <MoneyField id="agi-today" value={annualIncome} onChange={(v) => setAnnualIncome(Number(v) || 0)} compact />
-                <p className="mt-1 text-xs leading-snug text-muted">
-                  {annualIncome > 0
-                    ? `At calculation, the suggested traditional premium is ${money(Math.round(annualIncome * 0.07))} (7%). The default single premium for asset-based, annuity care, and hybrid life is ${money(Math.round(annualIncome * 0.025))} (2.5%), unless a different deposit was already entered.`
-                    : "Optional. If entered, 7% is the suggested traditional premium and 2.5% is the default single premium for asset-based, annuity care, and hybrid life."}
-                </p>
-              </div>
             ) : null}
             <div id="run-kind-actions" className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
               {missingRun.length ? (
