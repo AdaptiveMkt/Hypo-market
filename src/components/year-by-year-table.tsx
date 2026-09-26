@@ -8,7 +8,7 @@ import {
   type YearRow,
 } from "@/lib/calc";
 import { KIND_TAB } from "@/lib/kind-tabs";
-import { moneyCents } from "@/lib/utils";
+import { money, moneyCents } from "@/lib/utils";
 
 const MODEL_START_YEAR = new Date().getFullYear();
 
@@ -125,7 +125,7 @@ export function YearByYearTable({
                 className={`border-t tabular-nums ${gone ? "border-deplete bg-cream" : "border-line text-navy"}`}
               >
                 <td className={cell}>{calendarYear(r.year)}</td>
-                <td className={cell}>{moneyCents(r.remainingNetStart)}</td>
+                <td className={cell}>{money(r.remainingNetStart)}</td>
                 {policyEnabled ? (
                   <td className={cell}>{lifetime ? LIFETIME_BENEFIT_MARK : moneyCents(r.insurancePoolStart)}</td>
                 ) : null}
@@ -142,7 +142,7 @@ export function YearByYearTable({
                   </>
                 ) : null}
                 <td className={`${cell} ${r.drawn ? "font-bold amt-red" : ""}`}>
-                  {r.drawn > 0 ? moneyCents(-r.drawn) : moneyCents(0)}
+                  {r.drawn > 0 ? money(-r.drawn) : money(0)}
                 </td>
                 <td className={`${gone ? "py-2 font-bold amt-red" : "py-2"} px-1 text-center`}>
                   {r.shortfallCumulative ? moneyCents(r.shortfallCumulative) : "—"}
@@ -168,8 +168,8 @@ export function YearByYearTable({
             ) : null}
             <td className="py-2 px-1 text-center font-bold amt-red">
               {(last?.drawnCumulative ?? 0) > 0
-                ? moneyCents(-(last?.drawnCumulative ?? 0))
-                : moneyCents(0)}
+                ? money(-(last?.drawnCumulative ?? 0))
+                : money(0)}
             </td>
             <td className="py-2 px-1 text-center">
               {last?.shortfallCumulative ? moneyCents(last.shortfallCumulative) : "—"}

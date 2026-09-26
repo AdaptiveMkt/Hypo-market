@@ -2020,7 +2020,7 @@ export function Calculator() {
                 ...(featureRow
                   ? [
                       { id: "col-year", group: "column" as const, label: "Beginning of the run", value: String(calendarYear(featureRow.year)), amount: calendarYear(featureRow.year) },
-                      { id: "col-assets", group: "column" as const, label: "Countable Assets (net after tax) · beginning", value: moneyCents(featureRow.remainingNetStart) },
+                      { id: "col-assets", group: "column" as const, label: "Countable Assets (net after tax) · beginning", value: money(featureRow.remainingNetStart) },
                     ]
                   : []),
                 ...(policy.enabled && featureRow
@@ -2059,7 +2059,7 @@ export function Calculator() {
                         label: "Accumulative co-pay from countable assets · beginning",
                         value: (
                           <span className={featureRow.drawnCumulative > 0 ? "font-bold amt-red" : ""}>
-                            {featureRow.drawnCumulative > 0 ? moneyCents(-featureRow.drawnCumulative) : moneyCents(0)}
+                            {featureRow.drawnCumulative > 0 ? money(-featureRow.drawnCumulative) : money(0)}
                           </span>
                         ),
                       },
@@ -2075,7 +2075,7 @@ export function Calculator() {
                   ? [
                       { id: "dep-year", group: "depletion" as const, label: "End of the run", value: String(calendarYear(depletionRow.year)), amount: calendarYear(depletionRow.year) },
                       { id: "dep-status", group: "depletion" as const, label: "Status · end", value: <RedAmt>{depletionRow.status}</RedAmt> },
-                      { id: "dep-assets", group: "depletion" as const, label: "Countable Assets (net after tax) · end", value: moneyCents(depletionRow.remainingNetStart), amount: depletionRow.remainingNet },
+                      { id: "dep-assets", group: "depletion" as const, label: "Countable Assets (net after tax) · end", value: money(depletionRow.remainingNetStart), amount: depletionRow.remainingNet },
                     ]
                   : []),
                 ...(policy.enabled && depletionRow
@@ -2116,7 +2116,7 @@ export function Calculator() {
                         amount: depletionRow.drawnCumulative,
                         value: (
                           <span className={depletionRow.drawnCumulative > 0 ? "font-bold amt-red" : ""}>
-                            {depletionRow.drawnCumulative > 0 ? moneyCents(-depletionRow.drawnCumulative) : moneyCents(0)}
+                            {depletionRow.drawnCumulative > 0 ? money(-depletionRow.drawnCumulative) : money(0)}
                           </span>
                         ),
                       },
@@ -2171,8 +2171,8 @@ export function Calculator() {
                         value: (
                           <span className={yearRowsShown.at(-1)!.drawnCumulative > 0 ? "font-bold amt-red" : ""}>
                             {yearRowsShown.at(-1)!.drawnCumulative > 0
-                              ? moneyCents(-yearRowsShown.at(-1)!.drawnCumulative)
-                              : moneyCents(0)}
+                              ? money(-yearRowsShown.at(-1)!.drawnCumulative)
+                              : money(0)}
                           </span>
                         ),
                       },

@@ -196,10 +196,11 @@ export function StepperField({
   attention?: boolean;
   commas?: boolean;
 }) {
+  const grouped = commas || (Boolean(prefix) && decimals === 0);
   const shown =
     blankWhenZero && (!value || value === 0)
       ? ""
-      : commas
+      : grouped
         ? Number(value || 0).toLocaleString("en-US", {
             minimumFractionDigits: decimals,
             maximumFractionDigits: decimals,
