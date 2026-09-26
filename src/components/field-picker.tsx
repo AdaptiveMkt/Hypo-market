@@ -16,6 +16,7 @@ export function FieldPicker({
   options,
   placeholder = "Select…",
   invalid = false,
+  attention = false,
   searchable,
   open: openProp,
   onOpenChange,
@@ -26,6 +27,7 @@ export function FieldPicker({
   options: PickerOption[];
   placeholder?: string;
   invalid?: boolean;
+  attention?: boolean;
   searchable?: boolean;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -72,7 +74,7 @@ export function FieldPicker({
       <button
         type="button"
         id={id}
-        className={`${triggerClass} ${invalid ? "border-deplete" : ""}`}
+        className={`${triggerClass} ${invalid ? "border-deplete" : ""} ${attention ? "need-input" : ""}`}
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-invalid={invalid}
@@ -177,6 +179,7 @@ export function StepperField({
   decimals = 0,
   blankWhenZero = false,
   compact = false,
+  attention = false,
 }: {
   id: string;
   value: number;
@@ -189,6 +192,7 @@ export function StepperField({
   decimals?: number;
   blankWhenZero?: boolean;
   compact?: boolean;
+  attention?: boolean;
 }) {
   const shown =
     blankWhenZero && (!value || value === 0)
@@ -219,7 +223,7 @@ export function StepperField({
           id={id}
           className={`box-border w-full min-w-0 max-w-full rounded-lg border border-line bg-paper text-base tabular-nums text-ink outline-none focus:border-teal ${
             compact ? "min-h-9 py-1.5" : "min-h-11 py-2.5"
-          } ${prefix ? (compact ? "pl-6 pr-2" : "pl-7 pr-3") : compact ? "px-2" : "px-3"}`}
+          } ${prefix ? (compact ? "pl-6 pr-2" : "pl-7 pr-3") : compact ? "px-2" : "px-3"} ${attention ? "need-input" : ""}`}
           inputMode={decimals ? "decimal" : "numeric"}
           enterKeyHint="done"
           placeholder={placeholder}

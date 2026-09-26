@@ -168,9 +168,11 @@ html.dark {
     height: auto;
   }
 
-  img.pdf-page-shot {
-    max-width: none !important;
-    height: auto !important;
+  .need-input {
+    background-color: #ffe566 !important;
+    color: #1b3a4b !important;
+    border-color: #c9a000 !important;
+    box-shadow: 0 0 0 3px #ffe566;
   }
 
   .pdf-view-bar {

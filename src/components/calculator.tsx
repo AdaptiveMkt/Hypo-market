@@ -214,11 +214,11 @@ export function Calculator() {
   const narrow = useNarrow();
   const [assets, setAssets] = useState<Assets>(() => ({
     ...DEFAULT_ASSETS,
-    excludable: defaultExcludableAssets(""),
+    excludable: defaultExcludableAssets("Alabama"),
   }));
   const [excludableTouched, setExcludableTouched] = useState(false);
   const [assetRois, setAssetRois] = useState<AssetRois>(() => ({ ...DEFAULT_ASSET_ROIS }));
-  const [state, setState] = useState("");
+  const [state, setState] = useState("Alabama");
   const [setting, setSetting] = useState<CareSetting | "">("");
   const [settingNeeded, setSettingNeeded] = useState(false);
   const activeSetting: CareSetting = setting || DEFAULT_CARE_SETTING;
@@ -235,6 +235,7 @@ export function Calculator() {
   const [annualIncome, setAnnualIncome] = useState(0);
   const [saveMsg, setSaveMsg] = useState("");
   const [stateNeeded, setStateNeeded] = useState(false);
+  const [gapsOn, setGapsOn] = useState(false);
   const [durationNeeded, setDurationNeeded] = useState(false);
   const [protectPct, setProtectPct] = useState(DEFAULT_PROTECT_PCT);
   const [ageNeeded, setAgeNeeded] = useState(false);
@@ -821,9 +822,9 @@ export function Calculator() {
     setPoolShown(false);
   }
   function resetAll() {
-    setAssets({ ...DEFAULT_ASSETS, excludable: defaultExcludableAssets("") });
+    setAssets({ ...DEFAULT_ASSETS, excludable: defaultExcludableAssets("Alabama") });
     setAssetRois({ ...DEFAULT_ASSET_ROIS });
-    setState("");
+    setState("Alabama");
     setExcludableTouched(false);
     setSetting("");
     setSettingNeeded(false);
@@ -874,6 +875,7 @@ export function Calculator() {
     setStateNeeded(false);
     setAgeNeeded(false);
     setDurationNeeded(false);
+    setGapsOn(false);
     setYearPage(0);
     try {
       localStorage.removeItem(SAVE_KEY);
@@ -1085,6 +1087,8 @@ export function Calculator() {
     setAgeNeeded(missingAge);
     setDurationNeeded(missingYears);
     if (missingState || missingSetting || missingAge || missingYears || missingAssets || missingSection2 || missingSection3) {
+      setGapsOn(true);
+      if (missingSection3) setSection3Open(true);
       const id = missingState
         ? "state"
         : missingSetting
@@ -1094,7 +1098,7 @@ export function Calculator() {
             : missingYears
               ? "duration"
               : missingAssets
-                ? "checking"
+                ? "countable-assets"
                 : missingSection2
                   ? "section-2-confirm"
                   : "section-3-confirm";
@@ -1241,7 +1245,7 @@ export function Calculator() {
       <section className="mt-4 card-xl min-w-0 overflow-visible p-4 sm:p-5">
         <h2 className="mb-3 border-b-2 border-gold pb-2 font-display text-xl text-navy">1. Countable Assets at Risk</h2>
           <p className="mb-3 text-sm text-muted">Enter today’s values. Leave unused lines at 0. Totals are not reduced for selling costs or illiquidity.</p>
-          <div className="grid gap-3 lg:grid-cols-2">
+          <div id="countable-assets" className={`grid scroll-mt-24 gap-3 lg:grid-cols-2 ${gapsOn && pool <= 0 ? "need-input rounded-lg p-2" : ""}`}>
             {ASSET_FIELDS.map((f) => (
               <div key={f.key} className="min-w-0 border-b border-line/60 pb-3 last:border-b-0">
                 {f.key === "home" ? (
@@ -1328,7 +1332,7 @@ export function Calculator() {
         <section className="card-xl min-w-0 p-4 md:p-5">
           <h2 className="mb-3 border-b-2 border-gold pb-2 font-display text-xl text-navy">2. Where and when care starts</h2>
             <label className={labelClass} htmlFor="age-today">Age today <span className="font-normal text-muted">(Input Your Current Age)</span></label>
-            <StepperField id="age-today" value={ageToday} onChange={applyAge} step={1} min={MIN_AGE_TODAY} max={110} placeholder="Select or Input Age" blankWhenZero />
+            <StepperField id="age-today" value={ageToday} onChange={applyAge} step={1} min={MIN_AGE_TODAY} max={110} placeholder="Select or Input Age" blankWhenZero attention={gapsOn && ageToday < MIN_AGE_TODAY} />
             {ageNeeded && ageToday < MIN_AGE_TODAY ? (
               <p className="mt-1 text-sm font-semibold leading-snug text-deplete" role="alert">Enter age today ({MIN_AGE_TODAY} or older) to run the hypothetical.</p>
             ) : (
@@ -1365,6 +1369,7 @@ export function Calculator() {
               value={state}
               placeholder="Select a state…"
               invalid={stateNeeded && !state}
+              attention={gapsOn && !state}
               options={STATE_NAMES.map((s) => ({ value: s, label: s }))}
               onChange={(next) => {
                 setState(next);
@@ -1418,6 +1423,7 @@ export function Calculator() {
               value={setting}
               placeholder="Select care setting"
               invalid={settingNeeded && !setting}
+              attention={gapsOn && !setting}
               options={(Object.keys(SETTING_LABELS) as CareSetting[]).map((k) => ({ value: k, label: SETTING_LABELS[k] }))}
               onChange={(v) => { setSetting(v as CareSetting); setSettingNeeded(false); setCpiOverride(null); }}
             />
@@ -1447,6 +1453,7 @@ export function Calculator() {
                   value={duration ? String(duration) : ""}
                   placeholder="Select the number of years…"
                   invalid={durationNeeded && !duration}
+                  attention={gapsOn && !duration}
                   options={Array.from({ length: 20 }, (_, i) => i + 1).map((y) => ({
                     value: String(y),
                     label: `${y} year${y === 1 ? "" : "s"}`,
@@ -1526,7 +1533,7 @@ export function Calculator() {
                 type="button"
                 aria-pressed={section2Confirmed}
                 className={`btn-block rounded-lg px-4 py-2.5 text-sm font-semibold hover:brightness-110 ${
-                  section2Confirmed ? "bg-teal text-cream" : "border border-navy bg-navy text-cream"
+                  section2Confirmed ? "bg-teal text-cream" : gapsOn ? "need-input" : "border border-navy bg-navy text-cream"
                 }`}
                 onClick={() => confirmSection2(!section2Confirmed)}
               >
@@ -1919,7 +1926,7 @@ export function Calculator() {
                 type="button"
                 aria-pressed={section3Confirmed}
                 className={`mt-4 btn-block rounded-lg px-4 py-2.5 text-sm font-semibold hover:brightness-110 ${
-                  section3Confirmed ? "bg-teal text-cream" : "border border-navy bg-navy text-cream"
+                  section3Confirmed ? "bg-teal text-cream" : gapsOn ? "need-input" : "border border-navy bg-navy text-cream"
                 }`}
                 onClick={() => confirmSection3(!section3Confirmed)}
               >
@@ -1948,19 +1955,17 @@ export function Calculator() {
                 <button
                   key={kind}
                   type="button"
-                  className="btn-block rounded-lg px-3 py-2.5 text-sm font-semibold hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="btn-block rounded-lg px-3 py-2.5 text-sm font-semibold hover:brightness-110"
                   style={{ background: KIND_TAB[kind].accent, color: kind === "assetBased" || kind === "hybridLife" ? "#1b3a4b" : "#fff" }}
                   onClick={() => runHypo(kind)}
-                  disabled={missingRun.length > 0}
                 >
                   {label}
                 </button>
               ))}
               <button
                 type="button"
-                className="btn-block btn-attention-red rounded-lg hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50 sm:col-span-2"
+                className="btn-block btn-attention-red rounded-lg hover:brightness-110 sm:col-span-2"
                 onClick={() => runHypo()}
-                disabled={missingRun.length > 0}
               >
                 Run All Selected
               </button>
