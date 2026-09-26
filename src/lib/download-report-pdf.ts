@@ -120,7 +120,10 @@ function stampPageNumbers(pdf: jsPDF, mark: "consumer" | "demo" | "") {
       pdf.setFont("helvetica", "bold");
       pdf.setFontSize(72);
       pdf.setTextColor(128, 128, 128);
-      pdf.text("DEMO", pageW / 2, pageH / 2, { align: "center" });
+      pdf.text("DEMO", pageW / 2, pageH / 2, {
+        angle: 15,
+        align: "center",
+      });
       pdf.setGState(new GState({ opacity: 1 }));
     }
 

@@ -59,6 +59,85 @@ export function ContactAskDialog({
   );
 }
 
+export function AdvisorCaptureDialog({
+  open,
+  name,
+  phone,
+  email,
+  state,
+  onChange,
+  onCancel,
+  onSubmit,
+}: {
+  open: boolean;
+  name: string;
+  phone: string;
+  email: string;
+  state: string;
+  onChange: (partial: { name?: string; phone?: string; email?: string; state?: string }) => void;
+  onCancel: () => void;
+  onSubmit: () => void;
+}) {
+  if (!open) return null;
+  const ready = Boolean(name.trim() && phone.trim() && email.includes("@") && state.trim());
+  return (
+    <div
+      className="fixed inset-0 z-[80] flex items-start justify-center overflow-y-auto bg-navy/55 p-4 pt-16"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="advisor-capture-title"
+    >
+      <form
+        className="card-xl w-full max-w-lg bg-paper p-5"
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (ready) onSubmit();
+        }}
+      >
+        <h2 id="advisor-capture-title" className="font-display text-xl text-navy">
+          Advisor information
+        </h2>
+        <p className="mt-2 text-sm text-muted">
+          Name, phone, email, and state are required before this DEMO report can be saved.
+          Delivery is not sent from this screen.
+        </p>
+        <div className="mt-4 grid gap-3">
+          <div>
+            <label className={labelClass} htmlFor="advisor-save-name">Name</label>
+            <input id="advisor-save-name" required className={fieldClass} value={name} autoComplete="name" onChange={(e) => onChange({ name: e.target.value })} />
+          </div>
+          <div>
+            <label className={labelClass} htmlFor="advisor-save-phone">Phone</label>
+            <input id="advisor-save-phone" required className={fieldClass} value={phone} autoComplete="tel" onChange={(e) => onChange({ phone: e.target.value })} />
+          </div>
+          <div>
+            <label className={labelClass} htmlFor="advisor-save-email">Email</label>
+            <input id="advisor-save-email" required type="email" className={fieldClass} value={email} autoComplete="email" onChange={(e) => onChange({ email: e.target.value })} />
+          </div>
+          <div>
+            <label className={labelClass} htmlFor="advisor-save-state">State</label>
+            <FieldPicker
+              id="advisor-save-state"
+              value={state}
+              placeholder="Select a state…"
+              options={STATE_NAMES.map((s) => ({ value: s, label: s }))}
+              onChange={(v) => onChange({ state: v })}
+            />
+          </div>
+        </div>
+        <div className="mt-4 grid gap-2 sm:grid-cols-2">
+          <button type="button" className="btn-block rounded-lg border border-card-border text-navy hover:bg-cream" onClick={onCancel}>
+            Cancel
+          </button>
+          <button type="submit" className="btn-block rounded-lg bg-navy text-cream hover:bg-teal disabled:opacity-40" disabled={!ready}>
+            Save PDF
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
 export function ContactRequestDialog({
   open,
   initial,

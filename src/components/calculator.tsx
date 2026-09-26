@@ -143,7 +143,7 @@ function snapshotReadyCards(): { label: string; value: string }[] {
     value: node.querySelector("p.font-display")?.textContent?.trim() ?? "",
   })).filter((card) => card.label && card.value);
 }
-import { ContactAskDialog, ContactRequestDialog, PdfReadyDialog, PlanningAssistDialog } from "@/components/pdf-delivery-dialogs";
+import { ContactAskDialog, ContactRequestDialog, AdvisorCaptureDialog, PdfReadyDialog, PlanningAssistDialog } from "@/components/pdf-delivery-dialogs";
 import { MedicaidVaCard } from "@/components/medicaid-va-card";
 import { AdvisorProfessionalFolds, DisclaimerCard } from "@/components/disclaimer-card";
 import { WelcomeCard } from "@/components/welcome-card";
@@ -294,6 +294,7 @@ export function Calculator() {
   const [ageNeeded, setAgeNeeded] = useState(false);
   const [showReport, setShowReport] = useState(false);
   const [printAfterOpen, setPrintAfterOpen] = useState(false);
+  const [advisorCaptureOpen, setAdvisorCaptureOpen] = useState(false);
   const [pdfPick, setPdfPick] = useState(false);
   const [personalizeOpen, setPersonalizeOpen] = useState(false);
   const [finderIndex, setFinderIndex] = useState(0);
@@ -1158,9 +1159,15 @@ export function Calculator() {
     if (!personalizeOpen) setTheme(true);
   }, [personalizeOpen]);
   const pdfUnlocked = ran && section2Confirmed && (insuranceLocked || section3Confirmed);
-  const canPdf = pdfUnlocked && audience === "interested";
+  const licensedPdf = audience === "licensed-client" || audience === "licensed-solo";
+  const canPdf = pdfUnlocked && (audience === "interested" || licensedPdf);
   function requestPdfDownload() {
-    if (!canPdf) return;
+    if (!pdfUnlocked) return;
+    if (licensedPdf) {
+      setAdvisorCaptureOpen(true);
+      return;
+    }
+    if (audience !== "interested") return;
     setDetails((d) => withScenarioDetails(d, insuranceLocked));
     setAttachAdvisor(advisorReceivesPdf(advisor, client));
     setPdfPick(true);
@@ -1195,9 +1202,10 @@ export function Calculator() {
           setPrintAfterOpen(false);
           setShowReport(false);
           const snap = mailRef.current;
+          const demoRun = audience === "licensed-client" || audience === "licensed-solo";
           let note = "The file is not on this computer until you choose Save PDF to this computer.";
           let next: "contact" | "done" = "contact";
-          if (advisorReceivesPdf(snap.advisor, snap.client) && snap.attachAdvisor) {
+          if (!demoRun && advisorReceivesPdf(snap.advisor, snap.client) && snap.attachAdvisor) {
             try {
               const r = await emailAdvisorPdf({
                 data: {
@@ -1217,6 +1225,9 @@ export function Calculator() {
             } catch {
               note = "The advisor copy could not be emailed. Save your copy below.";
             }
+            next = "done";
+          } else if (demoRun) {
+            note = "DEMO report. Advisor name, phone, email, and state were recorded on this device. Nothing was emailed.";
             next = "done";
           } else {
             setContactDraft({
@@ -1243,7 +1254,7 @@ export function Calculator() {
     return () => {
       window.clearTimeout(t);
     };
-  }, [showReport, printAfterOpen]);
+  }, [showReport, printAfterOpen, audience]);
 
   function scrollToId(id: string) {
     const el = document.getElementById(id);
@@ -1505,7 +1516,7 @@ export function Calculator() {
     medicaidOpen: countableExHome < NAIC_LOCKOUT_ASSETS,
     readyCards: snapshotReadyCards(),
     details,
-    allowPdf: audience === "interested",
+    allowPdf: audience === "interested" || audience === "licensed-client" || audience === "licensed-solo",
     pdfDemo: audience === "licensed-client" || audience === "licensed-solo",
     audienceNote: audience === "licensed-solo" ? "Contact Adaptive Marketing Group for terms of use and licensing agreement." : "",
     onClose: () => {
@@ -1518,7 +1529,13 @@ export function Calculator() {
       }, 80);
     },
     onPdf: requestPdfDownload,
-    onClosePdf: () => runPdfDownload(true),
+    onClosePdf: () => {
+      if (audience === "licensed-client" || audience === "licensed-solo") {
+        setAdvisorCaptureOpen(true);
+        return;
+      }
+      runPdfDownload(true);
+    },
     onNeedAdvisor: () => {
       setShowReport(false);
       window.setTimeout(() => {
@@ -3213,6 +3230,22 @@ export function Calculator() {
           filenamePreview={pdfFilename(state)}
           onCancel={() => setPdfPick(false)}
           onConfirm={runPdfDownload}
+        />,
+        document.body,
+      ) : null}
+      {advisorCaptureOpen ? createPortal(
+        <AdvisorCaptureDialog
+          open
+          name={advisor.name}
+          phone={advisor.phone}
+          email={advisor.email}
+          state={advisor.state || state}
+          onChange={(partial) => setAdvisor((p) => ({ ...p, ...partial }))}
+          onCancel={() => setAdvisorCaptureOpen(false)}
+          onSubmit={() => {
+            setAdvisorCaptureOpen(false);
+            runPdfDownload(true);
+          }}
         />,
         document.body,
       ) : null}
