@@ -29,11 +29,13 @@ import {
   VA_RATES_REVIEWED,
 } from "@/lib/va-aa";
 
-function Fold({ title, children }: { title: string; children: ReactNode }) {
+function Fold({ title, children, id }: { title: string; children: ReactNode; id?: string }) {
   return (
-    <TitleCollapse title={title} className="mt-2">
-      {children}
-    </TitleCollapse>
+    <div id={id} className={id ? "scroll-mt-28" : undefined}>
+      <TitleCollapse title={title} className="mt-2" openOnHash={id}>
+        {children}
+      </TitleCollapse>
+    </div>
   );
 }
 
@@ -100,6 +102,25 @@ export function MedicaidVaBody({
       </p>
       <p className="mb-2 text-xs leading-relaxed text-muted">
         <LinkedCopy text={MEDICAID_FUTURE_QUALIFIER} />
+      </p>
+      <p className="mb-2 text-xs leading-relaxed text-muted">
+        In this hypothetical:{" "}
+        <a href="#qit-miller" className="source-link">QIT</a>
+        {" · "}
+        <a href="#mapt-trust" className="source-link">MAPT</a>
+        {" · "}
+        <a href="#ssi-program" className="source-link">SSI</a>
+        {" · "}
+        <a href="#cpi-education" className="source-link">CPI</a>
+        . Sources:{" "}
+        <Cite href={SRC.medicaid}>Medicaid</Cite>
+        {" · "}
+        <Cite href={SRC.ssaSsi}>Supplemental Security Income</Cite>
+        {" · "}
+        <Cite href={SRC.blsCpi}>Bureau of Labor Statistics</Cite>
+        {" · "}
+        <Cite href={SRC.spousalStatute}>42 U.S.C. §1396r-5</Cite>
+        .
       </p>
 
       <p><LinkedCopy text={ltc.lead} /></p>
@@ -198,7 +219,7 @@ export function MedicaidVaBody({
           ))}
         </ul>
       </Fold>
-      <Fold title="Qualified Income Trust (QIT / Miller Trust)">
+      <Fold id="qit-miller" title="Qualified Income Trust (QIT / Miller Trust)">
         <QitMillerCards state={state} />
       </Fold>
       <Fold title="How this hypothetical spends down">
@@ -234,7 +255,7 @@ export function MedicaidVaBody({
           </ul>
         </Fold>
       </Fold>
-      <Fold title={mapt.title}>
+      <Fold id="mapt-trust" title={mapt.title}>
         <p className="mb-2">
           Educational only — a MAPT must be drafted by a qualified Medicaid or elder-care
           planning attorney. This model does not create or value a trust. MAPT principal
@@ -261,7 +282,7 @@ export function MedicaidVaBody({
       </Fold>
 
       <Step n="6" label="Related programs (do not confuse with Medicaid LTC)" />
-      <Fold title={ssi.title}>
+      <Fold id="ssi-program" title={ssi.title}>
         <p className="mb-2"><LinkedCopy text={ssi.lead} /></p>
         {ssi.bullets.map((b) => (
           <Fold key={b.heading} title={b.heading}>

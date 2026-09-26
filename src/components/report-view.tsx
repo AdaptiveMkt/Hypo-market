@@ -747,7 +747,14 @@ export function ReportView({
                 a={veteran ? "Yes — VA pension limits illustrated" : "No"}
               />
               <Qa
-                q="Medicaid asset-protection strategies"
+                q={
+                  <>
+                    Medicaid asset-protection strategies
+                    <a href="#medicaid-information" className="source-link ml-1 align-super text-xs font-semibold">
+                      *
+                    </a>
+                  </>
+                }
                 a={
                   details.edu
                     ? "Yes — illustrated in the Educational card"
@@ -1944,8 +1951,8 @@ export function ReportView({
         </section>
         ) : null}
 
-        <section className="report-block" data-medicaid-fold data-medicaid-open={medicaidOpen ? "1" : "0"}>
-          <TitleCollapse title="Medicaid Information" className="mt-0" defaultOpen={medicaidOpen}>
+        <section id="medicaid-information" className="report-block scroll-mt-28" data-medicaid-fold data-medicaid-open={medicaidOpen ? "1" : "0"}>
+          <TitleCollapse title="Medicaid Information" className="mt-0" defaultOpen={medicaidOpen} openOnHash="medicaid-information">
             <MedicaidVaBody
               state={state}
               policy={policy}
@@ -2378,8 +2385,8 @@ export function ReportView({
 
         {details.edu ? (
         <>
-        <section className="report-block border-l-4 border-teal bg-paper px-4 py-2 text-sm text-muted">
-          <TitleCollapse title="Educational — How CPI is calculated" className="mt-0">
+        <section id="cpi-education" className="report-block scroll-mt-28 border-l-4 border-teal bg-paper px-4 py-2 text-sm text-muted">
+          <TitleCollapse title="Educational — How CPI is calculated" className="mt-0" openOnHash="cpi-education">
           <TitleCollapse title="CPI, care costs, and riders">
             <p>
             <Cite href={SRC.blsCpi}>BLS CPI-U/CPI-W</Cite> measure a consumer market basket, not private-pay long-term
