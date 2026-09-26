@@ -2306,13 +2306,6 @@ export function ReportView({
         </section>
         ) : null}
 
-        {policy.enabled && details.confidence ? (
-        <section className="report-block">
-          <h2 className="mb-3 font-display text-xl text-navy">Model confidence scores</h2>
-          <ConfidencePanel confidence={confidence} />
-        </section>
-        ) : null}
-
         {details.naicGuide ? (
         <section className="report-block">
           <h2 className="mb-2 font-display text-xl text-navy">
@@ -2337,6 +2330,13 @@ export function ReportView({
             . Pages 48–51 of the Shopper’s Guide reprint this worksheet.
           </p>
           <FilledNaicWorksheet />
+        </section>
+        ) : null}
+
+        {policy.enabled && details.confidence ? (
+        <section className="report-block">
+          <h2 className="mb-3 font-display text-xl text-navy">Model confidence scores</h2>
+          <ConfidencePanel confidence={confidence} />
         </section>
         ) : null}
 

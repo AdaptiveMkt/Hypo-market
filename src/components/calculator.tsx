@@ -3095,10 +3095,6 @@ export function Calculator() {
               ))}
             </div>
           </ViewFold>
-
-          <ViewFold title="Model confidence scores" hint={`${DETAIL_HINTS.confidence} View more details.`} checked={details.confidence} onPdf={(v) => setDetail("confidence", v)}>
-            <ConfidencePanel confidence={confidence} />
-          </ViewFold>
             </>
           ) : null}
 
@@ -3141,6 +3137,10 @@ export function Calculator() {
       )}
 
       {ran && policy.enabled ? (
+        <>
+        <ViewFold title="Model confidence scores" hint={`${DETAIL_HINTS.confidence} View more details.`} checked={details.confidence} onPdf={(v) => setDetail("confidence", v)}>
+          <ConfidencePanel confidence={confidence} />
+        </ViewFold>
         <ViewFold title="Hypothesis sensitivity" hint={`${DETAIL_HINTS.sensitivity} View more details.`} checked={details.sensitivity} onPdf={(v) => setDetail("sensitivity", v)}>
           <p className="mb-3 text-sm text-muted">{sensitivity.insight}</p>
           <div className="grid gap-3">
@@ -3157,6 +3157,7 @@ export function Calculator() {
             ))}
           </div>
         </ViewFold>
+        </>
       ) : null}
 
       <div id="disclosure-terms" className="mt-5 scroll-mt-8 card-xl border-2 px-4 py-2 text-sm text-muted">
