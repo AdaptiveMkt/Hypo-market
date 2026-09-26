@@ -25,6 +25,7 @@ import { money } from "@/lib/utils";
 import { TAX_RATE_GROUPS, TAX_RATE_OPTIONS } from "@/lib/tax-brackets";
 import { SRC } from "@/lib/sources";
 import { Cite } from "@/components/source-links";
+import { AALTCI_MEAN_CLAIM_AGE } from "@/lib/claim-age";
 
 type Step =
   | { kind: "mode" }
@@ -497,6 +498,11 @@ export function FactFinder({
             <div className="mt-3">
               <StepperField id="ff-claim" value={claimAge} onChange={(v) => onClaimAge(Number(v) || claimAge)} step={1} min={ageToday + 1} max={120} />
             </div>
+            <p className="mt-2 text-xs leading-snug text-muted">
+              * Industry claim experience: age {AALTCI_MEAN_CLAIM_AGE} is the mean age at claim in the{" "}
+              <Cite href={SRC.aaltci2024Claims}>AALTCI 2024 LTCI claims data</Cite>
+              {" "}(Connecticut Partnership sample, range 31–103). The age above is this model’s planning age. You can change it.
+            </p>
             <Nav back={back} next={next} />
           </>
         ) : null}
