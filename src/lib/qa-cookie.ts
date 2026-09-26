@@ -15,6 +15,7 @@ export type QaSave = {
   finderPersonal: boolean;
   assets: Assets;
   assetRois: AssetRois;
+  lifeFaceAmount?: number;
   excludableTouched: boolean;
   state: string;
   setting: string;

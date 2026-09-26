@@ -219,6 +219,7 @@ export function Calculator() {
     ...DEFAULT_ASSETS,
     excludable: defaultExcludableAssets("Alabama"),
   }));
+  const [lifeFaceAmount, setLifeFaceAmount] = useState(0);
   const [excludableTouched, setExcludableTouched] = useState(false);
   const [assetRois, setAssetRois] = useState<AssetRois>(() => ({ ...DEFAULT_ASSET_ROIS }));
   const [state, setState] = useState("Alabama");
@@ -333,6 +334,7 @@ export function Calculator() {
     if (saved?.advisorCleared) setAdvisorCleared(true);
     if (saved && saved.finderIndex > 0) {
       setAssets({ ...DEFAULT_ASSETS, ...saved.assets });
+      setLifeFaceAmount(Number(saved.lifeFaceAmount) || 0);
       setAssetRois({ ...DEFAULT_ASSET_ROIS, ...saved.assetRois });
       setExcludableTouched(Boolean(saved.excludableTouched));
       if (saved.state) setState(saved.state);
@@ -384,6 +386,7 @@ export function Calculator() {
       finderIndex,
       finderPersonal,
       assets,
+      lifeFaceAmount,
       assetRois,
       excludableTouched,
       state,
@@ -412,6 +415,7 @@ export function Calculator() {
     finderIndex,
     finderPersonal,
     assets,
+    lifeFaceAmount,
     assetRois,
     excludableTouched,
     state,
@@ -977,6 +981,7 @@ export function Calculator() {
   }
   function resetAll() {
     setAssets({ ...DEFAULT_ASSETS, excludable: defaultExcludableAssets("Alabama") });
+    setLifeFaceAmount(0);
     setAssetRois({ ...DEFAULT_ASSET_ROIS });
     setState("Alabama");
     setExcludableTouched(false);
@@ -1355,6 +1360,7 @@ export function Calculator() {
     iraRoi,
     netRoi,
     assets,
+    lifeFaceAmount,
     assetRois,
     excludeHome,
     grossPool,
@@ -1477,6 +1483,8 @@ export function Calculator() {
         contact={<PartyFields idPrefix="client" party={client} onChange={(partial) => setClient((p) => ({ ...p, ...partial }))} />}
         assets={assets}
         rois={assetRois}
+        lifeFaceAmount={lifeFaceAmount}
+        onLifeFace={setLifeFaceAmount}
         onAsset={setAsset}
         onRoi={setAssetRoi}
         taxRate={taxRate}
@@ -1635,6 +1643,16 @@ export function Calculator() {
                     <StepperField id={`roi-${f.key}`} value={Number(assetRois[f.key]) || 0} onChange={(v) => setAssetRoi(f.key, v)} step={0.1} min={0} max={20} decimals={1} compact />
                   </div>
                 </div>
+                {f.key === "life" ? (
+                  <div className="mt-2">
+                    <label className={labelClass} htmlFor="life-face">
+                      Life insurance face amount *{" "}
+                      <a href="#adb-definition" className="source-link">(see definition of accelerated death benefits)</a>
+                    </label>
+                    <MoneyField id="life-face" value={lifeFaceAmount} onChange={(v) => setLifeFaceAmount(Number(v) || 0)} compact />
+                    <p className="mt-1 text-xs text-muted">Reported only. It does not pay for care unless the policy pays an accelerated death benefit for a terminal illness as defined in the policy, or the policy is sold to a third party.</p>
+                  </div>
+                ) : null}
               </div>
             ))}
             <div>
@@ -2601,6 +2619,20 @@ export function Calculator() {
 
           {!insuranceLocked ? (
             <>
+          <ViewFold title="Life insurance face amount *" hint={`${DETAIL_HINTS.lifeFace} View more details.`} checked={details.lifeFace} onPdf={(v) => setDetail("lifeFace", v)}>
+            <p className="text-sm text-navy">Face amount: <span className="font-semibold tabular-nums">{money(lifeFaceAmount)}</span></p>
+            <p className="mt-2 text-sm text-muted">
+              * Cash value is the countable asset. The face amount is reported only and has no impact on payment of care unless the policy pays an accelerated death benefit for a terminal illness as defined in the policy, or the policy is sold to a third party.
+            </p>
+            <div id="adb-definition" className="mt-3 scroll-mt-24">
+              <TitleCollapse title="Definition of accelerated death benefits" className="mt-0" defaultOpen={false}>
+                <p className="text-sm text-muted">
+                  An accelerated death benefit pays part of a life insurance death benefit while the insured is still living. For a terminal illness, IRC §101(g) generally applies when a physician certifies that death is reasonably expected within 24 months. The contract defines how much of the face can be accelerated. A sale of the policy to a third party (a life settlement) converts the contract to cash and is not a care payment in this model unless those proceeds are entered as a countable asset.{" "}
+                  <Cite href={SRC.irc101g}>26 U.S.C. §101(g)</Cite>
+                </p>
+              </TitleCollapse>
+            </div>
+          </ViewFold>
           <ViewFold title="Year by year projection" hint={`${DETAIL_HINTS.yearByYear} View more details.`} defaultOpen checked={details.yearByYear} onPdf={(v) => setDetail("yearByYear", v)}>
             <p className="mb-3 text-sm text-muted">
               {yearTabRows.length} years modeled

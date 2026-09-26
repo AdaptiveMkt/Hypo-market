@@ -165,6 +165,7 @@ export function ReportView({
   iraRoi,
   netRoi,
   assets,
+  lifeFaceAmount = 0,
   assetRois,
   excludeHome,
   grossPool,
@@ -229,6 +230,7 @@ export function ReportView({
   iraRoi: number;
   netRoi: number;
   assets: Assets;
+  lifeFaceAmount?: number;
   assetRois?: AssetRois;
   excludeHome: boolean;
   grossPool: number;
@@ -682,6 +684,31 @@ export function ReportView({
             </tbody>
           </table>
         </section>
+
+        {details.lifeFace ? (
+        <section className="report-block" id="adb-definition">
+          <TitleCollapse
+            title="Life insurance face amount *"
+            className="mt-0"
+            defaultOpen={false}
+            pdfChecked
+            pdfLocked
+          >
+            <p className="text-sm text-navy">
+              Face amount: <span className="font-semibold tabular-nums">{money(lifeFaceAmount)}</span>
+            </p>
+            <p className="mt-2 text-sm text-muted">
+              * Cash value is already in countable assets. The face amount has no impact on payment of care unless the policy pays an accelerated death benefit for a terminal illness as defined in the policy, or the policy is sold to a third party.
+            </p>
+            <TitleCollapse title="Definition of accelerated death benefits" className="mt-3">
+              <p className="text-sm text-muted">
+                An accelerated death benefit pays part of a life insurance death benefit while the insured is still living. For a terminal illness, IRC §101(g) generally applies when a physician certifies that death is reasonably expected within 24 months. The contract defines how much of the face can be accelerated. A sale to a third party (a life settlement) is cash from selling the contract. It is not a care payment in this model unless those proceeds are entered as a countable asset.{" "}
+                <Cite href={SRC.irc101g}>26 U.S.C. §101(g)</Cite>
+              </p>
+            </TitleCollapse>
+          </TitleCollapse>
+        </section>
+        ) : null}
 
         <section className="report-block">
           <h2 className="mb-3 font-display text-xl text-navy">

@@ -110,6 +110,8 @@ export function FactFinder({
   contact,
   assets,
   rois,
+  lifeFaceAmount,
+  onLifeFace,
   onAsset,
   onRoi,
   taxRate,
@@ -168,6 +170,8 @@ export function FactFinder({
   contact: ReactNode;
   assets: Assets;
   rois: AssetRois;
+  lifeFaceAmount: number;
+  onLifeFace: (n: number) => void;
   onAsset: (key: AssetKey, raw: string) => void;
   onRoi: (key: AssetKey, raw: string) => void;
   taxRate: number;
@@ -346,6 +350,29 @@ export function FactFinder({
               </div>
             </div>
             <p className="mt-2 text-xs text-muted">Leave the value blank if this line is $0.</p>
+            {step.key === "life" ? (
+              <div className="mt-3">
+                <label className={labelClass} htmlFor="ff-life-face">
+                  Life insurance face amount *{" "}
+                  <a href="#adb-definition" className="source-link">
+                    (see definition of accelerated death benefits)
+                  </a>
+                </label>
+                <StepperField
+                  id="ff-life-face"
+                  value={lifeFaceAmount}
+                  onChange={(v) => onLifeFace(Number(v) || 0)}
+                  step={1000}
+                  min={0}
+                  prefix="$"
+                  commas
+                  blankWhenZero
+                />
+                <p className="mt-1 text-xs text-muted">
+                  Reported only. The face amount does not pay for care unless the policy pays an accelerated death benefit for a terminal illness as defined in the policy, or the policy is sold to a third party.
+                </p>
+              </div>
+            ) : null}
             <Nav back={back} next={next} />
           </>
         ) : null}
