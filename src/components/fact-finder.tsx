@@ -24,6 +24,7 @@ import { SETTING_LABELS, STATE_NAMES, type CareSetting } from "@/lib/costs";
 import { money } from "@/lib/utils";
 import { TAX_RATE_GROUPS, TAX_RATE_OPTIONS } from "@/lib/tax-brackets";
 import { SRC } from "@/lib/sources";
+import { Cite } from "@/components/source-links";
 
 type Step =
   | { kind: "mode" }
@@ -481,6 +482,11 @@ export function FactFinder({
             <div className="mt-3">
               <StepperField id="ff-cpi" value={Number(cpi.toFixed(1))} onChange={(v) => onCpi(Number(v))} step={0.1} min={0} max={12} decimals={1} />
             </div>
+            <p className="mt-2 text-xs leading-snug text-muted">
+              * {cpi.toFixed(1)}% is the compound annual growth in the national median{" "}
+              {setting ? SETTING_LABELS[setting as CareSetting].toLowerCase() : "assisted living"} cost from 2021 to 2025.{" "}
+              <Cite href={SRC.carescout}>CareScout Cost of Care Survey</Cite>
+            </p>
             <Nav back={back} next={next} />
           </>
         ) : null}

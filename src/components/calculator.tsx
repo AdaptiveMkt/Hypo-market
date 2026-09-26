@@ -1824,7 +1824,7 @@ export function Calculator() {
                       : <>Using the 5-year {SETTING_SHORT[activeSetting]} benchmark, <Pct>{cpi.toFixed(1)}%</Pct>{state ? <> for care in <StateName name={state} /></> : null}.</>}
                 </p>
             </div>
-            <p className="mt-3 text-xs text-muted">* 5-year CPI / LTC for the care selected. {fiveYearLtcBenchmarks().map((row) => `If ${row.ifLabel}, the rate is ${row.cagr.toFixed(1)}%`).join(". ")}.</p>
+            <p className="mt-3 text-xs text-muted">* 5-year compound growth in the national median cost for the care selected, 2021–2025. {fiveYearLtcBenchmarks().map((row) => `If ${row.ifLabel}, the rate is ${row.cagr.toFixed(1)}%`).join(". ")}. Source: <Cite href={SRC.carescout}>CareScout Cost of Care Survey</Cite>.</p>
             <div className="mt-3 grid w-full min-w-0 grid-cols-1 gap-3 md:grid-cols-2">
               <div className="min-w-0">
                 <label className={labelClass} htmlFor="claim-age">Estimated age when care might be needed *</label>
