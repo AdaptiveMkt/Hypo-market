@@ -168,6 +168,11 @@ html.dark {
     height: auto;
   }
 
+  canvas.pdf-page-canvas {
+    max-width: none !important;
+    height: auto !important;
+  }
+
   input,
   textarea,
   select,

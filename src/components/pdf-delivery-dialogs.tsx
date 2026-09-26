@@ -2,10 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import { FieldPicker } from "@/components/field-picker";
-import { PdfInlineViewer } from "@/components/pdf-inline-viewer";
 import { STATE_NAMES } from "@/lib/costs";
 import { submitContactRequest } from "@/lib/send-report-mail";
 import { CONTACT_EMAIL } from "@/lib/email-attachment";
+import { PdfPageView } from "@/components/pdf-page-view";
 
 const fieldClass =
   "w-full rounded-lg border border-line bg-paper px-3 py-2 text-navy";
@@ -294,9 +294,7 @@ export function PdfReadyDialog({
           {filename}
         </p>
         {note ? <p className="mt-2 text-sm text-navy">{note}</p> : null}
-        {viewing ? (
-          <PdfInlineViewer url={url} title={filename} className="mt-3" />
-        ) : null}
+        {viewing ? <PdfPageView url={url} /> : null}
         <div className="mt-4 stack-actions">
           <button
             type="button"
@@ -346,13 +344,7 @@ export function PdfReadyDialog({
               Exit full screen
             </button>
           </div>
-          <div className="min-h-0 flex-1 overflow-hidden bg-[#d7d2c8] p-2 sm:p-3">
-            <PdfInlineViewer
-              url={url}
-              title={filename}
-              className="flex h-full min-h-0 flex-col [&_>div:last-child]:max-h-none [&_>div:last-child]:h-full"
-            />
-          </div>
+          <PdfPageView url={url} fill />
         </div>
       ) : null}
     </div>
