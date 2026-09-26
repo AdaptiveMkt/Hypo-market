@@ -2583,7 +2583,7 @@ export function Calculator() {
                         group: "column" as const,
                         label: "Accumulative co-pay from countable assets · beginning",
                         value: (
-                          <span className={featureRow.drawnCumulative > 0 ? "font-bold amt-red" : ""}>
+                          <span className={featureRow.drawnCumulative > 0 ? "text-shortfall" : ""}>
                             {featureRow.drawnCumulative > 0 ? money(-featureRow.drawnCumulative) : money(0)}
                           </span>
                         ),
@@ -2640,7 +2640,7 @@ export function Calculator() {
                         label: "Accumulative co-pay from countable assets · end",
                         amount: depletionRow.drawnCumulative,
                         value: (
-                          <span className={depletionRow.drawnCumulative > 0 ? "font-bold amt-red" : ""}>
+                          <span className={depletionRow.drawnCumulative > 0 ? "text-shortfall" : ""}>
                             {depletionRow.drawnCumulative > 0 ? money(-depletionRow.drawnCumulative) : money(0)}
                           </span>
                         ),
@@ -2694,7 +2694,7 @@ export function Calculator() {
                         label: "Accumulative co-pay from countable assets",
                         amount: yearRowsShown.at(-1)!.drawnCumulative,
                         value: (
-                          <span className={yearRowsShown.at(-1)!.drawnCumulative > 0 ? "font-bold amt-red" : ""}>
+                          <span className={yearRowsShown.at(-1)!.drawnCumulative > 0 ? "text-shortfall" : ""}>
                             {yearRowsShown.at(-1)!.drawnCumulative > 0
                               ? money(-yearRowsShown.at(-1)!.drawnCumulative)
                               : money(0)}
@@ -2885,7 +2885,7 @@ export function Calculator() {
                     <div className="flex justify-between gap-3"><dt className="text-muted">Today’s annual cost</dt><dd className="tabular-nums">{money(row.today)}</dd></div>
                     <div className="flex justify-between gap-3"><dt className="text-muted">First-year bill in this run</dt><dd className="tabular-nums">{money(row.proj.firstCost)}</dd></div>
                     <div className="flex justify-between gap-3"><dt className="text-muted">Assets remaining</dt><dd className="tabular-nums">{money(row.proj.endPool)}</dd></div>
-                    <div className="flex justify-between gap-3"><dt className="text-muted">Shortfall</dt><dd className="tabular-nums">{row.proj.shortfallTotal ? money(row.proj.shortfallTotal) : "None"}</dd></div>
+                    <div className="flex justify-between gap-3"><dt className="text-muted">Shortfall</dt><dd className={row.proj.shortfallTotal ? "tabular-nums text-shortfall" : "tabular-nums"}>{row.proj.shortfallTotal ? money(row.proj.shortfallTotal) : "None"}</dd></div>
                   </dl>
                 </article>
               ))}
@@ -2901,7 +2901,7 @@ export function Calculator() {
                     <dl className="mt-2 grid gap-1.5 text-sm">
                       <div className="flex justify-between gap-3"><dt className="text-muted">Insurance paid</dt><dd className="tabular-nums">{money(row.proj.insuranceTotal)}</dd></div>
                       <div className="flex justify-between gap-3"><dt className="text-muted">Assets left</dt><dd className="tabular-nums">{money(row.proj.endPool)}</dd></div>
-                      <div className="flex justify-between gap-3"><dt className="text-muted">Shortfall</dt><dd className="tabular-nums">{row.proj.shortfallTotal ? money(row.proj.shortfallTotal) : "None"}</dd></div>
+                      <div className="flex justify-between gap-3"><dt className="text-muted">Shortfall</dt><dd className={row.proj.shortfallTotal ? "tabular-nums text-shortfall" : "tabular-nums"}>{row.proj.shortfallTotal ? money(row.proj.shortfallTotal) : "None"}</dd></div>
                     </dl>
                   </article>
                 ))}
@@ -2910,7 +2910,7 @@ export function Calculator() {
                   <dl className="mt-2 grid gap-1.5 text-sm">
                     <div className="flex justify-between gap-3"><dt className="text-muted">Insurance paid</dt><dd className="tabular-nums">{money(0)}</dd></div>
                     <div className="flex justify-between gap-3"><dt className="text-muted">Assets left</dt><dd className="tabular-nums">{money(selfFunded.endPool)}</dd></div>
-                    <div className="flex justify-between gap-3"><dt className="text-muted">Shortfall</dt><dd className="tabular-nums">{selfFunded.shortfallTotal ? money(selfFunded.shortfallTotal) : "None"}</dd></div>
+                    <div className="flex justify-between gap-3"><dt className="text-muted">Shortfall</dt><dd className={selfFunded.shortfallTotal ? "tabular-nums text-shortfall" : "tabular-nums"}>{selfFunded.shortfallTotal ? money(selfFunded.shortfallTotal) : "None"}</dd></div>
                   </dl>
                 </article>
               </div>
@@ -2942,7 +2942,7 @@ export function Calculator() {
                     <dl className="mt-2 grid gap-1.5 text-sm">
                       <div className="flex justify-between gap-3"><dt className="text-muted">Insurance paid</dt><dd className="tabular-nums">{money(row.proj.insuranceTotal)}</dd></div>
                       <div className="flex justify-between gap-3"><dt className="text-muted">Assets remaining</dt><dd className="tabular-nums">{money(row.proj.endPool)}</dd></div>
-                      <div className="flex justify-between gap-3"><dt className="text-muted">Shortfall</dt><dd className="tabular-nums">{row.proj.shortfallTotal ? money(row.proj.shortfallTotal) : "None"}</dd></div>
+                      <div className="flex justify-between gap-3"><dt className="text-muted">Shortfall</dt><dd className={row.proj.shortfallTotal ? "tabular-nums text-shortfall" : "tabular-nums"}>{row.proj.shortfallTotal ? money(row.proj.shortfallTotal) : "None"}</dd></div>
                     </dl>
                   </article>
                 ))}
@@ -2974,7 +2974,7 @@ export function Calculator() {
                       <div className="flex justify-between gap-3"><dt className="text-muted">LTC pool at purchase</dt><dd className="tabular-nums">{row.proj.lifetimeBenefit ? LIFETIME_BENEFIT_MARK : money(row.proj.benefitPoolAtPurchase ?? 0)}</dd></div>
                       <div className="flex justify-between gap-3"><dt className="text-muted">Insurance paid</dt><dd className="tabular-nums">{money(row.proj.insuranceTotal)}</dd></div>
                       <div className="flex justify-between gap-3"><dt className="text-muted">Assets remaining</dt><dd className="tabular-nums">{money(row.proj.endPool)}</dd></div>
-                      <div className="flex justify-between gap-3"><dt className="text-muted">Shortfall</dt><dd className="tabular-nums">{row.proj.shortfallTotal ? money(row.proj.shortfallTotal) : "None"}</dd></div>
+                      <div className="flex justify-between gap-3"><dt className="text-muted">Shortfall</dt><dd className={row.proj.shortfallTotal ? "tabular-nums text-shortfall" : "tabular-nums"}>{row.proj.shortfallTotal ? money(row.proj.shortfallTotal) : "None"}</dd></div>
                     </dl>
                   </article>
                 ))}
@@ -3150,7 +3150,7 @@ export function Calculator() {
                 <p className="text-sm text-muted">{row.shock}</p>
                 <dl className="mt-2 grid gap-1.5 text-sm">
                   <div className="flex justify-between gap-3"><dt className="text-muted">Assets remaining</dt><dd className="tabular-nums">{money(row.remaining)}</dd></div>
-                  <div className="flex justify-between gap-3"><dt className="text-muted">Shortfall</dt><dd className="tabular-nums">{row.shortfall ? money(row.shortfall) : "None"}</dd></div>
+                  <div className="flex justify-between gap-3"><dt className="text-muted">Shortfall</dt><dd className={row.shortfall ? "tabular-nums text-shortfall" : "tabular-nums"}>{row.shortfall ? money(row.shortfall) : "None"}</dd></div>
                   <div className="flex justify-between gap-3"><dt className="text-muted">Years at claim cost</dt><dd className="tabular-nums">{row.yearsAtClaim.toFixed(2)}</dd></div>
                 </dl>
               </article>
@@ -3701,7 +3701,7 @@ function MovableKpiGrid({
 }
 
 function RedAmt({ children }: { children: ReactNode }) {
-  return <span className="amt-red font-bold">{children}</span>;
+  return <span className="text-shortfall">{children}</span>;
 }
 
 function PartyFields({

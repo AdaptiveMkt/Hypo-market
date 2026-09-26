@@ -12,6 +12,21 @@ import { money, moneyCents } from "@/lib/utils";
 
 const MODEL_START_YEAR = new Date().getFullYear();
 
+function Num({
+  text,
+  value,
+  shortfall = false,
+}: {
+  text: string;
+  value: number;
+  shortfall?: boolean;
+}) {
+  if (shortfall ? value !== 0 : value < 0) {
+    return <span className="text-shortfall">{text}</span>;
+  }
+  return <>{text}</>;
+}
+
 function calendarYear(modelYear: number) {
   return MODEL_START_YEAR + Math.max(1, modelYear) - 1;
 }
@@ -125,27 +140,48 @@ export function YearByYearTable({
                 className={`border-t tabular-nums ${gone ? "border-deplete bg-cream" : "border-line text-navy"}`}
               >
                 <td className={cell}>{calendarYear(r.year)}</td>
-                <td className={cell}>{money(r.remainingNetStart)}</td>
+                <td className={cell}>
+                  <Num text={money(r.remainingNetStart)} value={r.remainingNetStart} />
+                </td>
                 {policyEnabled ? (
-                  <td className={cell}>{lifetime ? LIFETIME_BENEFIT_MARK : moneyCents(r.insurancePoolStart)}</td>
+                  <td className={cell}>
+                    <Num
+                      text={lifetime ? LIFETIME_BENEFIT_MARK : moneyCents(r.insurancePoolStart)}
+                      value={lifetime ? 0 : r.insurancePoolStart}
+                    />
+                  </td>
                 ) : null}
                 <td className={`py-2 px-1 text-center ${remainClass}`} title={remainTitle}>
-                  {lifetime && policyEnabled
-                    ? `${moneyCents(r.remainingNet)} + lifetime*`
-                    : moneyCents(totalLeft)}
+                  <Num
+                    text={
+                      lifetime && policyEnabled
+                        ? `${moneyCents(r.remainingNet)} + lifetime*`
+                        : moneyCents(totalLeft)
+                    }
+                    value={lifetime && policyEnabled ? r.remainingNet : totalLeft}
+                  />
                 </td>
                 <td className={`${cell} ${r.cost ? "font-bold amt-red" : ""}`}>{moneyCents(r.cost)}</td>
                 {policyEnabled ? (
                   <>
                     <td className={cell}>{moneyCents(r.insurance)}</td>
-                    <td className={cell}>{lifetime ? LIFETIME_BENEFIT_MARK : moneyCents(r.insurancePoolRemaining)}</td>
+                    <td className={cell}>
+                      <Num
+                        text={lifetime ? LIFETIME_BENEFIT_MARK : moneyCents(r.insurancePoolRemaining)}
+                        value={lifetime ? 0 : r.insurancePoolRemaining}
+                      />
+                    </td>
                   </>
                 ) : null}
-                <td className={`${cell} ${r.drawn ? "font-bold amt-red" : ""}`}>
-                  {r.drawn > 0 ? money(-r.drawn) : money(0)}
+                <td className={`${cell} ${r.drawn ? "font-bold" : ""}`}>
+                  <Num text={r.drawn > 0 ? money(-r.drawn) : money(0)} value={r.drawn > 0 ? -r.drawn : 0} />
                 </td>
-                <td className={`${gone ? "py-2 font-bold amt-red" : "py-2"} px-1 text-center`}>
-                  {r.shortfallCumulative ? moneyCents(r.shortfallCumulative) : "—"}
+                <td className="py-2 px-1 text-center">
+                  <Num
+                    text={r.shortfallCumulative ? moneyCents(r.shortfallCumulative) : "—"}
+                    value={r.shortfallCumulative}
+                    shortfall
+                  />
                 </td>
               </tr>
             );
@@ -166,13 +202,22 @@ export function YearByYearTable({
                 <td className="py-2 px-1 text-center">—</td>
               </>
             ) : null}
-            <td className="py-2 px-1 text-center font-bold amt-red">
-              {(last?.drawnCumulative ?? 0) > 0
-                ? money(-(last?.drawnCumulative ?? 0))
-                : money(0)}
+            <td className="py-2 px-1 text-center font-bold">
+              <Num
+                text={
+                  (last?.drawnCumulative ?? 0) > 0
+                    ? money(-(last?.drawnCumulative ?? 0))
+                    : money(0)
+                }
+                value={(last?.drawnCumulative ?? 0) > 0 ? -(last?.drawnCumulative ?? 0) : 0}
+              />
             </td>
             <td className="py-2 px-1 text-center">
-              {last?.shortfallCumulative ? moneyCents(last.shortfallCumulative) : "—"}
+              <Num
+                text={last?.shortfallCumulative ? moneyCents(last.shortfallCumulative) : "—"}
+                value={last?.shortfallCumulative ?? 0}
+                shortfall
+              />
             </td>
           </tr>
         </tfoot>

@@ -2385,7 +2385,7 @@ export function ReportView({
                     <td className="py-1.5 pr-2">{r.factor}</td>
                     <td className="py-1.5 pr-2">{r.shock}</td>
                     <td className="py-1.5 pr-2 text-right">{money(r.remaining)}</td>
-                    <td className="py-1.5 pr-2 text-right">
+                    <td className={`py-1.5 pr-2 text-right ${!r.isBase && r.dRemain < 0 ? "text-shortfall" : ""}`}>
                       {r.isBase ? "—" : `${r.dRemain > 0 ? "+" : ""}${money(r.dRemain)}`}
                     </td>
                     <td className="py-1.5 pr-2 text-right text-shortfall">{r.shortfall ? money(r.shortfall) : "—"}</td>

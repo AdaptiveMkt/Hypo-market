@@ -916,6 +916,14 @@ html.pdf-capture #aum-report .tabular-nums.font-bold.amt-green {
     -webkit-text-fill-color: var(--color-amount) !important;
   }
 
+  .text-shortfall,
+  .text-shortfall.tabular-nums,
+  strong.text-shortfall {
+    color: #ff1a1a !important;
+    -webkit-text-fill-color: #ff1a1a !important;
+    font-weight: 700 !important;
+  }
+
   .amt-green,
   td.amt-green,
   .tabular-nums.font-bold.amt-green {

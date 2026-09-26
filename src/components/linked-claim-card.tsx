@@ -83,7 +83,7 @@ export function LinkedClaimCard({
                   <td className="py-2 pr-2 text-right tabular-nums">{money(row.insurance)}</td>
                   <td className="py-2 pr-2 text-right tabular-nums">{money(row.residual)}</td>
                   <td className="py-2 pr-2 text-right tabular-nums">{money(row.assetsLeft)}</td>
-                  <td className="py-2 text-right tabular-nums">
+                  <td className={`py-2 text-right tabular-nums ${row.shortfall ? "text-shortfall" : ""}`}>
                     {row.shortfall ? money(row.shortfall) : "—"}
                   </td>
                 </tr>
