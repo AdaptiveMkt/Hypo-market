@@ -281,7 +281,7 @@ export function FactFinder({
           <div className="h-full rounded-full bg-teal" style={{ width: `${pct}%` }} />
         </div>
         <p className="mt-1 text-xs text-muted">
-          Question {safeIndex + 1} of {steps.length}. {pct}% of 100% complete.
+          {pct}% of 100% complete.
         </p>
       </div>
 
