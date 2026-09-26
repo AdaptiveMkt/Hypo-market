@@ -87,8 +87,7 @@ export function CopyrightMark({
 }) {
   return (
     <>
-      © 2026 <AmgName className={linkClass} /> & Adaptive Marketing Group. All rights
-      reserved.
+      © 2026 <AmgName className={linkClass} />. All rights reserved.
     </>
   );
 }

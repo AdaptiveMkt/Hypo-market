@@ -1074,8 +1074,8 @@ export function Calculator() {
       window.removeEventListener("aum-download-pdf", requestPdfDownload);
     };
   }, [canPdf, insuranceLocked, showReciprocity]);
-  function runPdfDownload() {
-    if (audience !== "interested") return;
+  function runPdfDownload(force = false) {
+    if (!force && audience !== "interested") return;
     setPdfError("");
     setPdfPick(false);
     setShowReport(true);
@@ -1404,6 +1404,14 @@ export function Calculator() {
     audienceNote: audience === "licensed-client" ? "DEMO" : audience === "licensed-solo" ? "Contact Adaptive Marketing Group for terms of use and licensing agreement." : "",
     onClose: () => setShowReport(false),
     onPdf: requestPdfDownload,
+    onClosePdf: () => runPdfDownload(true),
+    onNeedAdvisor: () => {
+      setShowReport(false);
+      window.setTimeout(() => {
+        document.getElementById("advisor-name")?.scrollIntoView({ behavior: "smooth", block: "center" });
+        (document.getElementById("advisor-name") as HTMLElement | null)?.focus();
+      }, 120);
+    },
   };
 
   const needsAdvisor = audience === "licensed-client" || audience === "licensed-solo";

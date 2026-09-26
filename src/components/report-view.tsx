@@ -139,6 +139,19 @@ type InsuranceCompareRow = {
   years: number;
 };
 
+function missingAdvisorFields(advisor: AdvisorParty) {
+  const gaps: string[] = [];
+  if (!advisor.name.trim()) gaps.push("Name");
+  if (!advisor.designation.trim()) gaps.push("Designation");
+  if (!advisor.firm.trim()) gaps.push("Company or firm");
+  if (!advisor.address.trim()) gaps.push("Address");
+  if (!advisor.state.trim()) gaps.push("State");
+  if (!advisor.zip.trim()) gaps.push("ZIP code");
+  if (!advisor.phone.trim()) gaps.push("Phone");
+  if (!advisor.email.includes("@")) gaps.push("Email");
+  return gaps;
+}
+
 export function ReportView({
   state,
   setting,
@@ -200,6 +213,8 @@ export function ReportView({
   audienceNote = "",
   onClose,
   onPdf,
+  onClosePdf,
+  onNeedAdvisor,
 }: {
   state: string;
   setting: CareSetting;
@@ -266,7 +281,13 @@ export function ReportView({
   audienceNote?: string;
   onClose: () => void;
   onPdf: () => void;
+  onClosePdf?: () => void;
+  onNeedAdvisor?: () => void;
 }) {
+  const [closeAsk, setCloseAsk] = useState(false);
+  const closeAskRef = useRef(false);
+  closeAskRef.current = closeAsk;
+  const advisorGaps = missingAdvisorFields(advisor);
   const csv = policy.csv?.enabled
     ? csvMilestones(policy.singlePremium, policy.csv, delay, duration)
     : null;
@@ -323,7 +344,9 @@ export function ReportView({
     ];
     inert.forEach((n) => n?.setAttribute("inert", ""));
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key !== "Escape") return;
+      if (closeAskRef.current) setCloseAsk(false);
+      else onClose();
     };
     window.addEventListener("keydown", onKey);
     return () => {
@@ -2370,7 +2393,7 @@ export function ReportView({
           </button>
           <button
             type="button"
-            onClick={onClose}
+            onClick={() => setCloseAsk(true)}
             className="btn-block rounded-lg border border-navy bg-navy text-cream"
           >
             Close
@@ -2382,6 +2405,53 @@ export function ReportView({
           support. Escape closes this report.
         </p>
       </article>
+      {closeAsk ? (
+        <div className="no-print fixed inset-0 z-[60] flex items-end justify-center bg-navy/55 p-4 sm:items-center" role="dialog" aria-modal="true" aria-labelledby="close-pdf-title">
+          <div className="card-xl w-full max-w-md bg-paper p-5">
+            <h2 id="close-pdf-title" className="font-display text-xl text-navy">Before you close</h2>
+            {advisorGaps.length === 0 ? (
+              <>
+                <p className="mt-2 text-sm text-navy">Advisor information is complete. You can download the PDF.</p>
+                <div className="mt-4 grid gap-2">
+                  <button
+                    type="button"
+                    className="btn-block rounded-lg border border-gold bg-gold text-masthead"
+                    onClick={() => {
+                      setCloseAsk(false);
+                      (onClosePdf ?? onPdf)();
+                    }}
+                  >
+                    Download PDF
+                  </button>
+                  <button type="button" className="btn-block rounded-lg border border-navy bg-navy text-cream" onClick={onClose}>
+                    Close without downloading
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="mt-2 text-sm text-navy">A PDF can be downloaded only after the advisor information is completed in its entirety.</p>
+                <p className="mt-2 text-sm text-muted">Still needed: {advisorGaps.join(", ")}.</p>
+                <div className="mt-4 grid gap-2">
+                  <button
+                    type="button"
+                    className="btn-block rounded-lg border border-gold bg-gold text-masthead"
+                    onClick={() => {
+                      setCloseAsk(false);
+                      (onNeedAdvisor ?? onClose)();
+                    }}
+                  >
+                    Complete advisor information
+                  </button>
+                  <button type="button" className="btn-block rounded-lg border border-navy text-navy" onClick={() => setCloseAsk(false)}>
+                    Stay on this view
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
