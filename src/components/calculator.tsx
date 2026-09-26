@@ -1489,9 +1489,9 @@ export function Calculator() {
                   }}
                 />
                 <p className="mt-1 text-xs font-bold leading-snug amt-red">
-                  * You can change the age of claim. The default, {AALTCI_MEAN_CLAIM_AGE}, is the mean age at claim in the{" "}
+                  Age {AALTCI_MEAN_CLAIM_AGE} is the mean age at claim in the{" "}
                   <Cite href={SRC.aaltci2024Claims}>AALTCI 2024 LTCI claims data</Cite>
-                  {" "}(Connecticut Partnership sample, range 31–103).
+                  {" "}(Connecticut Partnership sample, range 31–103). You can change the age of claim.
                 </p>
               </div>
               <div className="min-w-0">
