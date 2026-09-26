@@ -26,6 +26,7 @@ export type QaSave = {
   duration: number;
   taxRate: number;
   annualIncome?: number;
+  agiIncluded?: boolean;
   excludeHome: boolean;
   poolShown: boolean;
   client?: ContactParty;

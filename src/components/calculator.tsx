@@ -281,6 +281,7 @@ export function Calculator() {
   const [duration, setDuration] = useState(10);
   const [taxRate, setTaxRate] = useState(DEFAULT_TAX_RATE);
   const [annualIncome, setAnnualIncome] = useState(0);
+  const [agiIncluded, setAgiIncluded] = useState(false);
   const [saveMsg, setSaveMsg] = useState("");
   const [stateNeeded, setStateNeeded] = useState(false);
   const [gapsOn, setGapsOn] = useState(false);
@@ -391,6 +392,7 @@ export function Calculator() {
       if (saved.duration) setDuration(saved.duration);
       if (saved.taxRate != null) setTaxRate(saved.taxRate);
       if (saved.annualIncome != null) setAnnualIncome(Number(saved.annualIncome) || 0);
+      setAgiIncluded(Boolean(saved.agiIncluded) && Number(saved.annualIncome) > 0);
       setExcludeHome(saved.excludeHome !== false);
       setPoolShown(Boolean(saved.poolShown));
       if (saved.finderPersonal && saved.client) setClient({ ...EMPTY_CONTACT, ...saved.client });
@@ -444,6 +446,7 @@ export function Calculator() {
       duration,
       taxRate,
       annualIncome,
+      agiIncluded,
       excludeHome,
       poolShown,
       client: finderPersonal ? client : undefined,
@@ -474,6 +477,7 @@ export function Calculator() {
     duration,
     taxRate,
     annualIncome,
+    agiIncluded,
     excludeHome,
     poolShown,
     client,
@@ -540,7 +544,8 @@ export function Calculator() {
   }, [holdings, taxRate, careStart, protectPct, claimCost, cpi, duration, ageToday]);
   const medicaid = useMemo(() => medicaidProfile(state), [state]);
   const netRoi = netRoiPct(roi, taxRate);
-  const premiumParts = targetPremiumParts(pool, annualIncome);
+  const incomeForRun = agiIncluded ? annualIncome : 0;
+  const premiumParts = targetPremiumParts(pool, incomeForRun);
   const premiumTarget = premiumParts.suggested;
   const hybridOn = isAssetBased(policy);
   const lifetime = isLifetimeBenefit(policy.benefitYears);
@@ -806,7 +811,7 @@ export function Calculator() {
     roi,
     taxRate,
     iraRoi,
-    annualIncome,
+    annualIncome: incomeForRun,
     policy,
     client,
     advisor,
@@ -1050,6 +1055,7 @@ export function Calculator() {
     setProtectPct(DEFAULT_PROTECT_PCT);
     setTaxRate(DEFAULT_TAX_RATE);
     setAnnualIncome(0);
+    setAgiIncluded(false);
     const typical = typicalPurchaseForAge(DEFAULT_AGE_TODAY);
     const annual =
       typicalPremiumHint(DEFAULT_AGE_TODAY, typical.benefitInflationPct, typical.inflationMethod)
@@ -1360,20 +1366,20 @@ export function Calculator() {
       setKindBook((book) => {
         const priced = bookWithAgi(
           { ...book, [policy.kind]: { ...policy, kind: policy.kind, enabled: true } },
-          annualIncome,
+          incomeForRun,
         );
-        const next = policyWithAgi({ ...priced[only], kind: only, enabled: true }, annualIncome);
+        const next = policyWithAgi({ ...priced[only], kind: only, enabled: true }, incomeForRun);
         setPolicy(next);
         return { ...priced, [only]: next };
       });
       setYearKind(only);
     } else {
-      const priced = bookWithAgi({ ...kindBook, [policy.kind]: policy }, annualIncome);
+      const priced = bookWithAgi({ ...kindBook, [policy.kind]: policy }, incomeForRun);
       setKindBook(priced);
       setPolicy((p) =>
         policyWithAgi(
           { ...(priced[p.kind] ?? p), enabled: p.enabled || Object.values(runKinds).some(Boolean) },
-          annualIncome,
+          incomeForRun,
         ),
       );
     }
@@ -1426,7 +1432,7 @@ export function Calculator() {
     insToday,
     insClaim,
     premiumTarget,
-    annualIncome,
+    annualIncome: incomeForRun,
     summary,
     recommendations,
     chartData,
@@ -1614,7 +1620,12 @@ export function Calculator() {
         onConfirm3={() => confirmSection3(true)}
         section3Confirmed={section3Confirmed}
         annualIncome={annualIncome}
-        onAnnualIncome={setAnnualIncome}
+        onAnnualIncome={(n) => {
+          setAnnualIncome(n);
+          setAgiIncluded(false);
+        }}
+        agiIncluded={agiIncluded}
+        onIncludeAgi={() => setAgiIncluded(annualIncome > 0)}
         insuranceLocked={insuranceLocked}
         onRun={(only) => runHypo(only)}
         onOpenForm={() => setShowFullForm(true)}
@@ -1735,12 +1746,27 @@ export function Calculator() {
           )}
           <div className="mt-4">
             <label className={labelClass} htmlFor="agi-today">Adjusted gross household income today</label>
-            <MoneyField id="agi-today" value={annualIncome} onChange={(v) => setAnnualIncome(Number(v) || 0)} compact />
+            <MoneyField
+              id="agi-today"
+              value={annualIncome}
+              onChange={(v) => {
+                setAnnualIncome(Number(v) || 0);
+                setAgiIncluded(false);
+              }}
+              compact
+            />
             <p className="mt-1 text-xs leading-snug text-muted">
               {annualIncome > 0
                 ? `Suggested traditional premium ${money(Math.round(annualIncome * 0.07))} (7%). Default single premium for asset-based, annuity care, and hybrid life ${money(Math.round(annualIncome * 0.025))} (2.5%), unless a different deposit was already entered.`
-                : "Optional. If entered, 7% is the suggested traditional premium and 2.5% is the default single premium for asset-based, annuity care, and hybrid life."}
+                : "Optional. Enter income, then include it so the run can use 7% for traditional and 2.5% for the single premium."}
             </p>
+            <button
+              type="button"
+              className="btn-block mt-3 rounded-lg bg-teal px-4 py-2.5 text-sm font-semibold text-cream hover:brightness-110"
+              onClick={() => setAgiIncluded(annualIncome > 0)}
+            >
+              {agiIncluded ? "Adjusted gross income included" : "Include Adjusted Gross Income"}
+            </button>
           </div>
           <div className="mt-4 grid w-full min-w-0 grid-cols-1 gap-2">
             <button
