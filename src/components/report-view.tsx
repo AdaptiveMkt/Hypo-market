@@ -502,14 +502,14 @@ export function ReportView({
             }}
             disabled={voice === "playing"}
           >
-            {voice === "paused" ? "Resume speaking" : "Hear summary"}
+            {voice === "paused" ? "Resume speaking" : "Listen to Summary"}
           </button>
           <p className="col-span-full text-xs leading-snug text-muted" aria-live="polite">
             {voice === "playing"
               ? "Celeste is reading the descriptive summary and recommendations…"
               : voice === "paused"
                 ? "Paused. Resume speaking to continue."
-                : "Celeste does not start on its own. Tap Hear summary if you want this read aloud."}
+                : "Celeste does not start on its own. Tap Listen to Summary if you want this read aloud."}
           </p>
             <div className={`col-span-full grid gap-2 ${allowPdf ? "grid-cols-3" : "grid-cols-2"}`}>
             <button
