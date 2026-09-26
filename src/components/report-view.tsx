@@ -426,10 +426,10 @@ export function ReportView({
     >
       {pdfDemo ? (
         <p
-          className="pointer-events-none fixed left-1/2 top-1/2 z-[60] -translate-x-1/2 -translate-y-1/2 rotate-[15deg] select-none text-7xl font-bold tracking-wide text-neutral-500/45"
+          className="pointer-events-none fixed left-1/2 top-1/2 z-[60] -translate-x-1/2 -translate-y-1/2 rotate-[15deg] select-none text-[25pt] font-bold tracking-wide text-neutral-400"
           aria-hidden="true"
         >
-          DEMO
+          DEMO-NON LICENSED COPY
         </p>
       ) : null}
       <article

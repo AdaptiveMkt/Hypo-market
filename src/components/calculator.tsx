@@ -1536,7 +1536,7 @@ export function Calculator() {
     readyCards: snapshotReadyCards(),
     details,
     allowPdf: audience === "interested" || audience === "licensed-client" || audience === "licensed-solo",
-    pdfDemo: audience === "licensed-solo",
+    pdfDemo: audience === "licensed-client" || audience === "licensed-solo",
     audienceRole: audience,
     audienceNote: audience === "licensed-solo" ? "Contact Adaptive Marketing Group for terms of use and licensing agreement." : "",
     onClose: () => {

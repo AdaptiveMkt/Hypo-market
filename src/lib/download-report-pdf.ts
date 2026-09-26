@@ -124,11 +124,11 @@ function stampPageNumbers(pdf: jsPDF, mark: "consumer" | "demo" | "", banner = "
       pdf.setGState(new GState({ opacity: 1 }));
     }
     if (mark === "demo") {
-      pdf.setGState(new GState({ opacity: 0.45 }));
+      pdf.setGState(new GState({ opacity: 1 }));
       pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(72);
-      pdf.setTextColor(128, 128, 128);
-      pdf.text("DEMO", pageW / 2, pageH / 2, {
+      pdf.setFontSize(25);
+      pdf.setTextColor(176, 176, 176);
+      pdf.text("DEMO-NON LICENSED COPY", pageW / 2, pageH / 2, {
         angle: 15,
         align: "center",
       });
