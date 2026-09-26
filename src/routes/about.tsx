@@ -91,7 +91,7 @@ function About() {
             starts. A planning <strong>target premium</strong> for traditional coverage is 7%
             of adjusted gross household income when that income is entered; otherwise 2.5%
             of countable assets. Asset-based, annuity care, and hybrid life default the single
-            premium to 2.5% of countable assets. Premiums vary by
+            premium to 2.5% of countable assets or $75,000, whichever is greater. Premiums vary by
             age, health, marital status, and state of issue. Discuss with your LTC
             Insurance Representative or financial advisor for more insights,
             qualifications requirements and costs.

@@ -43,6 +43,7 @@ import {
   isLifetimeBenefit,
   isLinkedKind,
   linkedSingleFromPool,
+  TARGET_PREMIUM_RATE,
   LIFETIME_BENEFIT_MARK,
   LIFETIME_BENEFIT_NOTE,
   leverageLabel,
@@ -527,7 +528,8 @@ export function Calculator() {
         const row = next[kind];
         if (!row) continue;
         const sp = row.singlePremium;
-        if (sp === 0 || sp === DEFAULT_LINKED_SINGLE_PREMIUM || sp === prior) {
+        const plain = pool > 0 ? Math.round(pool * TARGET_PREMIUM_RATE) : 0;
+        if (sp === 0 || sp === DEFAULT_LINKED_SINGLE_PREMIUM || sp === prior || sp === plain) {
           next[kind] = { ...row, singlePremium: deposit };
           changed = true;
         }
@@ -536,7 +538,12 @@ export function Calculator() {
     });
     setPolicy((p) => {
       if (!isLinkedKind(p.kind)) return p;
-      if (p.singlePremium === 0 || p.singlePremium === DEFAULT_LINKED_SINGLE_PREMIUM || p.singlePremium === prior) {
+      if (
+        p.singlePremium === 0 ||
+        p.singlePremium === DEFAULT_LINKED_SINGLE_PREMIUM ||
+        p.singlePremium === prior ||
+        p.singlePremium === Math.round(pool * TARGET_PREMIUM_RATE)
+      ) {
         return { ...p, singlePremium: deposit };
       }
       return p;
@@ -1789,8 +1796,8 @@ export function Calculator() {
             />
             <p className="mt-1 text-xs leading-snug text-muted">
               {annualIncome > 0
-                ? `Suggested traditional premium ${money(Math.round(annualIncome * 0.07))} (7% of this income). Asset-based, annuity care, and hybrid life default the single premium to 2.5% of countable assets.`
-                : "Optional. Include this income to use 7% as the suggested traditional premium. Asset-based, annuity care, and hybrid life default the single premium to 2.5% of countable assets."}
+                ? `Suggested traditional premium ${money(Math.round(annualIncome * 0.07))} (7% of this income). Asset-based, annuity care, and hybrid life default the single premium to 2.5% of countable assets or $75,000, whichever is greater.`
+                : "Optional. Include this income to use 7% as the suggested traditional premium. Asset-based, annuity care, and hybrid life default the single premium to 2.5% of countable assets or $75,000, whichever is greater."}
             </p>
             <button
               type="button"

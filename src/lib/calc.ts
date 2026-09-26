@@ -538,9 +538,9 @@ export function inflateDaily(
 export const TARGET_PREMIUM_RATE = 0.025;
 export const TARGET_INCOME_RATE = 0.07;
 export const TARGET_PREMIUM_LABEL =
-  "Target premium is only a suggestion. Traditional long-term care uses 7% of adjusted gross household income. Asset-based, annuity care, and hybrid life default the single premium to 2.5% of countable assets. Individual premiums vary by state, age, marital status, underwriting, benefits, and riders.";
+  "Target premium is only a suggestion. Traditional long-term care uses 7% of adjusted gross household income. Asset-based, annuity care, and hybrid life default the single premium to 2.5% of countable assets or $75,000, whichever is greater. Individual premiums vary by state, age, marital status, underwriting, benefits, and riders.";
 export const TARGET_PREMIUM_FORMULA =
-  "Traditional suggested premium is 7% of adjusted gross household income. The default single premium for asset-based, annuity care, and hybrid life is 2.5% of countable assets.";
+  "Traditional suggested premium is 7% of adjusted gross household income. The default single premium for asset-based, annuity care, and hybrid life is 2.5% of countable assets or $75,000, whichever is greater.";
 
 export function targetPremium(countableAssets: number, annualIncome = 0) {
   return targetPremiumParts(countableAssets, annualIncome).suggested;
@@ -560,9 +560,12 @@ export function targetPremiumParts(countableAssets: number, annualIncome = 0) {
   };
 }
 
+export const LINKED_SINGLE_FLOOR = 75_000;
+
 export function linkedSingleFromPool(countable: number) {
   const n = Math.max(0, Math.round(Number(countable) || 0));
-  return n > 0 ? Math.round(n * TARGET_PREMIUM_RATE) : DEFAULT_LINKED_SINGLE_PREMIUM;
+  const fromAssets = n > 0 ? Math.round(n * TARGET_PREMIUM_RATE) : 0;
+  return Math.max(fromAssets, LINKED_SINGLE_FLOOR);
 }
 
 export function agiPremiums(annualIncome: number) {
