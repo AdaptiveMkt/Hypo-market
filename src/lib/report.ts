@@ -195,7 +195,7 @@ export function analysisNarrative(opts: ReportOpts): string {
       ? `a ${policyKindLabel(s.policy.kind).toLowerCase()} (premium ${money(s.policy.singlePremium)}, leverage ${s.policy.leverage}x)`
       : `a traditional reimbursement policy (daily benefit ${money(s.policy.dailyBenefit)} today, benefit period ${isLifetimeBenefit(s.policy.benefitYears) ? `${LIFETIME_BENEFIT_MARK}. ${LIFETIME_BENEFIT_NOTE}` : `${s.policy.benefitYears} years`}, ${s.policy.elimDays}-day elimination, inflation ${s.policy.inflationMethod === "none" || s.policy.benefitInflationPct <= 0 ? "level" : `${s.policy.benefitInflationPct}% ${s.policy.inflationMethod}`}, annual premium ${money(s.policy.annualPremium)})`;
     const industry = typicalPremiumHint(
-      s.ageToday,
+      Number(s.ageToday) || 0,
       s.policy.benefitInflationPct,
       s.policy.inflationMethod,
     );
