@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { FieldPicker } from "@/components/field-picker";
+import { PdfInlineViewer } from "@/components/pdf-inline-viewer";
 import { STATE_NAMES } from "@/lib/costs";
 import { submitContactRequest } from "@/lib/send-report-mail";
 import { CONTACT_EMAIL } from "@/lib/email-attachment";
@@ -271,28 +272,30 @@ export function PdfReadyDialog({
 
   return (
     <div
-      className="fixed inset-0 z-[70] flex items-start justify-center overflow-y-auto bg-navy/55 p-4 pt-16"
+      className="fixed inset-0 z-[70] flex items-start justify-center overflow-y-auto bg-navy/55 p-3 pt-10 sm:p-4 sm:pt-16"
       role="dialog"
       aria-modal="true"
       aria-labelledby="pdf-ready-title"
     >
-      <div className="card-xl w-full max-w-lg bg-paper p-4 shadow-[var(--shadow-card)] md:p-5">
+      <div
+        className={`card-xl w-full bg-paper p-4 shadow-[var(--shadow-card)] md:p-5 ${
+          viewing || full ? "max-w-4xl" : "max-w-lg"
+        }`}
+      >
         <h2 id="pdf-ready-title" className="font-display text-xl text-navy">
           Your PDF is ready
         </h2>
         <p className="mt-2 text-sm text-muted">
-          Nothing is downloaded until you choose Save PDF to this computer. Open PDF views it here.
+          Nothing is downloaded until you choose Save PDF to this computer. Open PDF
+          shows the pages here on phone and desktop — same readable pages, not a blank
+          frame.
         </p>
         <p className="mt-3 break-all rounded-lg border border-teal/40 bg-cream/40 px-3 py-2 text-sm text-navy">
           {filename}
         </p>
         {note ? <p className="mt-2 text-sm text-navy">{note}</p> : null}
         {viewing ? (
-          <iframe
-            title={filename}
-            src={url}
-            className="mt-3 h-[70vh] w-full rounded-lg border border-line bg-paper"
-          />
+          <PdfInlineViewer url={url} title={filename} className="mt-3" />
         ) : null}
         <div className="mt-4 stack-actions">
           <button
@@ -312,7 +315,10 @@ export function PdfReadyDialog({
           <button
             type="button"
             className="btn-block rounded-lg border border-gold bg-gold text-center text-masthead hover:brightness-105"
-            onClick={() => setFull(true)}
+            onClick={() => {
+              setViewing(true);
+              setFull(true);
+            }}
           >
             Full screen
           </button>
@@ -340,7 +346,13 @@ export function PdfReadyDialog({
               Exit full screen
             </button>
           </div>
-          <iframe title={filename} src={url} className="min-h-0 w-full flex-1 bg-paper" />
+          <div className="min-h-0 flex-1 overflow-hidden bg-[#d7d2c8] p-2 sm:p-3">
+            <PdfInlineViewer
+              url={url}
+              title={filename}
+              className="flex h-full min-h-0 flex-col [&_>div:last-child]:max-h-none [&_>div:last-child]:h-full"
+            />
+          </div>
         </div>
       ) : null}
     </div>
