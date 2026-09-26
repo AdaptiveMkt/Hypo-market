@@ -90,8 +90,8 @@ function About() {
             year after the assumed return. Premiums stop (waiver of premium) once care
             starts. A planning <strong>target premium</strong> for traditional coverage is 7%
             of adjusted gross household income when that income is entered; otherwise 2.5%
-            of countable assets. Asset-based, annuity care, and hybrid life use 2.5% of that
-            income as the default single premium. Premiums vary by
+            of countable assets. Asset-based, annuity care, and hybrid life default the single
+            premium to 2.5% of countable assets. Premiums vary by
             age, health, marital status, and state of issue. Discuss with your LTC
             Insurance Representative or financial advisor for more insights,
             qualifications requirements and costs.

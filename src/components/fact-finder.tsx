@@ -473,8 +473,8 @@ export function FactFinder({
               />
               <p className="mt-1 text-xs leading-snug text-muted">
                 {annualIncome > 0
-                  ? `Suggested traditional premium ${money(agiPremiums(annualIncome).traditionalAnnual)} (7%). Default single premium for asset-based, annuity care, and hybrid life ${money(agiPremiums(annualIncome).linkedSingle)} (2.5%).`
-                  : "Optional. Enter income, then include it so the run can use 7% for traditional and 2.5% for the single premium."}
+                  ? `Suggested traditional premium ${money(agiPremiums(annualIncome).traditionalAnnual)} (7% of this income). Asset-based, annuity care, and hybrid life default the single premium to 2.5% of countable assets.`
+                  : "Optional. Include this income to use 7% as the suggested traditional premium. Asset-based, annuity care, and hybrid life default the single premium to 2.5% of countable assets."}
               </p>
               <button
                 type="button"

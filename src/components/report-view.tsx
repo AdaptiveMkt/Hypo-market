@@ -1146,7 +1146,7 @@ export function ReportView({
                 <p className="mb-2 text-sm text-muted">
                   {TARGET_PREMIUM_LABEL} This run’s traditional planning figure is {money(premiumTarget)}
                   {annualIncome > 0
-                    ? ` (7% of adjusted gross household income ${money(annualIncome)}). Asset-based, annuity care, and hybrid life use 2.5% of that income, ${money(Math.round(annualIncome * 0.025))}, as the default single premium unless a different deposit was entered.`
+                    ? ` (7% of adjusted gross household income ${money(annualIncome)}). Asset-based, annuity care, and hybrid life default the single premium to 2.5% of countable assets unless a different deposit was entered.`
                     : " (2.5% of countable assets, because adjusted gross household income was not entered)."}
                 </p>
                 <table className="w-full text-sm">

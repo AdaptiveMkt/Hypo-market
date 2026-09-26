@@ -489,10 +489,11 @@ export function policyForCompareLane(
   const residual =
     current.residualPct > 0 ? current.residualPct : DEFAULT_HYBRID_LIFE.residualPct;
   const face = hybridFaceForMonthly(monthly);
+  const fromPool = linkedSingleFromPool(countable);
   const deposit =
-    current.singlePremium > 0
+    current.singlePremium > 0 && current.singlePremium !== DEFAULT_LINKED_SINGLE_PREMIUM
       ? current.singlePremium
-      : DEFAULT_LINKED_SINGLE_PREMIUM;
+      : fromPool;
   return {
     ...current,
     enabled: true,
@@ -537,9 +538,9 @@ export function inflateDaily(
 export const TARGET_PREMIUM_RATE = 0.025;
 export const TARGET_INCOME_RATE = 0.07;
 export const TARGET_PREMIUM_LABEL =
-  "Target premium is only a suggestion. Traditional long-term care uses 7% of adjusted gross household income. Asset-based, annuity care, and hybrid life use 2.5% of that income as the default single premium. Individual premiums vary by state, age, marital status, underwriting, benefits, and riders.";
+  "Target premium is only a suggestion. Traditional long-term care uses 7% of adjusted gross household income. Asset-based, annuity care, and hybrid life default the single premium to 2.5% of countable assets. Individual premiums vary by state, age, marital status, underwriting, benefits, and riders.";
 export const TARGET_PREMIUM_FORMULA =
-  "Traditional suggested premium is 7% of adjusted gross household income. The default single premium for asset-based, annuity care, and hybrid life is 2.5% of that income.";
+  "Traditional suggested premium is 7% of adjusted gross household income. The default single premium for asset-based, annuity care, and hybrid life is 2.5% of countable assets.";
 
 export function targetPremium(countableAssets: number, annualIncome = 0) {
   return targetPremiumParts(countableAssets, annualIncome).suggested;
@@ -559,6 +560,11 @@ export function targetPremiumParts(countableAssets: number, annualIncome = 0) {
   };
 }
 
+export function linkedSingleFromPool(countable: number) {
+  const n = Math.max(0, Math.round(Number(countable) || 0));
+  return n > 0 ? Math.round(n * TARGET_PREMIUM_RATE) : DEFAULT_LINKED_SINGLE_PREMIUM;
+}
+
 export function agiPremiums(annualIncome: number) {
   const agi = Math.max(0, Math.round(Number(annualIncome) || 0));
   return {
@@ -570,13 +576,8 @@ export function agiPremiums(annualIncome: number) {
 
 export function policyWithAgi(policy: LtcPolicy, annualIncome: number): LtcPolicy {
   const priced = agiPremiums(annualIncome);
-  if (priced.agi <= 0) return policy;
-  if (policy.kind === "traditional") return { ...policy, annualPremium: priced.traditionalAnnual };
-  if (isLinkedKind(policy.kind)) {
-    const untouched = policy.singlePremium <= 0 || policy.singlePremium === DEFAULT_LINKED_SINGLE_PREMIUM;
-    return untouched ? { ...policy, singlePremium: priced.linkedSingle } : policy;
-  }
-  return policy;
+  if (priced.agi <= 0 || policy.kind !== "traditional") return policy;
+  return { ...policy, annualPremium: priced.traditionalAnnual };
 }
 
 export function bookWithAgi(
