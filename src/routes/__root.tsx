@@ -7,7 +7,6 @@ import { PreviewHostBridge } from "@/components/preview-host-bridge";
 import { ScrollToHeaderOnLoad } from "@/components/scroll-to-header";
 import { ContentGuard } from "@/components/content-guard";
 import { ThemeToggle, useDarkMode } from "@/components/theme-toggle";
-import { VoiceControls } from "@/components/voice-controls";
 import { HypoChatbot } from "@/components/hypo-chatbot";
 import { DisclosureTermsLink } from "@/components/disclosure-link";
 import { CopyrightMark } from "@/components/source-links";
@@ -121,10 +120,8 @@ function Root() {
                   </Link>
                   <DisclosureTermsLink className="text-masthead-fg underline underline-offset-4 hover:text-gold" />
                 </nav>
-                <div className="mt-4">
-                  <VoiceControls>
-                    <ThemeToggle />
-                  </VoiceControls>
+                <div className="mt-4 max-w-xs">
+                  <ThemeToggle />
                 </div>
               </div>
             </header>
