@@ -215,6 +215,7 @@ export function PdfReadyDialog({
   pages,
   note,
   onContinue,
+  onSaved,
 }: {
   open: boolean;
   filename: string;
@@ -222,6 +223,7 @@ export function PdfReadyDialog({
   pages: string[];
   note?: string;
   onContinue: () => void;
+  onSaved?: () => void;
 }) {
   const [viewing, setViewing] = useState(true);
   const [full, setFull] = useState(false);
@@ -261,6 +263,7 @@ export function PdfReadyDialog({
     document.body.appendChild(a);
     a.click();
     window.setTimeout(() => a.remove(), 0);
+    onSaved?.();
   }
 
   function exitFull() {
@@ -355,6 +358,169 @@ export function PdfReadyDialog({
           <PdfPageView pages={pages} fill />
         </div>
       ) : null}
+    </div>
+  );
+}
+
+const PLAN_DISCLAIMER =
+  "By submitting, you ask that a licensed financial services professional who can discuss long-term care planning in your state may contact you in the way you selected. You do not have to buy insurance or any investment. You do not have to share any personal or financial information beyond what you choose to enter here. This request is not an application, a quote, or advice.";
+
+export function PlanningAssistDialog({
+  open,
+  step,
+  initial,
+  onNo,
+  onYes,
+  onCloseForm,
+  onSent,
+}: {
+  open: boolean;
+  step: "ask" | "form";
+  initial?: { name?: string; state?: string; age?: string; email?: string; phone?: string };
+  onNo: () => void;
+  onYes: () => void;
+  onCloseForm: () => void;
+  onSent: (ok: boolean) => void;
+}) {
+  const [name, setName] = useState(initial?.name ?? "");
+  const [state, setState] = useState(initial?.state ?? "");
+  const [age, setAge] = useState(initial?.age ?? "");
+  const [partner, setPartner] = useState<"" | "yes" | "no">("");
+  const [partnerAge, setPartnerAge] = useState("");
+  const [email, setEmail] = useState(initial?.email ?? "");
+  const [phone, setPhone] = useState(initial?.phone ?? "");
+  const [prefer, setPrefer] = useState<"" | "Call" | "Text" | "Email">("");
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+  if (!open) return null;
+
+  async function submit() {
+    setError("");
+    if (name.trim().length < 2) {
+      setError("Full name is required.");
+      return;
+    }
+    if (partner === "yes" && !partnerAge.trim()) {
+      setError("Enter the age of your spouse or domestic partner.");
+      return;
+    }
+    setBusy(true);
+    try {
+      const r = await submitContactRequest({
+        data: {
+          name,
+          phone,
+          email,
+          state,
+          acknowledged: true,
+          age,
+          partner: partner === "yes" ? "Yes" : partner === "no" ? "No" : "",
+          partnerAge: partner === "yes" ? partnerAge : "",
+          prefer,
+        },
+      });
+      onSent(Boolean(r.emailed));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not send the request.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div
+      className="fixed inset-0 z-[80] flex items-start justify-center overflow-y-auto bg-navy/55 p-4 pt-16"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="plan-assist-title"
+    >
+      <div className="card-xl w-full max-w-lg bg-paper p-4 shadow-[var(--shadow-card)] md:p-5">
+        {step === "ask" ? (
+          <>
+            <h2 id="plan-assist-title" className="font-display text-xl text-navy">
+              Do you want assistance with long-term care planning?
+            </h2>
+            <div className="mt-4 grid gap-2 sm:grid-cols-2">
+              <button type="button" className="btn-block rounded-lg bg-teal px-4 py-2.5 text-sm font-semibold text-cream" onClick={onYes}>
+                Yes
+              </button>
+              <button type="button" className="btn-block rounded-lg border border-navy px-4 py-2.5 text-sm font-semibold text-navy" onClick={onNo}>
+                No
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <h2 id="plan-assist-title" className="font-display text-xl text-navy">
+              Long-term care planning request
+            </h2>
+            <div className="mt-3 grid gap-3">
+              <div>
+                <label className={labelClass} htmlFor="plan-name">What is your full name? (required)</label>
+                <input id="plan-name" className={fieldClass} value={name} autoComplete="name" required onChange={(e) => setName(e.target.value)} />
+              </div>
+              <div>
+                <label className={labelClass} htmlFor="plan-state">What is your state of residence?</label>
+                <FieldPicker
+                  id="plan-state"
+                  value={state}
+                  placeholder="Select a state…"
+                  options={STATE_NAMES.map((s) => ({ value: s, label: s }))}
+                  onChange={setState}
+                />
+              </div>
+              <div>
+                <label className={labelClass} htmlFor="plan-age">What is your age?</label>
+                <input id="plan-age" className={fieldClass} inputMode="numeric" value={age} onChange={(e) => setAge(e.target.value.replace(/[^\d]/g, "").slice(0, 3))} />
+              </div>
+              <div>
+                <p className={labelClass}>Do you have a spouse or domestic partner?</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <button type="button" className={`rounded-lg px-3 py-2 text-sm font-semibold ${partner === "yes" ? "bg-teal text-cream" : "border border-navy text-navy"}`} onClick={() => setPartner("yes")}>Yes</button>
+                  <button type="button" className={`rounded-lg px-3 py-2 text-sm font-semibold ${partner === "no" ? "bg-teal text-cream" : "border border-navy text-navy"}`} onClick={() => setPartner("no")}>No</button>
+                </div>
+              </div>
+              {partner === "yes" ? (
+                <div>
+                  <label className={labelClass} htmlFor="plan-partner-age">Age of spouse or domestic partner</label>
+                  <input id="plan-partner-age" className={fieldClass} inputMode="numeric" value={partnerAge} onChange={(e) => setPartnerAge(e.target.value.replace(/[^\d]/g, "").slice(0, 3))} />
+                </div>
+              ) : null}
+              <div>
+                <label className={labelClass} htmlFor="plan-email">What is your email address?</label>
+                <input id="plan-email" className={fieldClass} type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+              </div>
+              <div>
+                <label className={labelClass} htmlFor="plan-phone">What is your phone or text number?</label>
+                <input id="plan-phone" className={fieldClass} autoComplete="tel" value={phone} onChange={(e) => setPhone(e.target.value)} />
+              </div>
+              <div>
+                <p className={labelClass}>Which way do you prefer to be contacted?</p>
+                <div className="grid grid-cols-3 gap-2">
+                  {(["Call", "Text", "Email"] as const).map((way) => (
+                    <button key={way} type="button" className={`rounded-lg px-3 py-2 text-sm font-semibold ${prefer === way ? "bg-teal text-cream" : "border border-navy text-navy"}`} onClick={() => setPrefer(way)}>
+                      {way}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+            {error ? <p className="mt-2 text-sm font-semibold text-deplete" role="alert">{error}</p> : null}
+            <button
+              type="button"
+              className="btn-block mt-4 rounded-lg bg-teal px-4 py-2.5 text-sm font-semibold text-cream disabled:opacity-50"
+              disabled={busy}
+              onClick={() => void submit()}
+            >
+              {busy ? "Sending…" : "Submit"}
+            </button>
+            <p className="mt-2 text-xs leading-relaxed text-muted">* {PLAN_DISCLAIMER}</p>
+            <button type="button" className="mt-3 text-sm text-navy underline" disabled={busy} onClick={onCloseForm}>
+              Close
+            </button>
+          </>
+        )}
+      </div>
     </div>
   );
 }

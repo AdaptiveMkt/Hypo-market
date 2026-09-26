@@ -135,7 +135,7 @@ function snapshotReadyCards(): { label: string; value: string }[] {
     value: node.querySelector("p.font-display")?.textContent?.trim() ?? "",
   })).filter((card) => card.label && card.value);
 }
-import { ContactAskDialog, ContactRequestDialog, PdfReadyDialog } from "@/components/pdf-delivery-dialogs";
+import { ContactAskDialog, ContactRequestDialog, PdfReadyDialog, PlanningAssistDialog } from "@/components/pdf-delivery-dialogs";
 import { MedicaidVaCard } from "@/components/medicaid-va-card";
 import { AdvisorProfessionalFolds, DisclaimerCard } from "@/components/disclaimer-card";
 import { WelcomeCard } from "@/components/welcome-card";
@@ -291,6 +291,7 @@ export function Calculator() {
   const [client, setClient] = useState<ContactParty>({ ...EMPTY_CONTACT });
   const [advisor, setAdvisor] = useState<AdvisorParty>({ ...EMPTY_ADVISOR });
   const [contactAsk, setContactAsk] = useState(false);
+  const [planHelp, setPlanHelp] = useState<null | "ask" | "form">(null);
   const [contactForm, setContactForm] = useState(false);
   const [contactDraft, setContactDraft] = useState({ name: "", phone: "", email: "", state: "" });
   const [attachAdvisor, setAttachAdvisor] = useState(true);
@@ -3101,6 +3102,7 @@ export function Calculator() {
             const next = pdfReady.next;
             URL.revokeObjectURL(pdfReady.url);
             setPdfReady(null);
+            if (planHelp) return;
             if (next === "contact") {
               setContactAsk(true);
             } else {
@@ -3108,6 +3110,35 @@ export function Calculator() {
               setSaveMsg("PDF saved. The form was reset.");
               window.setTimeout(() => setSaveMsg(""), 3500);
             }
+          }}
+          onSaved={() => {
+            if (!planHelp) setPlanHelp("ask");
+          }}
+        />,
+        document.body,
+      ) : null}
+      {planHelp ? createPortal(
+        <PlanningAssistDialog
+          open
+          step={planHelp}
+          initial={{
+            name: client.name,
+            state: client.state || state,
+            age: ageToday ? String(ageToday) : "",
+            email: client.email,
+            phone: client.phone,
+          }}
+          onNo={() => setPlanHelp(null)}
+          onYes={() => setPlanHelp("form")}
+          onCloseForm={() => setPlanHelp(null)}
+          onSent={(ok) => {
+            setPlanHelp(null);
+            setSaveMsg(
+              ok
+                ? "Planning request sent to Info@preserve-your-assets.com."
+                : "The planning request could not be emailed from this environment.",
+            );
+            window.setTimeout(() => setSaveMsg(""), 4500);
           }}
         />,
         document.body,

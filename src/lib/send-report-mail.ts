@@ -62,6 +62,10 @@ type ContactRequest = {
   email: string;
   state: string;
   acknowledged: boolean;
+  age?: string;
+  partner?: string;
+  partnerAge?: string;
+  prefer?: string;
 };
 
 function parseContact(raw: unknown): ContactRequest {
@@ -71,12 +75,16 @@ function parseContact(raw: unknown): ContactRequest {
   const phone = String(o.phone ?? "").trim();
   const email = String(o.email ?? "").trim().toLowerCase();
   const state = String(o.state ?? "").trim();
+  const age = String(o.age ?? "").trim();
+  const partner = String(o.partner ?? "").trim();
+  const partnerAge = String(o.partnerAge ?? "").trim();
+  const prefer = String(o.prefer ?? "").trim();
   if (name.length < 2) throw new Error("Enter your name.");
-  if (phone.replace(/\D/g, "").length < 10) throw new Error("Enter a phone number.");
-  if (!validEmail(email)) throw new Error("Enter a valid email.");
-  if (!state) throw new Error("Select a state.");
+  if (phone && phone.replace(/\D/g, "").length < 10) throw new Error("Enter a phone number.");
+  if (email && !validEmail(email)) throw new Error("Enter a valid email.");
+  if (!phone && !email) throw new Error("Enter a phone number or an email so someone can reply.");
   if (o.acknowledged !== true) throw new Error("Check the box to request contact in your state.");
-  return { name, phone, email, state, acknowledged: true };
+  return { name, phone, email, state, acknowledged: true, age, partner, partnerAge, prefer };
 }
 
 async function sendMail(payload: {
@@ -172,23 +180,27 @@ export const emailAdvisorPdf = createServerFn({ method: "POST" })
 export const submitContactRequest = createServerFn({ method: "POST" })
   .validator((data: unknown) => parseContact(data))
   .handler(async ({ data }): Promise<{ ok: true; emailed: boolean }> => {
-    const ask = `I am requesting additional information, please send me at least two qualified professional Long term care representatives in ${data.state}.`;
+    const ask = `I am requesting additional information, please send me at least two qualified professional Long term care representatives in ${data.state || "my state"}.`;
     const html = `<p>${escapeHtml(ask)}</p>
 <ul>
 <li>Name: ${escapeHtml(data.name)}</li>
-<li>Phone: ${escapeHtml(data.phone)}</li>
-<li>Email: ${escapeHtml(data.email)}</li>
-<li>State: ${escapeHtml(data.state)}</li>
+<li>Phone: ${escapeHtml(data.phone || "—")}</li>
+<li>Email: ${escapeHtml(data.email || "—")}</li>
+<li>State of residence: ${escapeHtml(data.state || "—")}</li>
+<li>Age: ${escapeHtml(data.age || "—")}</li>
+<li>Spouse or domestic partner: ${escapeHtml(data.partner || "—")}</li>
+<li>Partner age: ${escapeHtml(data.partnerAge || "—")}</li>
+<li>Preferred contact: ${escapeHtml(data.prefer || "—")}</li>
 <li>Acknowledgement: checked</li>
 </ul>
 <p>This request was sent to ${escapeHtml(CONTACT_EMAIL)}. This is not a quote or an application.</p>
 <p>${escapeHtml(HOLD_HARMLESS_SHORT)}</p>
 <p>${escapeHtml(COPYRIGHT_LINE)}</p>`;
-    const text = `${ask}\n\nName: ${data.name}\nPhone: ${data.phone}\nEmail: ${data.email}\nState: ${data.state}\nAcknowledgement: checked\n\nSent to ${CONTACT_EMAIL}.\n\n${HOLD_HARMLESS_SHORT}\n\n${COPYRIGHT_LINE}`;
+    const text = `${ask}\n\nName: ${data.name}\nPhone: ${data.phone || "—"}\nEmail: ${data.email || "—"}\nState of residence: ${data.state || "—"}\nAge: ${data.age || "—"}\nSpouse or domestic partner: ${data.partner || "—"}\nPartner age: ${data.partnerAge || "—"}\nPreferred contact: ${data.prefer || "—"}\nAcknowledgement: checked\n\nSent to ${CONTACT_EMAIL}.\n\n${HOLD_HARMLESS_SHORT}\n\n${COPYRIGHT_LINE}`;
     try {
       const emailed = await sendMail({
         to: [CONTACT_EMAIL],
-        reply_to: data.email,
+        reply_to: validEmail(data.email) ? data.email : undefined,
         subject: `Contact request — ${data.name} (${data.state})`,
         html,
         text,
