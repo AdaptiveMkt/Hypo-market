@@ -1,5 +1,5 @@
 import html2canvas from "html2canvas";
-import { jsPDF } from "jspdf";
+import { GState, jsPDF } from "jspdf";
 import { COPYRIGHT_LINE } from "@/lib/disclaimer";
 
 const MIN_MARGIN = 36;
@@ -64,7 +64,7 @@ function autoFit(opts: {
 }
 
 /** Numbers are written after the last page exists, so “Page X of Y” matches the file. */
-function stampPageNumbers(pdf: jsPDF) {
+function stampPageNumbers(pdf: jsPDF, watermark: boolean) {
   const pages = pdf.getNumberOfPages();
   const pageW = pdf.internal.pageSize.getWidth();
   const pageH = pdf.internal.pageSize.getHeight();
@@ -103,8 +103,22 @@ function stampPageNumbers(pdf: jsPDF) {
     pdf.setFont("helvetica", "normal");
     pdf.setFontSize(8);
     pdf.text(FOOTER, BASE_MARGIN, pageH - 16);
+
+    if (watermark) {
+      pdf.setGState(new GState({ opacity: 0.35 }));
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(35);
+      pdf.setTextColor(128, 128, 128);
+      pdf.text("Contact a Qualified Financial Services Professional.", pageW / 2, pageH / 2, {
+        angle: 15,
+        align: "center",
+      });
+      pdf.setGState(new GState({ opacity: 1 }));
+    }
+
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(10);
+    pdf.setTextColor(27, 58, 75);
     pdf.text(label, pageW - BASE_MARGIN, pageH - 16, { align: "right" });
   }
 }
@@ -711,7 +725,7 @@ export async function downloadReportPdf(
     if (!captured) throw new Error("No section could be drawn. Try Client sitting, then download again.");
 
     if (preview) commitPagePreview(preview);
-    stampPageNumbers(pdf);
+    stampPageNumbers(pdf, root.dataset.pdfWatermark === "1");
 
     const blob = pdf.output("blob") as Blob;
     const url = savePdfBlob(blob, filename);

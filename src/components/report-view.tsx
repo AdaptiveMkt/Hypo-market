@@ -192,6 +192,8 @@ export function ReportView({
   medicaidOpen = false,
   readyCards = [],
   details = ALL_DETAILS_ON,
+  allowPdf = true,
+  audienceNote = "",
   onClose,
   onPdf,
 }: {
@@ -254,6 +256,8 @@ export function ReportView({
   medicaidOpen?: boolean;
   readyCards?: { label: string; value: string }[];
   details?: DetailFlags;
+  allowPdf?: boolean;
+  audienceNote?: string;
   onClose: () => void;
   onPdf: () => void;
 }) {
@@ -377,10 +381,16 @@ export function ReportView({
       <article
         id="aum-report"
         data-medicaid-open={medicaidOpen ? "1" : "0"}
+        data-pdf-watermark={allowPdf ? "1" : "0"}
         ref={reportRef}
         tabIndex={-1}
         className="mx-auto max-w-5xl space-y-8 bg-paper px-4 py-8 text-ink outline-none sm:px-8"
       >
+        {audienceNote ? (
+          <p className={`no-print text-center font-bold text-neutral-500 ${audienceNote === "DEMO" ? "text-[35pt] leading-tight" : "text-xl leading-snug"}`}>
+            {audienceNote}
+          </p>
+        ) : null}
         <section className="report-block" data-pdf-break-after="1">
           <div className="overflow-hidden rounded-xl border border-line bg-paper">
             <img
@@ -469,6 +479,7 @@ export function ReportView({
               type="button"
               onClick={onPdf}
               className="btn-block rounded-lg border border-gold bg-gold text-masthead hover:brightness-105"
+              hidden={!allowPdf}
             >
               Download PDF
             </button>
@@ -2323,6 +2334,7 @@ export function ReportView({
           <button
             type="button"
             onClick={onPdf}
+            hidden={!allowPdf}
             className="btn-block rounded-lg border border-gold bg-gold text-masthead"
           >
             Download PDF

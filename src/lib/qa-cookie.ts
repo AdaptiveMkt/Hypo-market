@@ -1,11 +1,16 @@
 import type { AssetRois, Assets, LtcPolicy, PolicyKind, StructureFlags } from "@/lib/calc";
-import type { ContactParty } from "@/lib/report";
+import type { AdvisorParty, ContactParty } from "@/lib/report";
 
 const NAME = "aum-qa";
 const MAX_AGE = 60 * 60 * 24 * 180;
 
+export type AudienceRole = "interested" | "licensed-client" | "licensed-solo";
+
 export type QaSave = {
   v: 1;
+  audience?: AudienceRole;
+  advisorCleared?: boolean;
+  advisor?: AdvisorParty;
   finderIndex: number;
   finderPersonal: boolean;
   assets: Assets;

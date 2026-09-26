@@ -152,6 +152,7 @@ export function FactFinder({
   gotoStep,
   onGotoHandled,
   reportReady,
+  canDownload,
   onView,
   onPdf,
 }: {
@@ -209,6 +210,7 @@ export function FactFinder({
   gotoStep: string;
   onGotoHandled: () => void;
   reportReady: boolean;
+  canDownload: boolean;
   onView: () => void;
   onPdf: () => void;
 }) {
@@ -626,7 +628,9 @@ export function FactFinder({
             {reportReady ? (
               <div className="mt-3 grid grid-cols-2 gap-2">
                 <button type="button" onClick={onView} className="flex min-h-11 items-center justify-center rounded-lg border border-gold bg-gold px-3 py-2 text-sm font-semibold text-masthead">View all</button>
-                <button type="button" onClick={onPdf} className="flex min-h-11 items-center justify-center rounded-lg border border-navy bg-navy px-3 py-2 text-sm font-semibold text-cream">Download PDF</button>
+                {canDownload ? (
+                  <button type="button" onClick={onPdf} className="flex min-h-11 items-center justify-center rounded-lg border border-navy bg-navy px-3 py-2 text-sm font-semibold text-cream">Download PDF</button>
+                ) : null}
               </div>
             ) : null}
             <button type="button" className="mt-3 text-sm text-navy underline" onClick={back}>Back</button>

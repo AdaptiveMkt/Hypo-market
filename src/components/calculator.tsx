@@ -140,7 +140,8 @@ import { MedicaidVaCard } from "@/components/medicaid-va-card";
 import { AdvisorProfessionalFolds, DisclaimerCard } from "@/components/disclaimer-card";
 import { WelcomeCard } from "@/components/welcome-card";
 import { FactFinder } from "@/components/fact-finder";
-import { clearQaCookie, readQaCookie, writeQaCookie } from "@/lib/qa-cookie";
+import { AudienceBanner, AudienceGate } from "@/components/audience-gate";
+import { clearQaCookie, readQaCookie, writeQaCookie, type AudienceRole } from "@/lib/qa-cookie";
 import { ChartRegion, useNarrow } from "@/components/chart-region";
 import { defaultExcludableAssets, medicaidProfile } from "@/lib/medicaid";
 import {
@@ -249,6 +250,9 @@ export function Calculator() {
   const [finderPersonal, setFinderPersonal] = useState(false);
   const [finderGoto, setFinderGoto] = useState("");
   const [showFullForm, setShowFullForm] = useState(false);
+  const [audience, setAudience] = useState<AudienceRole | null>(null);
+  const [advisorCleared, setAdvisorCleared] = useState(false);
+  const [booted, setBooted] = useState(false);
   const themeBeforeIncognito = useRef<"light" | "dark" | null>(null);
   const qaReady = useRef(false);
   const [pdfReady, setPdfReady] = useState<{
@@ -324,6 +328,9 @@ export function Calculator() {
 
   useEffect(() => {
     const saved = readQaCookie();
+    if (saved?.audience) setAudience(saved.audience);
+    if (saved?.advisor) setAdvisor({ ...EMPTY_ADVISOR, ...saved.advisor });
+    if (saved?.advisorCleared) setAdvisorCleared(true);
     if (saved && saved.finderIndex > 0) {
       setAssets({ ...DEFAULT_ASSETS, ...saved.assets });
       setAssetRois({ ...DEFAULT_ASSET_ROIS, ...saved.assetRois });
@@ -362,15 +369,18 @@ export function Calculator() {
     }
     const arm = window.setTimeout(() => {
       qaReady.current = true;
+      setBooted(true);
     }, 0);
     return () => window.clearTimeout(arm);
   }, []);
 
   useEffect(() => {
-    if (!qaReady.current) return;
-    if (finderIndex <= 0 && !readQaCookie()) return;
+    if (!qaReady.current || !audience) return;
     writeQaCookie({
       v: 1,
+      audience,
+      advisorCleared,
+      advisor,
       finderIndex,
       finderPersonal,
       assets,
@@ -425,6 +435,9 @@ export function Calculator() {
     section3Confirmed,
     partnershipOn,
     protectPct,
+    audience,
+    advisorCleared,
+    advisor,
   ]);
 
   useEffect(() => {
@@ -1002,6 +1015,8 @@ export function Calculator() {
     setFinderPersonal(false);
     setFinderGoto("");
     setShowFullForm(false);
+    setAudience(null);
+    setAdvisorCleared(false);
     themeBeforeIncognito.current = null;
     setTheme(true);
     setHypoRunId(0);
@@ -1044,21 +1059,23 @@ export function Calculator() {
     if (!personalizeOpen) setTheme(true);
   }, [personalizeOpen]);
   const pdfUnlocked = ran && section2Confirmed && (insuranceLocked || section3Confirmed);
+  const canPdf = pdfUnlocked && audience === "interested";
   function requestPdfDownload() {
-    if (!pdfUnlocked) return;
+    if (!canPdf) return;
     setDetails((d) => withScenarioDetails(d, insuranceLocked));
     setAttachAdvisor(advisorReceivesPdf(advisor, client));
     setPdfPick(true);
   }
   useEffect(() => {
-    document.documentElement.dataset.pdfReady = pdfUnlocked ? "1" : "0";
+    document.documentElement.dataset.pdfReady = canPdf ? "1" : "0";
     window.addEventListener("aum-download-pdf", requestPdfDownload);
     return () => {
       document.documentElement.dataset.pdfReady = "0";
       window.removeEventListener("aum-download-pdf", requestPdfDownload);
     };
-  }, [pdfUnlocked, insuranceLocked, showReciprocity]);
+  }, [canPdf, insuranceLocked, showReciprocity]);
   function runPdfDownload() {
+    if (audience !== "interested") return;
     setPdfError("");
     setPdfPick(false);
     setShowReport(true);
@@ -1181,8 +1198,13 @@ export function Calculator() {
     setPdfPick(false);
     setAttachAdvisor(advisorReceivesPdf(advisor, client));
     setShowReport(true);
-    setPrintAfterOpen(true);
-    setSaveMsg("Preparing PDF…");
+    if (audience === "interested") {
+      setPrintAfterOpen(true);
+      setSaveMsg("Preparing PDF…");
+    } else {
+      setPrintAfterOpen(false);
+      setSaveMsg("");
+    }
     if (locked) {
       window.setTimeout(() => scrollToId("medicaid-va-card"), 80);
     } else {
@@ -1374,12 +1396,62 @@ export function Calculator() {
     medicaidOpen: countableExHome < NAIC_LOCKOUT_ASSETS,
     readyCards: snapshotReadyCards(),
     details,
+    allowPdf: audience === "interested",
+    audienceNote: audience === "licensed-client" ? "DEMO" : audience === "licensed-solo" ? "Contact Adaptive Marketing Group for terms of use and licensing agreement." : "",
     onClose: () => setShowReport(false),
     onPdf: requestPdfDownload,
   };
 
+  const needsAdvisor = audience === "licensed-client" || audience === "licensed-solo";
+  const advisorOk = Boolean(
+    advisor.name.trim() && advisor.firm.trim() && advisor.email.includes("@") && advisor.phone.trim(),
+  );
+  const showQuestions = booted && Boolean(audience) && (!needsAdvisor || advisorCleared);
+
   return (
     <div className="min-w-0 max-w-full overflow-x-clip">
+      {!showQuestions ? (
+        !booted ? null : !audience ? (
+          <AudienceGate
+            onSelect={(role) => {
+              setAudience(role);
+              setAdvisorCleared(false);
+            }}
+          />
+        ) : (
+          <section className="card-xl min-w-0 p-4 md:p-5">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-teal">Before the welcome</p>
+            <h2 className="mt-1 font-display text-xl text-navy">Advisor information is required</h2>
+            <p className="mt-2 text-sm text-muted">
+              A licensed insurance professional must enter advisor details before the fact finder starts.
+            </p>
+            <div className="mt-3">
+              <AudienceBanner role={audience} />
+            </div>
+            <div className="mt-4">
+              <PartyFields
+                idPrefix="advisor-gate"
+                party={{ ...advisor, state: advisor.state || state }}
+                extra
+                onChange={(partial) => setAdvisor((p) => ({ ...p, ...partial }))}
+              />
+            </div>
+            {advisorOk ? null : (
+              <p className="mt-3 text-sm font-semibold text-deplete">Name, firm, email, and phone are required.</p>
+            )}
+            <button
+              type="button"
+              className="btn-block mt-4 rounded-lg bg-navy px-4 py-2.5 text-sm font-semibold text-cream disabled:opacity-40"
+              disabled={!advisorOk}
+              onClick={() => setAdvisorCleared(true)}
+            >
+              Continue
+            </button>
+          </section>
+        )
+      ) : (
+      <>
+      <AudienceBanner role={audience} />
       <WelcomeCard />
       <FactFinder
         index={finderIndex}
@@ -1471,13 +1543,16 @@ export function Calculator() {
         gotoStep={finderGoto}
         onGotoHandled={() => setFinderGoto("")}
         reportReady={pdfUnlocked}
+        canDownload={canPdf}
         onView={viewAllReport}
         onPdf={requestPdfDownload}
       />
       {pdfUnlocked ? (
         <div className="mx-auto mt-4 grid max-w-md grid-cols-2 gap-2">
           <button type="button" onClick={viewAllReport} className="flex min-h-11 items-center justify-center rounded-lg border border-gold bg-gold px-3 py-2 text-center text-sm font-semibold text-masthead hover:brightness-105">View all</button>
-          <button type="button" onClick={requestPdfDownload} className="flex min-h-11 items-center justify-center rounded-lg border border-navy bg-navy px-3 py-2 text-center text-sm font-semibold text-cream hover:bg-teal">Download PDF</button>
+          {canPdf ? (
+            <button type="button" onClick={requestPdfDownload} className="flex min-h-11 items-center justify-center rounded-lg border border-navy bg-navy px-3 py-2 text-center text-sm font-semibold text-cream hover:bg-teal">Download PDF</button>
+          ) : null}
         </div>
       ) : null}
       {showFullForm ? (
@@ -1587,7 +1662,7 @@ export function Calculator() {
             {pdfUnlocked ? (
               <div className="grid grid-cols-2 gap-2">
                 <button type="button" onClick={viewAllReport} className="flex min-h-11 items-center justify-center rounded-lg border border-gold bg-gold px-3 py-2 text-center text-sm font-semibold text-masthead hover:brightness-105">View all</button>
-                <button type="button" onClick={requestPdfDownload} className="flex min-h-11 items-center justify-center rounded-lg border border-navy bg-navy px-3 py-2 text-center text-sm font-semibold text-cream hover:bg-teal">Download PDF</button>
+                {canPdf ? <button type="button" onClick={requestPdfDownload} className="flex min-h-11 items-center justify-center rounded-lg border border-navy bg-navy px-3 py-2 text-center text-sm font-semibold text-cream hover:bg-teal">Download PDF</button> : null}
               </div>
             ) : null}
             <button
@@ -2892,8 +2967,11 @@ export function Calculator() {
               View all
             </button>
             <p className="text-center text-xs leading-snug text-muted">
-              Open a title above to view more details. Check Add to PDF on each card you want in the download.
+              {canPdf
+                ? "Open a title above to view more details. Check Add to PDF on each card you want in the download."
+                : "View only. A PDF download is not available for this selection."}
             </p>
+            {canPdf ? (
             <button
               type="button"
               onClick={requestPdfDownload}
@@ -2901,6 +2979,7 @@ export function Calculator() {
             >
               Download PDF
             </button>
+            ) : null}
           </div>
         ) : null}
       </div>
@@ -3027,6 +3106,8 @@ export function Calculator() {
           onCopayChange={setProtectPct}
         />
       ) : null}
+      </>
+      )}
     </div>
   );
 }
