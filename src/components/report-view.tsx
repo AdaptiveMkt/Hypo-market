@@ -519,10 +519,10 @@ export function ReportView({
             </button>
             <button
               type="button"
-              onClick={onClose}
-              className="btn-block rounded-lg border border-navy bg-navy text-cream hover:bg-teal"
+              onClick={() => (onClosePdf ?? onPdf)()}
+              className="btn-block rounded-lg bg-teal text-cream hover:brightness-110"
             >
-              (X) Close
+              Print to PDF
             </button>
           </div>
         </div>
