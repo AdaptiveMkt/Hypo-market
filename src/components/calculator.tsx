@@ -108,7 +108,6 @@ import {
   ALL_DETAILS_OFF,
   ALL_DETAILS_ON,
   CLIENT_SITTING,
-  DEFAULT_DETAILS,
   DISCLOSURE_SECTION_IDS,
   isRequiredDetail,
   lockoutDetails,
@@ -350,7 +349,7 @@ export function Calculator() {
   const [issueState, setIssueState] = useState("");
   const [issueTouched, setIssueTouched] = useState(false);
   const [veteran, setVeteran] = useState(false);
-  const [details, setDetails] = useState<DetailFlags>({ ...DEFAULT_DETAILS });
+  const [details, setDetails] = useState<DetailFlags>({ ...CLIENT_SITTING });
   const [runKinds, setRunKinds] = useState<StructureFlags>({ ...DEFAULT_STRUCTURE_FLAGS });
   const [yearKind, setYearKind] = useState<PolicyKind>("traditional");
   const [warnFlash, setWarnFlash] = useState(false);
@@ -1128,7 +1127,7 @@ export function Calculator() {
     setIssueState("");
     setIssueTouched(false);
     setVeteran(false);
-    setDetails({ ...DEFAULT_DETAILS });
+    setDetails(withScenarioDetails({ ...CLIENT_SITTING }, false));
     setRunKinds({ ...DEFAULT_STRUCTURE_FLAGS });
     setStateNeeded(false);
     setAgeNeeded(false);

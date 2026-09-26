@@ -93,10 +93,9 @@ export function DetailsPicker({
             }
           />
           <span>
-            Client sitting (recommended)
+            Sitting with client
             <span className="mt-0.5 block text-xs font-normal text-muted">
-              Allocation, care options, compare insurance, year-by-year for each selected run, Explore Traditional, Asset-based, Annuity, and Hybrid, State Partnership, and Medicaid Information.
-              Not the full packet.
+              Default for the PDF. Includes allocation, care options, compare insurance, year-by-year for each selected run, Explore Traditional, Asset-based, Annuity, and Hybrid, State Partnership, and Medicaid Information. Check any other section below to add it.
             </span>
           </span>
         </label>
@@ -241,12 +240,12 @@ export function PdfSectionsDialog({
   const [testBusy, setTestBusy] = useState(false);
   const [mail, setMail] = useState<SmtpPublicStatus | null>(null);
   useEffect(() => {
-    if (open) {
-      setStep("attachment");
-      setTestMsg("");
-      void getMailStatus().then(setMail).catch(() => setMail(null));
-    }
-  }, [open]);
+    if (!open) return;
+    setStep("attachment");
+    setTestMsg("");
+    onChange(lockoutMode ? lockoutDetails() : withScenarioDetails({ ...CLIENT_SITTING }, false));
+    void getMailStatus().then(setMail).catch(() => setMail(null));
+  }, [open, lockoutMode]);
   const selected = DETAIL_SECTIONS.filter((s) => details[s.id]).length;
   const advisorCopyOk = Boolean(advisorEmail && clientReady);
   if (!open) return null;
@@ -406,7 +405,7 @@ export function PdfSectionsDialog({
         <p className="mt-2 text-sm text-muted">
           {lockoutMode
             ? "This run is a Medicaid planning packet. Required legal disclaimers, sources, and how to find a qualified professional cannot be unchecked. Insurance design is not included."
-            : "Sections 1–3, the Ready cards you left on screen, and all three See the numbers sections (year-by-year for each selected run, asset allocation, and compare care options) always print. Client sitting is the default and also includes Explore Traditional, Asset-based, Annuity, and Hybrid. Other checked cards print in the same order as View. Then save the file to this computer."}
+            : "Sitting with client is selected by default. Sections 1–3 and the Ready cards always print. Check any other section below to add it to this PDF. Then save the file to this computer."}
         </p>
         {DESIGNATION_PDF_IDS.some((id) => details[id]) ? (
           <DesignationNotice
