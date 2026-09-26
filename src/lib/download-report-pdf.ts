@@ -64,7 +64,7 @@ function autoFit(opts: {
 }
 
 /** Numbers are written after the last page exists, so “Page X of Y” matches the file. */
-function stampPageNumbers(pdf: jsPDF, watermark: boolean) {
+function stampPageNumbers(pdf: jsPDF, mark: "consumer" | "demo" | "") {
   const pages = pdf.getNumberOfPages();
   const pageW = pdf.internal.pageSize.getWidth();
   const pageH = pdf.internal.pageSize.getHeight();
@@ -104,7 +104,7 @@ function stampPageNumbers(pdf: jsPDF, watermark: boolean) {
     pdf.setFontSize(8);
     pdf.text(FOOTER, BASE_MARGIN, pageH - 16);
 
-    if (watermark) {
+    if (mark === "consumer") {
       pdf.setGState(new GState({ opacity: 0.35 }));
       pdf.setFont("helvetica", "bold");
       pdf.setFontSize(35);
@@ -113,6 +113,14 @@ function stampPageNumbers(pdf: jsPDF, watermark: boolean) {
         angle: 15,
         align: "center",
       });
+      pdf.setGState(new GState({ opacity: 1 }));
+    }
+    if (mark === "demo") {
+      pdf.setGState(new GState({ opacity: 0.45 }));
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(72);
+      pdf.setTextColor(128, 128, 128);
+      pdf.text("DEMO", pageW / 2, pageH / 2, { align: "center" });
       pdf.setGState(new GState({ opacity: 1 }));
     }
 
@@ -725,7 +733,8 @@ export async function downloadReportPdf(
     if (!captured) throw new Error("No section could be drawn. Try Client sitting, then download again.");
 
     if (preview) commitPagePreview(preview);
-    stampPageNumbers(pdf, root.dataset.pdfWatermark === "1");
+    const mark = root.dataset.pdfDemo === "1" ? "demo" : root.dataset.pdfWatermark === "1" ? "consumer" : "";
+    stampPageNumbers(pdf, mark);
 
     const blob = pdf.output("blob") as Blob;
     const url = savePdfBlob(blob, filename);

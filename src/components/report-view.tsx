@@ -210,6 +210,7 @@ export function ReportView({
   readyCards = [],
   details = ALL_DETAILS_ON,
   allowPdf = true,
+  pdfDemo = false,
   audienceNote = "",
   onClose,
   onPdf,
@@ -278,6 +279,7 @@ export function ReportView({
   readyCards?: { label: string; value: string }[];
   details?: DetailFlags;
   allowPdf?: boolean;
+  pdfDemo?: boolean;
   audienceNote?: string;
   onClose: () => void;
   onPdf: () => void;
@@ -411,12 +413,13 @@ export function ReportView({
         id="aum-report"
         data-medicaid-open={medicaidOpen ? "1" : "0"}
         data-pdf-watermark={allowPdf ? "1" : "0"}
+        data-pdf-demo={pdfDemo ? "1" : "0"}
         ref={reportRef}
         tabIndex={-1}
         className="mx-auto max-w-5xl space-y-8 bg-paper px-4 py-8 text-ink outline-none sm:px-8"
       >
         {audienceNote ? (
-          <p className={`no-print text-center font-bold text-neutral-500 ${audienceNote === "DEMO" ? "text-[35pt] leading-tight" : "text-xl leading-snug"}`}>
+          <p className="no-print text-center text-xl font-bold leading-snug text-neutral-500">
             {audienceNote}
           </p>
         ) : null}

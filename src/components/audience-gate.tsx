@@ -44,7 +44,6 @@ export function AudienceGate({ onSelect }: { onSelect: (role: AudienceRole) => v
 }
 
 export function audienceViewMessage(role: AudienceRole | null) {
-  if (role === "licensed-client") return "DEMO";
   if (role === "licensed-solo") return "Contact Adaptive Marketing Group for terms of use and licensing agreement.";
   return "";
 }
@@ -52,9 +51,8 @@ export function audienceViewMessage(role: AudienceRole | null) {
 export function AudienceBanner({ role }: { role: AudienceRole | null }) {
   const msg = audienceViewMessage(role);
   if (!msg) return null;
-  const demo = role === "licensed-client";
   return (
-    <p className={`text-center font-bold text-neutral-500 ${demo ? "text-[35pt] leading-tight" : "text-xl leading-snug"}`} role="status">
+    <p className="text-center text-xl font-bold leading-snug text-neutral-500" role="status">
       {msg}
     </p>
   );
