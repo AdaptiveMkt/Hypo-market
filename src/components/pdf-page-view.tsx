@@ -12,11 +12,11 @@ export function PdfPageView({ pages, fill = false }: { pages: string[]; fill?: b
     <div className={`flex min-h-0 flex-col overflow-hidden rounded-lg border border-line bg-paper ${fill ? "h-full min-h-0 flex-1" : "mt-3"}`}>
       <div className="pdf-view-bar shrink-0" role="toolbar" aria-label="PDF page and zoom">
         <div className="pdf-view-bar-row">
-          <button type="button" aria-label="Previous page" disabled={page <= 1} onClick={() => setPage((n) => Math.max(1, n - 1))}>
+          <button type="button" className="bg-teal" aria-label="Previous page" disabled={page <= 1} onClick={() => setPage((n) => Math.max(1, n - 1))}>
             Prev
           </button>
           <span>{total ? `${page} / ${total}` : "…"}</span>
-          <button type="button" aria-label="Next page" disabled={!total || page >= total} onClick={() => setPage((n) => Math.min(total, n + 1))}>
+          <button type="button" className="bg-teal" aria-label="Next page" disabled={!total || page >= total} onClick={() => setPage((n) => Math.min(total, n + 1))}>
             Next
           </button>
         </div>

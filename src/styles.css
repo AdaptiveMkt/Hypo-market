@@ -219,6 +219,12 @@ html.dark {
     color: var(--color-masthead);
   }
 
+  .pdf-view-bar button.bg-teal {
+    border-color: var(--color-teal);
+    background: var(--color-teal);
+    color: #fff;
+  }
+
   .pdf-view-bar button:disabled {
     opacity: 0.4;
   }
