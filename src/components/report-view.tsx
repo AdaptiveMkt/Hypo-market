@@ -2306,6 +2306,40 @@ export function ReportView({
         </section>
         ) : null}
 
+        {policy.enabled && details.confidence ? (
+        <section className="report-block">
+          <h2 className="mb-3 font-display text-xl text-navy">Model confidence scores</h2>
+          <ConfidencePanel confidence={confidence} />
+        </section>
+        ) : null}
+
+        {details.naicGuide ? (
+        <section className="report-block">
+          <h2 className="mb-2 font-display text-xl text-navy">
+            NAIC Shopper’s Guide to Long-Term Care Insurance
+          </h2>
+          <p className="text-sm text-muted">
+            Official NAIC consumer booklet (2022). Many states require this guide at
+            sale.{" "}
+            <Cite href={SRC.naicShopper}>Open or download the Shopper’s Guide (PDF)</Cite>.
+          </p>
+        </section>
+        ) : null}
+
+        {details.naicWorksheet ? (
+        <section className="report-block">
+          <h2 className="mb-2 font-display text-xl text-navy">
+            NAIC Long-Term Care Insurance Personal Worksheet
+          </h2>
+          <p className="text-sm text-muted">
+            Fillable HTML educational copy (NAIC Model Regulation #641, Appendix B). Not a carrier application.{" "}
+            <Cite href={SRC.naicSuitability}>Official blank PDF</Cite>
+            . Pages 48–51 of the Shopper’s Guide reprint this worksheet.
+          </p>
+          <FilledNaicWorksheet />
+        </section>
+        ) : null}
+
         {policy.enabled && details.sensitivity ? (
         <section className="report-block">
           <h2 className="mb-3 font-display text-xl text-navy">Hypothesis sensitivity</h2>
@@ -2364,40 +2398,6 @@ export function ReportView({
           <p className="mt-2 text-xs text-muted">
             One-way shocks. Insurance design stays as entered. Not a forecast.
           </p>
-        </section>
-        ) : null}
-
-        {policy.enabled && details.confidence ? (
-        <section className="report-block">
-          <h2 className="mb-3 font-display text-xl text-navy">Model confidence scores</h2>
-          <ConfidencePanel confidence={confidence} />
-        </section>
-        ) : null}
-
-        {details.naicGuide ? (
-        <section className="report-block">
-          <h2 className="mb-2 font-display text-xl text-navy">
-            NAIC Shopper’s Guide to Long-Term Care Insurance
-          </h2>
-          <p className="text-sm text-muted">
-            Official NAIC consumer booklet (2022). Many states require this guide at
-            sale.{" "}
-            <Cite href={SRC.naicShopper}>Open or download the Shopper’s Guide (PDF)</Cite>.
-          </p>
-        </section>
-        ) : null}
-
-        {details.naicWorksheet ? (
-        <section className="report-block">
-          <h2 className="mb-2 font-display text-xl text-navy">
-            NAIC Long-Term Care Insurance Personal Worksheet
-          </h2>
-          <p className="text-sm text-muted">
-            Fillable HTML educational copy (NAIC Model Regulation #641, Appendix B). Not a carrier application.{" "}
-            <Cite href={SRC.naicSuitability}>Official blank PDF</Cite>
-            . Pages 48–51 of the Shopper’s Guide reprint this worksheet.
-          </p>
-          <FilledNaicWorksheet />
         </section>
         ) : null}
 

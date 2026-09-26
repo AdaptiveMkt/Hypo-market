@@ -3096,23 +3096,6 @@ export function Calculator() {
             </div>
           </ViewFold>
 
-          <ViewFold title="Hypothesis sensitivity" hint={`${DETAIL_HINTS.sensitivity} View more details.`} checked={details.sensitivity} onPdf={(v) => setDetail("sensitivity", v)}>
-            <p className="mb-3 text-sm text-muted">{sensitivity.insight}</p>
-            <div className="grid gap-3">
-              {sensitivity.rows.map((row) => (
-                <article key={row.key} className={`rounded-lg border px-3 py-3 ${row.isBase ? "border-gold bg-cream" : "border-line"}`}>
-                  <p className="font-display text-base text-navy">{row.factor}{row.isBase ? " · this run" : ""}</p>
-                  <p className="text-sm text-muted">{row.shock}</p>
-                  <dl className="mt-2 grid gap-1.5 text-sm">
-                    <div className="flex justify-between gap-3"><dt className="text-muted">Assets remaining</dt><dd className="tabular-nums">{money(row.remaining)}</dd></div>
-                    <div className="flex justify-between gap-3"><dt className="text-muted">Shortfall</dt><dd className="tabular-nums">{row.shortfall ? money(row.shortfall) : "None"}</dd></div>
-                    <div className="flex justify-between gap-3"><dt className="text-muted">Years at claim cost</dt><dd className="tabular-nums">{row.yearsAtClaim.toFixed(2)}</dd></div>
-                  </dl>
-                </article>
-              ))}
-            </div>
-          </ViewFold>
-
           <ViewFold title="Model confidence scores" hint={`${DETAIL_HINTS.confidence} View more details.`} checked={details.confidence} onPdf={(v) => setDetail("confidence", v)}>
             <ConfidencePanel confidence={confidence} />
           </ViewFold>
@@ -3156,6 +3139,25 @@ export function Calculator() {
           ) : null}
         </>
       )}
+
+      {ran && policy.enabled ? (
+        <ViewFold title="Hypothesis sensitivity" hint={`${DETAIL_HINTS.sensitivity} View more details.`} checked={details.sensitivity} onPdf={(v) => setDetail("sensitivity", v)}>
+          <p className="mb-3 text-sm text-muted">{sensitivity.insight}</p>
+          <div className="grid gap-3">
+            {sensitivity.rows.map((row) => (
+              <article key={row.key} className={`rounded-lg border px-3 py-3 ${row.isBase ? "border-gold bg-cream" : "border-line"}`}>
+                <p className="font-display text-base text-navy">{row.factor}{row.isBase ? " · this run" : ""}</p>
+                <p className="text-sm text-muted">{row.shock}</p>
+                <dl className="mt-2 grid gap-1.5 text-sm">
+                  <div className="flex justify-between gap-3"><dt className="text-muted">Assets remaining</dt><dd className="tabular-nums">{money(row.remaining)}</dd></div>
+                  <div className="flex justify-between gap-3"><dt className="text-muted">Shortfall</dt><dd className="tabular-nums">{row.shortfall ? money(row.shortfall) : "None"}</dd></div>
+                  <div className="flex justify-between gap-3"><dt className="text-muted">Years at claim cost</dt><dd className="tabular-nums">{row.yearsAtClaim.toFixed(2)}</dd></div>
+                </dl>
+              </article>
+            ))}
+          </div>
+        </ViewFold>
+      ) : null}
 
       <div id="disclosure-terms" className="mt-5 scroll-mt-8 card-xl border-2 px-4 py-2 text-sm text-muted">
         <TitleCollapse title={DISCLOSURE_CARD_TITLE} className="mt-0" openOnHash="disclosure-terms" pdfChecked={details.eduHypo} onPdfChange={(v) => setDetail("eduHypo", v)}>
