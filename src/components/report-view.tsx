@@ -810,10 +810,14 @@ export function ReportView({
                     : "None — self-funded"
                 }
               />
-              <Qa q="Annual income (7% guideline)" a={annualIncome > 0 ? money(annualIncome) : "Not entered"} />
+              <Qa q="Adjusted gross household income today" a={annualIncome > 0 ? money(annualIncome) : "Not entered"} />
               <Qa
                 q={TARGET_PREMIUM_LABEL}
-                a={`${money(premiumTarget)} (2.5% of countable ${money(premiumParts.fromAssets)}; 7% of income ${annualIncome > 0 ? money(premiumParts.fromIncome) : "not entered"}; max = lesser)`}
+                a={
+                  annualIncome > 0
+                    ? `${money(premiumTarget)} (7% of adjusted gross household income)`
+                    : `${money(premiumTarget)} (2.5% of countable assets; income not entered)`
+                }
               />
               {policy.enabled ? (
                 <>
@@ -1140,10 +1144,10 @@ export function ReportView({
               </div>
               <div>
                 <p className="mb-2 text-sm text-muted">
-                  {TARGET_PREMIUM_LABEL} This run’s planning figure is {money(premiumTarget)}{" "}
-                  (2.5% of countable {money(premiumParts.fromAssets)}; 7% of income{" "}
-                  {annualIncome > 0 ? money(premiumParts.fromIncome) : "not entered"}; the
-                  max for traditional LTCI is the lesser).
+                  {TARGET_PREMIUM_LABEL} This run’s traditional planning figure is {money(premiumTarget)}
+                  {annualIncome > 0
+                    ? ` (7% of adjusted gross household income ${money(annualIncome)}). Asset-based, annuity care, and hybrid life use 2.5% of that income, ${money(Math.round(annualIncome * 0.025))}, as the default single premium unless a different deposit was entered.`
+                    : " (2.5% of countable assets, because adjusted gross household income was not entered)."}
                 </p>
                 <table className="w-full text-sm">
                   <thead>
@@ -1172,7 +1176,7 @@ export function ReportView({
                       <td className="py-2 pr-2">Planning</td>
                       <td className="py-2 pr-2 text-right">{money(premiumTarget)}</td>
                       <td className="py-2 text-right">
-                        {premiumParts.limitedBy === "income" ? "7% inc." : "2.5%"}
+                        {premiumParts.limitedBy === "income" ? "7% income" : "2.5% assets"}
                       </td>
                     </tr>
                   </tbody>

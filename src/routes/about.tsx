@@ -88,9 +88,10 @@ function About() {
           <li>
             <strong>Annual premium</strong> is taken from countable assets each accumulation
             year after the assumed return. Premiums stop (waiver of premium) once care
-            starts. A planning <strong>target premium</strong> uses 2.5% of countable
-            assets or 7% of income — whichever is less (the max for traditional long-term
-            care insurance in this model). Premiums vary by
+            starts. A planning <strong>target premium</strong> for traditional coverage is 7%
+            of adjusted gross household income when that income is entered; otherwise 2.5%
+            of countable assets. Asset-based, annuity care, and hybrid life use 2.5% of that
+            income as the default single premium. Premiums vary by
             age, health, marital status, and state of issue. Discuss with your LTC
             Insurance Representative or financial advisor for more insights,
             qualifications requirements and costs.

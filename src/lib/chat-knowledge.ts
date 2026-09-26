@@ -69,7 +69,7 @@ const CORE: KnowledgeChunk[] = [
     label: "NAIC Shopper’s Guide / Personal Worksheet",
     url: "https://content.naic.org/sites/default/files/publication-ltc-lp-shoppers-guide-long-term.pdf",
     aaltci: false,
-    text: `This model locks insurance options when countable assets are under $${NAIC_LOCKOUT_ASSETS.toLocaleString("en-US")} and warns under $${NAIC_WARN_ASSETS.toLocaleString("en-US")}. Planning floors only — not a filed NAIC statutory minimum. Target premium is only a suggestion (often discussed as 2.5% of countable assets or 7% of income for traditional LTCI). Premiums vary by state, age, underwriting & rate class, marital status, benefits, and riders.`,
+    text: `This model locks insurance options when countable assets are under $${NAIC_LOCKOUT_ASSETS.toLocaleString("en-US")} and warns under $${NAIC_WARN_ASSETS.toLocaleString("en-US")}. Planning floors only — not a filed NAIC statutory minimum. If adjusted gross household income is entered, the suggested traditional premium is 7% of that income and the default single premium for asset-based, annuity care, and hybrid life is 2.5% of that income. Otherwise the traditional planning figure is 2.5% of countable assets. Premiums vary by state, age, underwriting and rate class, marital status, benefits, and riders.`,
   },
   {
     id: "structures",

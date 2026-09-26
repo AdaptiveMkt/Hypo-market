@@ -204,7 +204,7 @@ export function analysisNarrative(opts: ReportOpts): string {
   }
 
   paras.push(
-    `A planning figure for discussion — not a quote — is a recommended target premium of ${money(premium)} per year (the lesser of 2.5% of countable assets or 7% of income; max for traditional long-term care insurance). Premiums vary by age, health, marital status, and state of issue.`,
+    `A planning figure for discussion — not a quote — is a suggested traditional premium of ${money(premium)} per year (7% of adjusted gross household income when that income is entered; otherwise 2.5% of countable assets). Asset-based, annuity care, and hybrid life default the single premium to 2.5% of that income. Premiums vary by age, health, marital status, and state of issue.`,
   );
   paras.push(
     `Tax: there is no general federal LTC credit — only an age-capped deduction (2026: $500 to $6,200) after the 7.5% AGI medical floor if you itemize. A credit cuts tax dollar-for-dollar; a deduction only lowers taxable income. ${stateLtcTaxBreak(s.state).detail} This is not tax advice.`,
@@ -244,7 +244,7 @@ export function recommendationsNarrative(opts: ReportOpts): string[] {
 
   if (!s.policy.enabled) {
     recs.push(
-      `No policy is in this run. A planning figure — not a quote — is a target premium of ${money(premium)} per year (the lesser of 2.5% of countable assets or 7% of income; max for traditional LTCI). Discuss how to fund that from cash flow versus assets.`,
+      `No policy is in this run. A planning figure — not a quote — is a traditional target premium of ${money(premium)} per year (7% of adjusted gross household income when entered; otherwise 2.5% of countable assets). Discuss how to fund that from cash flow versus assets.`,
     );
   } else {
     if (result.shortfallTotal > 0) {

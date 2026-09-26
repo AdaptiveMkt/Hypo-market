@@ -537,9 +537,9 @@ export function inflateDaily(
 export const TARGET_PREMIUM_RATE = 0.025;
 export const TARGET_INCOME_RATE = 0.07;
 export const TARGET_PREMIUM_LABEL =
-  "Target premium is only a suggestion based on a percentage of countable assets. Individual premiums or rates vary and may be higher or lower based on state of issue, age, marital status, underwriting & rate class, benefit selection and/or added riders.";
+  "Target premium is only a suggestion. Traditional long-term care uses 7% of adjusted gross household income. Asset-based, annuity care, and hybrid life use 2.5% of that income as the default single premium. Individual premiums vary by state, age, marital status, underwriting, benefits, and riders.";
 export const TARGET_PREMIUM_FORMULA =
-  "A long-term care insurance premium funding formula of 2.5% of countable assets or 7% of fixed income (max for traditional long-term care insurance).";
+  "Traditional suggested premium is 7% of adjusted gross household income. The default single premium for asset-based, annuity care, and hybrid life is 2.5% of that income.";
 
 export function targetPremium(countableAssets: number, annualIncome = 0) {
   return targetPremiumParts(countableAssets, annualIncome).suggested;
@@ -550,14 +550,45 @@ export function targetPremiumParts(countableAssets: number, annualIncome = 0) {
   const fromAssets = !Number.isFinite(n) || n <= 0 ? 0 : Math.round(n * TARGET_PREMIUM_RATE);
   const fromIncome =
     Number(annualIncome) > 0 ? Math.round(Number(annualIncome) * TARGET_INCOME_RATE) : 0;
-  const suggested =
-    fromIncome > 0 ? Math.min(fromAssets, fromIncome) : fromAssets;
+  const suggested = fromIncome > 0 ? fromIncome : fromAssets;
   return {
     fromAssets,
     fromIncome,
     suggested,
-    limitedBy: fromIncome > 0 && fromIncome < fromAssets ? ("income" as const) : ("assets" as const),
+    limitedBy: fromIncome > 0 ? ("income" as const) : ("assets" as const),
   };
+}
+
+export function agiPremiums(annualIncome: number) {
+  const agi = Math.max(0, Math.round(Number(annualIncome) || 0));
+  return {
+    agi,
+    traditionalAnnual: agi > 0 ? Math.round(agi * TARGET_INCOME_RATE) : 0,
+    linkedSingle: agi > 0 ? Math.round(agi * TARGET_PREMIUM_RATE) : 0,
+  };
+}
+
+export function policyWithAgi(policy: LtcPolicy, annualIncome: number): LtcPolicy {
+  const priced = agiPremiums(annualIncome);
+  if (priced.agi <= 0) return policy;
+  if (policy.kind === "traditional") return { ...policy, annualPremium: priced.traditionalAnnual };
+  if (isLinkedKind(policy.kind)) {
+    const untouched = policy.singlePremium <= 0 || policy.singlePremium === DEFAULT_LINKED_SINGLE_PREMIUM;
+    return untouched ? { ...policy, singlePremium: priced.linkedSingle } : policy;
+  }
+  return policy;
+}
+
+export function bookWithAgi(
+  book: Record<PolicyKind, LtcPolicy>,
+  annualIncome: number,
+): Record<PolicyKind, LtcPolicy> {
+  if (agiPremiums(annualIncome).agi <= 0) return book;
+  const next = { ...book };
+  (Object.keys(next) as PolicyKind[]).forEach((kind) => {
+    next[kind] = policyWithAgi({ ...next[kind], kind }, annualIncome);
+  });
+  return next;
 }
 
 export function netRoiPct(grossPct: number, taxRatePct: number) {

@@ -25,6 +25,7 @@ export type QaSave = {
   claimAgeTouched: boolean;
   duration: number;
   taxRate: number;
+  annualIncome?: number;
   excludeHome: boolean;
   poolShown: boolean;
   client?: ContactParty;

@@ -9,6 +9,7 @@ import {
   DAILY_BENEFIT_STEP,
   LINKED_MONTHLY_MIN,
   LINKED_MONTHLY_STEP,
+  agiPremiums,
   clampDailyBenefit,
   dailyFromMonthly,
   fiveYearIssueBand,
@@ -153,6 +154,8 @@ export function FactFinder({
   onElim,
   onRider,
   section3Confirmed,
+  annualIncome,
+  onAnnualIncome,
   insuranceLocked,
   onRun,
   onOpenForm,
@@ -213,6 +216,8 @@ export function FactFinder({
   onElim: (n: number) => void;
   onRider: (key: string) => void;
   section3Confirmed: boolean;
+  annualIncome: number;
+  onAnnualIncome: (n: number) => void;
   insuranceLocked: boolean;
   onRun: (only?: "traditional" | "assetBased" | "ltcAnnuity" | "hybridLife") => void;
   onOpenForm: () => void;
@@ -692,6 +697,24 @@ export function FactFinder({
             <p className="text-base font-semibold text-navy">
               {insuranceLocked ? "Countable assets are under this model’s insurance screen. You can still run the hypothetical." : "Which hypothetical should run?"}
             </p>
+            <div className="mt-4">
+              <label className={labelClass} htmlFor="ff-agi">Adjusted gross household income today</label>
+              <StepperField
+                id="ff-agi"
+                value={annualIncome}
+                onChange={(v) => onAnnualIncome(Number(v) || 0)}
+                prefix="$"
+                commas
+                step={1000}
+                min={0}
+                blankWhenZero
+              />
+              <p className="mt-1 text-xs leading-snug text-muted">
+                {annualIncome > 0
+                  ? `Suggested traditional premium ${money(agiPremiums(annualIncome).traditionalAnnual)} (7%). Default single premium for asset-based, annuity care, and hybrid life ${money(agiPremiums(annualIncome).linkedSingle)} (2.5%).`
+                  : "Optional. 7% of this income is the suggested traditional premium. 2.5% is the default single premium for asset-based, annuity care, and hybrid life."}
+              </p>
+            </div>
             <div className="mt-4 grid gap-2 sm:grid-cols-2">
               {(
                 [

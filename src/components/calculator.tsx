@@ -30,6 +30,8 @@ import {
   DEFAULT_LINKED_SINGLE_PREMIUM,
   STRUCTURE_OPTIONS,
   seedKindBook,
+  bookWithAgi,
+  policyWithAgi,
   assetBasedMonthlyCap,
   clampDailyBenefit,
   dailyFromMonthly,
@@ -388,6 +390,7 @@ export function Calculator() {
       setClaimAgeTouched(Boolean(saved.claimAgeTouched));
       if (saved.duration) setDuration(saved.duration);
       if (saved.taxRate != null) setTaxRate(saved.taxRate);
+      if (saved.annualIncome != null) setAnnualIncome(Number(saved.annualIncome) || 0);
       setExcludeHome(saved.excludeHome !== false);
       setPoolShown(Boolean(saved.poolShown));
       if (saved.finderPersonal && saved.client) setClient({ ...EMPTY_CONTACT, ...saved.client });
@@ -440,6 +443,7 @@ export function Calculator() {
       claimAgeTouched,
       duration,
       taxRate,
+      annualIncome,
       excludeHome,
       poolShown,
       client: finderPersonal ? client : undefined,
@@ -469,6 +473,7 @@ export function Calculator() {
     claimAgeTouched,
     duration,
     taxRate,
+    annualIncome,
     excludeHome,
     poolShown,
     client,
@@ -1353,14 +1358,24 @@ export function Calculator() {
     if (only) {
       setRunKinds({ traditional: false, assetBased: false, ltcAnnuity: false, hybridLife: false, [only]: true });
       setKindBook((book) => {
-        const saved = { ...book, [policy.kind]: { ...policy, kind: policy.kind, enabled: true } };
-        const next = { ...saved[only], kind: only, enabled: true };
+        const priced = bookWithAgi(
+          { ...book, [policy.kind]: { ...policy, kind: policy.kind, enabled: true } },
+          annualIncome,
+        );
+        const next = policyWithAgi({ ...priced[only], kind: only, enabled: true }, annualIncome);
         setPolicy(next);
-        return { ...saved, [only]: next };
+        return { ...priced, [only]: next };
       });
       setYearKind(only);
-    } else if (!policy.enabled && Object.values(runKinds).some(Boolean)) {
-      setPolicy((p) => ({ ...p, enabled: true }));
+    } else {
+      const priced = bookWithAgi({ ...kindBook, [policy.kind]: policy }, annualIncome);
+      setKindBook(priced);
+      setPolicy((p) =>
+        policyWithAgi(
+          { ...(priced[p.kind] ?? p), enabled: p.enabled || Object.values(runKinds).some(Boolean) },
+          annualIncome,
+        ),
+      );
     }
     executeHypo();
   }
@@ -1598,6 +1613,8 @@ export function Calculator() {
         onRider={(key) => patchPolicy({ enabled: true, ...parseRider(key) })}
         onConfirm3={() => confirmSection3(true)}
         section3Confirmed={section3Confirmed}
+        annualIncome={annualIncome}
+        onAnnualIncome={setAnnualIncome}
         insuranceLocked={insuranceLocked}
         onRun={(only) => runHypo(only)}
         onOpenForm={() => setShowFullForm(true)}
@@ -2352,6 +2369,17 @@ export function Calculator() {
               >
                 {section3Confirmed ? "Section 3 selection confirmed" : "Confirm Section 3 selection"}
               </button>
+            ) : null}
+            {section3Confirmed || insuranceLocked ? (
+              <div className="mt-4">
+                <label className={labelClass} htmlFor="agi-today">Adjusted gross household income today</label>
+                <MoneyField id="agi-today" value={annualIncome} onChange={(v) => setAnnualIncome(Number(v) || 0)} compact />
+                <p className="mt-1 text-xs leading-snug text-muted">
+                  {annualIncome > 0
+                    ? `At calculation, the suggested traditional premium is ${money(Math.round(annualIncome * 0.07))} (7%). The default single premium for asset-based, annuity care, and hybrid life is ${money(Math.round(annualIncome * 0.025))} (2.5%), unless a different deposit was already entered.`
+                    : "Optional. If entered, 7% is the suggested traditional premium and 2.5% is the default single premium for asset-based, annuity care, and hybrid life."}
+                </p>
+              </div>
             ) : null}
             <div id="run-kind-actions" className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
               {missingRun.length ? (
