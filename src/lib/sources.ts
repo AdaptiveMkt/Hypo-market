@@ -39,6 +39,13 @@ export const SRC = {
   irc101g: "https://www.law.cornell.edu/uscode/text/26/101",
   naicLifeSettlement:
     "https://content.naic.org/sites/default/files/publications-consumer-life-settlement.pdf",
+  naicModel697: "https://content.naic.org/sites/default/files/model-law-697.pdf",
+  naicModelIndex2026:
+    "https://content.naic.org/sites/default/files/committee-model-law-table-of-contents.pdf",
+  lisa: "https://www.lisa.org/",
+  coventry: "https://www.coventry.com/",
+  irsLifeProceeds:
+    "https://www.irs.gov/faqs/interest-dividends-other-types-of-income/life-insurance-disability-insurance-proceeds",
   irc1035: "https://www.law.cornell.edu/uscode/text/26/1035",
   cfpCode: "https://www.cfp.net/ethics/code-of-ethics-and-standards-of-conduct",
   fundingLtc: "https://fundingltcmarketplace.com/case-studies.html",
@@ -315,6 +322,30 @@ export const HYPO_SOURCES: { topic: string; label: string; href: string; note: s
     label: "A Shopper’s Guide to Long-Term Care Insurance (PDF)",
     href: "https://content.naic.org/sites/default/files/publication-ltc-lp-shoppers-guide-long-term.pdf",
     note: "NAIC consumer guide on benefit triggers, elimination periods, inflation options, exclusions, and the free-look period. Many states require this guide at sale.",
+  },
+  {
+    topic: "NAIC life settlements consumer guide",
+    label: "Selling Your Life Insurance Policy — Understanding Life Settlements (NAIC, 2022)",
+    href: "https://content.naic.org/sites/default/files/publications-consumer-life-settlement.pdf",
+    note: "Consumer brochure. A viatical settlement is a sale by someone who is terminally or chronically ill. A life settlement is a sale for other reasons. Ask the insurer about policy options before selling. Not a quote.",
+  },
+  {
+    topic: "NAIC Viatical Settlements Model Act",
+    label: "NAIC Viatical Settlements Model Act #697 (PDF)",
+    href: "https://content.naic.org/sites/default/files/model-law-697.pdf",
+    note: "Model licensing, disclosure, and anti-fraud rules for viatical and life settlements. Still listed in the NAIC Summer 2026 model index. States adopt it with variations.",
+  },
+  {
+    topic: "Life Insurance Settlement Association",
+    label: "LISA",
+    href: "https://www.lisa.org/",
+    note: "Trade association for life-settlement brokers, providers, and financing firms. Not a state license lookup and not a recommendation of any member.",
+  },
+  {
+    topic: "Example life-settlement company",
+    label: "Coventry",
+    href: "https://www.coventry.com/",
+    note: "Example of a company that buys life insurance policies on the secondary market. Named only as an illustration of a third-party buyer. Not an endorsement, a referral, or a quote.",
   },
   {
     topic: "NAIC Long-Term Care Insurance Model Act",

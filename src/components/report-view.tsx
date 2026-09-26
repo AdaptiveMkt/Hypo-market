@@ -81,6 +81,7 @@ import { ChartRegion } from "@/components/chart-region";
 import { pauseCeleste, playCelesteScript, resumeCeleste, stopCeleste, watchCeleste } from "@/lib/celeste";
 import { setVoiceOn, useVoiceOn } from "@/lib/voice-pref";
 import { LifeBenefitDefs } from "@/components/life-benefit-defs";
+import { LifeSettlementOptions } from "@/components/life-settlement-options";
 import { LtcGlossaryList } from "@/components/ltc-glossary";
 import { SamplePolicyPack } from "@/components/sample-ltc-policy";
 import {
@@ -933,6 +934,24 @@ export function ReportView({
             </tbody>
           </table>
         </section>
+
+        {lifeFaceAmount > 0 || (assets.life ?? 0) > 0 || (policy.enabled && policy.kind === "hybridLife") ? (
+        <section className="report-block">
+          <h2 className="mb-3 font-display text-xl text-navy">
+            Life insurance settlement options
+          </h2>
+          <LifeSettlementOptions
+            face={
+              lifeFaceAmount > 0
+                ? lifeFaceAmount
+                : policy.enabled && policy.kind === "hybridLife"
+                  ? specifiedFaceAmount(policy)
+                  : 0
+            }
+            cashValue={assets.life ?? 0}
+          />
+        </section>
+        ) : null}
 
         <section className="report-block">
           <h2 className="mb-3 font-display text-xl text-navy">
