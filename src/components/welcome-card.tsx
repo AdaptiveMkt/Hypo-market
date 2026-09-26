@@ -23,18 +23,6 @@ const CAPTIONS: { start: number; end: number; text: string }[] = [
   { start: 67, end: 69.7, text: "Thank you." },
 ];
 
-export function usePhoneLayout() {
-  const [phone, setPhone] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia("(max-width: 767px)");
-    const apply = () => setPhone(mq.matches);
-    apply();
-    mq.addEventListener("change", apply);
-    return () => mq.removeEventListener("change", apply);
-  }, []);
-  return phone;
-}
-
 export function WelcomeVideo() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [caption, setCaption] = useState("");
@@ -115,7 +103,7 @@ export function WelcomeVideo() {
   }, []);
 
   return (
-    <figure className="mt-4 min-w-0">
+    <figure className="mt-4 min-w-0 md:mt-0">
       <video
         ref={videoRef}
         className="block w-full rounded-lg bg-navy"
@@ -153,7 +141,6 @@ export function WelcomeCard({ onReset }: { onReset?: () => void }) {
   const [speaking, setSpeaking] = useState(false);
   const [status, setStatus] = useState("");
   const voiceOn = useVoiceOn();
-  const phone = usePhoneLayout();
 
   useEffect(() => {
     return watchCeleste((s) => {
@@ -180,7 +167,6 @@ export function WelcomeCard({ onReset }: { onReset?: () => void }) {
       <h2 id="welcome-heading" className="font-display text-xl text-navy">
         {WELCOME_HEADING}
       </h2>
-      {phone ? null : <WelcomeVideo />}
       <p className="mt-3 text-sm leading-relaxed text-muted">{WELCOME_BODY}</p>
       <div className="mt-4 stack-actions">
         <button
