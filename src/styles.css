@@ -556,6 +556,13 @@ html.dark {
   .text-deplete {
     animation: red-wave-color 4.5s ease-in-out 3;
   }
+  .text-shortfall,
+  .text-shortfall.tabular-nums,
+  .text-shortfall.font-display,
+  strong.text-shortfall {
+    color: #ff1a1a !important;
+    font-weight: 700;
+  }
   /* Bold amounts (not links): vermillion, no wave. */
   .amt-red,
   strong.tabular-nums:not(a *),
@@ -778,7 +785,11 @@ html.pdf-capture #aum-report .pct-red {
   -webkit-text-fill-color: #9a4500 !important;
 }
 
-html.pdf-capture #aum-report .amt-green,
+html.pdf-capture #aum-report .text-shortfall {
+  color: #ff1a1a !important;
+  -webkit-text-fill-color: #ff1a1a !important;
+  font-weight: 700 !important;
+}
 html.pdf-capture #aum-report td.amt-green,
 html.pdf-capture #aum-report .tabular-nums.font-bold.amt-green {
   color: #009e73 !important;

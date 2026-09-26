@@ -978,6 +978,7 @@ export function ReportView({
             <Kpi
               label="Unpaid shortfall"
               value={result.shortfallTotal ? money(result.shortfallTotal) : "None"}
+              tone="shortfall"
             />
             {depletedWhen ? (
               <Kpi label="Funds depleted" value={depletedWhen.label} />
@@ -1027,7 +1028,7 @@ export function ReportView({
               <p className="text-xs uppercase tracking-wide">Same scenario · no policy</p>
               <p className="mt-1">
                 Remaining <strong className="tabular-nums text-navy">{money(selfFunded.endPool)}</strong>.
-                Shortfall <strong className="tabular-nums text-navy">{selfFunded.shortfallTotal ? money(selfFunded.shortfallTotal) : "$0"}</strong>.
+                <span className="text-shortfall">Shortfall {selfFunded.shortfallTotal ? money(selfFunded.shortfallTotal) : "$0"}</span>.
               </p>
             </div>
             <div className="card px-4 py-3 text-sm text-muted">
@@ -1035,7 +1036,7 @@ export function ReportView({
               <p className="mt-1">
                 Insurance on claims <strong className="tabular-nums text-navy">{money(result.insuranceTotal)}</strong>.
                 Remaining <strong className="tabular-nums text-navy">{money(result.endPool)}</strong>.
-                Unpaid shortfall <strong className="tabular-nums text-navy">{result.shortfallTotal ? money(result.shortfallTotal) : "$0"}</strong>.
+                <span className="text-shortfall">Unpaid shortfall {result.shortfallTotal ? money(result.shortfallTotal) : "$0"}</span>.
               </p>
             </div>
           </div>
@@ -1319,7 +1320,7 @@ export function ReportView({
                 <Legend />
                 <Bar dataKey="cost" name="Total care cost" fill={CHART.cost} isAnimationActive={false} />
                 <Bar dataKey="remaining" name="Assets remaining" fill={CHART.remaining} isAnimationActive={false} />
-                <Bar dataKey="shortfall" name="Shortfall" fill={CHART.shortfall} isAnimationActive={false} />
+                <Bar dataKey="shortfall" name="Shortfall" fill="#ff1a1a" isAnimationActive={false} />
               </ComposedChart>
             </ResponsiveContainer>
           </div>
@@ -1351,7 +1352,7 @@ export function ReportView({
                       <td className="py-2 pr-2 text-right">{formatYearsLast(yearsT)}</td>
                       <td className="py-2 pr-2 text-right">{money(row.proj.firstCost)}</td>
                       <td className="py-2 pr-2 text-right">{money(row.proj.endPool)}</td>
-                      <td className="py-2 text-right">
+                      <td className="py-2 text-right text-shortfall">
                         {row.proj.shortfallTotal ? money(row.proj.shortfallTotal) : "—"}
                       </td>
                     </tr>
@@ -1431,7 +1432,7 @@ export function ReportView({
                 <Legend />
                 <Bar dataKey="remaining" name="Countable remaining" fill={CHART.remaining} isAnimationActive={false} />
                 <Bar dataKey="protected" name="Partnership protected" fill={CHART.cost} isAnimationActive={false} />
-                <Bar dataKey="shortfall" name="Unpaid shortfall" fill="url(#hatch-shortfall)" stroke={CHART.shortfall} isAnimationActive={false} />
+                <Bar dataKey="shortfall" name="Unpaid shortfall" fill="#ff1a1a" isAnimationActive={false} />
               </ComposedChart>
             </ResponsiveContainer>
           </div>
@@ -1445,7 +1446,7 @@ export function ReportView({
                   <th className="py-2 pr-2 text-right">Assets left</th>
                   <th className="py-2 pr-2 text-right">Protected</th>
                   <th className="py-2 pr-2 text-right">Could keep</th>
-                  <th className="py-2 pr-2 text-right">Shortfall</th>
+                  <th className="py-2 pr-2 text-right text-shortfall">Shortfall</th>
                   <th className="py-2 text-right">Pool lasts</th>
                 </tr>
               </thead>
@@ -1458,7 +1459,7 @@ export function ReportView({
                     <td className="py-2 pr-2 text-right">{money(row.proj.endPool)}</td>
                     <td className="py-2 pr-2 text-right">{money(row.impact.partnership.protected)}</td>
                     <td className="py-2 pr-2 text-right">{money(row.impact.partnership.keep)}</td>
-                    <td className="py-2 pr-2 text-right">
+                    <td className="py-2 pr-2 text-right text-shortfall">
                       {row.proj.shortfallTotal ? money(row.proj.shortfallTotal) : "—"}
                     </td>
                     <td className="py-2 text-right">{formatYearsLast(row.years)}</td>
@@ -1638,7 +1639,7 @@ export function ReportView({
                   <Legend />
                   <Bar dataKey="combined" name="Combined pool at claim" fill={CHART.remaining} isAnimationActive={false} />
                   <Bar dataKey="care" name="First-year care cost" fill={CHART.cost} isAnimationActive={false} />
-                  <Bar dataKey="shortfall" name="Shortfall" fill="url(#hatch-shortfall)" stroke={CHART.shortfall} isAnimationActive={false} />
+                  <Bar dataKey="shortfall" name="Shortfall" fill="#ff1a1a" isAnimationActive={false} />
                 </ComposedChart>
               </ResponsiveContainer>
             </div>
@@ -1683,7 +1684,7 @@ export function ReportView({
                         <td className="py-2 pr-2 text-right">{formatYearsLast(exhausted)}</td>
                         <td className="py-2 pr-2 text-right">{money(row.proj.insuranceTotal)}</td>
                         <td className="py-2 pr-2 text-right">{money(row.proj.endPool)}</td>
-                        <td className="py-2 text-right">
+                        <td className="py-2 text-right text-shortfall">
                           {row.proj.shortfallTotal ? money(row.proj.shortfallTotal) : "—"}
                         </td>
                       </tr>
@@ -1757,7 +1758,7 @@ export function ReportView({
                     <td className="py-2 pr-2 text-right">
                       {row.key === "traditional" ? "—" : money(row.proj.residualDeathBenefit)}
                     </td>
-                    <td className="py-2 text-right">
+                    <td className="py-2 text-right text-shortfall">
                       {row.proj.shortfallTotal ? money(row.proj.shortfallTotal) : "—"}
                     </td>
                   </tr>
@@ -2297,7 +2298,7 @@ export function ReportView({
                 <Tooltip formatter={(v) => money(Number(v) || 0)} />
                 <Legend />
                 <Bar dataKey="remain" name="Δ remaining vs this run" fill={CHART.remaining} isAnimationActive={false} />
-                <Bar dataKey="short" name="Δ unpaid shortfall vs this run" fill="url(#hatch-shortfall)" stroke={CHART.shortfall} isAnimationActive={false} />
+                <Bar dataKey="short" name="Δ unpaid shortfall vs this run" fill="#ff1a1a" isAnimationActive={false} />
                 <ReferenceLine y={0} stroke={CHART.selfFunded} />
               </ComposedChart>
             </ResponsiveContainer>
@@ -2310,7 +2311,7 @@ export function ReportView({
                   <th className="py-2 pr-2">Shock</th>
                   <th className="py-2 pr-2 text-right">Remaining</th>
                   <th className="py-2 pr-2 text-right">vs this run</th>
-                  <th className="py-2 pr-2 text-right">Unpaid shortfall</th>
+                  <th className="py-2 pr-2 text-right text-shortfall">Unpaid shortfall</th>
                   <th className="py-2 text-right">Pool at claim</th>
                 </tr>
               </thead>
@@ -2323,7 +2324,7 @@ export function ReportView({
                     <td className="py-1.5 pr-2 text-right">
                       {r.isBase ? "—" : `${r.dRemain > 0 ? "+" : ""}${money(r.dRemain)}`}
                     </td>
-                    <td className="py-1.5 pr-2 text-right">{r.shortfall ? money(r.shortfall) : "—"}</td>
+                    <td className="py-1.5 pr-2 text-right text-shortfall">{r.shortfall ? money(r.shortfall) : "—"}</td>
                     <td className="py-1.5 text-right">{formatYearsLast(r.yearsAtClaim)}</td>
                   </tr>
                 ))}
@@ -2526,11 +2527,12 @@ function Qa({ q, a }: { q: ReactNode; a: ReactNode }) {
   );
 }
 
-function Kpi({ label, value }: { label: string; value: string }) {
+function Kpi({ label, value, tone }: { label: string; value: string; tone?: "shortfall" }) {
+  const short = tone === "shortfall";
   return (
     <div className="card pdf-kpi px-3 py-3">
-      <p className="text-xs uppercase tracking-wide text-muted">{label}</p>
-      <p className="kpi-value font-display text-lg tabular-nums text-navy">{value}</p>
+      <p className={`text-xs uppercase tracking-wide ${short ? "text-shortfall" : "text-muted"}`}>{label}</p>
+      <p className={`kpi-value font-display text-lg tabular-nums ${short ? "text-shortfall" : "text-navy"}`}>{value}</p>
     </div>
   );
 }
