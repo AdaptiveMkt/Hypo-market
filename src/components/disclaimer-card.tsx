@@ -126,12 +126,15 @@ export function DisclaimerCard({
   include,
   details,
   onPdfChange,
+  expanded = false,
 }: {
   className?: string;
   /** When set, only checked hold-harmless titles print (PDF / View). */
   include?: DetailFlags;
   details?: DetailFlags;
   onPdfChange?: (id: DetailId, on: boolean) => void;
+  /** Show every section open. Used on the full terms page. */
+  expanded?: boolean;
 }) {
   const on = (heading: string) => {
     if (!include) return true;
@@ -189,7 +192,7 @@ export function DisclaimerCard({
       </p>
 
       {showMayDo ? (
-      <TitleCollapse title="What you may do" className="mt-3" {...pdf("What you may do")}>
+      <TitleCollapse defaultOpen={expanded} title="What you may do" className="mt-3" {...pdf("What you may do")}>
         <ul className="list-disc space-y-1 pl-5 text-sm text-muted">
           {TERMS_MAY_DO.map((t) => (
             <li key={t}>{t}</li>
@@ -199,7 +202,7 @@ export function DisclaimerCard({
       ) : null}
 
       {showMayNot ? (
-      <TitleCollapse title="What you may not do" className="mt-2" {...pdf("What you may not do")}>
+      <TitleCollapse defaultOpen={expanded} title="What you may not do" className="mt-2" {...pdf("What you may not do")}>
         <ul className="list-disc space-y-1 pl-5 text-sm text-muted">
           {TERMS_MAY_NOT.map((t) => (
             <li key={t}>{t}</li>
@@ -212,7 +215,7 @@ export function DisclaimerCard({
       ) : null}
 
       {showHold ? (
-      <TitleCollapse
+      <TitleCollapse defaultOpen={expanded}
         title={HOLD_HARMLESS_TITLE}
         className="mt-2"
         hint="Click the title to view publisher, legal, and privacy disclosures."
@@ -221,7 +224,7 @@ export function DisclaimerCard({
         {paras.map((p) => {
           const extra = p.heading === "What consumers buy" ? <WhatConsumersBuyPanel /> : null;
           const body = (
-            <TitleCollapse key={p.heading} title={p.heading} className="mt-2" {...pdf(p.heading)}>
+            <TitleCollapse defaultOpen={expanded} key={p.heading} title={p.heading} className="mt-2" {...pdf(p.heading)}>
               <p className="text-sm text-muted">
                 <LinkedCopy text={p.body} />
               </p>
@@ -241,13 +244,13 @@ export function DisclaimerCard({
       ) : null}
 
       {showLiability ? (
-      <TitleCollapse
+      <TitleCollapse defaultOpen={expanded}
         title="Limitation of liability and other terms"
         className="mt-2"
         {...pdf("Limitation of liability and other terms")}
       >
         {liability.map((p) => (
-          <TitleCollapse key={`tou-${p.heading}`} title={p.heading} className="mt-2">
+          <TitleCollapse defaultOpen={expanded} key={`tou-${p.heading}`} title={p.heading} className="mt-2">
             <p className="text-sm text-muted">
               <LinkedCopy text={p.body} />
             </p>
@@ -257,11 +260,11 @@ export function DisclaimerCard({
       ) : null}
 
       {showPrivacy ? (
-        <PrivacyPolicyBlock details={details} onPdfChange={onPdfChange} />
+        <PrivacyPolicyBlock expanded={expanded} details={details} onPdfChange={onPdfChange} />
       ) : null}
 
       {showAssumptions ? (
-      <TitleCollapse
+      <TitleCollapse defaultOpen={expanded}
         title="Assumptions and cost data"
         className="mt-2"
         {...pdf("Assumptions and cost data")}
@@ -291,14 +294,16 @@ export function PrivacyPolicyBlock({
   className = "mt-2",
   details,
   onPdfChange,
+  expanded = false,
 }: {
   className?: string;
   details?: DetailFlags;
   onPdfChange?: (id: DetailId, on: boolean) => void;
+  expanded?: boolean;
 }) {
   return (
     <div className={className}>
-      <TitleCollapse
+      <TitleCollapse defaultOpen={expanded}
         title={PRIVACY_POLICY_TITLE}
         className="mt-0"
         pdfChecked={details ? Boolean(details.dhPrivacy) : undefined}
@@ -308,7 +313,7 @@ export function PrivacyPolicyBlock({
           <LinkedCopy text={PRIVACY_POLICY_INTRO} />
         </p>
         {PRIVACY_POLICY_PARAS.map((p) => (
-          <TitleCollapse key={p.heading} title={p.heading} className="mt-2">
+          <TitleCollapse defaultOpen={expanded} key={p.heading} title={p.heading} className="mt-2">
             <p className="text-sm text-muted">
               <LinkedCopy text={p.body} />
             </p>

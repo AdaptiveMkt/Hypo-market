@@ -39,6 +39,26 @@ function CopyrightTerms() {
           later on this page. Using the calculator, View report, or PDF is agreement to
           those terms.
         </p>
+        <div className="mt-5 rounded-lg border border-line bg-cream px-4 py-3 text-sm">
+          <h3 className="font-display text-lg text-navy">Contact Adaptive Marketing Group</h3>
+          <p className="mt-2">
+            Phone:{" "}
+            <a href="tel:+13217957516" className="font-semibold text-teal underline underline-offset-2">
+              321-795-7516
+            </a>
+          </p>
+          <p className="mt-1">
+            Website:{" "}
+            <a
+              href="https://www.adaptivemarketingresources.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-teal underline underline-offset-2"
+            >
+              https://www.adaptivemarketingresources.com/
+            </a>
+          </p>
+        </div>
       </section>
 
       <section className="card-xl p-5">
@@ -117,9 +137,9 @@ function CopyrightTerms() {
         <p className="text-pretty text-muted">
           <LinkedCopy text="The following is part of these terms of use. It is intended to make clear who this model is for, what it is not, and that Adaptive Marketing Group does not assume professional or fiduciary liability for decisions made with it. It does not replace advice from a licensed professional, and it cannot waive a CFP® professional’s fiduciary duty when they provide Financial Advice." />
         </p>
-        <DisclaimerCard className="mt-4" />
+        <DisclaimerCard className="mt-4" expanded />
         {TERMS_LIABILITY_SECTIONS.map((p) => (
-          <TitleCollapse key={p.heading} title={p.heading} className="mt-3">
+          <TitleCollapse key={p.heading} title={p.heading} className="mt-3" defaultOpen>
             <p className="text-pretty text-sm text-muted">
               <LinkedCopy text={p.body} />
             </p>
