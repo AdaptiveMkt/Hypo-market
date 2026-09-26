@@ -17,6 +17,8 @@ export function FieldPicker({
   placeholder = "Select…",
   invalid = false,
   searchable,
+  open: openProp,
+  onOpenChange,
 }: {
   id: string;
   value: string;
@@ -25,8 +27,15 @@ export function FieldPicker({
   placeholder?: string;
   invalid?: boolean;
   searchable?: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }) {
-  const [open, setOpen] = useState(false);
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
+  const open = openProp ?? uncontrolledOpen;
+  function setOpen(next: boolean) {
+    if (openProp === undefined) setUncontrolledOpen(next);
+    onOpenChange?.(next);
+  }
   const [q, setQ] = useState("");
   const selected = options.find((o) => o.value === value);
   const useSearch = searchable ?? options.length > 10;
