@@ -351,7 +351,7 @@ export function FactFinder({
             <p className="text-base font-semibold text-navy">What is today’s value of your {step.label}?</p>
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
               <div>
-                <label className={labelClass} htmlFor={`ff-${step.key}`}>Value</label>
+                <label className={labelClass} htmlFor={`ff-${step.key}`}>{step.key === "life" ? "Cash Value Today" : "Value"}</label>
                 <StepperField id={`ff-${step.key}`} value={assets[step.key]} onChange={(v) => onAsset(step.key, v)} step={1000} min={0} prefix="$" commas blankWhenZero />
               </div>
               <div>
