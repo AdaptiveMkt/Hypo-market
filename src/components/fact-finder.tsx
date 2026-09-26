@@ -149,6 +149,11 @@ export function FactFinder({
   insuranceLocked,
   onRun,
   onOpenForm,
+  gotoStep,
+  onGotoHandled,
+  reportReady,
+  onView,
+  onPdf,
 }: {
   index: number;
   onIndex: (n: number) => void;
@@ -181,7 +186,7 @@ export function FactFinder({
   onCpi: (n: number) => void;
   claimAge: number;
   onClaimAge: (n: number) => void;
-  onConfirm2: () => void;
+  onConfirm2: () => boolean;
   section2Confirmed: boolean;
   runKinds: Record<PolicyKind, boolean>;
   designs: Record<PolicyKind, LtcPolicy>;
@@ -201,6 +206,11 @@ export function FactFinder({
   insuranceLocked: boolean;
   onRun: (only?: "traditional" | "assetBased" | "ltcAnnuity" | "hybridLife") => void;
   onOpenForm: () => void;
+  gotoStep: string;
+  onGotoHandled: () => void;
+  reportReady: boolean;
+  onView: () => void;
+  onPdf: () => void;
 }) {
   const hasCoverage = (Object.keys(runKinds) as PolicyKind[]).some((k) => runKinds[k]);
   const steps = useMemo(
@@ -220,8 +230,15 @@ export function FactFinder({
       first.current = false;
       return;
     }
+    if (done) return;
     document.getElementById("fact-finder")?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }, [safeIndex]);
+  }, [safeIndex, done]);
+  useEffect(() => {
+    if (!gotoStep) return;
+    const i = steps.findIndex((s) => s.kind === gotoStep);
+    if (i >= 0) onIndex(i);
+    onGotoHandled();
+  }, [gotoStep, steps, onIndex, onGotoHandled]);
 
   function next() {
     onIndex(Math.min(steps.length - 1, safeIndex + 1));
@@ -534,8 +551,7 @@ export function FactFinder({
               type="button"
               className={`mt-4 btn-block rounded-lg px-4 py-2.5 text-sm font-semibold ${section2Confirmed ? "bg-teal text-cream" : "bg-navy text-cream"}`}
               onClick={() => {
-                onConfirm2();
-                next();
+                if (onConfirm2()) next();
               }}
             >
               Confirm Section 2 selection
@@ -607,6 +623,12 @@ export function FactFinder({
                 Run All Selected
               </button>
             </div>
+            {reportReady ? (
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                <button type="button" onClick={onView} className="flex min-h-11 items-center justify-center rounded-lg border border-gold bg-gold px-3 py-2 text-sm font-semibold text-masthead">View all</button>
+                <button type="button" onClick={onPdf} className="flex min-h-11 items-center justify-center rounded-lg border border-navy bg-navy px-3 py-2 text-sm font-semibold text-cream">Download PDF</button>
+              </div>
+            ) : null}
             <button type="button" className="mt-3 text-sm text-navy underline" onClick={back}>Back</button>
           </>
         ) : null}

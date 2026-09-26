@@ -247,6 +247,7 @@ export function Calculator() {
   const [personalizeOpen, setPersonalizeOpen] = useState(false);
   const [finderIndex, setFinderIndex] = useState(0);
   const [finderPersonal, setFinderPersonal] = useState(false);
+  const [finderGoto, setFinderGoto] = useState("");
   const [showFullForm, setShowFullForm] = useState(false);
   const themeBeforeIncognito = useRef<"light" | "dark" | null>(null);
   const qaReady = useRef(false);
@@ -819,7 +820,7 @@ export function Calculator() {
       setSection3Open(false);
       setSection3Confirmed(false);
       setAlternativeRun(false);
-      return;
+      return false;
     }
     if (!poolShown) {
       setSection2Confirmed(false);
@@ -827,7 +828,7 @@ export function Calculator() {
         title: "Complete Section 1 first",
         body: "Select Calculate Countable Assets in Section 1 before confirming Section 2.",
       });
-      return;
+      return false;
     }
     if (ageToday < MIN_AGE_TODAY || !state || !setting || !duration) {
       setSection2Confirmed(false);
@@ -835,7 +836,7 @@ export function Calculator() {
         title: "Need more information",
         body: "Please complete age today, care state, care setting, and years of care before confirming Section 2.",
       });
-      return;
+      return false;
     }
     if (countableExHome < NAIC_LOCKOUT_ASSETS) {
       setSection3Open(false);
@@ -857,7 +858,7 @@ export function Calculator() {
           },
         ],
       });
-      return;
+      return true;
     }
     setSection3Open(true);
     setCue({
@@ -886,6 +887,7 @@ export function Calculator() {
       secondaryAction: "copay-alt",
       copayPct: protectPct,
     });
+    return true;
   }
   function confirmSection3(checked: boolean) {
     setSection3Confirmed(checked);
@@ -998,6 +1000,7 @@ export function Calculator() {
     setPersonalizeOpen(false);
     setFinderIndex(0);
     setFinderPersonal(false);
+    setFinderGoto("");
     setShowFullForm(false);
     themeBeforeIncognito.current = null;
     setTheme(true);
@@ -1218,13 +1221,20 @@ export function Calculator() {
     executeHypo();
   }
   function runHypo(only?: PolicyKind) {
+    const fromFinder = !showFullForm && finderIndex > 0;
+    const section2Ok =
+      section2Confirmed ||
+      (fromFinder && poolShown && Boolean(state) && Boolean(setting) && Boolean(duration) && ageToday >= MIN_AGE_TODAY);
+    const section3Ok = insuranceLocked || section3Confirmed || (fromFinder && poolShown);
+    if (section2Ok && !section2Confirmed) setSection2Confirmed(true);
+    if (section3Ok && !section3Confirmed) setSection3Confirmed(true);
     const missingState = !state;
     const missingSetting = !setting;
     const missingAge = ageToday < MIN_AGE_TODAY;
     const missingYears = !duration;
     const missingAssets = pool <= 0;
-    const missingSection2 = !section2Confirmed;
-    const missingSection3 = !insuranceLocked && !section3Confirmed;
+    const missingSection2 = !section2Ok;
+    const missingSection3 = !section3Ok;
     setStateNeeded(missingState);
     setSettingNeeded(missingSetting);
     setAgeNeeded(missingAge);
@@ -1245,10 +1255,26 @@ export function Calculator() {
                 : missingSection2
                   ? "section-2-confirm"
                   : "section-3-confirm";
-      window.setTimeout(() => {
-        scrollToId(id);
-        (document.getElementById(id) as HTMLElement | null)?.focus();
-      }, 50);
+      const step = missingAssets
+        ? "calculate"
+        : missingAge
+          ? "age"
+          : missingState
+            ? "state"
+            : missingSetting
+              ? "setting"
+              : missingYears
+                ? "years"
+                : missingSection2
+                  ? "confirm2"
+                  : "section3";
+      if (!showFullForm) setFinderGoto(step);
+      else {
+        window.setTimeout(() => {
+          scrollToId(id);
+          (document.getElementById(id) as HTMLElement | null)?.focus();
+        }, 50);
+      }
       const list = missingRun.length ? missingRun : ["Countable assets"];
       const join =
         list.length === 1
@@ -1268,6 +1294,8 @@ export function Calculator() {
         return { ...saved, [only]: next };
       });
       setYearKind(only);
+    } else if (!policy.enabled && Object.values(runKinds).some(Boolean)) {
+      setPolicy((p) => ({ ...p, enabled: true }));
     }
     executeHypo();
   }
@@ -1440,7 +1468,18 @@ export function Calculator() {
         insuranceLocked={insuranceLocked}
         onRun={(only) => runHypo(only)}
         onOpenForm={() => setShowFullForm(true)}
+        gotoStep={finderGoto}
+        onGotoHandled={() => setFinderGoto("")}
+        reportReady={pdfUnlocked}
+        onView={viewAllReport}
+        onPdf={requestPdfDownload}
       />
+      {pdfUnlocked ? (
+        <div className="mx-auto mt-4 grid max-w-md grid-cols-2 gap-2">
+          <button type="button" onClick={viewAllReport} className="flex min-h-11 items-center justify-center rounded-lg border border-gold bg-gold px-3 py-2 text-center text-sm font-semibold text-masthead hover:brightness-105">View all</button>
+          <button type="button" onClick={requestPdfDownload} className="flex min-h-11 items-center justify-center rounded-lg border border-navy bg-navy px-3 py-2 text-center text-sm font-semibold text-cream hover:bg-teal">Download PDF</button>
+        </div>
+      ) : null}
       {showFullForm ? (
       <>
       <section className="mt-4 card-xl min-w-0 p-4 md:p-5">
