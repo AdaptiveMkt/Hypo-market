@@ -313,7 +313,7 @@ export function recommendationsNarrative(opts: ReportOpts): string[] {
     `Confirm ${s.state} Medicaid CSRA, home-equity, income limits, QIT, and look-back rules with a qualified Medicaid or elder-care planning attorney. This model is not a determination of eligibility. See Medicaid Information for spend-down, Partnership, and solvency notes.`,
   );
   recs.push(
-    "Re-run the model when assets, health, marital status, or the state where care would be received change. Premiums vary by age, health, marital status, and state of issue.",
+    `Re-run the model when assets, health, marital status, or the state where care would be received change. ${SINGLE_PREMIUM_NOTE}`,
   );
 
   return recs;
