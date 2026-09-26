@@ -43,6 +43,7 @@ import {
   isLifetimeBenefit,
   isLinkedKind,
   linkedSingleFromPool,
+  SINGLE_PREMIUM_NOTE,
   TARGET_PREMIUM_RATE,
   LIFETIME_BENEFIT_MARK,
   LIFETIME_BENEFIT_NOTE,
@@ -2350,6 +2351,7 @@ export function Calculator() {
                           <label className={labelClass} htmlFor="single">{policy.kind === "hybridLife" ? "Death benefit" : "Single premium / deposit"}</label>
                           <StepperField id="single" value={policy.singlePremium || 0} prefix="$" step={1000} min={0} onChange={(v) => patchDesign({ singlePremium: Number(v) || 0 })} />
                         </div>
+                        <p className="text-xs leading-snug text-muted md:col-span-2">{SINGLE_PREMIUM_NOTE}</p>
                         <div>
                           <label className={labelClass} htmlFor="leverage">LTC leverage / extension</label>
                           <FieldPicker

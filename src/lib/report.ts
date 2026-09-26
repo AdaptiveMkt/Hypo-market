@@ -14,6 +14,7 @@ import {
   shortfallStart,
   targetPremium,
   TARGET_INCOME_RATE,
+  SINGLE_PREMIUM_NOTE,
   yearsPoolLasts,
   type AssetRois,
   type Assets,
@@ -220,7 +221,7 @@ export function analysisNarrative(opts: ReportOpts): string {
   }
 
   paras.push(
-    `A planning figure for discussion — not a quote — is a suggested traditional premium of ${money(premium)} per year (7% of adjusted gross household income when that income is entered; otherwise 2.5% of countable assets). Asset-based, annuity care, and hybrid life default the single premium to 2.5% of countable assets or $75,000, whichever is greater. Premiums vary by age, health, marital status, and state of issue.`,
+    `A planning figure for discussion — not a quote — is a suggested traditional premium of ${money(premium)} per year (7% of adjusted gross household income when that income is entered; otherwise 2.5% of countable assets). Asset-based, annuity care, and hybrid life default the single premium to 2.5% of countable assets or $75,000, whichever is greater. ${SINGLE_PREMIUM_NOTE}`,
   );
   paras.push(
     `Tax: there is no general federal LTC credit — only an age-capped deduction (2026: $500 to $6,200) after the 7.5% AGI medical floor if you itemize. A credit cuts tax dollar-for-dollar; a deduction only lowers taxable income. ${stateLtcTaxBreak(s.state).detail} This is not tax advice.`,

@@ -562,6 +562,9 @@ export function targetPremiumParts(countableAssets: number, annualIncome = 0) {
 
 export const LINKED_SINGLE_FLOOR = 75_000;
 
+export const SINGLE_PREMIUM_NOTE =
+  "(*) Single premium options vary on deposit amounts, benefit selections, age, health, gender, and state of issue. Contact a licensed insurance professional in your state for accurate premium and single premium calculations.";
+
 export function linkedSingleFromPool(countable: number) {
   const n = Math.max(0, Math.round(Number(countable) || 0));
   const fromAssets = n > 0 ? Math.round(n * TARGET_PREMIUM_RATE) : 0;

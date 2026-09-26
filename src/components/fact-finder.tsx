@@ -16,6 +16,7 @@ import {
   hybridFaceForMonthly,
   leverageLabel,
   monthlyFromDaily,
+  SINGLE_PREMIUM_NOTE,
   typicalBuyerHints,
   type AssetKey,
   type AssetRois,
@@ -897,6 +898,7 @@ function BenefitEditor({
               onChange={(v) => onPatch({ singlePremium: Number(v) || 0 })}
             />
           </div>
+          <p className="text-xs leading-snug text-muted sm:col-span-2">{SINGLE_PREMIUM_NOTE}</p>
           <div>
             <label className={labelClass}>LTC leverage</label>
             <FieldPicker
