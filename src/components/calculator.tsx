@@ -2806,7 +2806,7 @@ function ViewFold({
 }
 
 function MoneyField({ id, value, onChange, compact }: { id: string; value: number; onChange: (raw: string) => void; compact?: boolean }) {
-  return <StepperField id={id} value={value} onChange={onChange} step={1000} min={0} prefix="$" compact={compact} />;
+  return <StepperField id={id} value={value} onChange={onChange} step={1000} min={0} prefix="$" compact={compact} commas />;
 }
 
 const KPI_ORDER_KEY = "aum-kpi-order-v3";

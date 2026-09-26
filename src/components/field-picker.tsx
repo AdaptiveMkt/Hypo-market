@@ -180,6 +180,7 @@ export function StepperField({
   blankWhenZero = false,
   compact = false,
   attention = false,
+  commas = false,
 }: {
   id: string;
   value: number;
@@ -193,13 +194,19 @@ export function StepperField({
   blankWhenZero?: boolean;
   compact?: boolean;
   attention?: boolean;
+  commas?: boolean;
 }) {
   const shown =
     blankWhenZero && (!value || value === 0)
       ? ""
-      : decimals
-        ? Number(value || 0).toFixed(decimals)
-        : String(value || 0);
+      : commas
+        ? Number(value || 0).toLocaleString("en-US", {
+            minimumFractionDigits: decimals,
+            maximumFractionDigits: decimals,
+          })
+        : decimals
+          ? Number(value || 0).toFixed(decimals)
+          : String(value || 0);
 
   function bump(dir: 1 | -1) {
     if ((!value || value === 0) && dir > 0) {
