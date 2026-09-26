@@ -1,8 +1,25 @@
 "use client";
 
-import { useEffect, useMemo, useRef, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { FieldPicker, StepperField } from "@/components/field-picker";
-import { ASSET_FIELDS, DAILY_BENEFIT_MAX, DAILY_BENEFIT_MIN, DAILY_BENEFIT_STEP, type AssetKey, type Assets, type AssetRois } from "@/lib/calc";
+import {
+  ASSET_FIELDS,
+  DAILY_BENEFIT_MAX,
+  DAILY_BENEFIT_MIN,
+  DAILY_BENEFIT_STEP,
+  LINKED_MONTHLY_MIN,
+  LINKED_MONTHLY_STEP,
+  clampDailyBenefit,
+  dailyFromMonthly,
+  hybridFaceForMonthly,
+  leverageLabel,
+  monthlyFromDaily,
+  type AssetKey,
+  type AssetRois,
+  type Assets,
+  type LtcPolicy,
+  type PolicyKind,
+} from "@/lib/calc";
 import { SETTING_LABELS, STATE_NAMES, type CareSetting } from "@/lib/costs";
 import { money } from "@/lib/utils";
 import { TAX_RATE_GROUPS, TAX_RATE_OPTIONS } from "@/lib/tax-brackets";
@@ -24,13 +41,15 @@ type Step =
   | { kind: "years" }
   | { kind: "cpi" }
   | { kind: "claim" }
+  | { kind: "cover" }
+  | { kind: "benefits" }
   | { kind: "confirm2" }
   | { kind: "section3" }
   | { kind: "run" };
 
 const ASSET_QUESTIONS = ASSET_FIELDS.filter((f) => f.key !== "home");
 
-function stepsFor(personalized: boolean, insuranceLocked: boolean): Step[] {
+function stepsFor(personalized: boolean, insuranceLocked: boolean, hasCoverage: boolean): Step[] {
   const steps: Step[] = [{ kind: "mode" }];
   if (personalized) steps.push({ kind: "contact" });
   for (const f of ASSET_QUESTIONS) steps.push({ kind: "asset", key: f.key, label: f.label });
@@ -47,9 +66,11 @@ function stepsFor(personalized: boolean, insuranceLocked: boolean): Step[] {
     { kind: "years" },
     { kind: "cpi" },
     { kind: "claim" },
-    { kind: "confirm2" },
+    { kind: "cover" },
   );
-  if (!insuranceLocked) steps.push({ kind: "section3" });
+  if (hasCoverage) steps.push({ kind: "benefits" });
+  steps.push({ kind: "confirm2" });
+  if (!insuranceLocked && !hasCoverage) steps.push({ kind: "section3" });
   steps.push({ kind: "run" });
   return steps;
 }
@@ -64,6 +85,8 @@ function sectionOf(step: Step) {
     step.kind === "years" ||
     step.kind === "cpi" ||
     step.kind === "claim" ||
+    step.kind === "cover" ||
+    step.kind === "benefits" ||
     step.kind === "confirm2"
   ) {
     return "2. Where and when care starts";
@@ -108,6 +131,11 @@ export function FactFinder({
   onClaimAge,
   onConfirm2,
   section2Confirmed,
+  runKinds,
+  designs,
+  onToggleKind,
+  onPatchKind,
+  onConfirm3,
   dailyBenefit,
   benefitYears,
   elimDays,
@@ -117,7 +145,6 @@ export function FactFinder({
   onYears,
   onElim,
   onRider,
-  onConfirm3,
   section3Confirmed,
   insuranceLocked,
   onRun,
@@ -156,6 +183,11 @@ export function FactFinder({
   onClaimAge: (n: number) => void;
   onConfirm2: () => void;
   section2Confirmed: boolean;
+  runKinds: Record<PolicyKind, boolean>;
+  designs: Record<PolicyKind, LtcPolicy>;
+  onToggleKind: (kind: PolicyKind, on: boolean) => void;
+  onPatchKind: (kind: PolicyKind, partial: Partial<LtcPolicy>) => void;
+  onConfirm3: () => void;
   dailyBenefit: number;
   benefitYears: number;
   elimDays: number;
@@ -165,13 +197,19 @@ export function FactFinder({
   onYears: (n: number) => void;
   onElim: (n: number) => void;
   onRider: (key: string) => void;
-  onConfirm3: () => void;
   section3Confirmed: boolean;
   insuranceLocked: boolean;
   onRun: (only?: "traditional" | "assetBased" | "ltcAnnuity" | "hybridLife") => void;
   onOpenForm: () => void;
 }) {
-  const steps = useMemo(() => stepsFor(personalized, insuranceLocked), [personalized, insuranceLocked]);
+  const hasCoverage = (Object.keys(runKinds) as PolicyKind[]).some((k) => runKinds[k]);
+  const steps = useMemo(
+    () => stepsFor(personalized, insuranceLocked, hasCoverage),
+    [personalized, insuranceLocked, hasCoverage],
+  );
+  const selectedKinds = (["traditional", "assetBased", "ltcAnnuity", "hybridLife"] as PolicyKind[]).filter((k) => runKinds[k]);
+  const [benefitKind, setBenefitKind] = useState<PolicyKind>("traditional");
+  const activeBenefit = selectedKinds.includes(benefitKind) ? benefitKind : selectedKinds[0] ?? "traditional";
   const done = index >= steps.length;
   const safeIndex = Math.min(index, Math.max(0, steps.length - 1));
   const step = steps[safeIndex];
@@ -438,6 +476,56 @@ export function FactFinder({
           </>
         ) : null}
 
+        {step.kind === "cover" ? (
+          <>
+            <p className="text-base font-semibold text-navy">Which long-term care insurance designs should this run include?</p>
+            <p className="mt-1 text-sm text-muted">Select one or more. You can change the benefits for each design you select. Leave all off to run without insurance.</p>
+            <div className="mt-3 grid gap-2">
+              {(
+                [
+                  ["traditional", "Traditional LTC Insurance"],
+                  ["assetBased", "Asset Based LTC Insurance"],
+                  ["ltcAnnuity", "Annuity Care Insurance"],
+                  ["hybridLife", "Hybrid Life/LTC Insurance"],
+                ] as const
+              ).map(([kind, label]) => (
+                <label key={kind} className="flex min-h-11 cursor-pointer items-center gap-2 rounded-lg border border-line px-3 py-2 text-sm font-semibold text-navy">
+                  <input
+                    type="checkbox"
+                    className="size-4 accent-teal"
+                    checked={runKinds[kind]}
+                    onChange={(e) => onToggleKind(kind, e.target.checked)}
+                  />
+                  {label}
+                </label>
+              ))}
+            </div>
+            <Nav
+              back={back}
+              next={() => {
+                if (!hasCoverage) onConfirm3();
+                next();
+              }}
+            />
+          </>
+        ) : null}
+
+        {step.kind === "benefits" && activeBenefit ? (
+          <BenefitEditor
+            kind={activeBenefit}
+            kinds={selectedKinds}
+            onKind={setBenefitKind}
+            policy={designs[activeBenefit]}
+            riderOptions={riderOptions}
+            onPatch={(partial) => onPatchKind(activeBenefit, partial)}
+            onDone={() => {
+              onConfirm3();
+              next();
+            }}
+            back={back}
+          />
+        ) : null}
+
         {step.kind === "confirm2" ? (
           <>
             <p className="text-base font-semibold text-navy">Confirm where and when you think care might be needed.</p>
@@ -530,6 +618,205 @@ export function FactFinder({
         </button>
       </p>
     </section>
+  );
+}
+
+function BenefitEditor({
+  kind,
+  kinds,
+  onKind,
+  policy,
+  riderOptions,
+  onPatch,
+  onDone,
+  back,
+}: {
+  kind: PolicyKind;
+  kinds: PolicyKind[];
+  onKind: (kind: PolicyKind) => void;
+  policy: LtcPolicy;
+  riderOptions: { key: string; label: string }[];
+  onPatch: (partial: Partial<LtcPolicy>) => void;
+  onDone: () => void;
+  back: () => void;
+}) {
+  const labels: Record<PolicyKind, string> = {
+    traditional: "Traditional LTC Insurance",
+    assetBased: "Asset Based LTC Insurance",
+    ltcAnnuity: "Annuity Care Insurance",
+    hybridLife: "Hybrid Life/LTC Insurance",
+  };
+  const inflation =
+    policy.benefitInflationPct <= 0 || policy.inflationMethod === "none"
+      ? "none"
+      : `${policy.benefitInflationPct}-${policy.inflationMethod}`;
+  return (
+    <>
+      <p className="text-base font-semibold text-navy">Adjust the benefits for each design you selected.</p>
+      <div className="mt-3 flex gap-1 overflow-x-auto" role="tablist">
+        {kinds.map((k) => (
+          <button
+            key={k}
+            type="button"
+            role="tab"
+            aria-selected={k === kind}
+            className={`shrink-0 whitespace-nowrap rounded-t-lg px-3 py-2 text-sm font-semibold ${k === kind ? "bg-navy text-cream" : "border border-line text-navy"}`}
+            onClick={() => onKind(k)}
+          >
+            {labels[k]}
+          </button>
+        ))}
+      </div>
+      {kind === "traditional" ? (
+        <div className="mt-3 grid gap-3 sm:grid-cols-2">
+          <div>
+            <label className={labelClass}>Daily benefit</label>
+            <StepperField
+              id="ff-kind-daily"
+              value={policy.dailyBenefit}
+              prefix="$"
+              commas
+              step={DAILY_BENEFIT_STEP}
+              min={DAILY_BENEFIT_MIN}
+              max={DAILY_BENEFIT_MAX}
+              onChange={(v) => {
+                const n = clampDailyBenefit(Number(v));
+                onPatch({ dailyBenefit: n, monthlyBenefit: monthlyFromDaily(n) });
+              }}
+            />
+          </div>
+          <div>
+            <label className={labelClass}>Benefit period</label>
+            <FieldPicker
+              id="ff-kind-years"
+              value={String(policy.benefitYears)}
+              options={[
+                ...[3, 4, 5, 6, 8, 10].map((y) => ({ value: String(y), label: `${y} years` })),
+                { value: "99", label: "Lifetime *" },
+              ]}
+              onChange={(v) => onPatch({ benefitYears: Number(v) })}
+            />
+          </div>
+          <div>
+            <label className={labelClass}>Elimination period</label>
+            <FieldPicker
+              id="ff-kind-elim"
+              value={String(policy.elimDays)}
+              options={[0, 20, 30, 60, 90, 100, 180].map((d) => ({ value: String(d), label: `${d} days` }))}
+              onChange={(v) => onPatch({ elimDays: Number(v) })}
+            />
+          </div>
+          <div>
+            <label className={labelClass}>Benefit increase</label>
+            <FieldPicker
+              id="ff-kind-rider"
+              value={inflation}
+              options={riderOptions.map((o) => ({ value: o.key, label: o.label }))}
+              onChange={(v) => {
+                const found = riderOptions.find((o) => o.key === v);
+                if (!found) return;
+                const [pct, method] = found.key === "none" ? [0, "none" as const] : found.key.split("-");
+                onPatch({
+                  benefitInflationPct: found.key === "none" ? 0 : Number(pct),
+                  inflationMethod: found.key === "none" ? "none" : (method as LtcPolicy["inflationMethod"]),
+                });
+              }}
+            />
+          </div>
+          <div className="sm:col-span-2">
+            <label className={labelClass}>Annual premium</label>
+            <StepperField
+              id="ff-kind-premium"
+              value={policy.annualPremium || 0}
+              prefix="$"
+              commas
+              step={100}
+              min={0}
+              blankWhenZero
+              onChange={(v) => onPatch({ annualPremium: Number(v) || 0 })}
+            />
+          </div>
+        </div>
+      ) : (
+        <div className="mt-3 grid gap-3 sm:grid-cols-2">
+          <div>
+            <label className={labelClass}>{kind === "hybridLife" ? "Death benefit" : "Single premium / deposit"}</label>
+            <StepperField
+              id="ff-kind-single"
+              value={policy.singlePremium || 0}
+              prefix="$"
+              commas
+              step={1000}
+              min={0}
+              onChange={(v) => onPatch({ singlePremium: Number(v) || 0 })}
+            />
+          </div>
+          <div>
+            <label className={labelClass}>LTC leverage</label>
+            <FieldPicker
+              id="ff-kind-lev"
+              value={String(policy.leverage || 1)}
+              options={[1, 2, 3, 4].map((n) => ({ value: String(n), label: leverageLabel(n) }))}
+              onChange={(v) => onPatch({ leverage: Number(v) || 1 })}
+            />
+          </div>
+          <div>
+            <label className={labelClass}>Monthly benefit</label>
+            <StepperField
+              id="ff-kind-monthly"
+              value={Math.max(LINKED_MONTHLY_MIN, policy.monthlyBenefit || 0)}
+              prefix="$"
+              commas
+              step={LINKED_MONTHLY_STEP}
+              min={LINKED_MONTHLY_MIN}
+              onChange={(v) => {
+                const raw = Number(v) || 0;
+                const m = Math.max(LINKED_MONTHLY_MIN, Math.round(raw / LINKED_MONTHLY_STEP) * LINKED_MONTHLY_STEP);
+                onPatch({
+                  monthlyBenefit: m,
+                  dailyBenefit: dailyFromMonthly(m),
+                  singlePremium: kind === "hybridLife" ? hybridFaceForMonthly(m) : policy.singlePremium,
+                });
+              }}
+            />
+          </div>
+          <div>
+            <label className={labelClass}>Elimination period</label>
+            <FieldPicker
+              id="ff-kind-elim-h"
+              value={String(policy.elimDays)}
+              options={[0, 20, 30, 60, 90, 100, 180].map((d) => ({ value: String(d), label: `${d} days` }))}
+              onChange={(v) => onPatch({ elimDays: Number(v) })}
+            />
+          </div>
+          <div className="sm:col-span-2">
+            <label className={labelClass}>Benefit increase</label>
+            <FieldPicker
+              id="ff-kind-rider-h"
+              value={inflation}
+              options={riderOptions.map((o) => ({ value: o.key, label: o.label }))}
+              onChange={(v) => {
+                const found = riderOptions.find((o) => o.key === v);
+                if (!found) return;
+                const method = found.key === "none" ? "none" : found.key.split("-")[1];
+                onPatch({
+                  benefitInflationPct: found.key === "none" ? 0 : Number(found.key.split("-")[0]),
+                  inflationMethod: method as LtcPolicy["inflationMethod"],
+                });
+              }}
+            />
+          </div>
+        </div>
+      )}
+      <div className="mt-4 flex gap-2">
+        <button type="button" className="rounded-lg border border-navy px-4 py-2 text-sm font-semibold text-navy" onClick={back}>
+          Back
+        </button>
+        <button type="button" className="rounded-lg bg-teal px-4 py-2 text-sm font-semibold text-cream" onClick={onDone}>
+          Use these benefits
+        </button>
+      </div>
+    </>
   );
 }
 

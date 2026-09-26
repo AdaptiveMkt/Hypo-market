@@ -810,6 +810,34 @@ export function Calculator() {
     const stored = kind === policy.kind ? policy : kindBook[kind];
     return { ...stored, enabled: true, kind };
   }
+  function toggleRunKind(kind: PolicyKind, on: boolean) {
+    const nextFlags = { ...runKinds, [kind]: on };
+    setRunKinds(nextFlags);
+    if (!on) {
+      if (!Object.values(nextFlags).some(Boolean)) setPolicy((p) => ({ ...p, enabled: false }));
+      return;
+    }
+    const nextPolicy = { ...policyForKind(kind), kind, enabled: true };
+    setKindBook((book) => ({
+      ...book,
+      [policy.kind]: { ...policy, kind: policy.kind },
+      [kind]: nextPolicy,
+    }));
+    setPolicy(nextPolicy);
+    setYearKind(kind);
+  }
+  function patchKind(kind: PolicyKind, partial: Partial<LtcPolicy>) {
+    setDesignTouched(true);
+    const nextPolicy = { ...policyForKind(kind), ...partial, kind, enabled: true };
+    setKindBook((book) => ({
+      ...book,
+      [policy.kind]: kind === policy.kind ? nextPolicy : { ...policy, kind: policy.kind },
+      [kind]: nextPolicy,
+    }));
+    setPolicy(nextPolicy);
+    setYearKind(kind);
+    setRunKinds((flags) => ({ ...flags, [kind]: true }));
+  }
   function patchDesign(partial: Partial<LtcPolicy>) {
     setDesignTouched(true);
     patchPolicy(partial);
@@ -1281,6 +1309,15 @@ export function Calculator() {
         }}
         onConfirm2={() => confirmSection2(true)}
         section2Confirmed={section2Confirmed}
+        runKinds={runKinds}
+        designs={{
+          traditional: policyForKind("traditional"),
+          assetBased: policyForKind("assetBased"),
+          ltcAnnuity: policyForKind("ltcAnnuity"),
+          hybridLife: policyForKind("hybridLife"),
+        }}
+        onToggleKind={toggleRunKind}
+        onPatchKind={patchKind}
         dailyBenefit={policy.dailyBenefit}
         benefitYears={policy.benefitYears}
         elimDays={policy.elimDays}
