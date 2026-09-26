@@ -236,18 +236,20 @@ function Section1CueBody({
       : `You did not elect to exempt the primary residence from countable assets. No home equity was entered.`;
   return (
     <>
-      Great, you have completed Section 1, and based on your input, your countable assets are {money(pool)}
+      <p>
+        Great, you have completed Section 1, and based on your input, your countable assets are {money(pool)}. {homeNote} Now
+        let's proceed to Section 2, where you can let us know where and when you think you might need care. This is
+        subjective, but will help in the preparation of this hypothetical report.
+      </p>
       {band ? (
-        <>
-          {" "}
+        <p className="mt-3 text-sm text-muted">
+          * Buyer age bracket for this run: ages {band.label}, {band.share} of 2024 stand-alone buyers. Source:{" "}
           <a className="source-link" href={SRC.millimanSurvey2025} target="_blank" rel="noopener noreferrer">
-            * (ages {band.label}, {band.share} of buyers)
+            2025 Milliman LTCI Survey
           </a>
-        </>
-      ) : (
-        " *"
-      )}
-      . {homeNote} Now let's proceed to Section 2, where you can let us know where and when you think you might need care. This is subjective, but will help in the preparation of this hypothetical report.
+          . That source describes who bought coverage. It is not the source of the {money(pool)} total.
+        </p>
+      ) : null}
     </>
   );
 }
