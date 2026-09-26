@@ -971,7 +971,7 @@ export function Calculator() {
     setCue({
       title: "Industry averages for your age",
       body: section2IndustryMessage(ageToday),
-      note: "The daily amount, 3-year period, and 90-day wait follow the overall 2024 stand-alone sales mix in the 2025 Milliman LTCI Survey: average monthly maximum about $5,428 (about $178 a day, shown here in $10 steps), a 3-year period on 55.1% of sales, and an 84–100 day wait on 89.8%. Milliman does not publish that mix inside each 5-year age band. 3% compound is this model’s planning default under age 76 because it has no future-purchase-option field. Most 2024 sales used an FPO. Among automatic increases, 3% compound was 17.4%. Not a quote.",
+      note: "The daily amount, 3-year period, and 90-day wait follow the overall 2024 stand-alone sales mix in the 2025 Milliman LTCI Survey: average monthly maximum about $5,428 (about $178 a day, shown here in $10 steps), a 3-year period on 55.1% of sales, and an 84–100 day wait on 89.8%. Milliman does not publish that mix inside each 5-year age band. 3% compound is this model’s planning default under age 76 because it has no future-purchase-option field. Most 2024 sales used an FPO. Not a quote.",
       callout: agiTargetSentence(annualIncome),
       links: [
         {
