@@ -212,16 +212,18 @@ export function PdfReadyDialog({
   open,
   filename,
   url,
+  pages,
   note,
   onContinue,
 }: {
   open: boolean;
   filename: string;
   url: string;
+  pages: string[];
   note?: string;
   onContinue: () => void;
 }) {
-  const [viewing, setViewing] = useState(false);
+  const [viewing, setViewing] = useState(true);
   const [full, setFull] = useState(false);
   const stageRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -300,7 +302,7 @@ export function PdfReadyDialog({
           {filename}
         </p>
         {note && !viewing ? <p className="mt-2 text-sm text-navy">{note}</p> : null}
-        {viewing && !full ? <PdfPageView url={url} fill /> : null}
+        {viewing && !full ? <PdfPageView pages={pages} fill /> : null}
         <div className={`shrink-0 stack-actions ${viewing ? "mt-2 grid grid-cols-2" : "mt-4"}`}>
           <button
             type="button"
@@ -350,7 +352,7 @@ export function PdfReadyDialog({
               Exit full screen
             </button>
           </div>
-          <PdfPageView url={url} fill />
+          <PdfPageView pages={pages} fill />
         </div>
       ) : null}
     </div>

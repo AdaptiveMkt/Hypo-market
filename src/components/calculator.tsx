@@ -246,6 +246,7 @@ export function Calculator() {
   const [pdfReady, setPdfReady] = useState<{
     filename: string;
     url: string;
+    pages: string[];
     note: string;
     next: "contact" | "done";
   } | null>(null);
@@ -961,7 +962,7 @@ export function Calculator() {
             note = "Save the PDF on this computer. It was not emailed — no advisor email on this run.";
             next = "contact";
           }
-          setPdfReady({ filename: file.filename, url: file.url, note, next });
+          setPdfReady({ filename: file.filename, url: file.url, pages: file.previews, note, next });
           setSaveMsg("PDF is ready. Save it to this computer.");
         })
         .catch((err) => {
@@ -2667,6 +2668,7 @@ export function Calculator() {
           open
           filename={pdfReady.filename}
           url={pdfReady.url}
+          pages={pdfReady.pages}
           note={pdfReady.note}
           onContinue={() => {
             const next = pdfReady.next;

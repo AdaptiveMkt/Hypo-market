@@ -319,6 +319,7 @@ function drawStrip(
   y: number,
   w: number,
   h: number,
+  preview?: PagePreview,
 ) {
   const sliceH = Math.max(1, end - start);
   const pageCanvas = document.createElement("canvas");
@@ -330,6 +331,45 @@ function drawStrip(
   ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
   ctx.drawImage(canvas, 0, start, canvas.width, sliceH, 0, 0, canvas.width, sliceH);
   pdf.addImage(pageCanvas.toDataURL("image/jpeg", 0.92), "JPEG", x, y, w, h);
+  if (preview) {
+    const sx = preview.canvas.width / preview.pageW;
+    const sy = preview.canvas.height / preview.pageH;
+    preview.ctx.drawImage(pageCanvas, x * sx, y * sy, w * sx, h * sy);
+    preview.dirty = true;
+  }
+}
+
+type PagePreview = {
+  canvas: HTMLCanvasElement;
+  ctx: CanvasRenderingContext2D;
+  shots: string[];
+  pageW: number;
+  pageH: number;
+  dirty: boolean;
+};
+
+function createPagePreview(pageW: number, pageH: number): PagePreview | null {
+  const canvas = document.createElement("canvas");
+  const scale = 860 / pageW;
+  canvas.width = Math.round(pageW * scale);
+  canvas.height = Math.round(pageH * scale);
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return null;
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  return { canvas, ctx, shots: [], pageW, pageH, dirty: false };
+}
+
+function commitPagePreview(preview: PagePreview) {
+  if (!preview.dirty) return;
+  try {
+    preview.shots.push(preview.canvas.toDataURL("image/jpeg", 0.72));
+  } catch {
+    /* A phone can refuse a huge canvas. Keep the PDF even if this page image fails. */
+  }
+  preview.ctx.fillStyle = "#ffffff";
+  preview.ctx.fillRect(0, 0, preview.canvas.width, preview.canvas.height);
+  preview.dirty = false;
 }
 
 const PDF_LIGHT_VARS: Record<string, string> = {
@@ -528,6 +568,7 @@ function addCanvasPages(
   state: { y: number; started: boolean },
   keep = false,
   spans: Array<[number, number]> = [],
+  preview?: PagePreview | null,
 ) {
   const pageW = pdf.internal.pageSize.getWidth();
   const pageH = pdf.internal.pageSize.getHeight();
@@ -537,6 +578,7 @@ function addCanvasPages(
   const blockH = canvas.height * pxToPt;
   const remaining = () => CONTENT_TOP + usableH - state.y;
   const newPage = () => {
+    if (preview) commitPagePreview(preview);
     if (state.started) pdf.addPage();
     state.started = true;
     state.y = CONTENT_TOP;
@@ -568,7 +610,7 @@ function addCanvasPages(
       }
     }
     const h = Math.max(1, sliceEnd - cursor) * pxToPt;
-    drawStrip(pdf, canvas, cursor, sliceEnd, BASE_MARGIN, state.y, usableW, h);
+    drawStrip(pdf, canvas, cursor, sliceEnd, BASE_MARGIN, state.y, usableW, h, preview ?? undefined);
     state.y += h + GAP;
     cursor = sliceEnd;
     if (cursor < canvas.height - 2) newPage();
@@ -579,7 +621,7 @@ function addCanvasPages(
 export async function downloadReportPdf(
   filename: string,
   onProgress?: (msg: string) => void,
-): Promise<{ filename: string; base64: string; blob: Blob; url: string }> {
+): Promise<{ filename: string; base64: string; blob: Blob; url: string; previews: string[] }> {
   const root = await waitForReport();
   try {
     await document.fonts?.ready;
@@ -638,6 +680,7 @@ export async function downloadReportPdf(
 
     const pdf = new jsPDF({ unit: "pt", format: "letter", compress: true });
     const state = { y: CONTENT_TOP, started: false };
+    const preview = createPagePreview(pdf.internal.pageSize.getWidth(), pdf.internal.pageSize.getHeight());
 
     let captured = 0;
     for (let i = 0; i < blocks.length; i++) {
@@ -652,9 +695,11 @@ export async function downloadReportPdf(
             state,
             keep,
             cardSpans(blocks[i], part.scale, part.cssTop),
+            preview,
           );
         }
         if (blocks[i].dataset.pdfBreakAfter === "1" && state.started && state.y > CONTENT_TOP + 8) {
+          if (preview) commitPagePreview(preview);
           pdf.addPage();
           state.y = CONTENT_TOP;
         }
@@ -665,12 +710,13 @@ export async function downloadReportPdf(
     }
     if (!captured) throw new Error("No section could be drawn. Try Client sitting, then download again.");
 
+    if (preview) commitPagePreview(preview);
     stampPageNumbers(pdf);
 
     const blob = pdf.output("blob") as Blob;
     const url = savePdfBlob(blob, filename);
     const base64 = await blobToPdfBase64(blob);
-    return { filename, base64, blob, url };
+    return { filename, base64, blob, url, previews: preview?.shots ?? [] };
   } finally {
     restoreAccordions();
     document.documentElement.classList.remove("pdf-capture");

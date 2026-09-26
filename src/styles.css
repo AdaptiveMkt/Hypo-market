@@ -168,7 +168,7 @@ html.dark {
     height: auto;
   }
 
-  canvas.pdf-page-canvas {
+  img.pdf-page-shot {
     max-width: none !important;
     height: auto !important;
   }
@@ -215,6 +215,10 @@ html.dark {
     border-color: var(--color-gold);
     background: var(--color-gold);
     color: var(--color-masthead);
+  }
+
+  .pdf-view-bar button:disabled {
+    opacity: 0.4;
   }
 
   .pdf-view-bar span {
