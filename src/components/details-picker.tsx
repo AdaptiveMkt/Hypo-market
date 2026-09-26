@@ -31,6 +31,7 @@ export function DetailsPicker({
   hint,
   className = "mb-6 card px-4 py-3",
   showReciprocity = false,
+  onDownload,
 }: {
   details: DetailFlags;
   onChange: (next: DetailFlags) => void;
@@ -41,6 +42,7 @@ export function DetailsPicker({
   hint?: string;
   className?: string;
   showReciprocity?: boolean;
+  onDownload?: () => void;
 }) {
   const full = allDetailsOn(details);
   const sitting = isClientSitting(details);
@@ -121,6 +123,15 @@ export function DetailsPicker({
           >
             Deselect all
           </button>
+          {onDownload ? (
+            <button
+              type="button"
+              className="min-h-11 rounded-lg border border-gold bg-gold px-4 text-sm font-semibold text-masthead hover:brightness-105"
+              onClick={onDownload}
+            >
+              Download PDF and save to this computer
+            </button>
+          ) : null}
         </div>
         <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-muted">
           Optional sections — expand only if selected
@@ -273,6 +284,7 @@ export function PdfSectionsDialog({
           heading="Optional sections"
           hint={`${selected} of ${DETAIL_SECTIONS.length} will appear in the PDF.`}
           className="mt-4 card px-4 py-3"
+          onDownload={onConfirm}
         />
         <div className="mt-4 stack-actions md:grid-cols-3">
           <button
