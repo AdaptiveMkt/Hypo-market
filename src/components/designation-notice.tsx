@@ -13,9 +13,9 @@ export function DesignationNotice({
   const text = designationNonEndorsement(names);
   if (!text) return null;
   return (
-    <span className={`${className} block text-sm font-bold amt-red`}>
+    <p className={`${className} block w-full max-w-none text-sm font-bold leading-snug amt-red`}>
       {text}
-    </span>
+    </p>
   );
 }
 

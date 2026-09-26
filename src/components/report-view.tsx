@@ -539,7 +539,6 @@ export function ReportView({
                   </p>
                   <p className="mt-1 font-semibold text-navy">{advisor.name || "—"}</p>
                   {advisor.designation ? <p>{advisor.designation}</p> : null}
-                  <DesignationNoticeFold className="mt-2" />
                   {advisor.firm ? <p>{advisor.firm}</p> : null}
                   {advisor.address ? <p>{advisor.address}</p> : null}
                   <p>{[advisor.state, advisor.zip].filter(Boolean).join(" ")}</p>
@@ -548,6 +547,9 @@ export function ReportView({
                   <AdvisorProfessionalFolds />
                 </div>
               ) : null}
+              <div className="min-w-0 sm:col-span-2">
+                <DesignationNoticeFold className="mt-0 w-full max-w-none" />
+              </div>
             </div>
           </section>
         ) : null}
