@@ -95,28 +95,30 @@ export function PdfPageView({ url, fill = false }: { url: string; fill?: boolean
   }, [page, pages, zoom, width]);
 
   return (
-    <div className={`flex min-h-0 flex-col overflow-hidden rounded-lg border border-line bg-paper ${fill ? "h-full flex-1" : "mt-3"}`}>
-      <div className="flex shrink-0 flex-wrap items-center justify-center gap-2 border-b border-line bg-cream px-2 py-2">
-        <button type="button" className="shrink-0 whitespace-nowrap rounded-lg border border-navy px-3 py-2 text-sm font-semibold text-navy disabled:opacity-40" disabled={page <= 1} onClick={() => setPage((n) => Math.max(1, n - 1))}>
-          Previous
-        </button>
-        <span className="min-w-24 shrink-0 text-center text-sm font-semibold text-navy">
-          {pages ? `Page ${page} of ${pages}` : "Opening…"}
-        </span>
-        <button type="button" className="shrink-0 whitespace-nowrap rounded-lg border border-navy px-3 py-2 text-sm font-semibold text-navy disabled:opacity-40" disabled={!pages || page >= pages} onClick={() => setPage((n) => Math.min(pages, n + 1))}>
-          Next
-        </button>
-        <button type="button" className="shrink-0 whitespace-nowrap rounded-lg border border-gold px-3 py-2 text-sm font-semibold text-navy" onClick={() => setZoom((z) => Math.max(0.6, Math.round((z - 0.2) * 10) / 10))}>
-          Zoom out
-        </button>
-        <button type="button" className="shrink-0 whitespace-nowrap rounded-lg border border-gold bg-gold px-3 py-2 text-sm font-semibold text-masthead" onClick={() => setZoom(1)}>
-          Fit width
-        </button>
-        <button type="button" className="shrink-0 whitespace-nowrap rounded-lg border border-gold px-3 py-2 text-sm font-semibold text-navy" onClick={() => setZoom((z) => Math.min(2.4, Math.round((z + 0.2) * 10) / 10))}>
-          Zoom in
-        </button>
+    <div className={`flex min-h-0 flex-col overflow-hidden rounded-lg border border-line bg-paper ${fill ? "h-full min-h-0 flex-1" : "mt-3"}`}>
+      <div className="pdf-view-bar shrink-0" role="toolbar" aria-label="PDF page and zoom">
+        <div className="pdf-view-bar-row">
+          <button type="button" aria-label="Previous page" disabled={page <= 1} onClick={() => setPage((n) => Math.max(1, n - 1))}>
+            Prev
+          </button>
+          <span>{pages ? `${page} / ${pages}` : "…"}</span>
+          <button type="button" aria-label="Next page" disabled={!pages || page >= pages} onClick={() => setPage((n) => Math.min(pages, n + 1))}>
+            Next
+          </button>
+        </div>
+        <div className="pdf-view-bar-row">
+          <button type="button" aria-label="Zoom out" onClick={() => setZoom((z) => Math.max(0.6, Math.round((z - 0.25) * 100) / 100))}>
+            −
+          </button>
+          <button type="button" className="border-gold bg-gold text-masthead" aria-label="Fit page to width" onClick={() => setZoom(1)}>
+            Fit {Math.round(zoom * 100)}%
+          </button>
+          <button type="button" aria-label="Zoom in" onClick={() => setZoom((z) => Math.min(2.5, Math.round((z + 0.25) * 100) / 100))}>
+            +
+          </button>
+        </div>
       </div>
-      <div ref={wrapRef} className={`overflow-auto bg-white ${fill ? "min-h-0 flex-1" : "max-h-[70vh]"}`}>
+      <div ref={wrapRef} className={`min-h-0 overflow-auto bg-white ${fill ? "flex-1" : "h-[48vh] sm:h-[62vh]"}`}>
         {error ? <p className="p-4 text-sm font-semibold text-deplete">{error}</p> : null}
         <canvas ref={canvasRef} className="pdf-page-canvas mx-auto my-2 block bg-white" />
       </div>

@@ -272,30 +272,36 @@ export function PdfReadyDialog({
 
   return (
     <div
-      className="fixed inset-0 z-[70] flex items-start justify-center overflow-y-auto bg-navy/55 p-3 pt-10 sm:p-4 sm:pt-16"
+      className={`fixed inset-0 z-[70] flex justify-center bg-navy/55 ${
+        viewing
+          ? "items-stretch overflow-hidden p-2 pt-[max(0.5rem,env(safe-area-inset-top))]"
+          : "items-start overflow-y-auto p-3 pt-10 sm:p-4 sm:pt-16"
+      }`}
       role="dialog"
       aria-modal="true"
       aria-labelledby="pdf-ready-title"
     >
       <div
-        className={`card-xl w-full bg-paper p-4 shadow-[var(--shadow-card)] md:p-5 ${
-          viewing || full ? "max-w-4xl" : "max-w-lg"
+        className={`card-xl flex w-full flex-col bg-paper p-3 shadow-[var(--shadow-card)] sm:p-5 ${
+          viewing ? "h-full max-h-full min-h-0 max-w-4xl" : "max-w-lg"
         }`}
       >
-        <h2 id="pdf-ready-title" className="font-display text-xl text-navy">
+        <h2 id="pdf-ready-title" className="shrink-0 font-display text-xl text-navy">
           Your PDF is ready
         </h2>
-        <p className="mt-2 text-sm text-muted">
-          Nothing is downloaded until you choose Save PDF to this computer. Open PDF
-          shows the pages here on phone and desktop — same readable pages, not a blank
-          frame.
-        </p>
-        <p className="mt-3 break-all rounded-lg border border-teal/40 bg-cream/40 px-3 py-2 text-sm text-navy">
+        {viewing ? null : (
+          <p className="mt-2 text-sm text-muted">
+            Nothing is downloaded until you choose Save PDF to this computer. Open PDF
+            shows the pages here on phone and desktop — same readable pages, not a blank
+            frame.
+          </p>
+        )}
+        <p className="mt-2 shrink-0 truncate rounded-lg border border-teal/40 bg-cream/40 px-3 py-2 text-sm text-navy">
           {filename}
         </p>
-        {note ? <p className="mt-2 text-sm text-navy">{note}</p> : null}
-        {viewing ? <PdfPageView url={url} /> : null}
-        <div className="mt-4 stack-actions">
+        {note && !viewing ? <p className="mt-2 text-sm text-navy">{note}</p> : null}
+        {viewing && !full ? <PdfPageView url={url} fill /> : null}
+        <div className={`shrink-0 stack-actions ${viewing ? "mt-2 grid grid-cols-2" : "mt-4"}`}>
           <button
             type="button"
             className="btn-block rounded-lg border border-gold bg-gold text-center text-masthead hover:brightness-105"
