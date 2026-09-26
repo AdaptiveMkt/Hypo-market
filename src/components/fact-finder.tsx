@@ -289,7 +289,7 @@ export function FactFinder({
               <button type="button" className="btn-block rounded-lg border border-navy bg-navy px-3 py-2.5 text-sm font-semibold text-cream" onClick={() => { onPersonalized(true); next(); }}>
                 Personalize
               </button>
-              <button type="button" className="btn-block rounded-lg bg-black px-3 py-2.5 text-sm font-semibold text-white" onClick={() => { onPersonalized(false); next(); }}>
+              <button type="button" className="btn-block rounded-lg bg-teal px-3 py-2.5 text-sm font-semibold text-cream" onClick={() => { onPersonalized(false); next(); }}>
                 Incognito
               </button>
             </div>

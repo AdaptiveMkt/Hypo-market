@@ -1583,7 +1583,7 @@ export function Calculator() {
           extra={
             <button
               type="button"
-              className="inline-flex min-h-11 shrink-0 items-center justify-center whitespace-nowrap rounded-lg bg-black px-4 text-sm font-semibold text-white hover:bg-neutral-900"
+              className="inline-flex min-h-11 shrink-0 items-center justify-center whitespace-nowrap rounded-lg bg-teal px-4 text-sm font-semibold text-cream hover:brightness-110"
               aria-pressed={!personalizeOpen}
               aria-controls="personalize-asset-model"
               aria-label={personalizeOpen ? "Incognito Mode" : "Customize In Daylight Mode"}
