@@ -6,6 +6,7 @@ import { ASSET_FIELDS, DAILY_BENEFIT_MAX, DAILY_BENEFIT_MIN, DAILY_BENEFIT_STEP,
 import { SETTING_LABELS, STATE_NAMES, type CareSetting } from "@/lib/costs";
 import { money } from "@/lib/utils";
 import { TAX_RATE_GROUPS, TAX_RATE_OPTIONS } from "@/lib/tax-brackets";
+import { SRC } from "@/lib/sources";
 
 type Step =
   | { kind: "mode" }
@@ -370,8 +371,14 @@ export function FactFinder({
 
         {step.kind === "issue" ? (
           <>
-            <p className="text-base font-semibold text-navy">In what state would an insurance policy be issued?</p>
-            <p className="mt-1 text-xs text-muted">Leave this as the care state unless the policy would be issued somewhere else.</p>
+            <p className="text-base font-semibold text-navy">If insurance is to be considered, what state would the insurance become effective?</p>
+            <p className="mt-1 text-xs text-muted">
+              (* See{" "}
+              <a className="source-link" href={SRC.ltcPartnership} target="_blank" rel="noopener noreferrer">
+                reciprocity rules
+              </a>
+              )
+            </p>
             <div className="mt-3">
               <FieldPicker id="ff-issue" value={issueState || state} options={STATE_NAMES.map((s) => ({ value: s, label: s }))} onChange={onIssueState} />
             </div>
