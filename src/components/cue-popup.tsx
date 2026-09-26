@@ -166,7 +166,7 @@ export function CuePopup({
                 ref={closeRef}
                 type="button"
                 onClick={cue.applyOnClose ? closeAndUse : closeOnly}
-                className="inline-flex min-h-11 w-full items-center justify-center rounded-lg border border-navy bg-navy px-4 text-sm font-semibold text-cream hover:bg-teal"
+                className="inline-flex min-h-11 w-full items-center justify-center rounded-lg border border-navy bg-white px-4 text-sm font-semibold text-navy hover:bg-cream"
               >
                 {cue.closeLabel ?? "Close"}
               </button>

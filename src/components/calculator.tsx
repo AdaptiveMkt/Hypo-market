@@ -230,7 +230,7 @@ export function Calculator() {
   const [claimAgeTouched, setClaimAgeTouched] = useState(false);
   const delay = ageToday >= MIN_AGE_TODAY ? yearsUntilClaim(ageToday, claimAge) : 0;
   const buyerHints = ageToday >= MIN_AGE_TODAY ? typicalBuyerHints(ageToday) : null;
-  const [duration, setDuration] = useState(0);
+  const [duration, setDuration] = useState(10);
   const [taxRate, setTaxRate] = useState(DEFAULT_TAX_RATE);
   const [annualIncome, setAnnualIncome] = useState(0);
   const [saveMsg, setSaveMsg] = useState("");
@@ -766,6 +766,8 @@ export function Calculator() {
         },
       ],
       actionHint: "* Select these benefits for insurance run.",
+      closeLabel: "Keep Options",
+      applyOnClose: true,
       actionLabel: "Use this Options",
       action: "industry",
       secondaryLabel: `RUN ${protectPct}% Co-Pay ALTERNATIVE`,
@@ -836,7 +838,7 @@ export function Calculator() {
     setAlternativeRun(false);
     setClaimAge(AALTCI_MEAN_CLAIM_AGE);
     setClaimAgeTouched(false);
-    setDuration(0);
+    setDuration(10);
     setProtectPct(DEFAULT_PROTECT_PCT);
     setTaxRate(DEFAULT_TAX_RATE);
     setAnnualIncome(0);
