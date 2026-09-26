@@ -38,6 +38,7 @@ export function usePhoneLayout() {
 export function WelcomeVideo() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [caption, setCaption] = useState("");
+  const [sound, setSound] = useState<"starting" | "on" | "tap">("starting");
 
   function syncCaption() {
     const t = videoRef.current?.currentTime ?? 0;
@@ -48,24 +49,67 @@ export function WelcomeVideo() {
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
-    let stopped = false;
-    const startWithSound = () => {
-      if (stopped) return;
+    let dead = false;
+    let dropGesture = () => {};
+    v.playsInline = true;
+    v.setAttribute("playsinline", "");
+    v.setAttribute("webkit-playsinline", "true");
+    v.preload = "auto";
+    v.volume = 1;
+    v.muted = true;
+
+    const clearGesture = () => {
+      dropGesture();
+      dropGesture = () => {};
+    };
+    const armGesture = () => {
+      const go = () => {
+        if (dead) return;
+        v.muted = false;
+        v.volume = 1;
+        void v.play().then(() => {
+          if (!dead) setSound(v.muted ? "tap" : "on");
+        }).catch(() => {
+          if (!dead) setSound("tap");
+        });
+        clearGesture();
+      };
+      window.addEventListener("pointerdown", go);
+      window.addEventListener("touchend", go);
+      window.addEventListener("keydown", go);
+      dropGesture = () => {
+        window.removeEventListener("pointerdown", go);
+        window.removeEventListener("touchend", go);
+        window.removeEventListener("keydown", go);
+      };
+    };
+
+    void v.play().then(() => {
+      if (dead) return;
       v.muted = false;
       v.volume = 1;
-      void v.play().catch(() => {});
-    };
-    v.muted = false;
-    v.volume = 1;
-    const unlock = () => startWithSound();
-    void v.play().catch(() => {
-      window.addEventListener("pointerdown", unlock, { once: true });
-      window.addEventListener("keydown", unlock, { once: true });
+      if (!v.paused && !v.muted) {
+        setSound("on");
+        return;
+      }
+      return v.play();
+    }).then(() => {
+      if (dead || sound === "on") return;
+      if (v.paused || v.muted) {
+        setSound("tap");
+        armGesture();
+      } else {
+        setSound("on");
+      }
+    }).catch(() => {
+      if (dead) return;
+      setSound("tap");
+      armGesture();
     });
+
     return () => {
-      stopped = true;
-      window.removeEventListener("pointerdown", unlock);
-      window.removeEventListener("keydown", unlock);
+      dead = true;
+      clearGesture();
       v.pause();
     };
   }, []);
@@ -79,12 +123,12 @@ export function WelcomeVideo() {
         autoPlay
         playsInline
         preload="auto"
+        poster="/welcome/asset-preservation-poster.jpg"
         onTimeUpdate={syncCaption}
         onSeeked={syncCaption}
-        onPause={syncCaption}
         onEnded={() => setCaption("")}
       >
-        <source src="/welcome/asset-preservation.mp4" type="video/mp4" />
+        <source src="/welcome/asset-preservation.mp4?v=3" type="video/mp4" />
         <track
           kind="captions"
           srcLang="en"
@@ -96,7 +140,10 @@ export function WelcomeVideo() {
         className="mt-2 min-h-16 rounded-lg border border-line bg-cream px-3 py-2 text-sm leading-snug text-navy"
         aria-live="polite"
       >
-        {caption || "Closed captions show here, under the video, so they do not cover the picture."}
+        {caption ||
+          (sound === "tap"
+            ? "Playing. Tap the page once to turn the sound on."
+            : "Closed captions show here, under the video, so they do not cover the picture.")}
       </figcaption>
     </figure>
   );
