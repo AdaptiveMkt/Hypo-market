@@ -1,9 +1,68 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { playCelesteScript, stopCeleste, watchCeleste } from "@/lib/celeste";
 import { setVoiceOn, useVoiceOn } from "@/lib/voice-pref";
 import { WELCOME_BODY, WELCOME_HEADING, WELCOME_SPOKEN } from "@/lib/welcome";
+
+const CAPTIONS: { start: number; end: number; text: string }[] = [
+  { start: 0, end: 1.9, text: "Hello there." },
+  { start: 2, end: 9, text: "Let me ask, are you a financial services professional or licensed insurance agent that has clients concerned about the future costs of long-term care" },
+  { start: 9, end: 11.8, text: "and where their care might be needed?" },
+  { start: 12, end: 19, text: "Maybe you're just someone concerned whether or not your assets will last in the event of a chronic health challenge, and more importantly, what will be the consequences" },
+  { start: 19, end: 23, text: "to your family if and when long-term care is required in the future." },
+  { start: 23, end: 28.5, text: "If you are either one and you don't know where to start, consider taking this short online assessment." },
+  { start: 29, end: 35.5, text: "The assessment can be customized, or it can be run incognito without disclosing any personal contact or financial information." },
+  { start: 36, end: 43.5, text: "In fact, once the assessment is completed, you can view it privately and then download it to your personal computer or digital device." },
+  { start: 44, end: 48.5, text: "No personal or financial information is retained on any servers or this platform." },
+  { start: 49, end: 53.2, text: "So go on and see for yourself how this tool could be helpful in long-term care planning." },
+  { start: 53.2, end: 54.8, text: "You'll be glad you did." },
+  { start: 55, end: 57, text: "Oh, one more thing before I leave." },
+  { start: 57, end: 63, text: "If you are in the insurance or financial services industry and want to license and brand this tool, give us a call." },
+  { start: 63, end: 66.5, text: "Our information is provided and viewable within the terms of use." },
+  { start: 67, end: 69.7, text: "Thank you." },
+];
+
+function WelcomeVideo() {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [caption, setCaption] = useState("");
+
+  function syncCaption() {
+    const t = videoRef.current?.currentTime ?? 0;
+    const cue = CAPTIONS.find((c) => t >= c.start && t < c.end);
+    setCaption(cue?.text ?? "");
+  }
+
+  return (
+    <figure className="mt-4 min-w-0">
+      <video
+        ref={videoRef}
+        className="block w-full rounded-lg bg-navy"
+        controls
+        playsInline
+        preload="metadata"
+        onTimeUpdate={syncCaption}
+        onSeeked={syncCaption}
+        onPause={syncCaption}
+        onEnded={() => setCaption("")}
+      >
+        <source src="/welcome/asset-preservation.mp4" type="video/mp4" />
+        <track
+          kind="captions"
+          srcLang="en"
+          label="English"
+          src="/welcome/asset-preservation.vtt"
+        />
+      </video>
+      <figcaption
+        className="mt-2 min-h-16 rounded-lg border border-line bg-cream px-3 py-2 text-sm leading-snug text-navy"
+        aria-live="polite"
+      >
+        {caption || "Closed captions show here, under the video, so they do not cover the picture."}
+      </figcaption>
+    </figure>
+  );
+}
 
 export function WelcomeCard({ onReset }: { onReset?: () => void }) {
   const [speaking, setSpeaking] = useState(false);
@@ -35,6 +94,7 @@ export function WelcomeCard({ onReset }: { onReset?: () => void }) {
       <h2 id="welcome-heading" className="font-display text-xl text-navy">
         {WELCOME_HEADING}
       </h2>
+      <WelcomeVideo />
       <p className="mt-3 text-sm leading-relaxed text-muted">{WELCOME_BODY}</p>
       <div className="mt-4 stack-actions">
         <button
