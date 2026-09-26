@@ -1,7 +1,7 @@
 "use client";
 
 import type { AudienceRole } from "@/lib/qa-cookie";
-import { WelcomeVideo } from "@/components/welcome-card";
+import { usePhoneLayout, WelcomeVideo } from "@/components/welcome-card";
 
 const OPTIONS: { id: AudienceRole; n: string; title: string }[] = [
   {
@@ -22,6 +22,7 @@ const OPTIONS: { id: AudienceRole; n: string; title: string }[] = [
 ];
 
 export function AudienceGate({ onSelect }: { onSelect: (role: AudienceRole) => void }) {
+  const phone = usePhoneLayout();
   return (
     <section className="card-xl min-w-0 p-4 md:p-5" aria-label="Who is using this hypothetical">
       <p className="text-xs font-semibold uppercase tracking-[0.14em] text-teal">Before you begin</p>
@@ -40,9 +41,7 @@ export function AudienceGate({ onSelect }: { onSelect: (role: AudienceRole) => v
           </button>
         ))}
       </div>
-      <div className="md:hidden">
-        <WelcomeVideo />
-      </div>
+      {phone ? <WelcomeVideo /> : null}
     </section>
   );
 }

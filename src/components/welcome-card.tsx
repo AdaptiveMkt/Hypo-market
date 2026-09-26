@@ -23,6 +23,18 @@ const CAPTIONS: { start: number; end: number; text: string }[] = [
   { start: 67, end: 69.7, text: "Thank you." },
 ];
 
+export function usePhoneLayout() {
+  const [phone, setPhone] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)");
+    const apply = () => setPhone(mq.matches);
+    apply();
+    mq.addEventListener("change", apply);
+    return () => mq.removeEventListener("change", apply);
+  }, []);
+  return phone;
+}
+
 export function WelcomeVideo() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [caption, setCaption] = useState("");
@@ -33,14 +45,40 @@ export function WelcomeVideo() {
     setCaption(cue?.text ?? "");
   }
 
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    let stopped = false;
+    const startWithSound = () => {
+      if (stopped) return;
+      v.muted = false;
+      v.volume = 1;
+      void v.play().catch(() => {});
+    };
+    v.muted = false;
+    v.volume = 1;
+    const unlock = () => startWithSound();
+    void v.play().catch(() => {
+      window.addEventListener("pointerdown", unlock, { once: true });
+      window.addEventListener("keydown", unlock, { once: true });
+    });
+    return () => {
+      stopped = true;
+      window.removeEventListener("pointerdown", unlock);
+      window.removeEventListener("keydown", unlock);
+      v.pause();
+    };
+  }, []);
+
   return (
     <figure className="mt-4 min-w-0">
       <video
         ref={videoRef}
         className="block w-full rounded-lg bg-navy"
         controls
+        autoPlay
         playsInline
-        preload="metadata"
+        preload="auto"
         onTimeUpdate={syncCaption}
         onSeeked={syncCaption}
         onPause={syncCaption}
@@ -68,6 +106,7 @@ export function WelcomeCard({ onReset }: { onReset?: () => void }) {
   const [speaking, setSpeaking] = useState(false);
   const [status, setStatus] = useState("");
   const voiceOn = useVoiceOn();
+  const phone = usePhoneLayout();
 
   useEffect(() => {
     return watchCeleste((s) => {
@@ -94,9 +133,7 @@ export function WelcomeCard({ onReset }: { onReset?: () => void }) {
       <h2 id="welcome-heading" className="font-display text-xl text-navy">
         {WELCOME_HEADING}
       </h2>
-      <div className="hidden md:block">
-        <WelcomeVideo />
-      </div>
+      {phone ? null : <WelcomeVideo />}
       <p className="mt-3 text-sm leading-relaxed text-muted">{WELCOME_BODY}</p>
       <div className="mt-4 stack-actions">
         <button
