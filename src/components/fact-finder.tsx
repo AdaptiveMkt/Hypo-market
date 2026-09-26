@@ -255,6 +255,8 @@ export function FactFinder({
 
   const section = sectionOf(step);
   const names = ASSET_QUESTIONS.map((f) => f.label).slice(0, 4).join(", ");
+  const passedAssets = steps.slice(0, safeIndex).filter((s) => s.kind === "asset");
+  const assetSubtotal = passedAssets.reduce((sum, s) => sum + (s.kind === "asset" ? Number(assets[s.key]) || 0 : 0), 0);
 
   return (
     <section id="fact-finder" className="mt-4 card-xl min-w-0 scroll-mt-24 p-4 md:p-5" aria-label="Fact finder">
@@ -274,7 +276,14 @@ export function FactFinder({
       </div>
 
       <p className="text-xs font-semibold uppercase tracking-[0.14em] text-teal">Fact finder</p>
-      {section ? <h2 className="mt-1 border-b-2 border-gold pb-2 font-display text-xl text-navy">{section}</h2> : null}
+      {section ? (
+        <h2 className="mt-1 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b-2 border-gold pb-2 font-display text-xl text-navy">
+          <span>{section}</span>
+          {section.startsWith("1.") && passedAssets.length ? (
+            <span className="text-base font-semibold tabular-nums">Subtotal {money(assetSubtotal)}</span>
+          ) : null}
+        </h2>
+      ) : null}
       {step.kind === "asset" && safeIndex === steps.findIndex((s) => s.kind === "asset") ? (
         <p className="mt-2 text-sm text-muted">
           Enter today’s countable asset values. If you have no countable assets in {names}, and the other lines, leave blank.
