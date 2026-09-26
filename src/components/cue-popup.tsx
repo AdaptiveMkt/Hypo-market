@@ -24,6 +24,7 @@ export type CueMessage = {
   secondaryLabel?: string;
   secondaryAction?: CueActionId;
   note?: string;
+  callout?: string;
   links?: CueLink[];
   /** When set, the notice includes a co-pay percent the visitor can change before running. */
   copayPct?: number;
@@ -102,6 +103,7 @@ export function CuePopup({
           <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-3 sm:px-5 sm:py-4">
             <p className="text-sm leading-relaxed text-navy whitespace-pre-line sm:text-base">{cue.body}</p>
             {cue.note ? <p className="mt-3 text-sm leading-relaxed text-muted">{cue.note}</p> : null}
+            {cue.callout ? <p className="mt-3 text-sm font-semibold text-link">{cue.callout}</p> : null}
             {cue.links?.length ? (
               <ul className="mt-3 space-y-2 text-sm">
                 {cue.links.map((link) => (

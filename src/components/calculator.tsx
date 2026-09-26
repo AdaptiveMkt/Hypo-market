@@ -97,6 +97,7 @@ import { typicalLinkedBuyerHints, typicalPremiumHint } from "@/lib/what-consumer
 import { TitleCollapse } from "@/components/accordion";
 import { isDarkTheme, setTheme } from "@/components/theme-toggle";
 import { StateName, Pct } from "@/components/state-name";
+import { AgiPremiumCallout, agiTargetSentence } from "@/components/agi-premium-callout";
 import { LifeBenefitDefs } from "@/components/life-benefit-defs";
 import { Cite, CopyrightMark, LinkedCopy } from "@/components/source-links";
 import { SRC } from "@/lib/sources";
@@ -965,6 +966,7 @@ export function Calculator() {
       title: "Industry averages for your age",
       body: section2IndustryMessage(ageToday),
       note: "The daily amount, 3-year period, and 90-day wait follow the overall 2024 stand-alone sales mix in the 2025 Milliman LTCI Survey: average monthly maximum about $5,428 (about $178 a day, shown here in $10 steps), a 3-year period on 55.1% of sales, and an 84–100 day wait on 89.8%. Milliman does not publish that mix inside each 5-year age band. 3% compound is this model’s planning default under age 76 because it has no future-purchase-option field. Most 2024 sales used an FPO. Among automatic increases, 3% compound was 17.4%. Not a quote.",
+      callout: agiTargetSentence(annualIncome),
       links: [
         {
           kicker: "Source",
@@ -1852,6 +1854,7 @@ export function Calculator() {
                   <span className="font-semibold text-deplete">{buyerHints.inflation}</span>. You can change any field in Section 3.
                 </p>
                 <p className="mt-1">{typicalPurchaseNote(ageToday)}</p>
+                <AgiPremiumCallout agi={annualIncome} className="mt-2" />
                 <p className="mt-1">
                   Sources:{" "}
                   <Cite href={SRC.millimanSurvey2025}>2025 Milliman LTCI Survey</Cite>
@@ -1861,7 +1864,7 @@ export function Calculator() {
                   <Cite href={SRC.naicShopper}>NAIC Shopper’s Guide</Cite>
                 </p>
                 <TitleCollapse title="See what industry says people are buying in long-term care benefits" className="mt-2" defaultOpen={false} openOnHash="what-buyers-section2" hint="READ MORE.">
-                  <WhatConsumersBuyPanel ageToday={ageToday} kind={policy.kind} />
+                  <WhatConsumersBuyPanel ageToday={ageToday} kind={policy.kind} agi={annualIncome} />
                 </TitleCollapse>
               </div>
             ) : null}

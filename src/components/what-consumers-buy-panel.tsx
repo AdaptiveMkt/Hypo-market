@@ -1,4 +1,5 @@
 import { Cite } from "@/components/source-links";
+import { AgiPremiumCallout } from "@/components/agi-premium-callout";
 import { SRC } from "@/lib/sources";
 import { money } from "@/lib/utils";
 import type { PolicyKind } from "@/lib/calc";
@@ -43,16 +44,24 @@ function MiniTable({
 export function WhatConsumersBuyPanel({
   ageToday = 0,
   kind = "traditional",
+  agi = 0,
 }: {
   ageToday?: number;
   kind?: PolicyKind;
+  agi?: number;
 }) {
   if (isLinkedKind(kind)) {
-    return <ComboConsumersBuyPanel ageToday={ageToday} kind={kind} />;
+    return (
+      <>
+        <AgiPremiumCallout agi={agi} />
+        <ComboConsumersBuyPanel ageToday={ageToday} kind={kind} />
+      </>
+    );
   }
   const f = WHAT_CONSUMERS_BUY_FEATURES;
   return (
     <div className="mt-2 text-sm text-muted">
+      <AgiPremiumCallout agi={agi} className="mb-2" />
       <p>{WHAT_CONSUMERS_BUY_INTRO}</p>
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
         {WHAT_CONSUMERS_BUY_MARKET.map((c) => (

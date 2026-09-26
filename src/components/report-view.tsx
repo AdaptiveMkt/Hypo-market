@@ -75,6 +75,7 @@ import { ALL_DETAILS_ON, TAX_SECTION_LABEL, disclosureSelected, type DetailFlags
 import type { SensitivityResult } from "@/lib/sensitivity";
 import type { ConfidenceResult } from "@/lib/confidence";
 import { ConfidencePanel } from "@/components/confidence-panel";
+import { AgiPremiumCallout } from "@/components/agi-premium-callout";
 import { IndustryInsightsPanel } from "@/components/industry-insights";
 import { ChartRegion } from "@/components/chart-region";
 import { pauseCeleste, playCelesteScript, resumeCeleste, stopCeleste, watchCeleste } from "@/lib/celeste";
@@ -1143,6 +1144,7 @@ export function ReportView({
                 </ChartRegion>
               </div>
               <div>
+                <AgiPremiumCallout agi={annualIncome} className="mb-2" />
                 <p className="mb-2 text-sm text-muted">
                   {TARGET_PREMIUM_LABEL} This run’s traditional planning figure is {money(premiumTarget)}
                   {annualIncome > 0
@@ -2223,6 +2225,7 @@ export function ReportView({
             setting={setting}
             scenarios={linkedScenarios}
             countable={pool}
+            agi={annualIncome}
           />
         </section>
         ) : null}

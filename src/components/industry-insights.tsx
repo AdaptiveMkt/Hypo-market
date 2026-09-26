@@ -5,6 +5,7 @@ import { LinkedClaimCard } from "@/components/linked-claim-card";
 import { LtcGlossaryTerms } from "@/components/ltc-glossary";
 import { SamplePolicyPack } from "@/components/sample-ltc-policy";
 import { StateName } from "@/components/state-name";
+import { AgiPremiumCallout } from "@/components/agi-premium-callout";
 import { WhatConsumersBuyPanel } from "@/components/what-consumers-buy-panel";
 import type { LtcPolicy } from "@/lib/calc";
 import { isLinkedKind } from "@/lib/calc";
@@ -49,6 +50,7 @@ export function IndustryInsightsPanel({
   setting,
   scenarios = [],
   countable = 0,
+  agi = 0,
   embedded = false,
 }: {
   ageToday?: number;
@@ -57,11 +59,13 @@ export function IndustryInsightsPanel({
   setting?: CareSetting;
   scenarios?: ClaimScenarioRow[];
   countable?: number;
+  agi?: number;
   embedded?: boolean;
 }) {
   const linked = linkedCopy(isLinkedKind(policy.kind) ? policy.kind : "assetBased");
   const body = (
     <>
+      <AgiPremiumCallout agi={agi} className="mt-2" />
       {embedded ? (
         <p className="text-sm text-muted">
           Numbered reference sections used in this hypothetical. Each is collapsed until you
@@ -155,7 +159,7 @@ export function IndustryInsightsPanel({
         title="What people are buying"
         hint="Milliman / LIMRA / AALTCI mix — daily or monthly, period, wait, inflation, and age."
       >
-        <WhatConsumersBuyPanel ageToday={ageToday} kind={policy.kind} />
+        <WhatConsumersBuyPanel ageToday={ageToday} kind={policy.kind} agi={agi} />
       </Insight>
 
       <Insight
