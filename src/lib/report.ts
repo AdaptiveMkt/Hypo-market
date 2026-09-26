@@ -206,8 +206,8 @@ export function analysisNarrative(opts: ReportOpts): string {
     const agi = Math.max(0, Math.round(Number(s.annualIncome) || 0));
     const funding =
       agi > 0
-        ? ` Based on your disclosed AGI, the recommended annual household premium should be targeted no greater than ${money(Math.round(agi * TARGET_INCOME_RATE))}. Additional premium funding options might include reallocation of assets and using part of your Return on investment.`
-        : " Premium funding options to consider is to reallocate assets and use part of ROI to fund your household premiums.";
+        ? ` Based on your disclosed AGI, the recommended annual household premium should be no greater than ${money(Math.round(agi * TARGET_INCOME_RATE))}. Other ways to fund that premium include reallocating assets and using part of your return on investment.`
+        : " Premium funding options to consider are reallocating assets and using part of your return on investment to fund household premiums.";
     paras.push(
       `This run includes ${structure}. Insurance is modeled to pay the claim first; countable assets co-pay only the leftover. LTC benefits at purchase are ${result.lifetimeBenefit ? `${LIFETIME_BENEFIT_MARK}. ${LIFETIME_BENEFIT_NOTE}` : money(result.benefitPoolAtPurchase ?? 0)}. At claim they are ${result.lifetimeBenefit ? LIFETIME_BENEFIT_MARK : money(result.benefitPoolAtClaim ?? 0)}.${industryNote}${funding}`,
     );
