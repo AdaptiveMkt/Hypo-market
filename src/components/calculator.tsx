@@ -1650,14 +1650,18 @@ export function Calculator() {
                     <fieldset className="min-w-0 overflow-hidden rounded-lg border border-gold">
                       <legend className="px-2 text-sm font-semibold text-navy">Insurance types</legend>
                       <p className="px-3 pb-2 text-xs text-muted">Open a tab to enter that type’s deposits and benefits. Check a type to include it in the run. You can include more than one.</p>
-                      <div className="flex min-w-0 flex-wrap gap-1 border-b border-gold bg-cream px-2 pt-1">
+                      <div
+                        className="flex min-w-0 gap-1 overflow-x-auto border-b border-gold bg-cream px-2 pt-1"
+                        role="tablist"
+                        aria-label="Insurance types"
+                      >
                         {STRUCTURE_OPTIONS.map((o) => {
                           const active = policy.kind === o.key;
                           const tab = KIND_TAB[o.key];
                           return (
                             <div
                               key={o.key}
-                              className={`flex min-w-0 flex-1 items-center gap-1.5 rounded-t-lg px-2 py-1 ${
+                              className={`flex shrink-0 items-center gap-1.5 rounded-t-lg px-3 py-2 ${
                                 active ? tab.active : tab.idle
                               }`}
                             >
@@ -1679,17 +1683,25 @@ export function Calculator() {
                               />
                               <button
                                 type="button"
-                                className="min-h-11 min-w-0 flex-1 text-left text-xs font-semibold leading-snug sm:text-sm"
+                                role="tab"
+                                id={`kind-tab-${o.key}`}
+                                aria-selected={active}
+                                aria-controls="kind-tab-panel"
+                                className="min-h-11 whitespace-nowrap text-sm font-semibold"
                                 onClick={() => openKindTab(o.key)}
                               >
                                 {o.label}
-                                {active ? " (open)" : ""}
                               </button>
                             </div>
                           );
                         })}
                       </div>
-                      <div className="space-y-3 bg-paper p-3">
+                      <div
+                        id="kind-tab-panel"
+                        role="tabpanel"
+                        aria-labelledby={`kind-tab-${policy.kind}`}
+                        className="space-y-3 bg-paper p-3"
+                      >
                         <p className="text-sm font-semibold text-navy">
                           {STRUCTURE_OPTIONS.find((s) => s.key === policy.kind)?.label} — deposits and benefits
                         </p>

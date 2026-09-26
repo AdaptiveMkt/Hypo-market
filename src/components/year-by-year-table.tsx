@@ -27,7 +27,7 @@ export function KindYearTabs({
 }) {
   if (kinds.length === 0) return null;
   return (
-    <div className="mb-3 flex min-w-0 flex-wrap gap-1" role="tablist" aria-label="Year-by-year insurance type">
+    <div className="mb-3 flex min-w-0 gap-1 overflow-x-auto" role="tablist" aria-label="Year-by-year insurance type">
       {kinds.map((kind) => {
         const tab = KIND_TAB[kind];
         const selected = kind === active;
@@ -37,13 +37,12 @@ export function KindYearTabs({
             type="button"
             role="tab"
             aria-selected={selected}
-            className={`min-h-11 min-w-0 flex-1 rounded-t-lg px-2 py-1 text-left text-xs font-semibold leading-snug sm:text-sm ${
+            className={`shrink-0 whitespace-nowrap rounded-t-lg px-3 py-2 text-sm font-semibold ${
               selected ? tab.active : tab.idle
             }`}
             onClick={() => onChange(kind)}
           >
             {policyKindLabel(kind)}
-            {selected ? " (open)" : ""}
           </button>
         );
       })}
