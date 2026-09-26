@@ -140,6 +140,7 @@ import { MedicaidVaCard } from "@/components/medicaid-va-card";
 import { AdvisorProfessionalFolds, DisclaimerCard } from "@/components/disclaimer-card";
 import { WelcomeCard } from "@/components/welcome-card";
 import { FactFinder } from "@/components/fact-finder";
+import { clearQaCookie, readQaCookie, writeQaCookie } from "@/lib/qa-cookie";
 import { ChartRegion, useNarrow } from "@/components/chart-region";
 import { defaultExcludableAssets, medicaidProfile } from "@/lib/medicaid";
 import {
@@ -248,6 +249,7 @@ export function Calculator() {
   const [finderPersonal, setFinderPersonal] = useState(false);
   const [showFullForm, setShowFullForm] = useState(false);
   const themeBeforeIncognito = useRef<"light" | "dark" | null>(null);
+  const qaReady = useRef(false);
   const [pdfReady, setPdfReady] = useState<{
     filename: string;
     url: string;
@@ -318,6 +320,111 @@ export function Calculator() {
     const t = window.setTimeout(() => scrollToHeader(false), 200);
     return () => window.clearTimeout(t);
   }, []);
+
+  useEffect(() => {
+    const saved = readQaCookie();
+    if (saved && saved.finderIndex > 0) {
+      setAssets({ ...DEFAULT_ASSETS, ...saved.assets });
+      setAssetRois({ ...DEFAULT_ASSET_ROIS, ...saved.assetRois });
+      setExcludableTouched(Boolean(saved.excludableTouched));
+      if (saved.state) setState(saved.state);
+      setSetting((saved.setting || "") as CareSetting | "");
+      setCpiOverride(saved.cpiOverride ?? null);
+      if (saved.ageToday) setAgeToday(saved.ageToday);
+      if (saved.claimAge) setClaimAge(saved.claimAge);
+      setClaimAgeTouched(Boolean(saved.claimAgeTouched));
+      if (saved.duration) setDuration(saved.duration);
+      if (saved.taxRate != null) setTaxRate(saved.taxRate);
+      setExcludeHome(saved.excludeHome !== false);
+      setPoolShown(Boolean(saved.poolShown));
+      if (saved.finderPersonal && saved.client) setClient({ ...EMPTY_CONTACT, ...saved.client });
+      setIssueState(saved.issueState || "");
+      setIssueTouched(Boolean(saved.issueTouched));
+      if (saved.runKinds) setRunKinds({ ...DEFAULT_STRUCTURE_FLAGS, ...saved.runKinds });
+      if (saved.yearKind) setYearKind(saved.yearKind);
+      if (saved.policy) setPolicy(saved.policy);
+      if (saved.kindBook) setKindBook(saved.kindBook);
+      setSection2Confirmed(Boolean(saved.section2Confirmed));
+      setSection3Confirmed(Boolean(saved.section3Confirmed));
+      setSection3Open(Boolean(saved.section3Confirmed));
+      setPartnershipOn(saved.partnershipOn !== false);
+      if (saved.protectPct != null) setProtectPct(saved.protectPct);
+      setFinderPersonal(Boolean(saved.finderPersonal));
+      setFinderIndex(saved.finderIndex);
+      if (saved.finderPersonal) {
+        setPersonalizeOpen(true);
+        setTheme(false);
+      } else {
+        setPersonalizeOpen(false);
+        setTheme(true);
+      }
+    }
+    const arm = window.setTimeout(() => {
+      qaReady.current = true;
+    }, 0);
+    return () => window.clearTimeout(arm);
+  }, []);
+
+  useEffect(() => {
+    if (!qaReady.current) return;
+    if (finderIndex <= 0 && !readQaCookie()) return;
+    writeQaCookie({
+      v: 1,
+      finderIndex,
+      finderPersonal,
+      assets,
+      assetRois,
+      excludableTouched,
+      state,
+      setting,
+      cpiOverride,
+      ageToday,
+      claimAge,
+      claimAgeTouched,
+      duration,
+      taxRate,
+      excludeHome,
+      poolShown,
+      client: finderPersonal ? client : undefined,
+      issueState,
+      issueTouched,
+      runKinds,
+      yearKind,
+      policy,
+      kindBook,
+      section2Confirmed,
+      section3Confirmed,
+      partnershipOn,
+      protectPct,
+    });
+  }, [
+    finderIndex,
+    finderPersonal,
+    assets,
+    assetRois,
+    excludableTouched,
+    state,
+    setting,
+    cpiOverride,
+    ageToday,
+    claimAge,
+    claimAgeTouched,
+    duration,
+    taxRate,
+    excludeHome,
+    poolShown,
+    client,
+    issueState,
+    issueTouched,
+    runKinds,
+    yearKind,
+    policy,
+    kindBook,
+    section2Confirmed,
+    section3Confirmed,
+    partnershipOn,
+    protectPct,
+  ]);
 
   useEffect(() => {
     mailRef.current = { client, advisor, state, attachAdvisor };
@@ -917,6 +1024,7 @@ export function Calculator() {
     } catch {
       /* ignore */
     }
+    clearQaCookie();
     window.setTimeout(() => scrollToHeader(false), 50);
   }
   function applyIncognito(on: boolean) {
