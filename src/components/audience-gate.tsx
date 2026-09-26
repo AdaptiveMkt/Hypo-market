@@ -1,6 +1,7 @@
 "use client";
 
 import type { AudienceRole } from "@/lib/qa-cookie";
+import { WelcomeVideo } from "@/components/welcome-card";
 
 const OPTIONS: { id: AudienceRole; n: string; title: string }[] = [
   {
@@ -38,6 +39,9 @@ export function AudienceGate({ onSelect }: { onSelect: (role: AudienceRole) => v
             {opt.title}
           </button>
         ))}
+      </div>
+      <div className="md:hidden">
+        <WelcomeVideo />
       </div>
     </section>
   );

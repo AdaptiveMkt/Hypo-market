@@ -23,7 +23,7 @@ const CAPTIONS: { start: number; end: number; text: string }[] = [
   { start: 67, end: 69.7, text: "Thank you." },
 ];
 
-function WelcomeVideo() {
+export function WelcomeVideo() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [caption, setCaption] = useState("");
 
@@ -94,7 +94,9 @@ export function WelcomeCard({ onReset }: { onReset?: () => void }) {
       <h2 id="welcome-heading" className="font-display text-xl text-navy">
         {WELCOME_HEADING}
       </h2>
-      <WelcomeVideo />
+      <div className="hidden md:block">
+        <WelcomeVideo />
+      </div>
       <p className="mt-3 text-sm leading-relaxed text-muted">{WELCOME_BODY}</p>
       <div className="mt-4 stack-actions">
         <button
