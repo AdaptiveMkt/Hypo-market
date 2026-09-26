@@ -42,6 +42,7 @@ import {
   LIFETIME_BENEFIT_MARK,
   LIFETIME_BENEFIT_NOTE,
   leverageLabel,
+  millimanDecadeGroup,
   monthlyFromDaily,
   netRoiPct,
   poolTotal,
@@ -122,7 +123,7 @@ import {
 import { CuePopup, type CueMessage } from "@/components/cue-popup";
 import { KindYearTabs, YearByYearTable } from "@/components/year-by-year-table";
 import { KIND_TAB } from "@/lib/kind-tabs";
-import { section1AssetsMessage, section2IndustryMessage, section3ProtectMessage } from "@/lib/voice-cues";
+import { section2IndustryMessage, section3ProtectMessage } from "@/lib/voice-cues";
 import { pinToHeaderOnLoad, scrollToHeader } from "@/lib/scroll-header";
 import { WhatConsumersBuyPanel } from "@/components/what-consumers-buy-panel";
 import { ReportView } from "@/components/report-view";
@@ -211,6 +212,44 @@ function parseRider(value: string): Pick<LtcPolicy, "benefitInflationPct" | "inf
 }
 function disabledPolicy(p: LtcPolicy): LtcPolicy {
   return { ...p, enabled: false };
+}
+
+function Section1CueBody({
+  pool,
+  home,
+  excludeHome,
+  ageToday,
+}: {
+  pool: number;
+  home: number;
+  excludeHome: boolean;
+  ageToday: number;
+}) {
+  const equity = Number(home) || 0;
+  const band = millimanDecadeGroup(ageToday);
+  const homeNote = excludeHome
+    ? equity > 0
+      ? `The primary residence of ${money(equity)} is exempt and is not included in that countable amount.`
+      : `You elected to exempt the primary residence from countable assets. No home equity was entered.`
+    : equity > 0
+      ? `The primary residence of ${money(equity)} is not exempt and is included in that countable amount.`
+      : `You did not elect to exempt the primary residence from countable assets. No home equity was entered.`;
+  return (
+    <>
+      Great, you have completed Section 1, and based on your input, your countable assets are {money(pool)}
+      {band ? (
+        <>
+          {" "}
+          <a className="source-link" href={SRC.millimanSurvey2025} target="_blank" rel="noopener noreferrer">
+            * (ages {band.label}, {band.share} of buyers)
+          </a>
+        </>
+      ) : (
+        " *"
+      )}
+      . {homeNote} Now let's proceed to Section 2, where you can let us know where and when you think you might need care. This is subjective, but will help in the preparation of this hypothetical report.
+    </>
+  );
 }
 
 export function Calculator() {
@@ -1496,7 +1535,9 @@ export function Calculator() {
           setPoolShown(true);
           setCue({
             title: "Section 1 complete",
-            body: section1AssetsMessage({ pool, home: homeEquity, excludeHome }),
+            body: (
+              <Section1CueBody pool={pool} home={homeEquity} excludeHome={excludeHome} ageToday={ageToday} />
+            ),
           });
         }}
         ageToday={ageToday}
@@ -1680,7 +1721,9 @@ export function Calculator() {
                 setPoolShown(true);
                 setCue({
                   title: "Section 1 complete",
-                  body: section1AssetsMessage({ pool, home: homeEquity, excludeHome }),
+                  body: (
+                    <Section1CueBody pool={pool} home={homeEquity} excludeHome={excludeHome} ageToday={ageToday} />
+                  ),
                 });
               }}
             >

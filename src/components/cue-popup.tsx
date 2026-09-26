@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { StepperField } from "@/components/field-picker";
 
@@ -15,7 +15,7 @@ export type CueLink = {
 
 export type CueMessage = {
   title: string;
-  body: string;
+  body: ReactNode;
   closeLabel?: string;
   applyOnClose?: boolean;
   actionLabel?: string;
