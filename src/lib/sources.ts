@@ -37,6 +37,8 @@ export const SRC = {
     "https://www.irs.gov/newsroom/irs-releases-tax-inflation-adjustments-for-tax-year-2026-including-amendments-from-the-one-big-beautiful-bill",
   irc7702b: "https://www.law.cornell.edu/uscode/text/26/7702B",
   irc101g: "https://www.law.cornell.edu/uscode/text/26/101",
+  naicLifeSettlement:
+    "https://content.naic.org/sites/default/files/publications-consumer-life-settlement.pdf",
   irc1035: "https://www.law.cornell.edu/uscode/text/26/1035",
   cfpCode: "https://www.cfp.net/ethics/code-of-ethics-and-standards-of-conduct",
   fundingLtc: "https://fundingltcmarketplace.com/case-studies.html",

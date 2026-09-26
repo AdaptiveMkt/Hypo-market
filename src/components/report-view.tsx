@@ -79,6 +79,7 @@ import { IndustryInsightsPanel } from "@/components/industry-insights";
 import { ChartRegion } from "@/components/chart-region";
 import { pauseCeleste, playCelesteScript, resumeCeleste, stopCeleste, watchCeleste } from "@/lib/celeste";
 import { setVoiceOn, useVoiceOn } from "@/lib/voice-pref";
+import { LifeBenefitDefs } from "@/components/life-benefit-defs";
 import { LtcGlossaryList } from "@/components/ltc-glossary";
 import { SamplePolicyPack } from "@/components/sample-ltc-policy";
 import {
@@ -686,7 +687,7 @@ export function ReportView({
         </section>
 
         {details.lifeFace ? (
-        <section className="report-block" id="adb-definition">
+        <section className="report-block">
           <TitleCollapse
             title="Life insurance face amount *"
             className="mt-0"
@@ -706,6 +707,20 @@ export function ReportView({
                 <Cite href={SRC.irc101g}>26 U.S.C. §101(g)</Cite>
               </p>
             </TitleCollapse>
+          </TitleCollapse>
+        </section>
+        ) : null}
+
+        {details.adbDefs ? (
+        <section className="report-block">
+          <TitleCollapse
+            title="Accelerated death benefits, viaticals, and life settlements"
+            className="mt-0"
+            defaultOpen={false}
+            pdfChecked
+            pdfLocked
+          >
+            <LifeBenefitDefs />
           </TitleCollapse>
         </section>
         ) : null}

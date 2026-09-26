@@ -12,6 +12,11 @@ export const LTC_GLOSSARY: GlossaryEntry[] = [
       "An IRC §1035 tax-free exchange of an existing life insurance or annuity contract into another life, annuity, or qualifying long-term care contract. Basis and gain generally carry over. Must be a direct trustee-to-trustee (or carrier-to-carrier) transfer of the same owner and insured. Not every product qualifies. This model does not execute an exchange.",
   },
   {
+    term: "Accelerated death benefit (IRC §101(g))",
+    definition:
+      "A payment from a life insurance contract while the insured is still living, taken from the death benefit. Terminal illness under §101(g) is a physician’s certification that death is reasonably expected within 24 months; those amounts are generally excluded from income with no daily cap. Chronic illness uses the 2-of-6 ADL or severe cognitive test, and many riders also require the condition to last the rest of life. A §101(g)-only rider reduces the face and stops when the face is used. It is not tax-qualified long-term care insurance under §7702B and is generally not Partnership-certified. This model does not pay care from the face amount unless those dollars are entered as a countable asset.",
+  },
+  {
     term: "Activities of Daily Living (ADLs)",
     definition:
       "The six self-care tasks used as a tax-qualified benefit trigger: bathing, dressing, eating, toileting, transferring (moving in and out of a bed or chair), and continence. Tax-qualified policies generally pay when a clinician certifies that the insured cannot perform two of six ADLs without substantial assistance, expected to last at least 90 days.",
@@ -147,6 +152,11 @@ export const LTC_GLOSSARY: GlossaryEntry[] = [
       "The period (generally 60 months) Medicaid reviews for gifts or transfers below fair market value. Transfers in that window can create a penalty period of ineligibility. Spending assets on one’s own care is generally not a look-back gift. Confirm with an elder-law attorney.",
   },
   {
+    term: "Life settlement",
+    definition:
+      "A sale of a life insurance policy to a third party by an owner who is not terminally or chronically ill. The buyer pays a cash amount that is less than the death benefit, takes over future premiums, and collects the death benefit later. Proceeds above the owner’s basis are generally taxable. A life settlement is not an insurance claim and does not pay care in this model unless the cash received is entered as a countable asset. NAIC distinguishes this from a viatical settlement.",
+  },
+  {
     term: "Long-term care annuity",
     definition:
       "An annuity with a long-term care multiplier or rider. The deposit can provide a leveraged LTC pool and a remaining annuity or death value if unused. Tax and surrender-charge rules differ from stand-alone LTCI and from hybrid life. This model’s lane is educational, not a product illustration.",
@@ -275,6 +285,11 @@ export const LTC_GLOSSARY: GlossaryEntry[] = [
     term: "Underwriting decline",
     definition:
       "A new application that is not issued, most often for health, medications, build, or cognitive findings. Decline rates rise with issue age. Why claims start (Alzheimer’s, stroke, injury) is a different question from why a new application is declined.",
+  },
+  {
+    term: "Viatical settlement",
+    definition:
+      "A sale of a life insurance policy by an owner who is terminally or chronically ill. The buyer (a viatical settlement provider) pays cash now, pays remaining premiums, and receives the death benefit. If the seller meets the §101(g) terminal or chronic test and the buyer is a qualified viatical settlement provider, the proceeds can be treated like an accelerated death benefit for tax purposes. It is still a sale, not a long-term care insurance claim. This model does not apply the proceeds to care unless they are entered as a countable asset.",
   },
   {
     term: "Waiver of premium",

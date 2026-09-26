@@ -93,6 +93,7 @@ import { typicalLinkedBuyerHints, typicalPremiumHint } from "@/lib/what-consumer
 import { TitleCollapse } from "@/components/accordion";
 import { isDarkTheme, setTheme } from "@/components/theme-toggle";
 import { StateName, Pct } from "@/components/state-name";
+import { LifeBenefitDefs } from "@/components/life-benefit-defs";
 import { Cite, CopyrightMark, LinkedCopy } from "@/components/source-links";
 import { SRC } from "@/lib/sources";
 import { HEALTH_INSURANCE_INTRO, HEALTH_INSURANCE_TYPES } from "@/lib/health-insurance-types";
@@ -2673,6 +2674,9 @@ export function Calculator() {
                 </p>
               </TitleCollapse>
             </div>
+          </ViewFold>
+          <ViewFold title="Accelerated death benefits, viaticals, and life settlements" hint={`${DETAIL_HINTS.adbDefs} View more details.`} checked={details.adbDefs} onPdf={(v) => setDetail("adbDefs", v)}>
+            <LifeBenefitDefs />
           </ViewFold>
           <ViewFold title="Year by year projection" hint={`${DETAIL_HINTS.yearByYear} View more details.`} defaultOpen checked={details.yearByYear} onPdf={(v) => setDetail("yearByYear", v)}>
             <p className="mb-3 text-sm text-muted">
