@@ -28,6 +28,7 @@ import { TAX_RATE_GROUPS, TAX_RATE_OPTIONS } from "@/lib/tax-brackets";
 import { SRC } from "@/lib/sources";
 import { Cite } from "@/components/source-links";
 import { AALTCI_MEAN_CLAIM_AGE } from "@/lib/claim-age";
+import { partnershipInfo, partnershipPolicyName } from "@/lib/partnership";
 
 type Step =
   | { kind: "mode" }
@@ -470,6 +471,20 @@ export function FactFinder({
             <div className="mt-3">
               <FieldPicker id="ff-issue" value={issueState || state} options={STATE_NAMES.map((s) => ({ value: s, label: s }))} onChange={onIssueState} />
             </div>
+            {(() => {
+              const picked = issueState || state;
+              if (!picked) return null;
+              const info = partnershipInfo(picked);
+              return (
+                <p className="mt-3 font-display text-lg font-semibold leading-snug text-navy">
+                  {picked} — {partnershipPolicyName(info)}
+                  <span className="mt-1 block text-sm font-normal text-muted">
+                    NAIC Model Act #640.{" "}
+                    <Cite href={SRC.naicModel640}>NAIC Model Act #640</Cite>
+                  </span>
+                </p>
+              );
+            })()}
             <Nav back={back} next={next} />
           </>
         ) : null}
