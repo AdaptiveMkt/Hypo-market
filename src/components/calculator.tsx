@@ -1465,7 +1465,7 @@ export function Calculator() {
       ) : (
       <>
       <AudienceBanner role={audience} />
-      <WelcomeCard />
+      <WelcomeCard onReset={resetAll} />
       <FactFinder
         index={finderIndex}
         onIndex={setFinderIndex}

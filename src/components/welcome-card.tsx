@@ -5,7 +5,7 @@ import { playCelesteScript, stopCeleste, watchCeleste } from "@/lib/celeste";
 import { setVoiceOn, useVoiceOn } from "@/lib/voice-pref";
 import { WELCOME_BODY, WELCOME_HEADING, WELCOME_SPOKEN } from "@/lib/welcome";
 
-export function WelcomeCard() {
+export function WelcomeCard({ onReset }: { onReset?: () => void }) {
   const [speaking, setSpeaking] = useState(false);
   const [status, setStatus] = useState("");
   const voiceOn = useVoiceOn();
@@ -20,7 +20,18 @@ export function WelcomeCard() {
 
   return (
     <section className="card-xl min-w-0 p-4 md:p-5" aria-labelledby="welcome-heading">
-      <p className="mb-1 text-xs uppercase tracking-[0.14em] text-teal">New visitor</p>
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-xs uppercase tracking-[0.14em] text-teal">New visitor</p>
+        {onReset ? (
+          <button
+            type="button"
+            className="rounded-lg border border-navy px-3 py-1.5 text-sm font-semibold text-navy hover:bg-cream"
+            onClick={onReset}
+          >
+            Reset
+          </button>
+        ) : null}
+      </div>
       <h2 id="welcome-heading" className="font-display text-xl text-navy">
         {WELCOME_HEADING}
       </h2>
