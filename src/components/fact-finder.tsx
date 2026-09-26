@@ -252,6 +252,11 @@ export function FactFinder({
   function back() {
     onIndex(Math.max(0, safeIndex - 1));
   }
+  function totalAndMove() {
+    onCalculate();
+    const tax = steps.findIndex((s) => s.kind === "tax");
+    if (tax >= 0) onIndex(tax);
+  }
 
   const section = sectionOf(step);
   const names = ASSET_QUESTIONS.map((f) => f.label).slice(0, 4).join(", ");
@@ -277,12 +282,25 @@ export function FactFinder({
 
       <p className="text-xs font-semibold uppercase tracking-[0.14em] text-teal">Fact finder</p>
       {section ? (
-        <h2 className="mt-1 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b-2 border-gold pb-2 font-display text-xl text-navy">
-          <span>{section}</span>
-          {section.startsWith("1.") && passedAssets.length ? (
-            <span className="text-base font-semibold tabular-nums">Subtotal {money(assetSubtotal)}</span>
+        <div className="mt-1 flex flex-wrap items-end justify-between gap-x-4 gap-y-2 border-b-2 border-gold pb-2">
+          <h2 className="font-display text-xl text-navy">{section}</h2>
+          {section.startsWith("1.") && step.kind === "asset" ? (
+            <div className="flex flex-col items-end gap-2">
+              {passedAssets.length ? (
+                <p className="text-base font-semibold tabular-nums text-navy">Subtotal {money(assetSubtotal)}</p>
+              ) : null}
+              <button
+                type="button"
+                className="rounded-lg bg-teal px-4 py-2 text-sm font-semibold text-cream hover:brightness-110"
+                onClick={totalAndMove}
+              >
+                TOTAL COUNTABLE ASSETS NOW
+              </button>
+            </div>
+          ) : section.startsWith("1.") && passedAssets.length ? (
+            <p className="text-base font-semibold tabular-nums text-navy">Subtotal {money(assetSubtotal)}</p>
           ) : null}
-        </h2>
+        </div>
       ) : null}
       {step.kind === "asset" && safeIndex === steps.findIndex((s) => s.kind === "asset") ? (
         <p className="mt-2 text-sm text-muted">
