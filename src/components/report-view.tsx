@@ -544,15 +544,21 @@ export function ReportView({
                   <p>{[advisor.state, advisor.zip].filter(Boolean).join(" ")}</p>
                   {advisor.phone ? <p>{advisor.phone}</p> : null}
                   {advisor.email ? <p>{advisor.email}</p> : null}
-                  <AdvisorProfessionalFolds />
                 </div>
               ) : null}
-              <div className="min-w-0 sm:col-span-2">
-                <DesignationNoticeFold className="mt-0 w-full max-w-none" />
-              </div>
             </div>
           </section>
         ) : null}
+
+        {policy.enabled && (partyFilled(advisor) || advisor.firm || advisor.designation) ? (
+          <section className="report-block">
+            <AdvisorProfessionalFolds />
+          </section>
+        ) : null}
+
+        <section className="report-block">
+          <DesignationNoticeFold className="mt-0 w-full max-w-none" />
+        </section>
 
         <section className="report-block">
           <div className={`rounded-lg border-2 px-4 py-3 ${depletedWhen ? "border-deplete bg-cream" : "border-gold bg-paper"}`}>
