@@ -1507,7 +1507,15 @@ export function Calculator() {
     allowPdf: audience === "interested",
     pdfDemo: audience === "licensed-client" || audience === "licensed-solo",
     audienceNote: audience === "licensed-solo" ? "Contact Adaptive Marketing Group for terms of use and licensing agreement." : "",
-    onClose: () => setShowReport(false),
+    onClose: () => {
+      setShowReport(false);
+      setShowFullForm(true);
+      setPoolShown(true);
+      setSection3Open(true);
+      window.setTimeout(() => {
+        document.getElementById("countable-assets")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 80);
+    },
     onPdf: requestPdfDownload,
     onClosePdf: () => runPdfDownload(true),
     onNeedAdvisor: () => {
@@ -1570,6 +1578,7 @@ export function Calculator() {
       <>
       <AudienceBanner role={audience} />
       <WelcomeCard onReset={resetAll} />
+      {showFullForm ? null : (
       <FactFinder
         index={finderIndex}
         onIndex={setFinderIndex}
@@ -1675,6 +1684,7 @@ export function Calculator() {
         onView={viewAllReport}
         onPdf={requestPdfDownload}
       />
+      )}
       {pdfUnlocked ? (
         <div className="mx-auto mt-4 grid max-w-md grid-cols-2 gap-2">
           <button type="button" onClick={viewAllReport} className="flex min-h-11 items-center justify-center rounded-lg border border-gold bg-gold px-3 py-2 text-center text-sm font-semibold text-masthead hover:brightness-105">View all</button>
