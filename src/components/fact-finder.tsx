@@ -541,8 +541,7 @@ export function FactFinder({
                 <p className="mt-3 font-display text-lg font-semibold leading-snug text-navy">
                   {picked} — {partnershipPolicyName(info)}
                   <span className="mt-1 block text-sm font-normal text-muted">
-                    NAIC Model Act #640.{" "}
-                    <Cite href={SRC.naicModel640}>NAIC Model Act #640</Cite>
+                    Mode: <Cite href={SRC.naicModel640}>NAIC Model Act #640</Cite>
                   </span>
                 </p>
               );

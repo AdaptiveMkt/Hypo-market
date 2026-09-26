@@ -1876,7 +1876,11 @@ export function ReportView({
                                 : "Original TAP"}
                       </td>
                       <td className="py-1.5 pr-2">
-                        {!row.modeled ? "—" : row.mode === "total-asset" ? "Total asset" : "D4D"}
+                        {row.info.kind === "none" ? (
+                          "—"
+                        ) : (
+                          <Cite href={SRC.naicModel640}>NAIC Model Act #640</Cite>
+                        )}
                       </td>
                       <td className="py-1.5 pr-2 text-right">
                         {row.modeled ? money(row.assetsProtected) : "—"}
