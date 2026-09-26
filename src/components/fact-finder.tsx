@@ -11,9 +11,11 @@ import {
   LINKED_MONTHLY_STEP,
   clampDailyBenefit,
   dailyFromMonthly,
+  fiveYearIssueBand,
   hybridFaceForMonthly,
   leverageLabel,
   monthlyFromDaily,
+  typicalBuyerHints,
   type AssetKey,
   type AssetRois,
   type Assets,
@@ -548,6 +550,7 @@ export function FactFinder({
             onKind={setBenefitKind}
             policy={designs[activeBenefit]}
             riderOptions={riderOptions}
+            ageToday={ageToday}
             onPatch={(partial) => onPatchKind(activeBenefit, partial)}
             onDone={() => {
               onConfirm3();
@@ -665,6 +668,7 @@ function BenefitEditor({
   onKind,
   policy,
   riderOptions,
+  ageToday,
   onPatch,
   onDone,
   back,
@@ -674,6 +678,7 @@ function BenefitEditor({
   onKind: (kind: PolicyKind) => void;
   policy: LtcPolicy;
   riderOptions: { key: string; label: string }[];
+  ageToday: number;
   onPatch: (partial: Partial<LtcPolicy>) => void;
   onDone: () => void;
   back: () => void;
@@ -846,6 +851,15 @@ function BenefitEditor({
           </div>
         </div>
       )}
+      <p className="mt-3 text-xs leading-snug text-muted">
+        * Insurance buyer experience
+        {ageToday >= 40 ? ` for ages ${fiveYearIssueBand(ageToday) ?? "in this band"}` : ""}: most buyers select{" "}
+        {typicalBuyerHints(ageToday).daily}/day, a {typicalBuyerHints(ageToday).period} period, a {typicalBuyerHints(ageToday).elim} wait, and{" "}
+        {typicalBuyerHints(ageToday).inflation}. Daily benefit, benefit period, and wait follow the overall 2024 stand-alone sales mix.{" "}
+        <Cite href={SRC.millimanSurvey2025}>2025 Milliman LTCI Survey</Cite>
+        {" · "}
+        <Cite href={SRC.aaltciPrice2026}>AALTCI 2026 Price Index</Cite>
+      </p>
       <div className="mt-4 flex gap-2">
         <button type="button" className="rounded-lg border border-navy px-4 py-2 text-sm font-semibold text-navy" onClick={back}>
           Back
