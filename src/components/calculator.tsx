@@ -139,6 +139,7 @@ import { ContactAskDialog, ContactRequestDialog, PdfReadyDialog } from "@/compon
 import { MedicaidVaCard } from "@/components/medicaid-va-card";
 import { AdvisorProfessionalFolds, DisclaimerCard } from "@/components/disclaimer-card";
 import { WelcomeCard } from "@/components/welcome-card";
+import { FactFinder } from "@/components/fact-finder";
 import { ChartRegion, useNarrow } from "@/components/chart-region";
 import { defaultExcludableAssets, medicaidProfile } from "@/lib/medicaid";
 import {
@@ -243,6 +244,9 @@ export function Calculator() {
   const [printAfterOpen, setPrintAfterOpen] = useState(false);
   const [pdfPick, setPdfPick] = useState(false);
   const [personalizeOpen, setPersonalizeOpen] = useState(false);
+  const [finderIndex, setFinderIndex] = useState(0);
+  const [finderPersonal, setFinderPersonal] = useState(false);
+  const [showFullForm, setShowFullForm] = useState(false);
   const themeBeforeIncognito = useRef<"light" | "dark" | null>(null);
   const [pdfReady, setPdfReady] = useState<{
     filename: string;
@@ -857,6 +861,9 @@ export function Calculator() {
     setRan(false);
     setPoolShown(false);
     setPersonalizeOpen(false);
+    setFinderIndex(0);
+    setFinderPersonal(false);
+    setShowFullForm(false);
     themeBeforeIncognito.current = null;
     setTheme(true);
     setHypoRunId(0);
@@ -1210,6 +1217,87 @@ export function Calculator() {
   return (
     <div className="min-w-0 max-w-full overflow-x-clip">
       <WelcomeCard />
+      <FactFinder
+        index={finderIndex}
+        onIndex={setFinderIndex}
+        personalized={finderPersonal}
+        onPersonalized={(on) => {
+          setFinderPersonal(on);
+          applyIncognito(!on);
+        }}
+        contact={<PartyFields idPrefix="client" party={client} onChange={(partial) => setClient((p) => ({ ...p, ...partial }))} />}
+        assets={assets}
+        rois={assetRois}
+        onAsset={setAsset}
+        onRoi={setAssetRoi}
+        taxRate={taxRate}
+        onTaxRate={setTaxRate}
+        excludeHome={excludeHome}
+        onExcludeHome={(on) => {
+          setExcludeHome(on);
+          setPoolShown(false);
+        }}
+        poolShown={poolShown}
+        pool={pool}
+        onCalculate={() => {
+          setPoolShown(true);
+          setCue({
+            title: "Section 1 complete",
+            body: section1AssetsMessage({ pool, home: homeEquity, excludeHome }),
+          });
+        }}
+        ageToday={ageToday}
+        onAge={applyAge}
+        minAge={MIN_AGE_TODAY}
+        state={state}
+        onState={(next) => {
+          setState(next);
+          setStateNeeded(false);
+          if (!excludableTouched) setAssets((prev) => ({ ...prev, excludable: defaultExcludableAssets(next) }));
+        }}
+        issueState={issueTouched ? issueState : state}
+        onIssueState={(next) => {
+          setIssueTouched(true);
+          setIssueState(next);
+        }}
+        setting={setting}
+        onSetting={(v) => {
+          setSetting(v);
+          setSettingNeeded(false);
+          setCpiOverride(null);
+        }}
+        duration={duration}
+        onDuration={(n) => {
+          setDuration(n);
+          setDurationNeeded(false);
+        }}
+        cpi={cpi}
+        onCpi={(n) => setCpiOverride(n)}
+        claimAge={claimAge}
+        onClaimAge={(n) => {
+          const floor = ageToday >= MIN_AGE_TODAY ? ageToday + 1 : MIN_AGE_TODAY + 1;
+          setClaimAgeTouched(true);
+          setClaimAge(Math.max(floor, Math.round(n)));
+        }}
+        onConfirm2={() => confirmSection2(true)}
+        section2Confirmed={section2Confirmed}
+        dailyBenefit={policy.dailyBenefit}
+        benefitYears={policy.benefitYears}
+        elimDays={policy.elimDays}
+        riderKey={riderKey(policy)}
+        riderOptions={RIDER_OPTIONS.map((o) => ({ key: o.key, label: o.label }))}
+        onDaily={(v) => patchPolicy({ enabled: true, dailyBenefit: Number(v) || policy.dailyBenefit })}
+        onYears={(n) => patchPolicy({ enabled: true, benefitYears: n })}
+        onElim={(n) => patchPolicy({ enabled: true, elimDays: n })}
+        onRider={(key) => patchPolicy({ enabled: true, ...parseRider(key) })}
+        onConfirm3={() => confirmSection3(true)}
+        section3Confirmed={section3Confirmed}
+        insuranceLocked={insuranceLocked}
+        onRun={(only) => runHypo(only)}
+        onOpenForm={() => setShowFullForm(true)}
+      />
+      {showFullForm ? (
+      <>
       <section className="mt-4 card-xl min-w-0 p-4 md:p-5">
         <TitleCollapse
           title="Personalize Asset Model (optional input)"
@@ -1972,6 +2060,8 @@ export function Calculator() {
             </div>
           </TitleCollapse>
           </section>
+      </>
+      ) : null}
 
       {ran && (
         <>
