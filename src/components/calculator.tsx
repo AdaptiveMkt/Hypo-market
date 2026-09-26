@@ -863,6 +863,7 @@ export function Calculator() {
     todayCost,
     partnershipOn: partnershipApplies,
     preferTap,
+    lifeFaceAmount,
   });
   const recommendations = recommendationsNarrative({
     scenario,

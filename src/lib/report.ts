@@ -127,6 +127,7 @@ export type ReportOpts = {
   todayCost: number;
   partnershipOn?: boolean;
   preferTap?: boolean;
+  lifeFaceAmount?: number;
 };
 
 /** Plain-language description of this run for the Analysis sheet and emails. */
@@ -186,6 +187,17 @@ export function analysisNarrative(opts: ReportOpts): string {
     `Care is modeled to start ${startWhen} and last ${s.duration} year${s.duration === 1 ? "" : "s"}. Today's median ${setting.toLowerCase()} cost in ${s.state} is ${money(todayCost)} per year (about ${money(daily)} per day). Care costs inflate at ${s.cpi}% per year. Taxable assets are assumed to earn ${s.roi}% gross, with a ${s.taxRate ?? 0}% tax on that return (net ${net.toFixed(2)}%). Deferred annuities, life insurance cash value, and IRA / 401(k) grow tax-deferred at their own R.O.I. (IRA / 401(k) at ${s.iraRoi ?? s.roi}%). Roth IRA grows tax-free.`,
     `Using countable assets alone at today's cost, the pool is ${formatYearsLast(yearsToday)}. At the start of claim, countable assets (net after tax) are projected at ${money(result.startPoolNet)} against a first-year care bill of ${money(result.firstCost)}; that asset pool is ${formatYearsLast(yearsClaimAssets)}. Deferred IRA / annuity / life cash value is reduced by the ${s.taxRate ?? 0}% tax rate as if distributed at claim; taxable sleeves already grew at net R.O.I.`,
   ];
+
+  const face = Math.max(0, Math.round(Number(opts.lifeFaceAmount) || 0));
+  if (face > 0) {
+    const cash = Math.max(0, Math.round(Number(s.assets.life) || 0));
+    paras.push(
+      `A life insurance death benefit face amount of ${money(face)} is disclosed on this run${cash > 0 ? `, and life insurance cash value of ${money(cash)} is already in countable assets` : ""}. The face amount does not pay the care bill in this model. It can still matter for long-term care expenses if the policy is sold. A viatical settlement is a sale by an owner who is terminally or chronically ill. A licensed buyer pays cash now, takes over future premiums, and collects the death benefit later. If the seller meets the IRC §101(g) illness test and the buyer is a qualified viatical settlement provider, that cash can be taxed like an accelerated death benefit. A life settlement is a sale by an owner who is not terminally or chronically ill. The buyer pays less than the face amount, often more than cash surrender value, and collects the death benefit later. Either sale can help with long-term care expenses only after the cash received is entered as a countable asset. Gain above the owner’s basis on a life settlement is generally taxable.`,
+    );
+    paras.push(
+      `* Qualification disclosure: disclosing a face amount does not mean the policy qualifies for a life settlement or a viatical settlement. A viatical settlement generally requires a physician’s certification that the insured is terminally ill (death reasonably expected within 24 months) or chronically ill under IRC §101(g), and a buyer that is a qualified viatical settlement provider. A life settlement is a different transaction for an owner who does not meet that illness test. State licensing, contestability, minimum policy size, and the insurer’s own options (surrender, loan, or an accelerated death benefit) still apply. Ask the insurer what the contract offers before selling. See the NAIC life settlements guide (2022) and the NAIC Viatical Settlements Model Act #697. This is not a quote, a tax opinion, or a statement that this policy will qualify.`,
+    );
+  }
 
   if (!s.policy.enabled) {
     paras.push(

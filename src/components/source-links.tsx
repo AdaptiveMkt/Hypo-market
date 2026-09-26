@@ -60,6 +60,8 @@ const PHRASES: [string, string][] = [
   ["Consumer Price Index", SRC.blsCpi],
   ["NAIC Shopper’s Guide", SRC.naicShopper],
   ["Shopper’s Guide to Long-Term Care Insurance", SRC.naicShopper],
+  ["NAIC life settlements guide (2022)", SRC.naicLifeSettlement],
+  ["NAIC Viatical Settlements Model Act #697", SRC.naicModel697],
   ["Personal Worksheet", SRC.naicSuitability],
   ["2026 AALTCI Long-Term Care Insurance Price Index", SRC.aaltciPrice2026],
   ["AALTCI", SRC.aaltci],
