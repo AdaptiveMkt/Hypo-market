@@ -577,10 +577,8 @@ export function agiPremiums(annualIncome: number) {
   };
 }
 
-export function policyWithAgi(policy: LtcPolicy, annualIncome: number): LtcPolicy {
-  const priced = agiPremiums(annualIncome);
-  if (priced.agi <= 0 || policy.kind !== "traditional") return policy;
-  return { ...policy, annualPremium: priced.traditionalAnnual };
+export function policyWithAgi(policy: LtcPolicy, _annualIncome: number): LtcPolicy {
+  return policy;
 }
 
 export function bookWithAgi(

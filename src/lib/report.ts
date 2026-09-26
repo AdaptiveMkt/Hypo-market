@@ -13,6 +13,7 @@ import {
   netRoiPct,
   shortfallStart,
   targetPremium,
+  TARGET_INCOME_RATE,
   yearsPoolLasts,
   type AssetRois,
   type Assets,
@@ -21,6 +22,7 @@ import {
 } from "./calc";
 import { SETTING_LABELS, type CareSetting } from "./costs";
 import { stateLtcTaxBreak } from "./ltc-tax";
+import { typicalPremiumHint } from "./what-consumers-buy";
 
 export const SAVE_KEY = "aum-scenario-v2";
 
@@ -192,8 +194,22 @@ export function analysisNarrative(opts: ReportOpts): string {
     const structure = isLinkedKind(s.policy.kind)
       ? `a ${policyKindLabel(s.policy.kind).toLowerCase()} (premium ${money(s.policy.singlePremium)}, leverage ${s.policy.leverage}x)`
       : `a traditional reimbursement policy (daily benefit ${money(s.policy.dailyBenefit)} today, benefit period ${isLifetimeBenefit(s.policy.benefitYears) ? `${LIFETIME_BENEFIT_MARK}. ${LIFETIME_BENEFIT_NOTE}` : `${s.policy.benefitYears} years`}, ${s.policy.elimDays}-day elimination, inflation ${s.policy.inflationMethod === "none" || s.policy.benefitInflationPct <= 0 ? "level" : `${s.policy.benefitInflationPct}% ${s.policy.inflationMethod}`}, annual premium ${money(s.policy.annualPremium)})`;
+    const industry = typicalPremiumHint(
+      s.ageToday,
+      s.policy.benefitInflationPct,
+      s.policy.inflationMethod,
+    );
+    const industryNote =
+      !isLinkedKind(s.policy.kind) && industry.amount != null
+        ? ` Annual premium defaults to the ${industry.band} age-bracket industry midpoint, ${money(industry.amount)}, from the 2026 AALTCI Long-Term Care Insurance Price Index. Not a quote.`
+        : "";
+    const agi = Math.max(0, Math.round(Number(s.annualIncome) || 0));
+    const funding =
+      agi > 0
+        ? ` Based on your disclosed AGI, the recommended annual household premium should be targeted no greater than ${money(Math.round(agi * TARGET_INCOME_RATE))}. Additional premium funding options might include reallocation of assets and using part of your Return on investment.`
+        : " Premium funding options to consider is to reallocate assets and use part of ROI to fund your household premiums.";
     paras.push(
-      `This run includes ${structure}. Insurance is modeled to pay the claim first; countable assets co-pay only the leftover. LTC benefits at purchase are ${result.lifetimeBenefit ? `${LIFETIME_BENEFIT_MARK}. ${LIFETIME_BENEFIT_NOTE}` : money(result.benefitPoolAtPurchase ?? 0)}. At claim they are ${result.lifetimeBenefit ? LIFETIME_BENEFIT_MARK : money(result.benefitPoolAtClaim ?? 0)}.`,
+      `This run includes ${structure}. Insurance is modeled to pay the claim first; countable assets co-pay only the leftover. LTC benefits at purchase are ${result.lifetimeBenefit ? `${LIFETIME_BENEFIT_MARK}. ${LIFETIME_BENEFIT_NOTE}` : money(result.benefitPoolAtPurchase ?? 0)}. At claim they are ${result.lifetimeBenefit ? LIFETIME_BENEFIT_MARK : money(result.benefitPoolAtClaim ?? 0)}.${industryNote}${funding}`,
     );
     paras.push(
       `The combined pool (countable assets + LTC benefits) at today's cost is ${money(combinedToday)} and is ${formatYearsLast(yearsCombinedToday)}. At claim the combined pool is ${money(combinedClaim)} against ${money(result.firstCost)} per year and is ${formatYearsLast(yearsCombinedClaim)}. Insurance paid over the modeled years is ${money(result.insuranceTotal)}. Countable assets remaining are ${money(result.endPool)}, which is ${preserved >= 0 ? money(preserved) + " higher" : money(Math.abs(preserved)) + " lower"} than if the same care had been paid from assets with no policy (${money(selfFunded.endPool)} left).`,
