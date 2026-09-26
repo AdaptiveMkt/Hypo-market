@@ -226,7 +226,7 @@ export function Calculator() {
   const cpi = cpiOverride ?? (setting ? fiveYearLtcCagr(setting) : DEFAULT_CARE_CPI);
   const cpiTouched = cpiOverride != null;
   const [ageToday, setAgeToday] = useState(DEFAULT_AGE_TODAY);
-  const [claimAge, setClaimAge] = useState(AALTCI_MEAN_CLAIM_AGE);
+  const [claimAge, setClaimAge] = useState(() => actuarialClaimAge(DEFAULT_AGE_TODAY));
   const [claimAgeTouched, setClaimAgeTouched] = useState(false);
   const delay = ageToday >= MIN_AGE_TODAY ? yearsUntilClaim(ageToday, claimAge) : 0;
   const buyerHints = ageToday >= MIN_AGE_TODAY ? typicalBuyerHints(ageToday) : null;
@@ -836,7 +836,7 @@ export function Calculator() {
     setSection3Confirmed(false);
     setSection3Open(false);
     setAlternativeRun(false);
-    setClaimAge(AALTCI_MEAN_CLAIM_AGE);
+    setClaimAge(actuarialClaimAge(DEFAULT_AGE_TODAY));
     setClaimAgeTouched(false);
     setDuration(10);
     setProtectPct(DEFAULT_PROTECT_PCT);
@@ -1576,6 +1576,15 @@ export function Calculator() {
               <p className="mt-1 text-sm text-muted">
                 Uses this run’s countable assets, age today, years until claim, care setting, inflation, and how long care may last.
                 You set the share of countable assets (net after tax at claim) you want left after the modeled care years.
+              </p>
+              <p className="mt-2 text-sm font-semibold leading-snug text-navy">
+                Industry claim experience age to be insured: {AALTCI_MEAN_CLAIM_AGE}.
+              </p>
+              <p className="mt-1 text-xs leading-snug text-muted">
+                Mean age at claim in the{" "}
+                <Cite href={SRC.aaltci2024Claims}>AALTCI 2024 LTCI claims data</Cite>
+                {" "}(Connecticut Partnership sample, range 31–103). Benefit defaults follow the{" "}
+                <Cite href={SRC.millimanSurvey2025}>2025 Milliman LTCI Survey</Cite>.
               </p>
               <label className={`${labelClass} mt-3`} htmlFor="protect-pct">
                 Protect this share of countable assets at claim (%)

@@ -1,4 +1,5 @@
 import { fiveYearIssueBand, LIFETIME_BENEFIT_NOTE, monthlyFromDaily, typicalBuyerHints } from "./calc";
+import { AALTCI_MEAN_CLAIM_AGE } from "./claim-age";
 import type { ProtectAssetsSize } from "./protect-assets";
 import { money, moneyCents } from "./utils";
 
@@ -53,6 +54,9 @@ export function section3ProtectMessage(opts: {
   const monthlyClaim = money(Math.round(monthlyFromDaily(s.dailyAtClaim)));
   const cpi = `${Number(opts.cpiPct).toFixed(1)}%`;
   const lead =
+    `Industry claim experience age to be insured: ${AALTCI_MEAN_CLAIM_AGE}. ` +
+    `That is the mean age at claim in the AALTCI 2024 LTCI claims data (Connecticut Partnership sample, range 31–103). ` +
+    `Benefit defaults follow the 2025 Milliman LTCI Survey. ` +
     `Based on ${money(opts.pool)} countable assets today at age ${opts.ageToday}, and considering based on industry claim's experience, ` +
     `your care needs may occur sometime within ${when} at age ${opts.claimAge}. ` +
     `This model projects your countable assets, net after tax, at claim to be about ${moneyCents(s.assetsAtClaimNet)}. ` +

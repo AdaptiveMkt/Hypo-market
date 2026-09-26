@@ -7,11 +7,21 @@ export const DEFAULT_AGE_TODAY = 60;
 /** Youngest age this hypothetical will run. */
 export const MIN_AGE_TODAY = 40;
 
+/** Years from today until the planning claim age.
+ * 65+ → 10 years. 50–64 → 15 years. 40–49 → 20 years.
+ * Ages 50–59 are named in both the 50–64 and 40–59 bands; the 50–64 band (+15) is used.
+ */
+export function planningYearsUntilCare(ageToday: number): number {
+  const age = Math.round(Number(ageToday) || 0);
+  if (age >= 65) return 10;
+  if (age >= 50) return 15;
+  return 20;
+}
+
 export function actuarialClaimAge(ageToday: number): number {
   const age = Math.round(Number(ageToday) || 0);
-  if (age < 18) return AALTCI_MEAN_CLAIM_AGE;
-  if (age >= AALTCI_MEAN_CLAIM_AGE) return age + 2;
-  return AALTCI_MEAN_CLAIM_AGE;
+  if (age < MIN_AGE_TODAY) return AALTCI_MEAN_CLAIM_AGE;
+  return age + planningYearsUntilCare(age);
 }
 
 export function yearsUntilClaim(ageToday: number, claimAge: number): number {
