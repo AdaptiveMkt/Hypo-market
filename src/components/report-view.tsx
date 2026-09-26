@@ -38,6 +38,7 @@ import {
   leverageLabel,
   policyKindLabel,
   specifiedFaceAmount,
+  STRUCTURE_OPTIONS,
   yearsPoolLasts,
   targetPremium,
   targetPremiumParts,
@@ -47,6 +48,7 @@ import {
   type LtcPolicy,
   type PolicyKind,
   type Projection,
+  type StructureFlags,
 } from "@/lib/calc";
 import { LinkedClaimCard } from "@/components/linked-claim-card";
 import { HybridLifeOptionsPanel } from "@/components/hybrid-life-options-panel";
@@ -175,6 +177,8 @@ export function ReportView({
   inflationCompare,
   insuranceCompare,
   structureCompare = [],
+  runKinds,
+  onToggleStructure,
   careCompare,
   sensitivity,
   confidence,
@@ -239,6 +243,8 @@ export function ReportView({
     thisRun?: boolean;
     proj: Projection;
   }[];
+  runKinds?: StructureFlags;
+  onToggleStructure?: (kind: PolicyKind, on: boolean) => void;
   careCompare: CareRow[];
   sensitivity: SensitivityResult;
   confidence: ConfidenceResult;
@@ -1612,10 +1618,25 @@ export function ReportView({
             Explore Traditional, Asset-based, Hybrid, and LTC Annuity
           </h2>
           <p className="mb-3 text-sm text-muted">
-            Only the structures checked on this run are illustrated. Traditional uses this
+            Check a structure to add it to this comparison. Traditional uses this
             run’s premium and daily benefit. Linked lanes use this run’s hybrid fields or
             planning defaults. Educational — not a quote.
           </p>
+          {onToggleStructure && runKinds ? (
+            <div className="no-print mb-3 flex flex-wrap gap-x-4 gap-y-2">
+              {STRUCTURE_OPTIONS.filter((o) => o.key !== "traditional").map((o) => (
+                <label key={o.key} className="flex min-h-11 cursor-pointer items-center gap-2 text-sm font-semibold text-navy">
+                  <input
+                    type="checkbox"
+                    className="size-4 accent-teal"
+                    checked={!!runKinds[o.key]}
+                    onChange={(e) => onToggleStructure(o.key, e.target.checked)}
+                  />
+                  {o.key === "assetBased" ? "Asset-based" : o.key === "ltcAnnuity" ? "Annuity based" : "Hybrid life/LTC"}
+                </label>
+              ))}
+            </div>
+          ) : null}
           {structureCompare.length === 0 ? (
             <p className="text-sm text-muted">No structures were selected to run.</p>
           ) : (

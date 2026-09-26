@@ -1380,6 +1380,10 @@ export function Calculator() {
     inflationCompare,
     insuranceCompare,
     structureCompare,
+    runKinds,
+    onToggleStructure: (kind: PolicyKind, on: boolean) => {
+      setRunKinds((prev) => ({ ...prev, [kind]: on }));
+    },
     careCompare,
     sensitivity,
     confidence,
@@ -2759,6 +2763,19 @@ export function Calculator() {
 
           {policy.enabled ? (
             <ViewFold title="Explore Traditional, Asset-based, Hybrid, and LTC Annuity" hint={`${DETAIL_HINTS.hybrid} View more details.`} checked={details.hybrid} onPdf={(v) => setDetail("hybrid", v)}>
+              <div className="mb-3 flex flex-wrap gap-x-4 gap-y-2">
+                {STRUCTURE_OPTIONS.filter((o) => o.key !== "traditional").map((o) => (
+                  <label key={o.key} className="flex min-h-11 cursor-pointer items-center gap-2 text-sm font-semibold text-navy">
+                    <input
+                      type="checkbox"
+                      className="size-4 accent-teal"
+                      checked={!!runKinds[o.key]}
+                      onChange={(e) => setRunKinds((prev) => ({ ...prev, [o.key]: e.target.checked }))}
+                    />
+                    {o.key === "assetBased" ? "Asset-based" : o.key === "ltcAnnuity" ? "Annuity based" : "Hybrid life/LTC"}
+                  </label>
+                ))}
+              </div>
               <div className="grid gap-3">
                 {structureCompare.map((row) => (
                   <article key={row.key} className={`rounded-lg border px-3 py-3 ${row.thisRun ? "border-gold bg-cream" : "border-line"}`}>
