@@ -511,10 +511,11 @@ export function ReportView({
                 ? "Paused. Resume speaking to continue."
                 : "Celeste does not start on its own. Tap Hear summary if you want this read aloud."}
           </p>
+            <div className={`col-span-full grid gap-2 ${allowPdf ? "grid-cols-3" : "grid-cols-2"}`}>
             <button
               type="button"
               onClick={onPdf}
-              className="btn-block rounded-lg border border-gold bg-gold text-masthead hover:brightness-105"
+              className="flex min-h-11 items-center justify-center rounded-lg border border-gold bg-gold px-2 text-center text-sm font-semibold text-masthead hover:brightness-105"
               hidden={!allowPdf}
             >
               Download PDF
@@ -522,10 +523,18 @@ export function ReportView({
             <button
               type="button"
               onClick={() => (onClosePdf ?? onPdf)()}
-              className="btn-block rounded-lg bg-teal text-cream hover:brightness-110"
+              className="flex min-h-11 items-center justify-center rounded-lg bg-teal px-2 text-center text-sm font-semibold text-cream hover:brightness-110"
             >
               Print to PDF
             </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex min-h-11 items-center justify-center rounded-lg border border-navy bg-white px-2 text-center text-sm font-semibold text-navy hover:bg-cream"
+            >
+              Edit
+            </button>
+            </div>
           </div>
         </div>
 
