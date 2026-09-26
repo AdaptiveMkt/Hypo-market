@@ -417,6 +417,10 @@ export function Calculator() {
       if (saved.finderPersonal) {
         setPersonalizeOpen(true);
         setTheme(false);
+      } else if (saved.audience === "licensed-client") {
+        setFinderPersonal(true);
+        setPersonalizeOpen(true);
+        setTheme(false);
       } else {
         setPersonalizeOpen(false);
         setTheme(true);
@@ -1146,6 +1150,12 @@ export function Calculator() {
     window.setTimeout(() => scrollToHeader(false), 50);
   }
   function applyIncognito(on: boolean) {
+    if (audience === "licensed-client") {
+      setFinderPersonal(true);
+      setPersonalizeOpen(true);
+      setTheme(false);
+      return;
+    }
     if (on) {
       setPersonalizeOpen(false);
       setTheme(true);
@@ -1156,8 +1166,12 @@ export function Calculator() {
     themeBeforeIncognito.current = null;
   }
   useLayoutEffect(() => {
+    if (audience === "licensed-client") {
+      setTheme(false);
+      return;
+    }
     if (!personalizeOpen) setTheme(true);
-  }, [personalizeOpen]);
+  }, [personalizeOpen, audience]);
   const pdfUnlocked = ran && section2Confirmed && (insuranceLocked || section3Confirmed);
   const licensedPdf = audience === "licensed-client" || audience === "licensed-solo";
   const canPdf = pdfUnlocked && (audience === "interested" || licensedPdf);
@@ -1299,6 +1313,11 @@ export function Calculator() {
   ].filter(Boolean);
 
   function executeHypo() {
+    if (audience === "licensed-client") {
+      setFinderPersonal(true);
+      setPersonalizeOpen(true);
+      setTheme(false);
+    }
     const locked = insuranceLockedOut(pool);
     setHypoRunId((n) => n + 1);
     setDetails(locked ? lockoutDetails() : withScenarioDetails({ ...CLIENT_SITTING }, false));
@@ -1517,7 +1536,8 @@ export function Calculator() {
     readyCards: snapshotReadyCards(),
     details,
     allowPdf: audience === "interested" || audience === "licensed-client" || audience === "licensed-solo",
-    pdfDemo: audience === "licensed-client" || audience === "licensed-solo",
+    pdfDemo: audience === "licensed-solo",
+    audienceRole: audience,
     audienceNote: audience === "licensed-solo" ? "Contact Adaptive Marketing Group for terms of use and licensing agreement." : "",
     onClose: () => {
       setShowReport(false);
@@ -1559,6 +1579,11 @@ export function Calculator() {
             onSelect={(role) => {
               setAudience(role);
               setAdvisorCleared(false);
+              if (role === "licensed-client") {
+                setFinderPersonal(true);
+                setPersonalizeOpen(true);
+                setTheme(false);
+              }
             }}
           />
         ) : (

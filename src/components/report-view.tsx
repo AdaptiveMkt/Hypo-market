@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import type { AudienceRole } from "@/lib/qa-cookie";
 import {
   Area,
   Bar,
@@ -155,6 +156,13 @@ function missingAdvisorFields(advisor: AdvisorParty) {
   return gaps;
 }
 
+const ROLE_HEADER: Partial<Record<AudienceRole, string>> = {
+  interested:
+    "Contact a Qualified Long Term Care agent or financial services professional for up to date insurance quotes and carrier illustrations in your state.",
+  "licensed-client":
+    "Obtain up to date carrier quotes and illustrations from the advisor shown in this report.",
+};
+
 export function ReportView({
   state,
   setting,
@@ -215,6 +223,7 @@ export function ReportView({
   details = ALL_DETAILS_ON,
   allowPdf = true,
   pdfDemo = false,
+  audienceRole = null,
   audienceNote = "",
   onClose,
   onPdf,
@@ -285,6 +294,7 @@ export function ReportView({
   details?: DetailFlags;
   allowPdf?: boolean;
   pdfDemo?: boolean;
+  audienceRole?: AudienceRole | null;
   audienceNote?: string;
   onClose: () => void;
   onPdf: () => void;
@@ -414,11 +424,20 @@ export function ReportView({
       aria-labelledby="report-title"
       style={{ scrollPaddingTop: "5.5rem" }}
     >
+      {pdfDemo ? (
+        <p
+          className="pointer-events-none fixed left-1/2 top-1/2 z-[60] -translate-x-1/2 -translate-y-1/2 rotate-[15deg] select-none text-7xl font-bold tracking-wide text-neutral-500/45"
+          aria-hidden="true"
+        >
+          DEMO
+        </p>
+      ) : null}
       <article
         id="aum-report"
         data-medicaid-open={medicaidOpen ? "1" : "0"}
-        data-pdf-watermark={allowPdf ? "1" : "0"}
+        data-pdf-watermark={audienceRole === "interested" ? "1" : "0"}
         data-pdf-demo={pdfDemo ? "1" : "0"}
+        data-pdf-banner={audienceRole ? (ROLE_HEADER[audienceRole] ?? "") : ""}
         ref={reportRef}
         tabIndex={-1}
         className="mx-auto max-w-5xl space-y-8 bg-paper px-4 py-8 text-ink outline-none sm:px-8"
@@ -476,6 +495,9 @@ export function ReportView({
           </p>
           {lifetime ? (
             <p className="mt-2 text-xs font-semibold leading-snug text-navy">{LIFETIME_BENEFIT_NOTE}</p>
+          ) : null}
+          {audienceRole && ROLE_HEADER[audienceRole] ? (
+            <p className="mt-3 text-sm font-semibold leading-snug text-navy">{ROLE_HEADER[audienceRole]}</p>
           ) : null}
         </header>
 
@@ -559,11 +581,11 @@ export function ReportView({
           </section>
         ) : null}
 
-        {(partyFilled(client) || veteran || (policy.enabled && (partyFilled(advisor) || advisor.firm || advisor.designation))) ? (
+        {(audienceRole === "licensed-client" || partyFilled(client) || veteran || (policy.enabled && (partyFilled(advisor) || advisor.firm || advisor.designation))) ? (
           <section className="report-block">
             <h2 className="mb-3 font-display text-xl text-navy">Prepared for</h2>
             <div className="grid gap-4 sm:grid-cols-2 text-sm">
-              {partyFilled(client) || veteran ? (
+              {audienceRole === "licensed-client" || partyFilled(client) || veteran ? (
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-wide text-gold-ink">Client</p>
                   <p className="mt-1 font-semibold text-navy">{client.name || "—"}</p>
@@ -578,7 +600,7 @@ export function ReportView({
                   ) : null}
                 </div>
               ) : null}
-              {policy.enabled && (partyFilled(advisor) || advisor.firm || advisor.designation) ? (
+              {(audienceRole === "licensed-client" || (policy.enabled && (partyFilled(advisor) || advisor.firm || advisor.designation))) ? (
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-wide text-gold-ink">
                     Advisor / insurance professional

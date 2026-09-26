@@ -7,7 +7,7 @@ const MAX_MARGIN = 72;
 const BASE_MARGIN = 42;
 const GAP = 12;
 const FOOTER_H = 72;
-const CONTENT_TOP = 48;
+const CONTENT_TOP = 68;
 const FOOTER = COPYRIGHT_LINE;
 const UNSUPPORTED_COLOR = /(?:oklch|oklab|lab|lch|color-mix|color)\([^)]*\)/i;
 
@@ -64,7 +64,7 @@ function autoFit(opts: {
 }
 
 /** Numbers are written after the last page exists, so “Page X of Y” matches the file. */
-function stampPageNumbers(pdf: jsPDF, mark: "consumer" | "demo" | "") {
+function stampPageNumbers(pdf: jsPDF, mark: "consumer" | "demo" | "", banner = "") {
   const pages = pdf.getNumberOfPages();
   const pageW = pdf.internal.pageSize.getWidth();
   const pageH = pdf.internal.pageSize.getHeight();
@@ -92,6 +92,14 @@ function stampPageNumbers(pdf: jsPDF, mark: "consumer" | "demo" | "") {
     pdf.setFontSize(10);
     const label = `Page ${i} of ${pages}`;
     pdf.text(label, pageW - BASE_MARGIN, 22, { align: "right" });
+
+    if (banner) {
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(8);
+      pdf.setTextColor(27, 58, 75);
+      const bannerLines = pdf.splitTextToSize(banner, pageW - BASE_MARGIN * 2).slice(0, 2);
+      pdf.text(bannerLines, BASE_MARGIN, 36);
+    }
 
     pdf.setFont("helvetica", "normal");
     pdf.setFontSize(8);
@@ -737,7 +745,7 @@ export async function downloadReportPdf(
 
     if (preview) commitPagePreview(preview);
     const mark = root.dataset.pdfDemo === "1" ? "demo" : root.dataset.pdfWatermark === "1" ? "consumer" : "";
-    stampPageNumbers(pdf, mark);
+    stampPageNumbers(pdf, mark, root.dataset.pdfBanner || "");
 
     const blob = pdf.output("blob") as Blob;
     const url = savePdfBlob(blob, filename);
