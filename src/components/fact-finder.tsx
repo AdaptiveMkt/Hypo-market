@@ -56,9 +56,10 @@ type Step =
 
 const ASSET_QUESTIONS = ASSET_FIELDS.filter((f) => f.key !== "home");
 
-function stepsFor(personalized: boolean, insuranceLocked: boolean, hasCoverage: boolean): Step[] {
-  const steps: Step[] = [{ kind: "mode" }];
-  if (personalized) steps.push({ kind: "contact" });
+function stepsFor(personalized: boolean, insuranceLocked: boolean, hasCoverage: boolean, daylight = false): Step[] {
+  const steps: Step[] = [];
+  if (!daylight) steps.push({ kind: "mode" });
+  if (personalized || daylight) steps.push({ kind: "contact" });
   for (const f of ASSET_QUESTIONS) steps.push({ kind: "asset", key: f.key, label: f.label });
   steps.push(
     { kind: "tax" },
@@ -168,6 +169,7 @@ export function FactFinder({
   canDownload,
   onView,
   onPdf,
+  daylight = false,
 }: {
   index: number;
   onIndex: (n: number) => void;
@@ -232,11 +234,12 @@ export function FactFinder({
   canDownload: boolean;
   onView: () => void;
   onPdf: () => void;
+  daylight?: boolean;
 }) {
   const hasCoverage = (Object.keys(runKinds) as PolicyKind[]).some((k) => runKinds[k]);
   const steps = useMemo(
-    () => stepsFor(personalized, insuranceLocked, hasCoverage),
-    [personalized, insuranceLocked, hasCoverage],
+    () => stepsFor(personalized, insuranceLocked, hasCoverage, daylight),
+    [personalized, insuranceLocked, hasCoverage, daylight],
   );
   const selectedKinds = (["traditional", "assetBased", "ltcAnnuity", "hybridLife"] as PolicyKind[]).filter((k) => runKinds[k]);
   const [benefitKind, setBenefitKind] = useState<PolicyKind>("traditional");

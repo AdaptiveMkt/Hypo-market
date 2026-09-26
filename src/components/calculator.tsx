@@ -1592,6 +1592,7 @@ export function Calculator() {
             <h2 className="mt-1 font-display text-xl text-navy">Advisor information is required</h2>
             <p className="mt-2 text-sm text-muted">
               A licensed insurance professional must enter advisor details before the fact finder starts.
+              {audience === "licensed-client" ? " This section stays in daylight with the client information." : ""}
             </p>
             <div className="mt-3">
               <AudienceBanner role={audience} />
@@ -1622,7 +1623,24 @@ export function Calculator() {
       <AudienceBanner role={audience} />
       <WelcomeCard onReset={resetAll} />
       {showFullForm ? null : (
+      <>
+      {audience === "licensed-client" ? (
+        <section className="card-xl mt-4 min-w-0 p-4 md:p-5">
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-teal">Advisor</p>
+          <h2 className="mt-1 font-display text-xl text-navy">Advisor information</h2>
+          <p className="mt-2 text-sm text-muted">Shown in daylight with the client fact finder.</p>
+          <div className="mt-4">
+            <PartyFields
+              idPrefix="advisor-daylight"
+              party={{ ...advisor, state: advisor.state || state }}
+              extra
+              onChange={(partial) => setAdvisor((p) => ({ ...p, ...partial }))}
+            />
+          </div>
+        </section>
+      ) : null}
       <FactFinder
+        daylight={audience === "licensed-client"}
         index={finderIndex}
         onIndex={setFinderIndex}
         personalized={finderPersonal}
@@ -1727,6 +1745,7 @@ export function Calculator() {
         onView={viewAllReport}
         onPdf={requestPdfDownload}
       />
+      </>
       )}
       {pdfUnlocked ? (
         <div className="mx-auto mt-4 grid max-w-md grid-cols-2 gap-2">
