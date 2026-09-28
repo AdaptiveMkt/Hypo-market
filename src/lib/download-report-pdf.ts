@@ -64,7 +64,7 @@ function autoFit(opts: {
 }
 
 /** Numbers are written after the last page exists, so “Page X of Y” matches the file. */
-function stampPageNumbers(pdf: jsPDF, mark: "consumer" | "demo" | "", banner = "") {
+function stampPageNumbers(pdf: jsPDF, mark: "consumer" | "demo" | "", banner = "", bannerHref = "") {
   const pages = pdf.getNumberOfPages();
   const pageW = pdf.internal.pageSize.getWidth();
   const pageH = pdf.internal.pageSize.getHeight();
@@ -99,6 +99,9 @@ function stampPageNumbers(pdf: jsPDF, mark: "consumer" | "demo" | "", banner = "
       pdf.setTextColor(27, 58, 75);
       const bannerLines = pdf.splitTextToSize(banner, pageW - BASE_MARGIN * 2).slice(0, 2);
       pdf.text(bannerLines, BASE_MARGIN, 36);
+      if (bannerHref) {
+        pdf.link(BASE_MARGIN, 26, pageW - BASE_MARGIN * 2, bannerLines.length * 11, { url: bannerHref });
+      }
     }
 
     pdf.setFont("helvetica", "normal");
@@ -745,7 +748,7 @@ export async function downloadReportPdf(
 
     if (preview) commitPagePreview(preview);
     const mark = root.dataset.pdfDemo === "1" ? "demo" : root.dataset.pdfWatermark === "1" ? "consumer" : "";
-    stampPageNumbers(pdf, mark, root.dataset.pdfBanner || "");
+    stampPageNumbers(pdf, mark, root.dataset.pdfBanner || "", root.dataset.pdfBannerHref || "");
 
     const blob = pdf.output("blob") as Blob;
     const url = savePdfBlob(blob, filename);

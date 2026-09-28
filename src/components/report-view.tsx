@@ -162,7 +162,11 @@ const ROLE_HEADER: Partial<Record<AudienceRole, string>> = {
     "Contact a Qualified Long Term Care agent or financial services professional for up to date insurance quotes and carrier illustrations in your state.",
   "licensed-client":
     "Obtain up to date carrier quotes and illustrations from the advisor shown in this report.",
+  "licensed-solo":
+    "Contact Adaptive Marketing Group for terms of use and licensing agreement.",
 };
+
+const AMG_URL = "https://www.adaptivemarketingresources.com/";
 
 export function ReportView({
   state,
@@ -447,6 +451,7 @@ export function ReportView({
         data-pdf-watermark={audienceRole === "interested" ? "1" : "0"}
         data-pdf-demo={pdfDemo ? "1" : "0"}
         data-pdf-banner={audienceRole ? (ROLE_HEADER[audienceRole] ?? "") : ""}
+        data-pdf-banner-href={audienceRole === "licensed-solo" ? AMG_URL : ""}
         ref={reportRef}
         tabIndex={-1}
         className="mx-auto max-w-5xl space-y-8 bg-paper px-4 py-8 text-ink outline-none sm:px-8"
@@ -506,7 +511,19 @@ export function ReportView({
             <p className="mt-2 text-xs font-semibold leading-snug text-navy">{LIFETIME_BENEFIT_NOTE}</p>
           ) : null}
           {audienceRole && ROLE_HEADER[audienceRole] ? (
-            <p className="mt-3 text-sm font-semibold leading-snug text-navy">{ROLE_HEADER[audienceRole]}</p>
+            <p className="mt-3 text-sm font-semibold leading-snug text-navy">
+              {audienceRole === "licensed-solo" ? (
+                <>
+                  Contact{" "}
+                  <a href={AMG_URL} className="underline" target="_blank" rel="noopener noreferrer">
+                    Adaptive Marketing Group
+                  </a>{" "}
+                  for terms of use and licensing agreement.
+                </>
+              ) : (
+                ROLE_HEADER[audienceRole]
+              )}
+            </p>
           ) : null}
           {sharePending || shareUrl || shareError ? (
             <section data-share-omit className="mt-4 rounded-lg border border-gold bg-cream px-4 py-3 text-left text-sm text-navy">
