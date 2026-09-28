@@ -622,12 +622,6 @@ export function ReportView({
           </section>
         ) : null}
 
-        {policy.enabled && (partyFilled(advisor) || advisor.firm || advisor.designation) ? (
-          <section className="report-block">
-            <AdvisorProfessionalFolds />
-          </section>
-        ) : null}
-
         <section className="report-block">
           <div className={`rounded-lg border-2 px-4 py-3 ${depletedWhen ? "border-deplete bg-cream" : "border-gold bg-paper"}`}>
             <p className="text-xs uppercase tracking-wide text-muted">Funds depleted</p>
@@ -2072,14 +2066,6 @@ export function ReportView({
           </TitleCollapse>
         </section>
 
-        {insuranceLocked || details.dhContact || details.dhLicense ? (
-        <section className="report-block">
-          <TitleCollapse title="Find a qualified professional" className="mt-0" defaultOpen={insuranceLocked}>
-            <AdvisorProfessionalFolds details={details} lockout={insuranceLocked} />
-          </TitleCollapse>
-        </section>
-        ) : null}
-
         {policy.enabled && details.trends ? (
         <>
         <section className="report-block">
@@ -2562,6 +2548,14 @@ export function ReportView({
         ) : null}
 
         {policy.enabled ? <NaicLastPages /> : null}
+
+        {insuranceLocked || details.dhContact || details.dhLicense || details.dhIar || details.dhCfp || audienceRole === "licensed-client" || audienceRole === "licensed-solo" ? (
+        <section className="report-block">
+          <TitleCollapse title="Find a qualified professional" className="mt-0" defaultOpen={insuranceLocked}>
+            <AdvisorProfessionalFolds details={details} lockout={insuranceLocked} />
+          </TitleCollapse>
+        </section>
+        ) : null}
 
         <p className="no-print border-t border-line pt-4 text-center text-xs text-muted">
           <CopyrightMark />{" "}
