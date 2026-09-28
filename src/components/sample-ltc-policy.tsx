@@ -28,7 +28,7 @@ function riderWords(p: LtcPolicy) {
   return `${p.benefitInflationPct}% compound: each year the current daily maximum is multiplied by ${(1 + p.benefitInflationPct / 100).toFixed(2)}.`;
 }
 
-function OutlineDisclaimer() {
+export function SpecimenOutlineDisclaimer() {
   return (
     <div className="mt-4 card px-3 py-3 text-xs leading-relaxed text-muted">
       <p className="font-semibold uppercase tracking-wide text-navy">Disclaimer</p>
@@ -240,7 +240,6 @@ function LinkedSpecimen({
           <Cite href={SRC.iiprcOutline}>IIPRC outline standards</Cite>.
         </li>
       </ol>
-      <OutlineDisclaimer />
     </div>
   );
 }
@@ -425,7 +424,6 @@ export function SampleLtcPolicy({
             <Cite href={SRC.naicModel640}>NAIC Model Act #640 (PDF)</Cite>.
           </li>
         </ol>
-        <OutlineDisclaimer />
       </div>
     </TitleCollapse>
   );

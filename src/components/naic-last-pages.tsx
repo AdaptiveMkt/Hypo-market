@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { TitleCollapse } from "@/components/accordion";
 import { AllDesignationNotice } from "@/components/designation-notice";
+import { SpecimenOutlineDisclaimer } from "@/components/sample-ltc-policy";
 import { AmgName, Cite } from "@/components/source-links";
 import { SRC } from "@/lib/sources";
 
@@ -100,6 +101,7 @@ export function NaicLastPages() {
       >
         <AllDesignationNotice className="mt-0" />
       </TitleCollapse>
+      <SpecimenOutlineDisclaimer />
     </section>
   );
 }
