@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import type { AudienceRole } from "@/lib/qa-cookie";
-import { SHARE_DISCLAIMER } from "@/lib/share-report";
+import { shareDisclaimer } from "@/lib/share-report";
 import {
   Area,
   Bar,
@@ -227,6 +227,7 @@ export function ReportView({
   audienceRole = null,
   audienceNote = "",
   shareUrl = "",
+  shareHours = 72,
   sharePending = false,
   shareError = "",
   onClose,
@@ -301,6 +302,7 @@ export function ReportView({
   audienceRole?: AudienceRole | null;
   audienceNote?: string;
   shareUrl?: string;
+  shareHours?: number;
   sharePending?: boolean;
   shareError?: string;
   onClose: () => void;
@@ -518,7 +520,7 @@ export function ReportView({
                 </p>
               ) : null}
               {shareError ? <p className="mt-1 font-semibold text-deplete">{shareError}</p> : null}
-              <p className="mt-2 text-xs leading-relaxed">{SHARE_DISCLAIMER}</p>
+              <p className="mt-2 text-xs leading-relaxed">{shareDisclaimer(shareHours)}</p>
             </section>
           ) : null}
         </header>

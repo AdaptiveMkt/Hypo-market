@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SlugRouteImport } from './routes/$slug'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as CopyrightRouteImport } from './routes/copyright'
 import { Route as SuitabilityRouteImport } from './routes/suitability'
@@ -18,6 +19,11 @@ import { Route as SlugCodeRouteImport } from './routes/$slug.$code'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SlugRoute = SlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -36,13 +42,14 @@ const SuitabilityRoute = SuitabilityRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const SlugCodeRoute = SlugCodeRouteImport.update({
-  id: '/$slug/$code',
-  path: '/$slug/$code',
-  getParentRoute: () => rootRouteImport,
+  id: '/$code',
+  path: '/$code',
+  getParentRoute: () => SlugRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/$slug': typeof SlugRouteWithChildren
   '/about': typeof AboutRoute
   '/copyright': typeof CopyrightRoute
   '/suitability': typeof SuitabilityRoute
@@ -50,6 +57,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/$slug': typeof SlugRouteWithChildren
   '/about': typeof AboutRoute
   '/copyright': typeof CopyrightRoute
   '/suitability': typeof SuitabilityRoute
@@ -58,6 +66,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/$slug': typeof SlugRouteWithChildren
   '/about': typeof AboutRoute
   '/copyright': typeof CopyrightRoute
   '/suitability': typeof SuitabilityRoute
@@ -65,19 +74,26 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/copyright' | '/suitability' | '/$slug/$code'
+  fullPaths:
+    '/' | '/$slug' | '/about' | '/copyright' | '/suitability' | '/$slug/$code'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/copyright' | '/suitability' | '/$slug/$code'
+  to: '/' | '/$slug' | '/about' | '/copyright' | '/suitability' | '/$slug/$code'
   id:
-    '__root__' | '/' | '/about' | '/copyright' | '/suitability' | '/$slug/$code'
+    | '__root__'
+    | '/'
+    | '/$slug'
+    | '/about'
+    | '/copyright'
+    | '/suitability'
+    | '/$slug/$code'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  SlugRoute: typeof SlugRouteWithChildren
   AboutRoute: typeof AboutRoute
   CopyrightRoute: typeof CopyrightRoute
   SuitabilityRoute: typeof SuitabilityRoute
-  SlugCodeRoute: typeof SlugCodeRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -87,6 +103,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$slug': {
+      id: '/$slug'
+      path: '/$slug'
+      fullPath: '/$slug'
+      preLoaderRoute: typeof SlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -112,20 +135,30 @@ declare module '@tanstack/react-router' {
     }
     '/$slug/$code': {
       id: '/$slug/$code'
-      path: '/$slug/$code'
+      path: '/$code'
       fullPath: '/$slug/$code'
       preLoaderRoute: typeof SlugCodeRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof SlugRoute
     }
   }
 }
 
+interface SlugRouteChildren {
+  SlugCodeRoute: typeof SlugCodeRoute
+}
+
+const SlugRouteChildren: SlugRouteChildren = {
+  SlugCodeRoute: SlugCodeRoute,
+}
+
+const SlugRouteWithChildren = SlugRoute._addFileChildren(SlugRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  SlugRoute: SlugRouteWithChildren,
   AboutRoute: AboutRoute,
   CopyrightRoute: CopyrightRoute,
   SuitabilityRoute: SuitabilityRoute,
-  SlugCodeRoute: SlugCodeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -295,6 +295,7 @@ export function Calculator() {
   const [ageNeeded, setAgeNeeded] = useState(false);
   const [showReport, setShowReport] = useState(false);
   const [shareUrl, setShareUrl] = useState("");
+  const [shareHours, setShareHours] = useState(72);
   const [sharePending, setSharePending] = useState(false);
   const [shareError, setShareError] = useState("");
   const [printAfterOpen, setPrintAfterOpen] = useState(false);
@@ -1547,6 +1548,7 @@ export function Calculator() {
     audienceRole: audience,
     audienceNote: audience === "licensed-solo" ? "Contact Adaptive Marketing Group for terms of use and licensing agreement." : "",
     shareUrl,
+    shareHours,
     sharePending,
     shareError,
     onClose: () => {
@@ -1575,12 +1577,14 @@ export function Calculator() {
     },
   };
 
-  const canShare = audience === "interested" && partyFilled(client);
+  const incognitoShare = !finderPersonal;
+  const canShare = incognitoShare || (audience === "interested" && finderPersonal && partyFilled(client));
   useEffect(() => {
     if (!showReport || !canShare) return;
     let cancel = false;
     setShareUrl("");
     setShareError("");
+    setShareHours(incognitoShare ? 24 : 72);
     setSharePending(true);
     const name = client.name;
     const timer = window.setTimeout(() => {
@@ -1591,9 +1595,12 @@ export function Calculator() {
       }
       const clone = root.cloneNode(true) as HTMLElement;
       clone.querySelectorAll("[data-share-omit], [role='toolbar']").forEach((node) => node.remove());
-      publishShare({ data: { name, html: clone.innerHTML } })
+      publishShare({ data: { name, html: clone.innerHTML, incognito: incognitoShare } })
         .then((res) => {
-          if (!cancel) setShareUrl(res.url);
+          if (!cancel) {
+            setShareUrl(res.url);
+            setShareHours(res.hours);
+          }
         })
         .catch((err: unknown) => {
           if (!cancel) setShareError(err instanceof Error ? err.message : "The report link could not be created.");
@@ -1606,7 +1613,7 @@ export function Calculator() {
       cancel = true;
       window.clearTimeout(timer);
     };
-  }, [showReport, hypoRunId, canShare, client.name]);
+  }, [showReport, hypoRunId, canShare, incognitoShare, client.name]);
   const needsAdvisor = audience === "licensed-client" || audience === "licensed-solo";
   const advisorOk = Boolean(
     advisor.name.trim() && advisor.firm.trim() && advisor.email.includes("@") && advisor.phone.trim(),

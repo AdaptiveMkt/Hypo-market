@@ -1,9 +1,10 @@
 import { get, put } from "@vercel/blob";
-import { SHARE_HOURS, shareSlug, shareUrl } from "@/lib/share-report";
+import { INCOGNITO_HOURS, SHARE_HOURS, incognitoShareUrl, shareSlug, shareUrl } from "@/lib/share-report";
 
 type StoredShare = {
   slug: string;
   html: string;
+  hours: number;
   createdAt: string;
   firstViewedAt: string | null;
   expiresAt: string | null;
@@ -51,18 +52,20 @@ async function writeRaw(code: string, json: string) {
   });
 }
 
-export async function saveShare(name: string, html: string) {
-  const slug = shareSlug(name);
+export async function saveShare(name: string, html: string, incognito = false) {
   const code = randomCode();
+  const hours = incognito ? INCOGNITO_HOURS : SHARE_HOURS;
+  const slug = incognito ? `incognito-${code}` : shareSlug(name);
   const record: StoredShare = {
     slug,
     html,
+    hours,
     createdAt: new Date().toISOString(),
     firstViewedAt: null,
     expiresAt: null,
   };
   await writeRaw(code, JSON.stringify(record));
-  return { url: shareUrl(slug, code), slug, code };
+  return { url: incognito ? incognitoShareUrl(code) : shareUrl(slug, code), slug, code, hours };
 }
 
 export async function openShare(slug: string, code: string) {
@@ -75,14 +78,15 @@ export async function openShare(slug: string, code: string) {
     return { status: "missing" as const };
   }
   if (record.slug !== slug) return { status: "missing" as const };
+  const hours = record.hours === INCOGNITO_HOURS ? INCOGNITO_HOURS : SHARE_HOURS;
   const now = Date.now();
   if (record.expiresAt && now > Date.parse(record.expiresAt)) {
-    return { status: "expired" as const };
+    return { status: "expired" as const, hours };
   }
   if (!record.firstViewedAt) {
-    const opened = new Date(now);
-    record.firstViewedAt = opened.toISOString();
-    record.expiresAt = new Date(now + SHARE_HOURS * HOUR_MS).toISOString();
+    record.firstViewedAt = new Date(now).toISOString();
+    record.expiresAt = new Date(now + hours * HOUR_MS).toISOString();
+    record.hours = hours;
     await writeRaw(code, JSON.stringify(record));
   }
   return {
@@ -90,5 +94,6 @@ export async function openShare(slug: string, code: string) {
     html: record.html,
     expiresAt: record.expiresAt ?? "",
     firstViewedAt: record.firstViewedAt ?? "",
+    hours,
   };
 }
