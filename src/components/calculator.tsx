@@ -102,7 +102,7 @@ import { isDarkTheme, setTheme } from "@/components/theme-toggle";
 import { StateName, Pct } from "@/components/state-name";
 import { AgiPremiumCallout, agiTargetSentence } from "@/components/agi-premium-callout";
 import { LifeBenefitDefs } from "@/components/life-benefit-defs";
-import { Cite, CopyrightMark, HomeHealthCostNote, LinkedCopy } from "@/components/source-links";
+import { Cite, CopyrightMark, LinkedCopy } from "@/components/source-links";
 import { SRC } from "@/lib/sources";
 import { HEALTH_INSURANCE_INTRO, HEALTH_INSURANCE_TYPES } from "@/lib/health-insurance-types";
 import { DISCLOSURE_CARD_TITLE } from "@/lib/disclaimer";
@@ -2087,7 +2087,12 @@ export function Calculator() {
             ) : (
               <p className="mt-1 text-xs text-muted">Required to run.</p>
             )}
-            {setting === "home24" ? <HomeHealthCostNote /> : null}
+            {setting === "home24" ? (
+              <p className="mt-2 text-xs leading-snug text-muted">
+                * LTC News sourced home care costs from the{" "}
+                <Cite href={SRC.ltcNews}>LTC News</Cite> website.
+              </p>
+            ) : null}
             <div className="mt-3 min-w-0">
                 <label className={labelClass} htmlFor="duration">Select the number of years <span className="font-normal text-muted">(how long care may last)</span></label>
                 <FieldPicker

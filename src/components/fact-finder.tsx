@@ -28,7 +28,7 @@ import { SETTING_LABELS, STATE_NAMES, type CareSetting } from "@/lib/costs";
 import { money } from "@/lib/utils";
 import { TAX_RATE_GROUPS, TAX_RATE_OPTIONS } from "@/lib/tax-brackets";
 import { SRC } from "@/lib/sources";
-import { Cite, HomeHealthCostNote } from "@/components/source-links";
+import { Cite } from "@/components/source-links";
 import { AALTCI_MEAN_CLAIM_AGE } from "@/lib/claim-age";
 import { partnershipInfo, partnershipPolicyName } from "@/lib/partnership";
 
@@ -568,7 +568,10 @@ export function FactFinder({
                 onChange={(v) => onSetting(v as CareSetting)}
               />
             </div>
-            {setting === "home24" ? <HomeHealthCostNote /> : null}
+            <p className="mt-2 text-xs leading-snug text-muted">
+              * LTC News sourced home care costs from the{" "}
+              <Cite href={SRC.ltcNews}>LTC News</Cite> website.
+            </p>
             <Nav back={back} next={next} nextDisabled={!setting} />
           </>
         ) : null}
