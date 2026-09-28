@@ -1,5 +1,5 @@
 import { TitleCollapse } from "@/components/accordion";
-import { Cite, CopyrightMark, LinkedCopy } from "@/components/source-links";
+import { Cite } from "@/components/source-links";
 import { StateName } from "@/components/state-name";
 import {
   assetBasedLtcPool,
@@ -12,7 +12,6 @@ import {
   specifiedFaceAmount,
   type LtcPolicy,
 } from "@/lib/calc";
-import { HOLD_HARMLESS_SHORT } from "@/lib/disclaimer";
 import { SRC } from "@/lib/sources";
 import { money } from "@/lib/utils";
 import { IRC_101G_PER_DIEM_2026 } from "@/lib/irc-101g";
@@ -42,14 +41,6 @@ export function SpecimenOutlineDisclaimer() {
         Policies have exclusions, waiting periods, and benefit triggers — this is not a claim
         decision. Insurance does not pay until a licensed health-care practitioner certifies a
         benefit trigger and any elimination period has run.
-      </p>
-      <p className="mt-2">
-        <LinkedCopy text={HOLD_HARMLESS_SHORT} />
-      </p>
-      <p className="mt-2">
-        Contact a licensed insurance producer in your state (CLTC or LTCP recommended), and
-        the appropriate tax, legal, or financial professional for your situation.{" "}
-        <CopyrightMark />
       </p>
     </div>
   );
@@ -263,10 +254,8 @@ export function SampleLtcPolicy({
   return (
     <TitleCollapse title="Sample traditional LTC policy (NAIC outline of coverage)" defaultOpen={defaultOpen}>
       <p className="mb-3 text-sm text-muted">
-        Specimen only — not a policy, quote, illustration, or offer. Company, form number, and
-        issue state are placeholders. Benefit amounts below are copied from{" "}
-        <strong className="text-navy">this run</strong> so you can see how an outline is laid
-        out. A real outline must come from a licensed insurer in the issue state. Sources:{" "}
+        Benefit amounts below are copied from <strong className="text-navy">this run</strong> so
+        you can see how an outline is laid out. Sources:{" "}
         <Cite href={SRC.naicModel640}>NAIC Long-Term Care Insurance Model Act (#640)</Cite>
         ;{" "}
         <Cite href={SRC.iiprcOutline}>
@@ -451,8 +440,8 @@ export function SamplePolicyPack({
     <div className="space-y-1">
       <p className="mb-2 text-xs text-muted">
         Four specimen outlines — traditional reimbursement, asset-based single premium, hybrid
-        life, and LTC annuity. None is a filed form, quote, or offer. Figures follow this run
-        when that design is selected; otherwise planning defaults are used.
+        life, and LTC annuity. Figures follow this run when that design is selected; otherwise
+        planning defaults are used.
       </p>
       <SampleLtcPolicy policy={trad} state={state} defaultOpen={defaultOpen && policy.kind === "traditional"} />
       {LINKED_KINDS.map((row) => {
@@ -464,10 +453,8 @@ export function SamplePolicyPack({
             defaultOpen={defaultOpen && policy.kind === row.key}
           >
             <p className="mb-3 text-sm text-muted">
-              Specimen only — not a policy, quote, illustration, or offer. Linked-benefit,
-              hybrid, and annuity forms are generally <strong>not</strong> DRA Partnership
-              certified. A real outline of coverage must come from a licensed insurer in the
-              issue state.
+              Linked-benefit, hybrid, and annuity forms are generally <strong>not</strong> DRA
+              Partnership certified.
             </p>
             <LinkedSpecimen policy={p} state={state} kind={row.key} />
           </TitleCollapse>

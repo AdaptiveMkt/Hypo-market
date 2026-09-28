@@ -3,8 +3,7 @@ import { ClaimsHistoryPanel } from "@/components/claims-history-panel";
 import { Irc101gPanel } from "@/components/irc-101g-panel";
 import { LinkedClaimCard } from "@/components/linked-claim-card";
 import { LtcGlossaryTerms } from "@/components/ltc-glossary";
-import { AllDesignationNotice } from "@/components/designation-notice";
-import { SamplePolicyPack, SpecimenOutlineDisclaimer } from "@/components/sample-ltc-policy";
+import { SamplePolicyPack } from "@/components/sample-ltc-policy";
 import { StateName } from "@/components/state-name";
 import { AgiPremiumCallout } from "@/components/agi-premium-callout";
 import { WhatConsumersBuyPanel } from "@/components/what-consumers-buy-panel";
@@ -103,14 +102,6 @@ export function IndustryInsightsPanel({
           with no Medicaid asset disregard.
         </p>
         <SamplePolicyPack policy={policy} state={state} countable={countable} />
-        {embedded ? null : (
-          <>
-            <TitleCollapse title="Designation non-endorsement notice" className="mt-3" defaultOpen={false}>
-              <AllDesignationNotice className="mt-0" />
-            </TitleCollapse>
-            <SpecimenOutlineDisclaimer />
-          </>
-        )}
       </Insight>
 
       <Insight
