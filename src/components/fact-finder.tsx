@@ -43,6 +43,7 @@ type Step =
   | { kind: "calculate" }
   | { kind: "age" }
   | { kind: "state" }
+  | { kind: "city" }
   | { kind: "issue" }
   | { kind: "setting" }
   | { kind: "years" }
@@ -69,6 +70,7 @@ function stepsFor(personalized: boolean, insuranceLocked: boolean, hasCoverage: 
     { kind: "calculate" },
     { kind: "age" },
     { kind: "state" },
+    { kind: "city" },
     { kind: "issue" },
     { kind: "setting" },
     { kind: "years" },
@@ -88,6 +90,7 @@ function sectionOf(step: Step) {
   if (
     step.kind === "age" ||
     step.kind === "state" ||
+    step.kind === "city" ||
     step.kind === "issue" ||
     step.kind === "setting" ||
     step.kind === "years" ||
@@ -129,6 +132,8 @@ export function FactFinder({
   minAge,
   state,
   onState,
+  careCity,
+  onCareCity,
   issueState,
   onIssueState,
   setting,
@@ -194,6 +199,8 @@ export function FactFinder({
   minAge: number;
   state: string;
   onState: (s: string) => void;
+  careCity: string;
+  onCareCity: (city: string) => void;
   issueState: string;
   onIssueState: (s: string) => void;
   setting: string;
@@ -519,6 +526,25 @@ export function FactFinder({
             <div className="mt-3">
               <FieldPicker id="ff-state" value={state} options={STATE_NAMES.map((s) => ({ value: s, label: s }))} onChange={onState} />
             </div>
+            <Nav back={back} next={next} />
+          </>
+        ) : null}
+
+        {step.kind === "city" ? (
+          <>
+            <p className="text-base font-semibold text-navy">What city would care be received in?</p>
+            <p className="mt-1 text-xs leading-snug text-muted">
+              Optional. Leave blank to use the {state || "state"} median. A city pulls costs from the{" "}
+              <Cite href={SRC.ltcNews}>LTC News Cost of Care Calculator</Cite>.
+            </p>
+            <input
+              id="ff-city"
+              value={careCity}
+              onChange={(e) => onCareCity(e.target.value)}
+              placeholder="Search for a city"
+              autoComplete="address-level2"
+              className="mt-3 w-full rounded-lg border border-line bg-paper px-3 py-2 text-sm text-navy"
+            />
             <Nav back={back} next={next} />
           </>
         ) : null}

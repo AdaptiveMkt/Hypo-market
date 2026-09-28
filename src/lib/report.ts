@@ -21,7 +21,7 @@ import {
   type LtcPolicy,
   type Projection,
 } from "./calc";
-import { SETTING_LABELS, type CareSetting } from "./costs";
+import { LTC_NEWS_COST_URL, ltcNewsCostCite, SETTING_LABELS, type CareSetting } from "./costs";
 import { stateLtcTaxBreak } from "./ltc-tax";
 import { typicalPremiumHint } from "./what-consumers-buy";
 
@@ -75,6 +75,7 @@ export type Scenario = {
   assetRois?: AssetRois;
   excludeHome: boolean;
   state: string;
+  careCity?: string;
   setting: CareSetting;
   delay: number;
   ageToday?: number;
@@ -165,6 +166,7 @@ export function analysisNarrative(opts: ReportOpts): string {
   const preserved = result.endPool - selfFunded.endPool;
   const premium = targetPremium(pool, s.annualIncome ?? 0);
 
+  const where = s.careCity?.trim() ? `${s.careCity.trim()}, ${s.state}` : s.state;
   const paras = [
     (() => {
       const settingPhrase = SETTING_LABELS[s.setting];
@@ -184,8 +186,8 @@ export function analysisNarrative(opts: ReportOpts): string {
       return `This is an AI-generated hypothetical generated from the information submitted through this platform. For your review and download, this is the Hypothetical Long-Term Care Asset Utilization Modeling report based on that information. Other factors taken into account were the projected future costs of care in ${art} ${settingPhrase.toLowerCase()} setting and ${last}.`;
     })(),
     `Countable assets at risk in this run are ${money(pool)}. Gross assets are ${money(grossPool)}. Primary residence of ${money(s.assets.home)} is ${s.excludeHome ? "held out of the countable pool (homestead excluded)" : "included in the countable pool"}. Spouse-excluded (excludable) assets are ${money(s.assets.excludable)}.`,
-    `Care is modeled to start ${startWhen} and last ${s.duration} year${s.duration === 1 ? "" : "s"}. Today's median ${setting.toLowerCase()} cost in ${s.state} is ${money(todayCost)} per year (about ${money(daily)} per day). Care costs inflate at ${s.cpi}% per year. Taxable assets are assumed to earn ${s.roi}% gross, with a ${s.taxRate ?? 0}% tax on that return (net ${net.toFixed(2)}%). Deferred annuities, life insurance cash value, and IRA / 401(k) grow tax-deferred at their own R.O.I. (IRA / 401(k) at ${s.iraRoi ?? s.roi}%). Roth IRA grows tax-free.`,
-    `Using countable assets alone at today's cost, the pool is ${formatYearsLast(yearsToday)}. At the start of claim, countable assets (net after tax) are projected at ${money(result.startPoolNet)} against a first-year care bill of ${money(result.firstCost)}; that asset pool is ${formatYearsLast(yearsClaimAssets)}. Deferred IRA / annuity / life cash value is reduced by the ${s.taxRate ?? 0}% tax rate as if distributed at claim; taxable sleeves already grew at net R.O.I.`,
+    `Care is modeled to start ${startWhen} and last ${s.duration} year${s.duration === 1 ? "" : "s"}. Today's median ${setting.toLowerCase()} cost in ${where} is ${money(todayCost)} per year (about ${money(daily)} per day)${ltcNewsCostCite()}. Care costs inflate at ${s.cpi}% per year. Taxable assets are assumed to earn ${s.roi}% gross, with a ${s.taxRate ?? 0}% tax on that return (net ${net.toFixed(2)}%). Deferred annuities, life insurance cash value, and IRA / 401(k) grow tax-deferred at their own R.O.I. (IRA / 401(k) at ${s.iraRoi ?? s.roi}%). Roth IRA grows tax-free.`,
+    `Using countable assets alone at today's cost, the pool is ${formatYearsLast(yearsToday)}. At the start of claim, countable assets (net after tax) are projected at ${money(result.startPoolNet)} against a first-year care bill of ${money(result.firstCost)}${ltcNewsCostCite()}; that asset pool is ${formatYearsLast(yearsClaimAssets)}. Deferred IRA / annuity / life cash value is reduced by the ${s.taxRate ?? 0}% tax rate as if distributed at claim; taxable sleeves already grew at net R.O.I.`,
   ];
 
   const face = Math.max(0, Math.round(Number(opts.lifeFaceAmount) || 0));
@@ -225,7 +227,7 @@ export function analysisNarrative(opts: ReportOpts): string {
       `This run includes ${structure}. Insurance is modeled to pay the claim first; countable assets co-pay only the leftover. LTC benefits at purchase are ${result.lifetimeBenefit ? `${LIFETIME_BENEFIT_MARK}. ${LIFETIME_BENEFIT_NOTE}` : money(result.benefitPoolAtPurchase ?? 0)}. At claim they are ${result.lifetimeBenefit ? LIFETIME_BENEFIT_MARK : money(result.benefitPoolAtClaim ?? 0)}.${industryNote}${funding}`,
     );
     paras.push(
-      `The combined pool (countable assets + LTC benefits) at today's cost is ${money(combinedToday)} and is ${formatYearsLast(yearsCombinedToday)}. At claim the combined pool is ${money(combinedClaim)} against ${money(result.firstCost)} per year and is ${formatYearsLast(yearsCombinedClaim)}. Insurance paid over the modeled years is ${money(result.insuranceTotal)}. Countable assets remaining are ${money(result.endPool)}, which is ${preserved >= 0 ? money(preserved) + " higher" : money(Math.abs(preserved)) + " lower"} than if the same care had been paid from assets with no policy (${money(selfFunded.endPool)} left).`,
+      `The combined pool (countable assets + LTC benefits) at today's cost is ${money(combinedToday)} and is ${formatYearsLast(yearsCombinedToday)}. At claim the combined pool is ${money(combinedClaim)} against ${money(result.firstCost)} per year${ltcNewsCostCite()} and is ${formatYearsLast(yearsCombinedClaim)}. Insurance paid over the modeled years is ${money(result.insuranceTotal)}. Countable assets remaining are ${money(result.endPool)}, which is ${preserved >= 0 ? money(preserved) + " higher" : money(Math.abs(preserved)) + " lower"} than if the same care had been paid from assets with no policy (${money(selfFunded.endPool)} left).`,
     );
     paras.push(
       `Cumulative unpaid shortfall after insurance and asset co-pay is ${result.shortfallTotal ? money(result.shortfallTotal) : "none"}. ${when ? `A shortfall first appears in model year ${when.year}, month ${when.monthInYear} (${when.monthsFromToday} months from today).` : "No unpaid shortfall appears in the modeled window."} ${result.depletedYear ? `Countable assets are depleted in model year ${result.depletedYear}.` : "Countable assets are not fully depleted in the modeled window."}`,
@@ -393,7 +395,7 @@ export function buildScenarioPdf(opts: ReportOpts): Blob {
   add(`Excludable assets (* Spouse Excluded Assets.): ${money(s.assets.excludable)}`);
   add(`State: ${s.state}`);
   add(`Setting: ${SETTING_LABELS[s.setting]}`);
-  add(`Today's annual median: ${money(todayCost)}`);
+  add(`Today's annual median: ${money(todayCost)} — LTC News Cost of Care Calculator (${LTC_NEWS_COST_URL})`);
   add(`Care starts: ${s.delay === 0 ? "now" : `in ${s.delay} years`}`);
   add(`Years of care modeled: ${s.duration}`);
   add(`Care-cost inflation: ${s.cpi}%`);
@@ -452,7 +454,7 @@ export function buildScenarioPdf(opts: ReportOpts): Blob {
   }
   add("");
   add(`Countable assets at start of care (net after tax): ${money(result.startPoolNet)}`);
-  add(`First-year cost of care: ${money(result.firstCost)}`);
+  add(`First-year cost of care: ${money(result.firstCost)} — LTC News Cost of Care Calculator (${LTC_NEWS_COST_URL})`);
   add(`Insurance paid first (all modeled years): ${money(result.insuranceTotal)}`);
   add(`Countable assets remaining: ${money(result.endPool)}`);
   add(`If assets paid all care (no policy): ${money(selfFunded.endPool)}`);

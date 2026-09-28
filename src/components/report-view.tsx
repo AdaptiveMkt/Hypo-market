@@ -829,7 +829,12 @@ export function ReportView({
                     <StateName name={state} />
                   </>
                 }
-                a={`${money(todayCost)} / year`}
+                a={
+                  <>
+                    {money(todayCost)} / year{" "}
+                    (<Cite href={SRC.ltcNews}>LTC News Cost of Care Calculator</Cite>)
+                  </>
+                }
               />
             </tbody>
           </table>
@@ -1016,6 +1021,10 @@ export function ReportView({
               />
             ) : null}
             <Kpi label="First-year care cost" value={money(result.firstCost)} />
+            <p className="col-span-full text-xs leading-snug text-muted">
+              * Care-cost figures in this report, including today’s median, the first-year care cost, and year-by-year Annual Care Costs, are sourced from the{" "}
+              <Cite href={SRC.ltcNews}>LTC News Cost of Care Calculator</Cite>.
+            </p>
             {policy.enabled ? (
               <Kpi label="Insurance paid" value={money(result.insuranceTotal)} />
             ) : null}
@@ -1416,6 +1425,10 @@ export function ReportView({
                 })}
               </tbody>
             </table>
+            <p className="mt-2 text-xs leading-snug text-muted">
+              Today’s annual cost and the inflated first-year cost are sourced from the{" "}
+              <Cite href={SRC.ltcNews}>LTC News Cost of Care Calculator</Cite>.
+            </p>
           </div>
         </section>
         ) : null}
@@ -1823,10 +1836,15 @@ export function ReportView({
             </table>
           </div>
           )}
-          <div className="mt-4 border-t border-gold pt-4">
-            <h3 className="mb-2 font-display text-lg text-navy">Hybrid life insurance options</h3>
-            <HybridLifeOptionsPanel policy={policy} />
-          </div>
+          <details className={`mt-4 border-t border-gold pt-4${runKinds?.hybridLife || policy.kind === "hybridLife" ? "" : " pdf-stay-closed"}`} open={runKinds?.hybridLife || policy.kind === "hybridLife" ? true : undefined}>
+            <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal [&::-webkit-details-marker]:hidden [&::marker]:content-none">
+              <span aria-hidden="true" className="naic-chevron inline-block text-gold-ink motion-reduce:transition-none">▸</span>
+              <h3 className="font-display text-lg text-navy">Hybrid life insurance options</h3>
+            </summary>
+            <div className="mt-2">
+              <HybridLifeOptionsPanel policy={policy} />
+            </div>
+          </details>
         </section>
         ) : null}
 
@@ -1882,19 +1900,44 @@ export function ReportView({
           </div>
         </section>
 
-        {Array.from({ length: Math.ceil(partnershipRows.length / 12) }, (_, i) =>
-          partnershipRows.slice(i * 12, i * 12 + 12),
-        ).map((chunk, i) => (
-          <section key={`pship-${i}`} className="report-block">
-            <h2 className="mb-3 font-display text-xl text-navy">
-              Partnership by state{i > 0 ? " (continued)" : ""}
-            </h2>
-            {i === 0 ? (
-              <p className="mb-3 text-sm text-muted">
-                Same claims as this run. Protected = benefits paid as a dollar-for-dollar
-                disregard (or in-state TAP where modeled). Confirm certification locally.
-              </p>
-            ) : null}
+        {(() => {
+          const selectedRows = partnershipRows.filter((row) => row.state === state);
+          const otherRows = partnershipRows.filter((row) => row.state !== state);
+          const partnershipCells = (row: (typeof partnershipRows)[number]) => (
+            <>
+              <td className="py-1.5 pr-2">{row.state}</td>
+              <td className="py-1.5 pr-2">
+                {row.info.kind === "none"
+                  ? "None"
+                  : row.info.kind === "masshealth"
+                    ? "MassHealth"
+                    : row.info.kind === "dra"
+                      ? "DRA"
+                      : row.info.kind === "original-dd"
+                        ? "Original D4D"
+                        : "Original TAP"}
+              </td>
+              <td className="py-1.5 pr-2">
+                {row.info.kind === "none" ? (
+                  "—"
+                ) : (
+                  <Cite href={SRC.naicModel640}>NAIC Model Act #640</Cite>
+                )}
+              </td>
+              <td className="py-1.5 pr-2 text-right">
+                {row.modeled ? money(row.assetsProtected) : "—"}
+              </td>
+              <td className="py-1.5 text-right">{money(row.spendDownStill)}</td>
+            </>
+          );
+          return (
+          <section className="report-block">
+            <h2 className="mb-3 font-display text-xl text-navy">Partnership by state</h2>
+            <p className="mb-3 text-sm text-muted">
+              Same claims as this run. Protected = benefits paid as a dollar-for-dollar
+              disregard (or in-state TAP where modeled). Confirm certification locally.
+              {state ? ` ${state} is open. Other states stay collapsed until you open them.` : ""}
+            </p>
             <div className="overflow-x-auto">
               <table className="w-full min-w-[700px] text-sm">
                 <thead>
@@ -1907,41 +1950,53 @@ export function ReportView({
                   </tr>
                 </thead>
                 <tbody>
-                  {chunk.map((row) => (
-                    <tr
-                      key={row.state}
-                      className={`border-t tabular-nums ${row.state === state ? "bg-cream font-semibold" : "border-line"}`}
-                    >
-                      <td className="py-1.5 pr-2">{row.state}</td>
-                      <td className="py-1.5 pr-2">
-                        {row.info.kind === "none"
-                          ? "None"
-                          : row.info.kind === "masshealth"
-                            ? "MassHealth"
-                            : row.info.kind === "dra"
-                              ? "DRA"
-                              : row.info.kind === "original-dd"
-                                ? "Original D4D"
-                                : "Original TAP"}
+                  {selectedRows.length ? (
+                    selectedRows.map((row) => (
+                      <tr key={row.state} className="border-t border-gold bg-cream font-semibold tabular-nums">
+                        {partnershipCells(row)}
+                      </tr>
+                    ))
+                  ) : (
+                    <tr className="border-t border-line">
+                      <td className="py-1.5 pr-2" colSpan={5}>
+                        Select a care state to show that Partnership row.
                       </td>
-                      <td className="py-1.5 pr-2">
-                        {row.info.kind === "none" ? (
-                          "—"
-                        ) : (
-                          <Cite href={SRC.naicModel640}>NAIC Model Act #640</Cite>
-                        )}
-                      </td>
-                      <td className="py-1.5 pr-2 text-right">
-                        {row.modeled ? money(row.assetsProtected) : "—"}
-                      </td>
-                      <td className="py-1.5 text-right">{money(row.spendDownStill)}</td>
                     </tr>
-                  ))}
+                  )}
                 </tbody>
               </table>
             </div>
+            {otherRows.length ? (
+              <details className="mt-3">
+                <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal [&::-webkit-details-marker]:hidden [&::marker]:content-none">
+                  <span aria-hidden="true" className="naic-chevron inline-block text-gold-ink motion-reduce:transition-none">▸</span>
+                  <span className="font-display text-base text-navy">All other states</span>
+                </summary>
+                <div className="mt-2 overflow-x-auto">
+                  <table className="w-full min-w-[700px] text-sm">
+                    <thead>
+                      <tr className="text-left text-xs uppercase tracking-wide text-muted">
+                        <th className="py-2 pr-2">State</th>
+                        <th className="py-2 pr-2">Program</th>
+                        <th className="py-2 pr-2">Mode</th>
+                        <th className="py-2 pr-2 text-right">Protected</th>
+                        <th className="py-2 text-right">Spend-down still</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {otherRows.map((row) => (
+                        <tr key={row.state} className="border-t border-line tabular-nums">
+                          {partnershipCells(row)}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+            ) : null}
           </section>
-        ))}
+          );
+        })()}
 
         <section className="report-block card px-4 py-3 text-sm text-muted">
           <p className="font-display text-base text-navy">
@@ -2247,8 +2302,9 @@ export function ReportView({
           </h2>
           <p className="mb-3 text-sm text-muted">
             Annual national medians. Home health is 44 hours/week. Memory care is 25%
-            above assisted living. Confirm a current location on the LTC News Cost of Care
-            Calculator. Earlier years in the 10-year table are this model’s historical path.
+            above assisted living. Confirm a current location on the{" "}
+            <Cite href={SRC.ltcNews}>LTC News Cost of Care Calculator</Cite>.
+            Earlier years in the 10-year table are this model’s historical path.
           </p>
           <div className="grid gap-3 sm:grid-cols-2">
             {[
@@ -2441,8 +2497,13 @@ export function ReportView({
         ) : null}
 
         <section id="disclosure-terms-report" className="report-block card-xl border-2 px-4 py-2 text-sm text-muted scroll-mt-8">
-          <h2 className="font-display text-xl text-navy">{DISCLOSURE_CARD_TITLE}</h2>
-          <DisclaimerCard className="mt-2" />
+          <details>
+            <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal [&::-webkit-details-marker]:hidden [&::marker]:content-none">
+              <span aria-hidden="true" className="naic-chevron inline-block text-gold-ink motion-reduce:transition-none">▸</span>
+              <h2 className="font-display text-xl text-navy">{DISCLOSURE_CARD_TITLE}</h2>
+            </summary>
+            <DisclaimerCard className="mt-2" />
+          </details>
         </section>
 
         {details.edu ? (

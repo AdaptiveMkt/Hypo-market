@@ -208,5 +208,12 @@ export function fiveYearLtcBenchmarks() {
 }
 
 export const DEFAULT_CARE_YEARS = 5;
+export const LTC_NEWS_COST_LABEL = "LTC News Cost of Care Calculator";
+export const LTC_NEWS_COST_URL = "https://www.ltcnews.com/long-term-care/cost-of-care";
+
+/** Phrase LinkedCopy turns into a link beside a care-cost figure. */
+export function ltcNewsCostCite(): string {
+  return ` (${LTC_NEWS_COST_LABEL})`;
+}
 export const DEFAULT_CARE_SETTING: CareSetting = "home24";
 export const DEFAULT_CARE_CPI = fiveYearLtcCagr(DEFAULT_CARE_SETTING);

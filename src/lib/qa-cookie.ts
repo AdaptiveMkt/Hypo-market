@@ -18,6 +18,7 @@ export type QaSave = {
   lifeFaceAmount?: number;
   excludableTouched: boolean;
   state: string;
+  careCity?: string;
   setting: string;
   cpiOverride: number | null;
   ageToday: number;

@@ -23,7 +23,7 @@ export const SRC = {
     "https://www.medicaid.gov/medicaid/long-term-services-supports/medicaid-long-term-services-and-supports-ltss-benefits/long-term-care-partnership-program",
   medicarePartA: "https://www.medicare.gov/what-medicare-covers/what-part-a-covers",
   medicarePartB: "https://www.medicare.gov/what-medicare-covers/what-part-b-covers",
-  medicareAdvantage: "https://www.medicare.gov/health-drug-plans/medicare-advantage",
+  medicareAdvantage: "https://www.medicare.gov/health-drug-plans/health-plans",
   medicarePartD: "https://www.medicare.gov/health-drug-plans/part-d",
   ltcPartnership:
     "https://www.medicaid.gov/medicaid/long-term-services-supports/medicaid-long-term-services-and-supports-ltss-benefits/long-term-care-partnership-program",
@@ -112,7 +112,7 @@ export const SRC = {
   secIapd: "https://adviserinfo.sec.gov/",
   cpaVerify: "https://cpaverify.org/",
   abalawyer: "https://www.americanbar.org/groups/legal_services/flh-home/flh-bar-directories-and-lawyer-finders/",
-  nelfCela: "https://www.nelf.org/find-a-cela",
+  nelfCela: "https://www.nelf.org/find-an-attorney",
   vaAccreditation: "https://www.va.gov/ogc/apps/accreditation/index.asp",
   cltc: "https://www.ltc-cltc.com/",
   cltcFind: "https://www.ltc-cltc.com/cltc/findCLTC/",
@@ -124,7 +124,7 @@ export const SRC = {
   secIarReg:
     "https://www.sec.gov/resources-small-businesses/small-business-guides-forms/investment-adviser-registration-and-regulation",
   nasaaCheck:
-    "https://www.nasaa.org/investor-education/check-out-your-investment-professional/",
+    "https://www.nasaa.org/investor-education/how-to-check-your-broker-or-investment-adviser/",
 } as const;
 
 /** Short categorized list for the Sources page and the report. Not the claims library. */
@@ -281,7 +281,7 @@ export const HYPO_SOURCES: { topic: string; label: string; href: string; note: s
   {
     topic: "Medicare Advantage",
     label: "Medicare.gov — Medicare Advantage (Part C)",
-    href: "https://www.medicare.gov/health-drug-plans/medicare-advantage",
+    href: "https://www.medicare.gov/health-drug-plans/health-plans",
     note: "Private replacement of Original Medicare. Still not custodial long-term care.",
   },
   {
@@ -555,7 +555,7 @@ export const LICENSE_LOOKUPS: { topic: string; label: string; href: string; note
   {
     topic: "Check an investment professional (NASAA)",
     label: "NASAA — Check out your investment professional",
-    href: "https://www.nasaa.org/investor-education/check-out-your-investment-professional/",
+    href: "https://www.nasaa.org/investor-education/how-to-check-your-broker-or-investment-adviser/",
     note: "State securities regulators’ path to IAPD / CRD for state-registered advisers and IARs.",
   },
   {
@@ -573,7 +573,7 @@ export const LICENSE_LOOKUPS: { topic: string; label: string; href: string; note
   {
     topic: "Certified Elder Law Attorney",
     label: "NAELA / NELF — Find a CELA",
-    href: "https://www.nelf.org/find-a-cela",
+    href: "https://www.nelf.org/find-an-attorney",
     note: "CELA is a designation. It does not replace checking the state bar license.",
   },
   {
@@ -590,7 +590,7 @@ export const LICENSE_LOOKUPS: { topic: string; label: string; href: string; note
  */
 export const DESIGNATION_LINKS: { match: string; href: string }[] = [
   { match: "CERTIFIED FINANCIAL PLANNER™", href: "https://www.cfp.net/verify-a-cfp-professional" },
-  { match: "Certified Elder Law Attorney", href: "https://www.nelf.org/find-a-cela" },
+  { match: "Certified Elder Law Attorney", href: "https://www.nelf.org/find-an-attorney" },
   { match: "Chartered Financial Consultant", href: "https://www.theamericancollege.edu/designations-degrees/ChFC" },
   { match: "Chartered Life Underwriter", href: "https://www.theamericancollege.edu/designations-degrees/CLU" },
   { match: "Retirement Income Certified Professional", href: "https://www.theamericancollege.edu/designations-degrees/RICP" },
@@ -611,7 +611,7 @@ export const DESIGNATION_LINKS: { match: string; href: string }[] = [
   { match: "CLU®", href: "https://www.theamericancollege.edu/designations-degrees/CLU" },
   { match: "RICP®", href: "https://www.theamericancollege.edu/designations-degrees/RICP" },
   { match: "IAPD", href: "https://adviserinfo.sec.gov/" },
-  { match: "CELA", href: "https://www.nelf.org/find-a-cela" },
+  { match: "CELA", href: "https://www.nelf.org/find-an-attorney" },
   { match: "CLTC", href: "https://www.ltc-cltc.com/cltc/findCLTC/" },
   { match: "LTCP", href: "https://www.ahip.org/" },
   { match: "IAR", href: "https://adviserinfo.sec.gov/" },

@@ -482,7 +482,7 @@ const html2opts = (scale: number, extra: Record<string, unknown> = {}) => ({
     el.style.maxHeight = "none";
     el.querySelectorAll("details").forEach((d) => {
       const det = d as HTMLDetailsElement;
-      if (!det.classList.contains("no-print")) det.open = true;
+      if (!det.classList.contains("no-print") && !det.classList.contains("pdf-stay-closed")) det.open = true;
     });
     el.querySelectorAll(".accordion-panel").forEach((p) => {
       const panel = p as HTMLElement;
@@ -533,7 +533,7 @@ function expandLive(root: HTMLElement) {
     p.style.display = "";
   });
   root.querySelectorAll("details").forEach((d) => {
-    if (!d.classList.contains("no-print")) (d as HTMLDetailsElement).open = true;
+    if (!d.classList.contains("no-print") && !d.classList.contains("pdf-stay-closed")) (d as HTMLDetailsElement).open = true;
   });
   return () => {
     prev.forEach(({ p, maxH, op, ov, tf, display }) => {

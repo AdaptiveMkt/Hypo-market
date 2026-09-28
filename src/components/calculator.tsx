@@ -84,6 +84,7 @@ import {
   fiveYearLtcBenchmarks,
   type CareSetting,
 } from "@/lib/costs";
+import { lookupLtcNewsCity, type LtcNewsCityCosts } from "@/lib/ltc-news-cost";
 import { DEFAULT_TAX_RATE, TAX_RATE_GROUPS, TAX_RATE_OPTIONS } from "@/lib/tax-brackets";
 import { careCostCompound } from "@/lib/cpi";
 import { compactMoney, money, moneyCents } from "@/lib/utils";
@@ -354,6 +355,10 @@ export function Calculator() {
   const [preferTap, setPreferTap] = useState(false);
   const [issueState, setIssueState] = useState("");
   const [issueTouched, setIssueTouched] = useState(false);
+  const [careCity, setCareCity] = useState("");
+  const [cityCosts, setCityCosts] = useState<LtcNewsCityCosts | null>(null);
+  const [cityStatus, setCityStatus] = useState<"" | "loading" | "error">("");
+  const [cityError, setCityError] = useState("");
   const [veteran, setVeteran] = useState(false);
   const [details, setDetails] = useState<DetailFlags>({ ...CLIENT_SITTING });
   const [runKinds, setRunKinds] = useState<StructureFlags>({ ...DEFAULT_STRUCTURE_FLAGS });
@@ -393,6 +398,7 @@ export function Calculator() {
       setAssetRois({ ...DEFAULT_ASSET_ROIS, ...saved.assetRois });
       setExcludableTouched(Boolean(saved.excludableTouched));
       if (saved.state) setState(saved.state);
+      if (saved.careCity) setCareCity(saved.careCity);
       setSetting((saved.setting || DEFAULT_CARE_SETTING) as CareSetting | "");
       setCpiOverride(saved.cpiOverride ?? null);
       if (saved.ageToday) setAgeToday(saved.ageToday);
@@ -451,6 +457,7 @@ export function Calculator() {
       assetRois,
       excludableTouched,
       state,
+      careCity,
       setting,
       cpiOverride,
       ageToday,
@@ -482,6 +489,7 @@ export function Calculator() {
     assetRois,
     excludableTouched,
     state,
+    careCity,
     setting,
     cpiOverride,
     ageToday,
@@ -573,7 +581,7 @@ export function Calculator() {
   const iraRoi = Number(assetRois.ira) || 0;
   const iraBal = Number(assets.ira) || 0;
   const spouseExcluded = Number(assets.excludable) || 0;
-  const todayCost = annualCost(state, activeSetting);
+  const todayCost = annualFor(activeSetting);
   const careStart = careStartYear(delay);
   const claimCost = careCostCompound(todayCost, cpi, Math.max(0, careStart - 1));
   const claimYearLabel = calendarYear(careStart);
@@ -627,6 +635,53 @@ export function Calculator() {
     return () => window.clearTimeout(t);
   }, [insuranceWarn, pool]);
 
+  useEffect(() => {
+    const city = careCity.trim();
+    if (city.length < 2 || !state) {
+      setCityCosts(null);
+      setCityStatus("");
+      setCityError("");
+      return;
+    }
+    let cancel = false;
+    setCityStatus("loading");
+    const t = window.setTimeout(() => {
+      lookupLtcNewsCity({ data: { city, state } })
+        .then((res) => {
+          if (cancel) return;
+          if (res.ok) {
+            setCityCosts(res.costs);
+            setCityStatus("");
+            setCityError("");
+          } else {
+            setCityCosts(null);
+            setCityStatus("error");
+            setCityError(res.error);
+          }
+        })
+        .catch(() => {
+          if (cancel) return;
+          setCityCosts(null);
+          setCityStatus("error");
+          setCityError("Could not reach the LTC News cost calculator.");
+        });
+    }, 600);
+    return () => {
+      cancel = true;
+      window.clearTimeout(t);
+    };
+  }, [careCity, state]);
+
+  function annualFor(settingKey: CareSetting): number {
+    if (cityCosts && cityCosts.state === state) {
+      if (settingKey === "home24") return cityCosts.home24Annual;
+      if (settingKey === "al") return cityCosts.assistedAnnual;
+      if (settingKey === "memory") return cityCosts.memoryAnnual;
+      return cityCosts.nursingAnnual;
+    }
+    return annualCost(state, settingKey);
+  }
+
   const baseArgs = {
     pool,
     state,
@@ -639,20 +694,21 @@ export function Calculator() {
     iraBalance: iraBal,
     iraRoiPct: iraRoi,
     holdings,
+    annualCostOverride: annualFor(activeSetting),
   };
 
   const result = useMemo(
     () => project({ ...baseArgs, policy }),
-    [pool, state, setting, delay, duration, cpi, roi, taxRate, iraBal, iraRoi, policy, holdings],
+    [pool, state, setting, delay, duration, cpi, roi, taxRate, iraBal, iraRoi, policy, holdings, cityCosts],
   );
   const selfFunded = useMemo(
     () => project({ ...baseArgs, policy: disabledPolicy(policy) }),
-    [pool, state, setting, delay, duration, cpi, roi, taxRate, iraBal, iraRoi, policy, holdings],
+    [pool, state, setting, delay, duration, cpi, roi, taxRate, iraBal, iraRoi, policy, holdings, cityCosts],
   );
   const yearView = useMemo(() => {
     if (!policy.enabled || yearKind === policy.kind || !runKinds[yearKind]) return result;
     return project({ ...baseArgs, policy: policyForKind(yearKind) });
-  }, [yearKind, result, runKinds, pool, state, setting, delay, duration, cpi, roi, taxRate, iraBal, iraRoi, policy, holdings, kindBook]);
+  }, [yearKind, result, runKinds, pool, state, setting, delay, duration, cpi, roi, taxRate, iraBal, iraRoi, policy, holdings, kindBook, cityCosts]);
 
   const pShipInfo = partnershipInfo(state);
   const partnershipApplies = Boolean(policy.enabled && partnershipOn && policy.kind === "traditional");
@@ -689,7 +745,7 @@ export function Calculator() {
   );
   const sensitivity = useMemo(
     () => hypothesisSensitivity({ ...baseArgs, policy }),
-    [pool, state, setting, delay, duration, cpi, roi, taxRate, iraBal, iraRoi, policy, holdings],
+    [pool, state, setting, delay, duration, cpi, roi, taxRate, iraBal, iraRoi, policy, holdings, cityCosts],
   );
   const confidence = useMemo(
     () =>
@@ -808,7 +864,7 @@ export function Calculator() {
         policy: { ...policy, benefitInflationPct: opt.benefitInflationPct, inflationMethod: opt.inflationMethod },
       }),
     }));
-  }, [policy, pool, state, setting, delay, duration, cpi, roi, taxRate, iraBal, iraRoi, holdings]);
+  }, [policy, pool, state, setting, delay, duration, cpi, roi, taxRate, iraBal, iraRoi, holdings, cityCosts]);
 
   const insuranceCompare = useMemo(() => {
     if (!policy.enabled) return [];
@@ -831,7 +887,7 @@ export function Calculator() {
         years: yearsPoolLasts(proj.startPoolNet + (proj.benefitPoolAtClaim ?? 0), proj.firstCost),
       };
     });
-  }, [policy, kindBook, runKinds, pool, state, setting, delay, duration, cpi, roi, taxRate, iraBal, iraRoi, holdings, partnershipOn, preferTap, selfFunded.endPool]);
+  }, [policy, kindBook, runKinds, pool, state, setting, delay, duration, cpi, roi, taxRate, iraBal, iraRoi, holdings, partnershipOn, preferTap, selfFunded.endPool, cityCosts]);
 
   const structureCompare = insuranceCompare.map((r) => ({
     key: r.key as PolicyKind,
@@ -841,14 +897,15 @@ export function Calculator() {
   }));
   const careCompare = (Object.keys(SETTING_LABELS) as CareSetting[]).map((s) => ({
     setting: s,
-    today: annualCost(state, s),
-    proj: project({ ...baseArgs, setting: s, policy }),
+    today: annualFor(s),
+    proj: project({ ...baseArgs, setting: s, annualCostOverride: annualFor(s), policy }),
   }));
   const scenario = {
     assets,
     assetRois,
     excludeHome,
     state,
+    careCity: cityCosts ? careCity.trim() : undefined,
     setting: activeSetting,
     delay,
     ageToday,
@@ -1086,6 +1143,8 @@ export function Calculator() {
     setLifeFaceAmount(0);
     setAssetRois({ ...DEFAULT_ASSET_ROIS });
     setState("Alabama");
+    setCareCity("");
+    setCityCosts(null);
     setExcludableTouched(false);
     setSetting(DEFAULT_CARE_SETTING);
     setSettingNeeded(false);
@@ -1730,6 +1789,8 @@ export function Calculator() {
           setStateNeeded(false);
           if (!excludableTouched) setAssets((prev) => ({ ...prev, excludable: defaultExcludableAssets(next) }));
         }}
+        careCity={careCity}
+        onCareCity={setCareCity}
         issueState={issueTouched ? issueState : state}
         onIssueState={(next) => {
           setIssueTouched(true);
@@ -2013,6 +2074,37 @@ export function Calculator() {
               <p className="mt-1 text-sm font-semibold text-deplete" role="alert">Select the state where care would be received to run the hypothetical.</p>
             ) : (
               <p className="mt-1 text-xs text-muted">Required to run. Care costs, Medicaid figures, and Partnership notes use this state.</p>
+            )}
+            <label className={`${labelClass} mt-3`} htmlFor="care-city">City where care would be received</label>
+            <input
+              id="care-city"
+              value={careCity}
+              onChange={(e) => setCareCity(e.target.value)}
+              placeholder="Search for a city"
+              autoComplete="address-level2"
+              className="w-full rounded-lg border border-line bg-paper px-3 py-2 text-sm text-navy"
+            />
+            {cityStatus === "loading" ? (
+              <p className="mt-1 text-xs text-muted">Looking up this city on the LTC News Cost of Care Calculator…</p>
+            ) : cityStatus === "error" ? (
+              <p className="mt-1 text-sm font-semibold text-deplete" role="alert">{cityError} State medians are still used.</p>
+            ) : cityCosts ? (
+              <p className="mt-1 text-xs leading-snug text-muted">
+                * {cityCosts.label} costs are from the{" "}
+                <Cite href={SRC.ltcNews}>LTC News Cost of Care Calculator</Cite>.
+                Home health, 44-hour week: {money(cityCosts.home44Annual)} / year.
+                This model’s around-the-clock home health is {money(cityCosts.home24Annual)} / year (44-hour median × 2.8).
+                Assisted living {money(cityCosts.assistedAnnual)}.
+                Memory care {money(cityCosts.memoryAnnual)}.
+                Nursing home {money(cityCosts.nursingAnnual)}.
+                {cityCosts.adultDayAnnual ? ` Adult day care ${money(cityCosts.adultDayAnnual)}.` : ""}
+                {" "}Not an agency quote.
+              </p>
+            ) : (
+              <p className="mt-1 text-xs text-muted">
+                Optional. A city replaces the state median with figures from the{" "}
+                <Cite href={SRC.ltcNews}>LTC News Cost of Care Calculator</Cite>.
+              </p>
             )}
             <label className={`${labelClass} mt-3`} htmlFor="issue-state">State where the insurance policy would be issued</label>
             <FieldPicker
@@ -2882,6 +2974,10 @@ export function Calculator() {
                 { id: "end-short", group: "more" as const, label: "Unpaid shortfall (end of run)", value: <RedAmt>{result.shortfallTotal ? moneyCents(result.shortfallTotal) : "None"}</RedAmt>, amount: result.shortfallTotal },
               ]}
             />
+            <p className="mt-3 text-xs leading-snug text-muted">
+              * Annual Care Costs and the first-year care cost are sourced from the{" "}
+              <Cite href={SRC.ltcNews}>LTC News Cost of Care Calculator</Cite>.
+            </p>
           </TitleCollapse>
         </section>
 
@@ -3013,6 +3109,10 @@ export function Calculator() {
                 </article>
               ))}
             </div>
+            <p className="mt-2 text-xs leading-snug text-muted">
+              Today’s annual cost and the first-year bill are sourced from the{" "}
+              <Cite href={SRC.ltcNews}>LTC News Cost of Care Calculator</Cite>.
+            </p>
           </ViewFold>
 
           {policy.enabled && insuranceCompare.length > 0 ? (
@@ -3102,10 +3202,15 @@ export function Calculator() {
                   </article>
                 ))}
               </div>
-              <div className="mt-4 border-t border-gold pt-4">
-                <h3 className="mb-2 font-display text-lg text-navy">Hybrid life insurance options</h3>
-                <HybridLifeOptionsPanel policy={policy} />
-              </div>
+              <details className={`mt-4 border-t border-gold pt-4${runKinds.hybridLife || policy.kind === "hybridLife" ? "" : " pdf-stay-closed"}`} open={runKinds.hybridLife || policy.kind === "hybridLife" ? true : undefined}>
+                <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal [&::-webkit-details-marker]:hidden [&::marker]:content-none">
+                  <span aria-hidden="true" className="naic-chevron inline-block text-gold-ink motion-reduce:transition-none">▸</span>
+                  <h3 className="font-display text-lg text-navy">Hybrid life insurance options</h3>
+                </summary>
+                <div className="mt-2">
+                  <HybridLifeOptionsPanel policy={policy} />
+                </div>
+              </details>
             </ViewFold>
           ) : null}
 

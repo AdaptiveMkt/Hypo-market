@@ -7,7 +7,9 @@ import {
   type PolicyKind,
   type YearRow,
 } from "@/lib/calc";
+import { Cite } from "@/components/source-links";
 import { KIND_TAB } from "@/lib/kind-tabs";
+import { SRC } from "@/lib/sources";
 import { money, moneyCents } from "@/lib/utils";
 
 const MODEL_START_YEAR = new Date().getFullYear();
@@ -225,8 +227,12 @@ export function YearByYearTable({
       {showNote ? (
       <p className="mt-2 text-xs text-muted">
         {policyEnabled
-          ? "Insurance Benefit Pool is remaining coverage at the start of that year. Countable Assets are net after tax (deferred accounts reduced by this run’s tax rate) before this year’s co-pay. Annual Care Costs* (est) are modeled from published median costs and this run’s inflation — not a quote. Insurance pays first up to that year’s maximum. If the bill is at or under that maximum and the pool still has room, Co-pay from Countable Assets is $0.00. Any amount assets do pay is shown as a negative number. Insurance Balance is the pool after that calendar year’s covered claim is subtracted. Total Remaining is Insurance Balance plus countable assets net after tax after the co-pay. "
-          : null}
+          ? "Insurance Benefit Pool is remaining coverage at the start of that year. Countable Assets are net after tax (deferred accounts reduced by this run’s tax rate) before this year’s co-pay. Annual Care Costs* (est) are modeled from published median costs and this run’s inflation — not a quote. Those care-cost figures are sourced from the "
+          : "Annual Care Costs* (est) are modeled from published median costs and this run’s inflation — not a quote. Those care-cost figures are sourced from the "}
+        <Cite href={SRC.ltcNews}>LTC News Cost of Care Calculator</Cite>.
+        {policyEnabled
+          ? " Insurance pays first up to that year’s maximum. If the bill is at or under that maximum and the pool still has room, Co-pay from Countable Assets is $0.00. Any amount assets do pay is shown as a negative number. Insurance Balance is the pool after that calendar year’s covered claim is subtracted. Total Remaining is Insurance Balance plus countable assets net after tax after the co-pay. "
+          : " "}
         {policyEnabled ? "Total Remaining" : "Countable Assets"} turns bold green when the pool starts declining, and bold red when it is depleted.
         The table runs through the wait until care and every modeled care year — it does not stop at year 10 or at depletion.
         {lifetime && policyEnabled ? ` ${LIFETIME_BENEFIT_NOTE}` : ""}

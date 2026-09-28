@@ -812,10 +812,13 @@ export function project(opts: {
   iraBalance?: number;
   iraRoiPct?: number;
   holdings?: Holding[];
+  /** When set, this annual cost replaces the state median (city lookup). */
+  annualCostOverride?: number;
 }): Projection {
   const cpi = opts.cpiPct / 100;
   const taxRate = Math.min(100, Math.max(0, Number(opts.taxRatePct) || 0)) / 100;
-  const base = annualCost(opts.state, opts.setting);
+  const override = Number(opts.annualCostOverride);
+  const base = override > 0 ? override : annualCost(opts.state, opts.setting);
   const hybrid = isAssetBased(opts.policy);
   const iraStart = Math.max(0, Number(opts.iraBalance) || 0);
   const holdings = opts.holdings?.length
