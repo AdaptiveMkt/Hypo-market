@@ -13,8 +13,10 @@ type StoredShare = {
 const memory = new Map<string, string>();
 const HOUR_MS = 60 * 60 * 1000;
 
-function token() {
-  return process.env.BLOB_READ_WRITE_TOKEN?.trim() || "";
+const STORE_ID = "store_dk2G5KgkmEt2uzGL";
+
+function blobOptions() {
+  return { access: "private" as const, storeId: STORE_ID };
 }
 
 function pathname(code: string) {
@@ -29,27 +31,30 @@ function randomCode() {
 }
 
 async function readRaw(code: string): Promise<string | null> {
-  if (!token()) return memory.get(code) ?? null;
   try {
-    const result = await get(pathname(code), { access: "private", useCache: false });
-    if (!result || result.statusCode !== 200 || !result.stream) return null;
+    const result = await get(pathname(code), { ...blobOptions(), useCache: false });
+    if (!result || result.statusCode !== 200 || !result.stream) return memory.get(code) ?? null;
     return new Response(result.stream).text();
   } catch {
-    return null;
+    return memory.get(code) ?? null;
   }
 }
 
 async function writeRaw(code: string, json: string) {
-  if (!token()) {
-    memory.set(code, json);
-    return;
+  try {
+    await put(pathname(code), json, {
+      ...blobOptions(),
+      addRandomSuffix: false,
+      allowOverwrite: true,
+      contentType: "application/json",
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "";
+    if (/store does not exist/i.test(message)) {
+      throw new Error("The temporary report link is not available yet. The report storage is not connected to this site.");
+    }
+    throw err;
   }
-  await put(pathname(code), json, {
-    access: "private",
-    addRandomSuffix: false,
-    allowOverwrite: true,
-    contentType: "application/json",
-  });
 }
 
 export async function saveShare(name: string, html: string, incognito = false) {
