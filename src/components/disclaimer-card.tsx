@@ -47,7 +47,7 @@ export function DesignationNoticeFold({
     <TitleCollapse
       title="Designation non-endorsement notice"
       className={className}
-      defaultOpen
+      defaultOpen={false}
       pdfLocked
       {...pdf}
     >
@@ -166,7 +166,6 @@ export function DisclaimerCard({
   const showAssumptions = on("Assumptions and cost data");
   const showSources = on("Sources used in this hypothetical");
   const showPrivacy = on("Privacy policy");
-  const showDesignation = on("Designation non-endorsement notice");
   if (
     include &&
     !paras.length &&
@@ -176,8 +175,7 @@ export function DisclaimerCard({
     !showHold &&
     !showLiability &&
     !showAssumptions &&
-    !showSources &&
-    !showDesignation
+    !showSources
   )
     return null;
 
@@ -243,14 +241,6 @@ export function DisclaimerCard({
           return body;
         })}
       </TitleCollapse>
-      ) : null}
-
-      {showDesignation ? (
-        <DesignationNoticeFold
-          className="mt-3"
-          details={details ?? include}
-          onPdfChange={onPdfChange}
-        />
       ) : null}
 
       {showLiability ? (

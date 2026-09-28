@@ -2156,14 +2156,17 @@ export function ReportView({
 
         {policy.enabled ? (
         <section className="report-block">
-          <h2 className="mb-3 font-display text-xl text-navy">
-            Long-term care glossary of terms
-          </h2>
-          <p className="mb-3 text-sm text-muted">
-            Definitions as used in this hypothetical. Educational — not a policy
-            contract, outline of coverage, or legal advice.
-          </p>
-          <LtcGlossaryTerms />
+          <details>
+            <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal [&::-webkit-details-marker]:hidden [&::marker]:content-none">
+              <span aria-hidden="true" className="naic-chevron inline-block text-gold-ink motion-reduce:transition-none">▸</span>
+              <h2 className="font-display text-xl text-navy">Long-term care glossary of terms</h2>
+            </summary>
+            <p className="mb-3 mt-3 text-sm text-muted">
+              Definitions as used in this hypothetical. Educational — not a policy
+              contract, outline of coverage, or legal advice.
+            </p>
+            <LtcGlossaryTerms />
+          </details>
         </section>
         ) : null}
 
@@ -2374,28 +2377,36 @@ export function ReportView({
 
         {details.naicGuide ? (
         <section className="report-block">
-          <h2 className="mb-2 font-display text-xl text-navy">
-            NAIC Shopper’s Guide to Long-Term Care Insurance
-          </h2>
-          <p className="text-sm text-muted">
-            Official NAIC consumer booklet (2022). Many states require this guide at
-            sale.{" "}
-            <Cite href={SRC.naicShopper}>Open or download the Shopper’s Guide (PDF)</Cite>.
-          </p>
+          <details>
+            <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal [&::-webkit-details-marker]:hidden [&::marker]:content-none">
+              <span aria-hidden="true" className="naic-chevron inline-block text-gold-ink motion-reduce:transition-none">▸</span>
+              <h2 className="font-display text-xl text-navy">NAIC Shopper’s Guide to Long-Term Care Insurance</h2>
+            </summary>
+            <p className="mt-2 text-sm text-muted">
+              Official NAIC consumer booklet (2022). Many states require this guide at
+              sale.{" "}
+              <Cite href={SRC.naicShopper}>Open or download the Shopper’s Guide (PDF)</Cite>.
+            </p>
+          </details>
         </section>
         ) : null}
 
         {details.naicWorksheet ? (
         <section className="report-block">
-          <h2 className="mb-2 font-display text-xl text-navy">
-            NAIC Long-Term Care Insurance Personal Worksheet
-          </h2>
-          <p className="text-sm text-muted">
-            Fillable HTML educational copy (NAIC Model Regulation #641, Appendix B). Not a carrier application.{" "}
-            <Cite href={SRC.naicSuitability}>Official blank PDF</Cite>
-            . Pages 48–51 of the Shopper’s Guide reprint this worksheet.
-          </p>
-          <FilledNaicWorksheet />
+          <details>
+            <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal [&::-webkit-details-marker]:hidden [&::marker]:content-none">
+              <span aria-hidden="true" className="naic-chevron inline-block text-gold-ink motion-reduce:transition-none">▸</span>
+              <h2 className="font-display text-xl text-navy">NAIC Long-Term Care Insurance Personal Worksheet</h2>
+            </summary>
+            <div className="mt-2">
+              <p className="text-sm text-muted">
+                Fillable HTML educational copy (NAIC Model Regulation #641, Appendix B). Not a carrier application.{" "}
+                <Cite href={SRC.naicSuitability}>Official blank PDF</Cite>
+                . Pages 48–51 of the Shopper’s Guide reprint this worksheet.
+              </p>
+              <FilledNaicWorksheet />
+            </div>
+          </details>
         </section>
         ) : null}
 

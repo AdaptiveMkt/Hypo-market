@@ -1,4 +1,6 @@
 import { Link } from "@tanstack/react-router";
+import { TitleCollapse } from "@/components/accordion";
+import { AllDesignationNotice } from "@/components/designation-notice";
 import { AmgName, Cite } from "@/components/source-links";
 import { SRC } from "@/lib/sources";
 
@@ -90,6 +92,14 @@ export function NaicLastPages() {
           </p>
         </div>
       </details>
+      <TitleCollapse
+        title="Designation non-endorsement notice"
+        className="mt-3"
+        defaultOpen={false}
+        pdfLocked
+      >
+        <AllDesignationNotice className="mt-0" />
+      </TitleCollapse>
     </section>
   );
 }
