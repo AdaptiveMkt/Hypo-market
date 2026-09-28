@@ -55,6 +55,73 @@ export const STATES: Record<string, [number, number, number, number]> = {
 
 export const STATE_NAMES = Object.keys(STATES);
 
+/**
+ * Five largest cities in each state, largest population first.
+ * 2023 Census Bureau city and place estimates. The District of Columbia is one city.
+ */
+export const TOP_CITIES: Record<string, string[]> = {
+  Alabama: ["Birmingham", "Huntsville", "Montgomery", "Mobile", "Tuscaloosa"],
+  Alaska: ["Anchorage", "Fairbanks", "Juneau", "Wasilla", "Sitka"],
+  Arizona: ["Phoenix", "Tucson", "Mesa", "Chandler", "Gilbert"],
+  Arkansas: ["Little Rock", "Fort Smith", "Fayetteville", "Springdale", "Jonesboro"],
+  California: ["Los Angeles", "San Diego", "San Jose", "San Francisco", "Fresno"],
+  Colorado: ["Denver", "Colorado Springs", "Aurora", "Fort Collins", "Lakewood"],
+  Connecticut: ["Bridgeport", "Stamford", "New Haven", "Hartford", "Waterbury"],
+  Delaware: ["Wilmington", "Dover", "Newark", "Middletown", "Smyrna"],
+  "District of Columbia": ["Washington"],
+  Florida: ["Jacksonville", "Miami", "Tampa", "Orlando", "St. Petersburg"],
+  Georgia: ["Atlanta", "Columbus", "Augusta", "Macon", "Savannah"],
+  Hawaii: ["Honolulu", "Pearl City", "Hilo", "Kailua", "Kaneohe"],
+  Idaho: ["Boise", "Meridian", "Nampa", "Idaho Falls", "Caldwell"],
+  Illinois: ["Chicago", "Aurora", "Naperville", "Joliet", "Rockford"],
+  Indiana: ["Indianapolis", "Fort Wayne", "Evansville", "South Bend", "Carmel"],
+  Iowa: ["Des Moines", "Cedar Rapids", "Davenport", "Sioux City", "Iowa City"],
+  Kansas: ["Wichita", "Overland Park", "Kansas City", "Olathe", "Topeka"],
+  Kentucky: ["Louisville", "Lexington", "Bowling Green", "Owensboro", "Covington"],
+  Louisiana: ["New Orleans", "Baton Rouge", "Shreveport", "Lafayette", "Lake Charles"],
+  Maine: ["Portland", "Lewiston", "Bangor", "South Portland", "Auburn"],
+  Maryland: ["Baltimore", "Frederick", "Gaithersburg", "Rockville", "Bowie"],
+  Massachusetts: ["Boston", "Worcester", "Springfield", "Cambridge", "Lowell"],
+  Michigan: ["Detroit", "Grand Rapids", "Warren", "Sterling Heights", "Ann Arbor"],
+  Minnesota: ["Minneapolis", "St. Paul", "Rochester", "Bloomington", "Duluth"],
+  Mississippi: ["Jackson", "Gulfport", "Southaven", "Hattiesburg", "Biloxi"],
+  Missouri: ["Kansas City", "St. Louis", "Springfield", "Columbia", "Independence"],
+  Montana: ["Billings", "Missoula", "Great Falls", "Bozeman", "Butte"],
+  Nebraska: ["Omaha", "Lincoln", "Bellevue", "Grand Island", "Kearney"],
+  Nevada: ["Las Vegas", "Henderson", "North Las Vegas", "Reno", "Sparks"],
+  "New Hampshire": ["Manchester", "Nashua", "Concord", "Dover", "Rochester"],
+  "New Jersey": ["Newark", "Jersey City", "Paterson", "Elizabeth", "Lakewood"],
+  "New Mexico": ["Albuquerque", "Las Cruces", "Rio Rancho", "Santa Fe", "Roswell"],
+  "New York": ["New York", "Buffalo", "Rochester", "Yonkers", "Syracuse"],
+  "North Carolina": ["Charlotte", "Raleigh", "Greensboro", "Durham", "Winston-Salem"],
+  "North Dakota": ["Fargo", "Bismarck", "Grand Forks", "Minot", "West Fargo"],
+  Ohio: ["Columbus", "Cleveland", "Cincinnati", "Toledo", "Akron"],
+  Oklahoma: ["Oklahoma City", "Tulsa", "Norman", "Broken Arrow", "Edmond"],
+  Oregon: ["Portland", "Salem", "Eugene", "Gresham", "Hillsboro"],
+  Pennsylvania: ["Philadelphia", "Pittsburgh", "Allentown", "Reading", "Erie"],
+  "Rhode Island": ["Providence", "Warwick", "Cranston", "Pawtucket", "East Providence"],
+  "South Carolina": ["Charleston", "Columbia", "North Charleston", "Mount Pleasant", "Rock Hill"],
+  "South Dakota": ["Sioux Falls", "Rapid City", "Aberdeen", "Brookings", "Watertown"],
+  Tennessee: ["Nashville", "Memphis", "Knoxville", "Chattanooga", "Clarksville"],
+  Texas: ["Houston", "San Antonio", "Dallas", "Austin", "Fort Worth"],
+  Utah: ["Salt Lake City", "West Valley City", "West Jordan", "Provo", "Orem"],
+  Vermont: ["Burlington", "South Burlington", "Rutland", "Essex Junction", "Barre"],
+  Virginia: ["Virginia Beach", "Chesapeake", "Norfolk", "Richmond", "Newport News"],
+  Washington: ["Seattle", "Spokane", "Tacoma", "Vancouver", "Bellevue"],
+  "West Virginia": ["Charleston", "Huntington", "Morgantown", "Parkersburg", "Wheeling"],
+  Wisconsin: ["Milwaukee", "Madison", "Green Bay", "Kenosha", "Racine"],
+  Wyoming: ["Cheyenne", "Casper", "Gillette", "Laramie", "Rock Springs"],
+};
+
+export function topCities(state: string): string[] {
+  return TOP_CITIES[state] ?? [];
+}
+
+/** Largest city in the state. Used when a care state is selected. */
+export function defaultCareCity(state: string): string {
+  return topCities(state)[0] ?? "";
+}
+
 export type CareSetting = "al" | "nh" | "nhs" | "home24" | "memory";
 
 export const SETTING_LABELS: Record<CareSetting, string> = {

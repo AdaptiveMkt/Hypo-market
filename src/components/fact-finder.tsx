@@ -24,7 +24,8 @@ import {
   type LtcPolicy,
   type PolicyKind,
 } from "@/lib/calc";
-import { SETTING_LABELS, STATE_NAMES, type CareSetting } from "@/lib/costs";
+import { SETTING_LABELS, STATE_NAMES, topCities, type CareSetting } from "@/lib/costs";
+import { nearbyCounties } from "@/lib/nearby-counties";
 import { money } from "@/lib/utils";
 import { TAX_RATE_GROUPS, TAX_RATE_OPTIONS } from "@/lib/tax-brackets";
 import { SRC } from "@/lib/sources";
@@ -534,17 +535,23 @@ export function FactFinder({
           <>
             <p className="text-base font-semibold text-navy">What city would care be received in?</p>
             <p className="mt-1 text-xs leading-snug text-muted">
-              Optional. Leave blank to use the {state || "state"} median. A city pulls costs from the{" "}
+              The five largest cities in {state || "this state"}. The largest is selected first. A choice uses that city’s median from the{" "}
               <Cite href={SRC.ltcNews}>LTC News Cost of Care Calculator</Cite>.
             </p>
-            <input
-              id="ff-city"
-              value={careCity}
-              onChange={(e) => onCareCity(e.target.value)}
-              placeholder="Search for a city"
-              autoComplete="address-level2"
-              className="mt-3 w-full rounded-lg border border-line bg-paper px-3 py-2 text-sm text-navy"
-            />
+            <div className="mt-3">
+              <FieldPicker
+                id="ff-city"
+                value={topCities(state).includes(careCity) ? careCity : topCities(state)[0] ?? ""}
+                placeholder="Select a city…"
+                options={topCities(state).map((city) => ({ value: city, label: city }))}
+                onChange={onCareCity}
+              />
+            </div>
+            {nearbyCounties(careCity, state).length ? (
+              <p className="mt-2 text-xs leading-snug text-muted">
+                Nearby counties: {nearbyCounties(careCity, state).join(", ")}.
+              </p>
+            ) : null}
             <Nav back={back} next={next} />
           </>
         ) : null}

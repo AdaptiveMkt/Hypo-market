@@ -80,11 +80,14 @@ import {
   SETTING_SHORT,
   STATE_NAMES,
   annualCost,
+  defaultCareCity,
+  topCities,
   fiveYearLtcCagr,
   fiveYearLtcBenchmarks,
   type CareSetting,
 } from "@/lib/costs";
 import { lookupLtcNewsCity, type LtcNewsCityCosts } from "@/lib/ltc-news-cost";
+import { nearbyCounties } from "@/lib/nearby-counties";
 import { DEFAULT_TAX_RATE, TAX_RATE_GROUPS, TAX_RATE_OPTIONS } from "@/lib/tax-brackets";
 import { careCostCompound } from "@/lib/cpi";
 import { compactMoney, money, moneyCents } from "@/lib/utils";
@@ -355,7 +358,7 @@ export function Calculator() {
   const [preferTap, setPreferTap] = useState(false);
   const [issueState, setIssueState] = useState("");
   const [issueTouched, setIssueTouched] = useState(false);
-  const [careCity, setCareCity] = useState("");
+  const [careCity, setCareCity] = useState(defaultCareCity("Alabama"));
   const [cityCosts, setCityCosts] = useState<LtcNewsCityCosts | null>(null);
   const [cityStatus, setCityStatus] = useState<"" | "loading" | "error">("");
   const [cityError, setCityError] = useState("");
@@ -397,8 +400,11 @@ export function Calculator() {
       setLifeFaceAmount(Number(saved.lifeFaceAmount) || 0);
       setAssetRois({ ...DEFAULT_ASSET_ROIS, ...saved.assetRois });
       setExcludableTouched(Boolean(saved.excludableTouched));
-      if (saved.state) setState(saved.state);
-      if (saved.careCity) setCareCity(saved.careCity);
+      if (saved.state) {
+        setState(saved.state);
+        const cities = topCities(saved.state);
+        setCareCity(saved.careCity && cities.includes(saved.careCity) ? saved.careCity : cities[0] ?? "");
+      }
       setSetting((saved.setting || DEFAULT_CARE_SETTING) as CareSetting | "");
       setCpiOverride(saved.cpiOverride ?? null);
       if (saved.ageToday) setAgeToday(saved.ageToday);
@@ -1143,7 +1149,7 @@ export function Calculator() {
     setLifeFaceAmount(0);
     setAssetRois({ ...DEFAULT_ASSET_ROIS });
     setState("Alabama");
-    setCareCity("");
+    setCareCity(defaultCareCity("Alabama"));
     setCityCosts(null);
     setExcludableTouched(false);
     setSetting(DEFAULT_CARE_SETTING);
@@ -1786,6 +1792,7 @@ export function Calculator() {
         state={state}
         onState={(next) => {
           setState(next);
+          setCareCity(defaultCareCity(next));
           setStateNeeded(false);
           if (!excludableTouched) setAssets((prev) => ({ ...prev, excludable: defaultExcludableAssets(next) }));
         }}
@@ -2066,6 +2073,7 @@ export function Calculator() {
               options={STATE_NAMES.map((s) => ({ value: s, label: s }))}
               onChange={(next) => {
                 setState(next);
+                setCareCity(defaultCareCity(next));
                 setStateNeeded(false);
                 if (!excludableTouched) setAssets((prev) => ({ ...prev, excludable: defaultExcludableAssets(next) }));
               }}
@@ -2076,14 +2084,18 @@ export function Calculator() {
               <p className="mt-1 text-xs text-muted">Required to run. Care costs, Medicaid figures, and Partnership notes use this state.</p>
             )}
             <label className={`${labelClass} mt-3`} htmlFor="care-city">City where care would be received</label>
-            <input
+            <FieldPicker
               id="care-city"
-              value={careCity}
-              onChange={(e) => setCareCity(e.target.value)}
-              placeholder="Search for a city"
-              autoComplete="address-level2"
-              className="w-full rounded-lg border border-line bg-paper px-3 py-2 text-sm text-navy"
+              value={topCities(state).includes(careCity) ? careCity : defaultCareCity(state)}
+              placeholder="Select a city…"
+              options={topCities(state).map((city) => ({ value: city, label: city }))}
+              onChange={setCareCity}
             />
+            {nearbyCounties(careCity, state).length ? (
+              <p className="mt-1 text-xs leading-snug text-muted">
+                Nearby counties: {nearbyCounties(careCity, state).join(", ")}.
+              </p>
+            ) : null}
             {cityStatus === "loading" ? (
               <p className="mt-1 text-xs text-muted">Looking up this city on the LTC News Cost of Care Calculator…</p>
             ) : cityStatus === "error" ? (
@@ -2102,7 +2114,7 @@ export function Calculator() {
               </p>
             ) : (
               <p className="mt-1 text-xs text-muted">
-                Optional. A city replaces the state median with figures from the{" "}
+                The five largest cities in {state || "the care state"}. A selection uses that city’s median from the{" "}
                 <Cite href={SRC.ltcNews}>LTC News Cost of Care Calculator</Cite>.
               </p>
             )}
@@ -3354,7 +3366,10 @@ export function Calculator() {
             <div className="mt-5 card-xl px-4 py-2">
               <TitleCollapse title="Advisor / insurance professional (optional)" className="mt-0" defaultOpen hint="Click the title to add the advisor or agent on the report. Leave blank to omit.">
                 <PartyFields idPrefix="advisor" party={{ ...advisor, state }} extra details={details} onPdfChange={setDetail} onChange={(partial) => {
-                  if (partial.state && partial.state !== state) setState(partial.state);
+                  if (partial.state && partial.state !== state) {
+                    setState(partial.state);
+                    setCareCity(defaultCareCity(partial.state));
+                  }
                   setAdvisor((p) => ({ ...p, ...partial, state: partial.state || state }));
                 }} />
                 <AdvisorProfessionalFolds details={details} onPdfChange={setDetail} />
