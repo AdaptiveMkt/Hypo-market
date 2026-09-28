@@ -1,14 +1,14 @@
 import { createServerFn } from "@tanstack/react-start";
 
 /** Personalized report links. The path is /[name]-hypo-asset-preservation/[code]. */
-export const SHARE_ORIGIN = "https://www.preserve-your-assets.com";
+export const SHARE_ORIGIN = "https://preserve-your-assets.com";
 /** Incognito report links. The path is /incognito-[code]. */
 export const INCOGNITO_ORIGIN = "https://preserve-your-assets.com";
 export const SHARE_HOURS = 72;
 export const INCOGNITO_HOURS = 24;
 
 export function shareDisclaimer(hours: number) {
-  return `This web address is visible to anyone who has the link. It expires ${hours} hours after it is first opened. To save this report, print to PDF and save the file on your computer. This site does not keep a copy after the link expires.`;
+  return `This web address is visible to anyone who has the link. It expires ${hours} hours after it is first opened. To save the content, print to PDF and save the file on your computer. This site does not keep a copy after the link expires.`;
 }
 
 export const SHARE_DISCLAIMER = shareDisclaimer(SHARE_HOURS);
