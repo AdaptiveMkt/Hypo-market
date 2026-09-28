@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 
-/** Live site. The path is /[name]-hypo-asset-preservation/[code]. */
-export const SHARE_ORIGIN = "https://preserve-your-assets.com";
+/** Public report links. The path is /[name]-hypo-asset-preservation/[code]. */
+export const SHARE_ORIGIN = "https://protect-your-assets.com";
 export const SHARE_HOURS = 72;
 
 export const SHARE_DISCLAIMER =
