@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import type { AudienceRole } from "@/lib/qa-cookie";
+import { SHARE_DISCLAIMER } from "@/lib/share-report";
 import {
   Area,
   Bar,
@@ -225,6 +226,9 @@ export function ReportView({
   pdfDemo = false,
   audienceRole = null,
   audienceNote = "",
+  shareUrl = "",
+  sharePending = false,
+  shareError = "",
   onClose,
   onPdf,
   onClosePdf,
@@ -296,6 +300,9 @@ export function ReportView({
   pdfDemo?: boolean;
   audienceRole?: AudienceRole | null;
   audienceNote?: string;
+  shareUrl?: string;
+  sharePending?: boolean;
+  shareError?: string;
   onClose: () => void;
   onPdf: () => void;
   onClosePdf?: () => void;
@@ -498,6 +505,21 @@ export function ReportView({
           ) : null}
           {audienceRole && ROLE_HEADER[audienceRole] ? (
             <p className="mt-3 text-sm font-semibold leading-snug text-navy">{ROLE_HEADER[audienceRole]}</p>
+          ) : null}
+          {sharePending || shareUrl || shareError ? (
+            <section data-share-omit className="mt-4 rounded-lg border border-gold bg-cream px-4 py-3 text-left text-sm text-navy">
+              <p className="font-semibold">Report link</p>
+              {sharePending ? <p className="mt-1">Creating a link for this report…</p> : null}
+              {shareUrl ? (
+                <p className="mt-1 break-all">
+                  <a href={shareUrl} className="font-semibold underline" target="_blank" rel="noopener noreferrer">
+                    {shareUrl}
+                  </a>
+                </p>
+              ) : null}
+              {shareError ? <p className="mt-1 font-semibold text-deplete">{shareError}</p> : null}
+              <p className="mt-2 text-xs leading-relaxed">{SHARE_DISCLAIMER}</p>
+            </section>
           ) : null}
         </header>
 

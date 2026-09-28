@@ -166,6 +166,7 @@ import {
 import { downloadReportPdf } from "@/lib/download-report-pdf";
 import { emailAdvisorPdf } from "@/lib/send-report-mail";
 import { pdfFilename } from "@/lib/email-attachment";
+import { publishShare } from "@/lib/share-report";
 import { hypothesisSensitivity } from "@/lib/sensitivity";
 import { modelConfidence } from "@/lib/confidence";
 import {
@@ -293,6 +294,9 @@ export function Calculator() {
   const [protectPct, setProtectPct] = useState(DEFAULT_PROTECT_PCT);
   const [ageNeeded, setAgeNeeded] = useState(false);
   const [showReport, setShowReport] = useState(false);
+  const [shareUrl, setShareUrl] = useState("");
+  const [sharePending, setSharePending] = useState(false);
+  const [shareError, setShareError] = useState("");
   const [printAfterOpen, setPrintAfterOpen] = useState(false);
   const [advisorCaptureOpen, setAdvisorCaptureOpen] = useState(false);
   const [pdfPick, setPdfPick] = useState(false);
@@ -1327,6 +1331,9 @@ export function Calculator() {
     setPdfPick(false);
     setAttachAdvisor(advisorReceivesPdf(advisor, client));
     setShowReport(true);
+    setShareUrl("");
+    setShareError("");
+    setSharePending(false);
     setPrintAfterOpen(false);
     setSaveMsg("");
     if (locked) {
@@ -1539,6 +1546,9 @@ export function Calculator() {
     pdfDemo: audience === "licensed-client" || audience === "licensed-solo",
     audienceRole: audience,
     audienceNote: audience === "licensed-solo" ? "Contact Adaptive Marketing Group for terms of use and licensing agreement." : "",
+    shareUrl,
+    sharePending,
+    shareError,
     onClose: () => {
       setShowReport(false);
       setShowFullForm(true);
@@ -1565,6 +1575,38 @@ export function Calculator() {
     },
   };
 
+  const canShare = audience === "interested" && partyFilled(client);
+  useEffect(() => {
+    if (!showReport || !canShare) return;
+    let cancel = false;
+    setShareUrl("");
+    setShareError("");
+    setSharePending(true);
+    const name = client.name;
+    const timer = window.setTimeout(() => {
+      const root = document.getElementById("aum-report");
+      if (!root || cancel) {
+        if (!cancel) setSharePending(false);
+        return;
+      }
+      const clone = root.cloneNode(true) as HTMLElement;
+      clone.querySelectorAll("[data-share-omit], [role='toolbar']").forEach((node) => node.remove());
+      publishShare({ data: { name, html: clone.innerHTML } })
+        .then((res) => {
+          if (!cancel) setShareUrl(res.url);
+        })
+        .catch((err: unknown) => {
+          if (!cancel) setShareError(err instanceof Error ? err.message : "The report link could not be created.");
+        })
+        .finally(() => {
+          if (!cancel) setSharePending(false);
+        });
+    }, 900);
+    return () => {
+      cancel = true;
+      window.clearTimeout(timer);
+    };
+  }, [showReport, hypoRunId, canShare, client.name]);
   const needsAdvisor = audience === "licensed-client" || audience === "licensed-solo";
   const advisorOk = Boolean(
     advisor.name.trim() && advisor.firm.trim() && advisor.email.includes("@") && advisor.phone.trim(),
