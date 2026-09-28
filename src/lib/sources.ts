@@ -101,6 +101,8 @@ export const SRC = {
     "https://www.ey.com/content/dam/ey-unified-site/ey-com/en-us/insights/insurance/documents/ey-hybrid-insurance-on-the-rise-a-new-era-for-long-term-care-protection.pdf",
   aaltciCosts2024:
     "https://www.aaltci.org/news/long-term-care-insurance-association-news/costs-long-term-care-insurance-2024-reported",
+  aaltciCareCost:
+    "https://www.aaltci.org/long-term-care-frequently-asked-questions/#how-much-long-term-care-cost",
   aarpHybrid: "https://www.aarp.org/money/personal-finance/hybrid-ltc-life-insurance/",
   naicStates: "https://content.naic.org/state-insurance-departments",
   naicLookup: "https://external-lookup-web.prod.naic.org/",

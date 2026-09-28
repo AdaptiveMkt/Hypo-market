@@ -28,7 +28,7 @@ import { SETTING_LABELS, STATE_NAMES, type CareSetting } from "@/lib/costs";
 import { money } from "@/lib/utils";
 import { TAX_RATE_GROUPS, TAX_RATE_OPTIONS } from "@/lib/tax-brackets";
 import { SRC } from "@/lib/sources";
-import { Cite } from "@/components/source-links";
+import { Cite, HomeHealthCostNote } from "@/components/source-links";
 import { AALTCI_MEAN_CLAIM_AGE } from "@/lib/claim-age";
 import { partnershipInfo, partnershipPolicyName } from "@/lib/partnership";
 
@@ -561,10 +561,14 @@ export function FactFinder({
                 id="ff-setting"
                 value={setting}
                 placeholder="Select care setting"
-                options={(Object.keys(SETTING_LABELS) as CareSetting[]).map((k) => ({ value: k, label: SETTING_LABELS[k] }))}
+                options={(Object.keys(SETTING_LABELS) as CareSetting[]).map((k) => ({
+                  value: k,
+                  label: k === "home24" ? `${SETTING_LABELS[k]}*` : SETTING_LABELS[k],
+                }))}
                 onChange={(v) => onSetting(v as CareSetting)}
               />
             </div>
+            {setting === "home24" ? <HomeHealthCostNote /> : null}
             <Nav back={back} next={next} nextDisabled={!setting} />
           </>
         ) : null}

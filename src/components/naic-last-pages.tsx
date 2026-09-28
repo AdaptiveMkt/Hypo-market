@@ -28,44 +28,68 @@ export function NaicCardDisclaimer() {
   );
 }
 
-/** Always printed on the last pages of View and PDF. */
+/** Always printed on the last pages of View and PDF. Collapsed in the on-screen report. */
 export function NaicLastPages() {
   return (
-    <>
-      <section className="report-block border-l-4 border-teal bg-paper px-4 py-3 text-sm text-muted">
-        <p className="font-display text-lg text-navy">NAIC consumer materials</p>
-        <p className="mt-2">
-          These NAIC publications are part of the source information for this hypothetical.
-          They are consumer and producer education — not a quote, not an application, and
-          not <AmgName /> advice.
-        </p>
-        <ul className="mt-3 list-disc space-y-2 pl-5">
-          <li>
-            <strong className="text-navy">NAIC Shopper’s Guide to Long-Term Care Insurance. </strong>
-            <Cite href={SRC.naicShopper}>Download the PDF</Cite>
-            {" "}
-            (benefit triggers, elimination periods, inflation options, exclusions, free-look).
-            Many states require this guide at sale.
-          </li>
-          <li>
-            <strong className="text-navy">NAIC Long-Term Care Insurance Personal Worksheet (suitability). </strong>
-            <Cite href={SRC.naicSuitability}>Official PDF (IIPRC application-form standards)</Cite>
-            . The Personal Worksheet and “Things You Should Know Before You Buy
-            Long-Term Care Insurance” are pages 48–51 of that guide.{" "}
-            <Cite href={`${SRC.naicShopper}#page=48`}>Open pages 48–51</Cite>
-            . Educational copy of the personal worksheet used to discuss ability to pay,
-            goals, and existing coverage. Issuers file their own worksheet with the state.
-          </li>
-        </ul>
-        <p className="no-print mt-3">
-          <Link
-            to="/suitability"
-            className="inline-flex min-h-11 items-center justify-center rounded-lg border border-navy bg-navy px-4 py-2 text-sm font-semibold text-cream hover:bg-teal"
+    <section
+      className="report-block border-l-4 border-teal bg-paper px-4 py-3 text-sm text-muted"
+      aria-labelledby="naic-consumer-materials"
+    >
+      <details>
+        <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal [&::-webkit-details-marker]:hidden [&::marker]:content-none">
+          <span
+            aria-hidden="true"
+            className="naic-chevron inline-block text-gold-ink motion-reduce:transition-none"
           >
-            Open fillable suitability worksheet
-          </Link>
-        </p>
-      </section>
-    </>
+            ▸
+          </span>
+          <h2 id="naic-consumer-materials" className="font-display text-lg text-navy">
+            NAIC consumer materials
+          </h2>
+        </summary>
+        <div className="mt-2">
+          <p>
+            These NAIC publications are part of the source information for this hypothetical.
+            They are consumer and producer education — not a quote, not an application, and
+            not <AmgName /> advice.
+          </p>
+          <ul className="mt-3 list-disc space-y-2 pl-5">
+            <li>
+              <strong className="text-navy">NAIC Shopper’s Guide to Long-Term Care Insurance. </strong>
+              <Cite href={SRC.naicShopper}>
+                Download the Shopper’s Guide (PDF)
+                <span className="sr-only"> (opens in a new tab)</span>
+              </Cite>
+              {" "}
+              (benefit triggers, elimination periods, inflation options, exclusions, free-look).
+              Many states require this guide at sale.
+            </li>
+            <li>
+              <strong className="text-navy">NAIC Long-Term Care Insurance Personal Worksheet (suitability). </strong>
+              <Cite href={SRC.naicSuitability}>
+                Official Personal Worksheet PDF (IIPRC application-form standards)
+                <span className="sr-only"> (opens in a new tab)</span>
+              </Cite>
+              . The Personal Worksheet and “Things You Should Know Before You Buy
+              Long-Term Care Insurance” are pages 48–51 of the Shopper’s Guide.{" "}
+              <Cite href={`${SRC.naicShopper}#page=48`}>
+                Open Shopper’s Guide pages 48–51
+                <span className="sr-only"> (opens in a new tab)</span>
+              </Cite>
+              . Educational copy of the personal worksheet used to discuss ability to pay,
+              goals, and existing coverage. Issuers file their own worksheet with the state.
+            </li>
+          </ul>
+          <p className="no-print mt-3">
+            <Link
+              to="/suitability"
+              className="inline-flex min-h-11 items-center justify-center rounded-lg border border-navy bg-navy px-4 py-2 text-sm font-semibold text-cream hover:bg-teal focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal"
+            >
+              Open fillable suitability worksheet
+            </Link>
+          </p>
+        </div>
+      </details>
+    </section>
   );
 }

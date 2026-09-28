@@ -141,6 +141,20 @@ html.dark {
     overflow-wrap: break-word;
   }
 
+  .naic-chevron {
+    transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  details[open] > summary .naic-chevron {
+    transform: rotate(90deg);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .naic-chevron {
+      transition: none;
+    }
+  }
+
   html.dark,
   html.dark body {
     background-color: var(--color-bg);

@@ -1,4 +1,4 @@
-/** Monthly medians: home 44hr, assisted living, NH semi, NH private. CareScout 2025. */
+/** Monthly medians: home 44hr, assisted living, NH semi, NH private. LTC News Cost of Care Calculator. */
 export const STATES: Record<string, [number, number, number, number]> = {
   Alabama: [5148, 4425, 8334, 8787],
   Alaska: [7245, 9882, 27831, 36000],
@@ -122,9 +122,10 @@ export function stateCostSnapshot(state: string) {
 }
 
 /**
- * National median annual costs. 44-hour home, AL, NH semi, NH private are
- * scaled 44/30). Memory care = assisted living × 1.25. Years 2016–2021 from
- * AARP PPI / Genworth; 2023–2025 from CareScout.
+ * National median annual costs. 44-hour home, AL, NH semi, and NH private are
+ * planning medians from the LTC News Cost of Care Calculator. 24-hour home care
+ * is that 44-hour median × 2.8. AALTCI publishes separate national home health
+ * aide figures and is not the state table. Memory care = assisted living × 1.25.
  */
 export type CostHistoryPoint = {
   year: number;
@@ -207,5 +208,5 @@ export function fiveYearLtcBenchmarks() {
 }
 
 export const DEFAULT_CARE_YEARS = 5;
-export const DEFAULT_CARE_SETTING: CareSetting = "al";
+export const DEFAULT_CARE_SETTING: CareSetting = "home24";
 export const DEFAULT_CARE_CPI = fiveYearLtcCagr(DEFAULT_CARE_SETTING);

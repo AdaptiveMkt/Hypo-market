@@ -115,6 +115,19 @@ export function Cite({
   );
 }
 
+/** Asterisk note for home health / 24-hour home care dollars. LTC News and AALTCI only. */
+export function HomeHealthCostNote({ className = "mt-2 text-xs leading-snug text-muted" }: { className?: string }) {
+  return (
+    <p className={className}>
+      * Home health / 24-hour home care cost. The 44-hour-a-week median is from the{" "}
+      <Cite href={SRC.ltcNews}>LTC News Cost of Care Calculator</Cite>.
+      Around-the-clock care in this model is 2.8 times that median (about 18 paid hours a day), not 168 billable hours.{" "}
+      <Cite href={SRC.aaltciCareCost}>AALTCI</Cite> also publishes national home health aide cost information.
+      Confirm a local quote. Not an agency price.
+    </p>
+  );
+}
+
 export function LinkedCopy({
   text,
   notice = false,

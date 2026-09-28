@@ -102,7 +102,7 @@ import { isDarkTheme, setTheme } from "@/components/theme-toggle";
 import { StateName, Pct } from "@/components/state-name";
 import { AgiPremiumCallout, agiTargetSentence } from "@/components/agi-premium-callout";
 import { LifeBenefitDefs } from "@/components/life-benefit-defs";
-import { Cite, CopyrightMark, LinkedCopy } from "@/components/source-links";
+import { Cite, CopyrightMark, HomeHealthCostNote, LinkedCopy } from "@/components/source-links";
 import { SRC } from "@/lib/sources";
 import { HEALTH_INSURANCE_INTRO, HEALTH_INSURANCE_TYPES } from "@/lib/health-insurance-types";
 import { DISCLOSURE_CARD_TITLE } from "@/lib/disclaimer";
@@ -271,7 +271,7 @@ export function Calculator() {
   const [excludableTouched, setExcludableTouched] = useState(false);
   const [assetRois, setAssetRois] = useState<AssetRois>(() => ({ ...DEFAULT_ASSET_ROIS }));
   const [state, setState] = useState("Alabama");
-  const [setting, setSetting] = useState<CareSetting | "">("");
+  const [setting, setSetting] = useState<CareSetting | "">(DEFAULT_CARE_SETTING);
   const [settingNeeded, setSettingNeeded] = useState(false);
   const activeSetting: CareSetting = setting || DEFAULT_CARE_SETTING;
   const [cpiOverride, setCpiOverride] = useState<number | null>(null);
@@ -393,7 +393,7 @@ export function Calculator() {
       setAssetRois({ ...DEFAULT_ASSET_ROIS, ...saved.assetRois });
       setExcludableTouched(Boolean(saved.excludableTouched));
       if (saved.state) setState(saved.state);
-      setSetting((saved.setting || "") as CareSetting | "");
+      setSetting((saved.setting || DEFAULT_CARE_SETTING) as CareSetting | "");
       setCpiOverride(saved.cpiOverride ?? null);
       if (saved.ageToday) setAgeToday(saved.ageToday);
       if (saved.claimAge) setClaimAge(saved.claimAge);
@@ -1087,7 +1087,7 @@ export function Calculator() {
     setAssetRois({ ...DEFAULT_ASSET_ROIS });
     setState("Alabama");
     setExcludableTouched(false);
-    setSetting("");
+    setSetting(DEFAULT_CARE_SETTING);
     setSettingNeeded(false);
     setCpiOverride(null);
     setAgeToday(DEFAULT_AGE_TODAY);
@@ -2056,13 +2056,17 @@ export function Calculator() {
               placeholder="Select care setting"
               invalid={settingNeeded && !setting}
               attention={gapsOn && !setting}
-              options={(Object.keys(SETTING_LABELS) as CareSetting[]).map((k) => ({ value: k, label: SETTING_LABELS[k] }))}
+              options={(Object.keys(SETTING_LABELS) as CareSetting[]).map((k) => ({
+                value: k,
+                label: k === "home24" ? `${SETTING_LABELS[k]}*` : SETTING_LABELS[k],
+              }))}
               onChange={(v) => { setSetting(v as CareSetting); setSettingNeeded(false); setCpiOverride(null); }}
             />
             {settingNeeded && !setting ? (
               <p className="mt-1 text-sm font-semibold leading-snug text-deplete" role="alert">Select a care setting to run the hypothetical.</p>
             ) : setting && state && todayCost > 0 ? (
               <p className="mt-1 text-sm font-bold leading-snug amt-red">
+                {setting === "home24" ? "* " : null}
                 Projected {SETTING_LABELS[setting].toLowerCase()} cost at claim
                 {ageToday >= MIN_AGE_TODAY
                   ? ` in ${claimYearLabel}${delay ? ` (${delay} year${delay === 1 ? "" : "s"})` : ""}`
@@ -2071,6 +2075,11 @@ export function Calculator() {
                 {delay > 0 ? ` · today’s median ${money(todayCost)}` : ""}.
                 Inflated at {cpi.toFixed(1)}% from{" "}
                 <Cite href={SRC.ltcNews}>LTC News Cost of Care Calculator</Cite>
+                {setting === "home24" ? (
+                  <>
+                    {" "}and <Cite href={SRC.aaltciCareCost}>AALTCI</Cite>
+                  </>
+                ) : null}
                 {state ? <> medians in <StateName name={state} /></> : null}.
               </p>
             ) : setting && !state ? (
@@ -2078,6 +2087,7 @@ export function Calculator() {
             ) : (
               <p className="mt-1 text-xs text-muted">Required to run.</p>
             )}
+            {setting === "home24" ? <HomeHealthCostNote /> : null}
             <div className="mt-3 min-w-0">
                 <label className={labelClass} htmlFor="duration">Select the number of years <span className="font-normal text-muted">(how long care may last)</span></label>
                 <FieldPicker

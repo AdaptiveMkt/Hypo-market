@@ -64,10 +64,10 @@ import { LTC_COMPARE_FEATURES, LTC_INSURANCE_OPTIONS } from "@/lib/ltc-compare";
 import { HEALTH_INSURANCE_INTRO, HEALTH_INSURANCE_TYPES } from "@/lib/health-insurance-types";
 import { LTC_RIDER_EXAMPLES, LTC_RIDER_GLANCE, LTC_RIDER_HYBRID_NOTE, LTC_RIDER_INTRO, LTC_RIDERS } from "@/lib/ltc-riders";
 import { MedicaidVaBody } from "@/components/medicaid-va-card";
-import { AdvisorProfessionalFolds, DesignationNoticeFold, DisclaimerCard } from "@/components/disclaimer-card";
+import { AdvisorProfessionalFolds, DisclaimerCard } from "@/components/disclaimer-card";
 import { TitleCollapse } from "@/components/accordion";
 import { NaicLastPages } from "@/components/naic-last-pages";
-import { Cite, CopyrightMark, LinkedCopy } from "@/components/source-links";
+import { Cite, CopyrightMark, HomeHealthCostNote, LinkedCopy } from "@/components/source-links";
 import { SRC } from "@/lib/sources";
 import { DISCLOSURE_CARD_TITLE } from "@/lib/disclaimer";
 import { DisclosureTermsLink } from "@/components/disclosure-link";
@@ -84,7 +84,7 @@ import { pauseCeleste, playCelesteScript, resumeCeleste, stopCeleste, watchCeles
 import { setVoiceOn, useVoiceOn } from "@/lib/voice-pref";
 import { LifeBenefitDefs } from "@/components/life-benefit-defs";
 import { LifeSettlementOptions } from "@/components/life-settlement-options";
-import { LtcGlossaryList } from "@/components/ltc-glossary";
+import { LtcGlossaryTerms } from "@/components/ltc-glossary";
 import { SamplePolicyPack } from "@/components/sample-ltc-policy";
 import {
   assetProtectionLimits,
@@ -501,12 +501,13 @@ export function ReportView({
             Long Term Care Asset Utilization Modeling
           </h1>
           <p className="mt-2 text-sm text-muted">
-            {SETTING_LABELS[setting]} in <StateName name={state} /> · care{" "}
+            {SETTING_LABELS[setting]}{setting === "home24" ? "*" : ""} in <StateName name={state} /> · care{" "}
             {delay === 0 ? "starting now" : `in ${delay} years`}
             {ageToday >= 18 ? ` (age ${ageToday} today → ${ageToday + delay} at claim)` : ""}
             · {duration} years modeled ·{" "}
             {new Date().toLocaleDateString("en-US")}
           </p>
+          {setting === "home24" ? <HomeHealthCostNote className="mt-2 text-xs leading-snug text-muted" /> : null}
           {lifetime ? (
             <p className="mt-2 text-xs font-semibold leading-snug text-navy">{LIFETIME_BENEFIT_NOTE}</p>
           ) : null}
@@ -664,10 +665,6 @@ export function ReportView({
             <AdvisorProfessionalFolds />
           </section>
         ) : null}
-
-        <section className="report-block">
-          <DesignationNoticeFold className="mt-0 w-full max-w-none" />
-        </section>
 
         <section className="report-block">
           <div className={`rounded-lg border-2 px-4 py-3 ${depletedWhen ? "border-deplete bg-cream" : "border-gold bg-paper"}`}>
@@ -2166,7 +2163,7 @@ export function ReportView({
             Definitions as used in this hypothetical. Educational — not a policy
             contract, outline of coverage, or legal advice.
           </p>
-          <LtcGlossaryList />
+          <LtcGlossaryTerms />
         </section>
         ) : null}
 
