@@ -2,6 +2,7 @@
 
 import { createPortal } from "react-dom";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { Link } from "@tanstack/react-router";
 import {
   Bar,
   CartesianGrid,
@@ -177,8 +178,6 @@ import {
   preservationImpact,
 } from "@/lib/partnership";
 import { RECIPROCITY_EXAMPLES, reciprocityOutcome } from "@/lib/reciprocity";
-import { NaicGuideCoverRow, NaicShopperCover, NaicSuitabilityCover } from "@/components/naic-shopper-cover";
-import { NaicCardDisclaimer } from "@/components/naic-last-pages";
 import { FieldPicker, StepperField } from "@/components/field-picker";
 import { FederalLtcDeductionPanel } from "@/components/federal-ltc-deduction-panel";
 import { Irc1035Panel } from "@/components/irc-1035-panel";
@@ -2071,7 +2070,7 @@ export function Calculator() {
                 : {money(claimCost)} per year
                 {delay > 0 ? ` · today’s median ${money(todayCost)}` : ""}.
                 Inflated at {cpi.toFixed(1)}% from{" "}
-                <Cite href={SRC.carescout}>CareScout Cost of Care</Cite>
+                <Cite href={SRC.ltcNews}>LTC News Cost of Care Calculator</Cite>
                 {state ? <> medians in <StateName name={state} /></> : null}.
               </p>
             ) : setting && !state ? (
@@ -2110,7 +2109,7 @@ export function Calculator() {
                       : <>Using the 5-year {SETTING_SHORT[activeSetting]} benchmark, <Pct>{cpi.toFixed(1)}%</Pct>{state ? <> for care in <StateName name={state} /></> : null}.</>}
                 </p>
             </div>
-            <p className="mt-3 text-xs text-muted">* 5-year compound growth in the national median cost for the care selected, 2021–2025. {fiveYearLtcBenchmarks().map((row) => `If ${row.ifLabel}, the rate is ${row.cagr.toFixed(1)}%`).join(". ")}. Source: <Cite href={SRC.carescout}>CareScout Cost of Care Survey</Cite>.</p>
+            <p className="mt-3 text-xs text-muted">* 5-year compound growth in the national median cost for the care selected, 2021–2025. {fiveYearLtcBenchmarks().map((row) => `If ${row.ifLabel}, the rate is ${row.cagr.toFixed(1)}%`).join(". ")}. Confirm current local prices on the <Cite href={SRC.ltcNews}>LTC News Cost of Care Calculator</Cite>.</p>
             <div className="mt-3 grid w-full min-w-0 grid-cols-1 gap-3 md:grid-cols-2">
               <div className="min-w-0">
                 <label className={labelClass} htmlFor="claim-age">Estimated age when care might be needed *</label>
@@ -2265,17 +2264,15 @@ export function Calculator() {
             </div>
             ) : null}
             {section2Confirmed && countableExHome >= NAIC_LOCKOUT_ASSETS ? (
-              <div className="mb-4" aria-label="NAIC consumer guides">
-                <h3 className="mb-3 border-b-2 border-gold pb-2 font-display text-lg text-navy">NAIC Shopper’s Guide and Suitability Worksheet</h3>
-                <NaicGuideCoverRow />
-                <div className="mt-4 grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2">
-                  <NaicShopperCover framed={false} pdfChecked={details.naicGuide} onPdfChange={(v) => setDetail("naicGuide", v)} />
-                  <NaicSuitabilityCover framed={false} pdfChecked={details.naicWorksheet} onPdfChange={(v) => setDetail("naicWorksheet", v)} />
-                </div>
-                <TitleCollapse title="NAIC sources and disclaimer" className="mt-3" defaultOpen={false} hint="View more details.">
-                  <NaicCardDisclaimer />
-                </TitleCollapse>
-              </div>
+              <p className="mb-4 text-sm text-navy">
+                NAIC consumer materials are not part of this benefit design.{" "}
+                <Cite href={SRC.naicShopper}>Shopper’s Guide to Long-Term Care Insurance</Cite>
+                {" · "}
+                <Link to="/suitability" className="font-semibold underline">
+                  Personal Worksheet
+                </Link>
+                . Either can be added from the report’s information sections.
+              </p>
             ) : null}
             {insuranceLocked ? (
               <div className="rounded-lg border-2 border-deplete bg-cream px-4 py-3">

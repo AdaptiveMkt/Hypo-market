@@ -1131,6 +1131,14 @@ export function ReportView({
             <h2 className="mb-2 font-display text-xl text-navy">
               Year-by-year projection{set.label ? ` — ${set.label}` : ""}{idx > 0 ? " (continued)" : " (View how funds are used)"}
             </h2>
+            {idx === 0 ? (
+              <p className="mb-3 text-sm text-navy">
+                This model simplifies Long-Term Care Insurance. Actual benefits depend on
+                policy language, benefit eligibility, elimination periods, reimbursement or
+                cash provisions, benefit maximums, inflation provisions, and other
+                contractual terms.
+              </p>
+            ) : null}
             {idx === 0 && setLater > 0 && setDepleted != null ? (
               <p className="mb-2 text-sm text-muted">
                 Funds depleted in {calendarYear(setDepleted)} (Y{setDepleted})
@@ -2052,11 +2060,11 @@ export function ReportView({
             <Cite href={SRC.aarpLtss}>AARP PPI (March 2026)</Cite>{" "}
             found assisted living and home care up about{" "}
             <strong className="text-navy">8% a year</strong>, nursing-home private rooms about{" "}
-            <strong className="text-navy">5% a year</strong>.{" "}
-            <Cite href={SRC.carescout}>CareScout’s 2025 survey</Cite> cooled:
+            <strong className="text-navy">5% a year</strong>. A later published survey cooled:
             assisted living +5%, in-home +3%, nursing semi +2%, private +1%.{" "}
             <Cite href={SRC.blsCpi}>BLS medical-care CPI</Cite> is near 2–3% recently
-            (long-run average ~5%). This run’s care CPI is{" "}
+            (long-run average ~5%). Confirm a current local price on the{" "}
+            <Cite href={SRC.ltcNews}>LTC News Cost of Care Calculator</Cite>. This run’s care CPI is{" "}
             <Pct>{cpi.toFixed(1)}%</Pct>. A 3% compound rider tracks a cooler medical-CPI world; 5%
             compound is closer to the 2019–2024 LTC average for nursing homes. Simple 5% lags
             compound 5% more each year.
@@ -2067,15 +2075,14 @@ export function ReportView({
               <p className="font-display text-lg text-navy">~8% / year</p>
               <p className="text-xs text-muted">
                 <Cite href={SRC.aarpLtss}>AARP PPI (March 2026)</Cite> /{" "}
-                <Cite href={SRC.carescout}>CareScout</Cite> 5-year run-up
+                <Cite href={SRC.ltcNews}>LTC News</Cite> for a current local price
               </p>
             </div>
             <div className="rounded-lg bg-cream px-3 py-3">
               <p className="text-xs uppercase tracking-wide text-muted">NH private, recent</p>
               <p className="font-display text-lg text-navy">~5% / year</p>
               <p className="text-xs text-muted">
-                <Cite href={SRC.aarpLtss}>AARP PPI (March 2026)</Cite>; 2025{" "}
-                <Cite href={SRC.carescout}>CareScout</Cite> slowed to 1–2%
+                <Cite href={SRC.aarpLtss}>AARP PPI (March 2026)</Cite>; later surveys slowed toward 1–2%
               </p>
             </div>
             <div className="rounded-lg bg-cream px-3 py-3">
@@ -2261,9 +2268,8 @@ export function ReportView({
           </h2>
           <p className="mb-3 text-sm text-muted">
             Annual national medians. Home health is 44 hours/week. Memory care is 25%
-            above assisted living. 2023–2025 medians: CareScout. Earlier years in the
-            10-year table are this model’s historical path and are not linked to a
-            publication older than five years.
+            above assisted living. Confirm a current location on the LTC News Cost of Care
+            Calculator. Earlier years in the 10-year table are this model’s historical path.
           </p>
           <div className="grid gap-3 sm:grid-cols-2">
             {[
@@ -2476,8 +2482,7 @@ export function ReportView({
               never simple-inflated. Insurance riders grow only the policy maximum and are
               not re-priced here. LTC survey rates have recently ranged from about 2–3% to
               about 5–8%. Sources: <Cite href={SRC.blsCpi}>BLS CPI</Cite>;{" "}
-              <Cite href={SRC.carescout}>CareScout</Cite> /{" "}
-              <Cite href={SRC.genworth}>Genworth 2024–2025</Cite>;{" "}
+              <Cite href={SRC.ltcNews}>LTC News Cost of Care Calculator</Cite>;{" "}
               <Cite href={SRC.aarpLtss}>AARP PPI on LTSS (Mar 2026)</Cite>. Not a forecast.
             </p>
           </TitleCollapse>
@@ -2493,10 +2498,7 @@ export function ReportView({
               Indiana/New York total asset protection is in-state only. Asset spend-down and
               income spend-down are different tests. Medicaid figures for{" "}
               <StateName name={state} /> are in Medicaid Information — they are not repeated here.
-              This is current-rule planning only: it does not assume Medicaid will still be
-              solvent or that any Partnership disregard or other Medicaid benefit will remain
-              the same — solvency and benefits may be adjusted by legislation, regulation, or
-              other government action. Full Medicaid Information is in that section of this report.
+              This is current-rule planning only. Government program benefits, eligibility standards, and laws may change. Verify current requirements with the appropriate government agency or qualified professional. Full Medicaid Information is in that section of this report.
               </p>
             </TitleCollapse>
             <TitleCollapse title={TAX_SECTION_LABEL}>

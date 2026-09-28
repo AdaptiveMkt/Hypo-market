@@ -46,7 +46,7 @@ export function HypoChatbot() {
     {
       role: "assistant",
       content:
-        "Ask about this hypothetical — assets, care costs, insurance, Partnership, tax, VA, or industry figures. Answers come from this model’s cards and every cited publisher (CareScout, NAIC, IRS, Medicaid.gov, VA.gov, Milliman, SOA, AALTCI.org, and others). Each source used is named in text and in voice. Not advice and not a quote.",
+        "Ask about this hypothetical — assets, care costs, or insurance. Answers stay with the model. Care prices point to the LTC News calculator. Not advice and not a quote.",
     },
   ]);
   const listRef = useRef<HTMLDivElement>(null);

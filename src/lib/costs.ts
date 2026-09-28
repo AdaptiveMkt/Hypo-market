@@ -76,8 +76,16 @@ export const SETTING_SHORT: Record<CareSetting, string> = {
 /** CareScout 2025 does not publish memory care; A Place for Mom 2026 ~25% above AL. */
 export const MEMORY_CARE_AL_FACTOR = 1.25;
 
-/** 24-hour home care as a planning multiple of the published 44-hour monthly median. */
+/**
+ * 24-hour home care as a planning multiple of the published 44-hour annual median.
+ * Not 168 ÷ 44 (3.82). Around-the-clock care is not priced here as 168 paid hours.
+ * Illustrative live-in schedule: about 18 paid hours a day (two daytime shifts;
+ * overnight presence is not a third full hourly shift). 18 × 7 = 126 hours a week.
+ * 126 ÷ 44 = 2.86, shown as 2.8. Not an agency quote.
+ */
 export const HOME24_FROM_44HR = 2.8;
+export const HOME24_METHOD =
+  "Published home-care medians are for about 44 hours a week. This model does not multiply that rate by 168 hours (168 ÷ 44 = 3.82). Around-the-clock care is priced as an illustrative live-in schedule of about 18 paid hours a day: two daytime shifts, with overnight presence not billed as a third full hourly shift. 18 × 7 = 126 hours a week, and 126 ÷ 44 = 2.86, shown as 2.8 times the 44-hour annual median. Agencies also use daily live-in rates and different shift patterns. Confirm a local quote. This is not an agency price.";
 
 export function annualCost(state: string, setting: CareSetting): number {
   const row = STATES[state];

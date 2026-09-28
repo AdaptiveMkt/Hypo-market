@@ -219,7 +219,7 @@ export function analysisNarrative(opts: ReportOpts): string {
     const agi = Math.max(0, Math.round(Number(s.annualIncome) || 0));
     const funding =
       agi > 0
-        ? ` Based on your disclosed AGI, the recommended annual household premium should be no greater than ${money(Math.round(agi * TARGET_INCOME_RATE))}. Other ways to fund that premium include reallocating assets and using part of your return on investment.`
+        ? ` Based on the adjusted gross income entered, an illustrative placeholder — not a recommended premium or a quote — is no greater than ${money(Math.round(agi * TARGET_INCOME_RATE))}. That 7% figure is not an industry suitability standard. Other ways to fund a premium include reallocating assets and using part of the return on investment.`
         : " Premium funding options to consider are reallocating assets and using part of your return on investment to fund household premiums.";
     paras.push(
       `This run includes ${structure}. Insurance is modeled to pay the claim first; countable assets co-pay only the leftover. LTC benefits at purchase are ${result.lifetimeBenefit ? `${LIFETIME_BENEFIT_MARK}. ${LIFETIME_BENEFIT_NOTE}` : money(result.benefitPoolAtPurchase ?? 0)}. At claim they are ${result.lifetimeBenefit ? LIFETIME_BENEFIT_MARK : money(result.benefitPoolAtClaim ?? 0)}.${industryNote}${funding}`,
@@ -233,7 +233,7 @@ export function analysisNarrative(opts: ReportOpts): string {
   }
 
   paras.push(
-    `A planning figure for discussion — not a quote — is a suggested traditional premium of ${money(premium)} per year (7% of adjusted gross household income when that income is entered; otherwise 2.5% of countable assets). Asset-based, annuity care, and hybrid life default the single premium to 2.5% of countable assets or $75,000, whichever is greater. ${SINGLE_PREMIUM_NOTE}`,
+    `An illustrative placeholder — not a recommended premium or insurance quote — is ${money(premium)} per year when income is entered at 7% of adjusted gross household income, otherwise 2.5% of countable assets. Asset-based, annuity care, and hybrid life use a placeholder deposit of 2.5% of countable assets or $75,000, whichever is greater. The 7% figure is not an industry suitability standard. ${SINGLE_PREMIUM_NOTE}`,
   );
   paras.push(
     `Tax: there is no general federal LTC credit — only an age-capped deduction (2026: $500 to $6,200) after the 7.5% AGI medical floor if you itemize. A credit cuts tax dollar-for-dollar; a deduction only lowers taxable income. ${stateLtcTaxBreak(s.state).detail} This is not tax advice.`,

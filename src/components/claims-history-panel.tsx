@@ -79,7 +79,7 @@ export function ClaimsHistoryPanel({
           <p className="font-display text-lg tabular-nums text-navy">~$35 billion</p>
           <p className="text-xs text-muted">
             Through 31 Dec 2025; $32B / 389k+ claims through 2024.{" "}
-            <Cite href={SRC.genworthLtcExp}>Genworth / CareScout</Cite>
+            <Cite href={SRC.genworthLtcExp}>Genworth</Cite>
           </p>
         </div>
         <div className="rounded-lg bg-cream px-3 py-3">
@@ -359,9 +359,9 @@ export function ClaimsHistoryPanel({
       </ul>
       <h3 className="mb-2 font-display text-lg text-navy">One carrier’s book: Genworth</h3>
       <p className="mb-3 text-sm text-muted">
-        {g.note} That is the deepest public claims dataset in the U.S. market, and the
-        same organization (via CareScout) publishes the Cost of Care survey this
-        hypothetical uses for state medians. Paying claims and raising in-force premiums
+        {g.note} That claims record is one company’s book. It is not the source of care prices in this model. Confirm care prices on the{" "}
+        <Cite href={SRC.ltcNews}>LTC News Cost of Care Calculator</Cite>.
+        Paying claims and raising in-force premiums
         are both part of the record: Genworth reports about $34.5 billion NPV of approved
         in-force rate actions since 2012.{" "}
         <Cite href={SRC.genworthLtcExp}>Genworth experience / 4Q 2025</Cite>

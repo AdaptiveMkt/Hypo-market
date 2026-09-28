@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as SlugRouteImport } from './routes/$slug'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as CopyrightRouteImport } from './routes/copyright'
+import { Route as SourcesRouteImport } from './routes/sources'
 import { Route as SuitabilityRouteImport } from './routes/suitability'
 import { Route as SlugCodeRouteImport } from './routes/$slug.$code'
 
@@ -36,6 +37,11 @@ const CopyrightRoute = CopyrightRouteImport.update({
   path: '/copyright',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SourcesRoute = SourcesRouteImport.update({
+  id: '/sources',
+  path: '/sources',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SuitabilityRoute = SuitabilityRouteImport.update({
   id: '/suitability',
   path: '/suitability',
@@ -52,6 +58,7 @@ export interface FileRoutesByFullPath {
   '/$slug': typeof SlugRouteWithChildren
   '/about': typeof AboutRoute
   '/copyright': typeof CopyrightRoute
+  '/sources': typeof SourcesRoute
   '/suitability': typeof SuitabilityRoute
   '/$slug/$code': typeof SlugCodeRoute
 }
@@ -60,6 +67,7 @@ export interface FileRoutesByTo {
   '/$slug': typeof SlugRouteWithChildren
   '/about': typeof AboutRoute
   '/copyright': typeof CopyrightRoute
+  '/sources': typeof SourcesRoute
   '/suitability': typeof SuitabilityRoute
   '/$slug/$code': typeof SlugCodeRoute
 }
@@ -69,21 +77,36 @@ export interface FileRoutesById {
   '/$slug': typeof SlugRouteWithChildren
   '/about': typeof AboutRoute
   '/copyright': typeof CopyrightRoute
+  '/sources': typeof SourcesRoute
   '/suitability': typeof SuitabilityRoute
   '/$slug/$code': typeof SlugCodeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/$slug' | '/about' | '/copyright' | '/suitability' | '/$slug/$code'
+    | '/'
+    | '/$slug'
+    | '/about'
+    | '/copyright'
+    | '/sources'
+    | '/suitability'
+    | '/$slug/$code'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/$slug' | '/about' | '/copyright' | '/suitability' | '/$slug/$code'
+  to:
+    | '/'
+    | '/$slug'
+    | '/about'
+    | '/copyright'
+    | '/sources'
+    | '/suitability'
+    | '/$slug/$code'
   id:
     | '__root__'
     | '/'
     | '/$slug'
     | '/about'
     | '/copyright'
+    | '/sources'
     | '/suitability'
     | '/$slug/$code'
   fileRoutesById: FileRoutesById
@@ -93,6 +116,7 @@ export interface RootRouteChildren {
   SlugRoute: typeof SlugRouteWithChildren
   AboutRoute: typeof AboutRoute
   CopyrightRoute: typeof CopyrightRoute
+  SourcesRoute: typeof SourcesRoute
   SuitabilityRoute: typeof SuitabilityRoute
 }
 
@@ -124,6 +148,13 @@ declare module '@tanstack/react-router' {
       path: '/copyright'
       fullPath: '/copyright'
       preLoaderRoute: typeof CopyrightRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sources': {
+      id: '/sources'
+      path: '/sources'
+      fullPath: '/sources'
+      preLoaderRoute: typeof SourcesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/suitability': {
@@ -158,6 +189,7 @@ const rootRouteChildren: RootRouteChildren = {
   SlugRoute: SlugRouteWithChildren,
   AboutRoute: AboutRoute,
   CopyrightRoute: CopyrightRoute,
+  SourcesRoute: SourcesRoute,
   SuitabilityRoute: SuitabilityRoute,
 }
 export const routeTree = rootRouteImport

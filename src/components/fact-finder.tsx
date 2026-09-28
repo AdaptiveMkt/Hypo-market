@@ -594,7 +594,7 @@ export function FactFinder({
             <p className="mt-2 text-xs leading-snug text-muted">
               * {cpi.toFixed(1)}% is the compound annual growth in the national median{" "}
               {setting ? SETTING_LABELS[setting as CareSetting].toLowerCase() : "assisted living"} cost from 2021 to 2025.{" "}
-              <Cite href={SRC.carescout}>CareScout Cost of Care Survey</Cite>
+              <Cite href={SRC.ltcNews}>LTC News Cost of Care Calculator</Cite>
             </p>
             <Nav back={back} next={next} />
           </>

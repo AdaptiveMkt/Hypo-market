@@ -538,9 +538,9 @@ export function inflateDaily(
 export const TARGET_PREMIUM_RATE = 0.025;
 export const TARGET_INCOME_RATE = 0.07;
 export const TARGET_PREMIUM_LABEL =
-  "Target premium is only a suggestion. Traditional long-term care uses 7% of adjusted gross household income. Asset-based, annuity care, and hybrid life default the single premium to 2.5% of countable assets or $75,000, whichever is greater. Individual premiums vary by state, age, marital status, underwriting, benefits, and riders.";
+  "Illustrative placeholder only. This is not a recommended premium or insurance quote. Enter the actual proposed premium or deposit. If none is entered, this model may show a placeholder: 7% of adjusted gross household income when income is entered, otherwise 2.5% of countable assets for a traditional annual figure, and 2.5% of countable assets or $75,000, whichever is greater, for an asset-based, annuity, or hybrid deposit. The 7% figure is not an industry suitability standard. A separate consumer worksheet notes that a premium above 7% of income may be hard to sustain. That is a caution, not a target.";
 export const TARGET_PREMIUM_FORMULA =
-  "Traditional suggested premium is 7% of adjusted gross household income. The default single premium for asset-based, annuity care, and hybrid life is 2.5% of countable assets or $75,000, whichever is greater.";
+  "Illustrative placeholder only. This is not a recommended premium or insurance quote.";
 
 export function targetPremium(countableAssets: number, annualIncome = 0) {
   return targetPremiumParts(countableAssets, annualIncome).suggested;

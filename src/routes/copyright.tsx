@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { TitleCollapse } from "@/components/accordion";
 import { DisclaimerCard } from "@/components/disclaimer-card";
-import { AmgName, Cite, LicenseLookupLinks, LinkedCopy, SourceLinks } from "@/components/source-links";
+import { AmgName, Cite, LinkedCopy } from "@/components/source-links";
 import { TERMS_LIABILITY_SECTIONS } from "@/lib/disclaimer";
 
 export const Route = createFileRoute("/copyright")({
@@ -35,9 +35,7 @@ function CopyrightTerms() {
           rights.
         </p>
         <p className="mt-3 text-pretty">
-          These terms of use include the liability disclosures and hold-harmless language
-          later on this page. Using the calculator, View report, or PDF is agreement to
-          those terms.
+          These terms of use include the limitation of liability later on this page. Using the calculator, View report, or PDF is agreement to those terms. The consumer-facing notice is titled Important Disclosure.
         </p>
         <div className="mt-5 rounded-lg border border-line bg-cream px-4 py-3 text-sm">
           <h3 className="font-display text-lg text-navy">Contact Adaptive Marketing Group</h3>
@@ -126,13 +124,18 @@ function CopyrightTerms() {
         <h2 className="mb-3 border-b-2 border-gold pb-2 font-display text-xl text-navy">
           Sources
         </h2>
-        <SourceLinks />
-        <LicenseLookupLinks className="mt-6" />
+        <p className="text-pretty">
+          Sources are grouped by topic on the{" "}
+          <Link to="/sources" className="font-semibold text-navy underline">
+            Sources and methodology
+          </Link>{" "}
+          page, separate from these terms.
+        </p>
       </section>
 
       <section className="card-xl p-5">
         <h2 className="mb-3 border-b-2 border-gold pb-2 font-display text-xl text-navy">
-          Liability disclosures and hold harmless
+          Liability disclosures
         </h2>
         <p className="text-pretty text-muted">
           <LinkedCopy text="The following is part of these terms of use. It is intended to make clear who this model is for, what it is not, and that Adaptive Marketing Group does not assume professional or fiduciary liability for decisions made with it. It does not replace advice from a licensed professional, and it cannot waive a CFP® professional’s fiduciary duty when they provide Financial Advice." />

@@ -237,8 +237,7 @@ export function MedicaidVaBody({
         <p className="mt-2 text-xs">
           Partnership can protect assets equal to benefits paid, without a five-year wait on
           those paid benefits. It does not replace the income test or a QIT. That disregard
-          is current-rule planning only — it does not assume Medicaid will still be solvent
-          or that the Partnership benefit will remain the same.
+          is current-rule planning only. Government program benefits, eligibility standards, and laws may change. Verify current requirements with the appropriate government agency or qualified professional.
         </p>
         <Fold title={ceiling.title}>
           <ul className="list-disc space-y-1 pl-4">

@@ -9,7 +9,7 @@ export function agiTargetPremium(agi: number) {
 export function agiTargetSentence(agi: number) {
   const amount = agiTargetPremium(agi);
   if (amount <= 0) return "";
-  return `(*) Based on your AGI, the target premium recommendation is ${money(amount)}.`;
+  return `(*) Illustrative placeholder only. This is not a recommended premium or insurance quote. A 7% of AGI figure for this entry is ${money(amount)}. It is not an industry suitability standard.`;
 }
 
 export function AgiPremiumCallout({ agi, className = "" }: { agi: number; className?: string }) {

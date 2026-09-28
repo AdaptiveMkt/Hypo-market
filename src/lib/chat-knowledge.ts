@@ -30,7 +30,7 @@ const CORE: KnowledgeChunk[] = [
   },
   {
     id: "disclaimer",
-    label: "Hold harmless — Adaptive Marketing Group",
+    label: "Important disclosure — Adaptive Marketing Group",
     aaltci: false,
     text: HOLD_HARMLESS_SHORT,
   },
@@ -69,7 +69,7 @@ const CORE: KnowledgeChunk[] = [
     label: "NAIC Shopper’s Guide / Personal Worksheet",
     url: "https://content.naic.org/sites/default/files/publication-ltc-lp-shoppers-guide-long-term.pdf",
     aaltci: false,
-    text: `This model locks insurance options when countable assets are under $${NAIC_LOCKOUT_ASSETS.toLocaleString("en-US")} and warns under $${NAIC_WARN_ASSETS.toLocaleString("en-US")}. Planning floors only — not a filed NAIC statutory minimum. If adjusted gross household income is included, the suggested traditional premium is 7% of that income. Asset-based, annuity care, and hybrid life default the single premium to 2.5% of countable assets or $75,000, whichever is greater. If income is not included, the traditional planning figure is 2.5% of countable assets. Premiums vary by state, age, underwriting and rate class, marital status, benefits, and riders.`,
+    text: `This model locks insurance options when countable assets are under $${NAIC_LOCKOUT_ASSETS.toLocaleString("en-US")} and warns under $${NAIC_WARN_ASSETS.toLocaleString("en-US")}. Those floors are educational only — not a filed NAIC statutory minimum. Premium and deposit fields are illustrative placeholders, not recommended premiums or quotes. Enter the actual proposed premium or deposit. If a placeholder is shown, it may be 7% of adjusted gross household income when income is entered, otherwise 2.5% of countable assets, and 2.5% of countable assets or $75,000, whichever is greater, for an asset-based, annuity, or hybrid deposit. The 7% figure is not an industry suitability standard.`,
   },
   {
     id: "structures",
@@ -80,11 +80,11 @@ const CORE: KnowledgeChunk[] = [
   },
   {
     id: "costs",
-    label: "CareScout Cost of Care",
-    url: "https://www.carescout.com/cost-of-care",
+    label: "LTC News Cost of Care Calculator",
+    url: "https://www.ltcnews.com/long-term-care/cost-of-care",
     aaltci: false,
     text:
-      "State care costs in this model are rounded annual medians from the CareScout Cost of Care Survey 2025 (published 2026), formerly circulated as Genworth Cost of Care. Settings: home care, assisted living, nursing facility, memory care. 24-hour home care is a planning multiple of the published 44-hour home-care median, not an agency quote. Local provider prices differ. Historical tables: Genworth Cost of Care archive.",
+      "State care costs in this model are rounded planning medians. Confirm a location on the LTC News Cost of Care Calculator, a nationwide private-pay calculator that is not an insurance-company survey. 24-hour home care is an illustrative 2.8 multiple of a 44-hour annual median (about 18 paid hours a day), not 168 billable hours and not an agency quote.",
   },
   {
     id: "cpi",
@@ -108,7 +108,7 @@ const CORE: KnowledgeChunk[] = [
     url: "https://www.medicaid.gov/medicaid/long-term-services-supports/medicaid-long-term-services-supports-ltss-benefits/long-term-care-partnership-program",
     aaltci: false,
     text:
-      "Medicaid LTC is means-tested. Countable assets generally spend down to a small individual limit (often about $2,000; couples both applying about $3,000). CSRA, MMMNA, and home-equity caps are in the CMCS Dec. 9, 2025 bulletin and Medicaid.gov spousal-impoverishment page; they vary by state. DRA Partnership can protect assets equal to benefits paid (dollar-for-dollar) in participating states; original CA/CT/IN/NY programs differ. Reciprocity is not automatic. Confirm with an elder-law attorney. This is current-rule planning only: it does not assume Medicaid will still be solvent or that the benefit will remain the same — solvency and benefits may be adjusted by legislation, regulation, or other government action.",
+      "Medicaid LTC is means-tested. Countable assets generally spend down to a small individual limit (often about $2,000; couples both applying about $3,000). CSRA, MMMNA, and home-equity caps are in the CMCS Dec. 9, 2025 bulletin and Medicaid.gov spousal-impoverishment page; they vary by state. DRA Partnership can protect assets equal to benefits paid (dollar-for-dollar) in participating states; original CA/CT/IN/NY programs differ. Reciprocity is not automatic. Confirm with an elder-law attorney. Government program benefits, eligibility standards, and laws may change. Verify current requirements with the appropriate government agency or qualified professional.",
   },
   {
     id: "va",

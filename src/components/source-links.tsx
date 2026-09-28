@@ -1,8 +1,9 @@
 import { type ReactNode } from "react";
+import { Link } from "@tanstack/react-router";
 import { TitleCollapse } from "@/components/accordion";
 import { DesignationNotice } from "@/components/designation-notice";
 import { designationsInText } from "@/lib/designations";
-import { HYPO_SOURCES, LICENSE_LOOKUPS, SRC } from "@/lib/sources";
+import { LICENSE_LOOKUPS, METHOD_SOURCE_GROUPS, SRC } from "@/lib/sources";
 
 const LINK =
   "source-link font-semibold text-link underline underline-offset-2 hover:text-link";
@@ -53,9 +54,8 @@ const PHRASES: [string, string][] = [
   ["Medicare", SRC.medicare],
   ["Medicaid", SRC.medicaid],
   ["Supplemental Security Income", SRC.ssaSsi],
-  ["CareScout Cost of Care", SRC.carescout],
-  ["CareScout", SRC.carescout],
-  ["Genworth Cost of Care", SRC.genworth],
+  ["LTC News Cost of Care Calculator", SRC.ltcNews],
+  ["LTC News", SRC.ltcNews],
   ["Bureau of Labor Statistics", SRC.blsCpi],
   ["Consumer Price Index", SRC.blsCpi],
   ["NAIC Shopper’s Guide", SRC.naicShopper],
@@ -193,20 +193,36 @@ function SourceList() {
   return (
     <>
       <p className="mt-1 text-sm text-muted">
-        Planning figures were drawn from the following public pages. Links open the
-        publisher’s site. Re-check before any decision — agencies update tables, often
-        each January 1 or December 1.
+        Care prices in the year-by-year run are rounded planning medians. Confirm a location
+        on the LTC News Cost of Care Calculator. The authorities below are grouped the same
+        way on the Sources page. Claims studies and sales surveys are not part of this list.
       </p>
-      {HYPO_SOURCES.map((s) => (
-        <TitleCollapse key={s.href} title={s.topic} className="mt-2">
-          <p className="text-sm text-muted">
-            <a href={s.href} target="_blank" rel="noopener noreferrer" className={LINK} data-source-href={s.href}>
-              {s.label}
-            </a>
-            {s.note ? ` — ${s.note}` : null}
-          </p>
-        </TitleCollapse>
+      {METHOD_SOURCE_GROUPS.map((group) => (
+        <div key={group.title} className="mt-3">
+          <p className="text-sm font-semibold text-navy">{group.title}</p>
+          <ul className="mt-1 space-y-1">
+            {group.items.map((item) => (
+              <li key={item.href + item.label} className="text-sm text-muted">
+                <a
+                  href={item.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={LINK}
+                  data-source-href={item.href}
+                >
+                  {item.label}
+                </a>
+                {item.note ? ` — ${item.note}` : null}
+              </li>
+            ))}
+          </ul>
+        </div>
       ))}
+      <p className="mt-3 text-sm">
+        <Link to="/sources" className={LINK}>
+          Sources and methodology
+        </Link>
+      </p>
     </>
   );
 }

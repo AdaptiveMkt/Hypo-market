@@ -1,7 +1,9 @@
 /** Official and survey sources used to build this educational hypothetical. Confirm current. */
 
 export const SRC = {
-  carescout: "https://www.carescout.com/cost-of-care",
+  ltcNews: "https://www.ltcnews.com/long-term-care/cost-of-care",
+  /** Kept so older citations compile. Do not show the CareScout name. Points at LTC News. */
+  carescout: "https://www.ltcnews.com/long-term-care/cost-of-care",
   medicare: "https://www.medicare.gov/",
   medicareLtc: "https://www.medicare.gov/coverage/long-term-care",
   medicareMedigap: "https://www.medicare.gov/health-drug-plans/medigap",
@@ -80,8 +82,7 @@ export const SRC = {
     "https://www.aaltci.org/2026-AALTCI-Long-Term-Care-Insurance-Price-Index/",
   naicLtcExp: "https://content.naic.org/sites/default/files/publication-ltc-lr-care-experience-report.pdf",
   genworthLtcExp: "https://pro.genworth.com/riiproweb/productinfo/pdf/905101.pdf",
-  genworth10k2025:
-    "https://www.publicnow.com/view/25B51FC130B5C34DBCB0A5A9127FAD93EEF50744",
+  genworth10k2025: "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001276520&type=10-K",
   genworthChoiceI:
     "https://www.scc.virginia.gov/boi/SERFFInquiry/Attachments/LH/GEFA-134686770.pdf",
   soa: "https://www.soa.org/",
@@ -124,24 +125,78 @@ export const SRC = {
     "https://www.nasaa.org/investor-education/check-out-your-investment-professional/",
 } as const;
 
+/** Short categorized list for the Sources page and the report. Not the claims library. */
+export const METHOD_SOURCE_GROUPS: { title: string; items: { label: string; href: string; note?: string }[] }[] = [
+  {
+    title: "Care costs",
+    items: [
+      {
+        label: "LTC News Cost of Care Calculator",
+        href: SRC.ltcNews,
+        note: "Nationwide private-pay calculator. Not an insurance-company survey. Confirm the location.",
+      },
+      {
+        label: "U.S. Bureau of Labor Statistics — Consumer Price Index",
+        href: SRC.blsCpi,
+        note: "Comparison for general inflation. It is not a facility or home-care price list.",
+      },
+    ],
+  },
+  {
+    title: "Long-term care insurance",
+    items: [
+      { label: "NAIC — Long-term care insurance", href: SRC.naicLtc },
+      { label: "NAIC Shopper’s Guide", href: SRC.naicShopper },
+      { label: "IIPRC — LTC outline of coverage standards", href: SRC.iiprcOutline },
+      { label: "IRC §7702B", href: SRC.irc7702b },
+    ],
+  },
+  {
+    title: "Medicare and Medicaid",
+    items: [
+      { label: "Medicare.gov", href: SRC.medicare },
+      { label: "Medicare — long-term care", href: SRC.medicareLtc },
+      { label: "Medicaid.gov", href: SRC.medicaid },
+      { label: "Medicaid long-term services", href: SRC.medicaidLtc },
+      { label: "Spousal impoverishment", href: SRC.medicaidSpousal },
+      { label: "42 U.S.C. §1396r-5", href: SRC.spousalStatute },
+    ],
+  },
+  {
+    title: "Tax",
+    items: [
+      { label: "IRS Publication 502", href: SRC.irs502 },
+      { label: "IRC §7702B", href: SRC.irc7702b },
+      { label: "IRC §101(g)", href: SRC.irc101g },
+      { label: "IRC §1035", href: SRC.irc1035 },
+    ],
+  },
+  {
+    title: "Veterans",
+    items: [
+      { label: "VA pension rates", href: SRC.vaPensionRates },
+      { label: "Aid and Attendance", href: SRC.vaAa },
+    ],
+  },
+  {
+    title: "Professional verification",
+    items: [
+      { label: "NAIC licensee lookup", href: SRC.naicLookup },
+      { label: "NIPR — look up a producer", href: SRC.niprNpn },
+      { label: "CFP Board — verify a CFP® professional", href: SRC.cfpVerify },
+      { label: "FINRA BrokerCheck", href: SRC.finraBrokercheck },
+      { label: "SEC IAPD", href: SRC.secIapd },
+      { label: "State bar directories", href: SRC.abalawyer },
+    ],
+  },
+];
+
 export const HYPO_SOURCES: { topic: string; label: string; href: string; note: string }[] = [
   {
     topic: "State care costs",
-    label: "CareScout Cost of Care",
-    href: "https://www.carescout.com/cost-of-care",
-    note: "Rounded annual medians from the Cost of Care Survey 2025 (published 2026), formerly circulated as Genworth Cost of Care. Local provider prices differ. 24-hour home care in this model is a planning multiple of the published 44-hour home-care median, not an agency quote.",
-  },
-  {
-    topic: "Genworth Cost of Care archive",
-    label: "Genworth Cost of Care",
-    href: "https://www.genworth.com/aging-and-you/finances/cost-of-care",
-    note: "Historical survey tables; CareScout now publishes the annual survey.",
-  },
-  {
-    topic: "Long-term services trends",
-    label: "AARP Public Policy Institute — LTSS",
-    href: "https://www.aarp.org/pri/topics/ltss/",
-    note: "Used for healthcare / LTSS inflation discussion (including AARP PPI material circulated March 2026), not as a state-by-state price list.",
+    label: "LTC News Cost of Care Calculator",
+    href: "https://www.ltcnews.com/long-term-care/cost-of-care",
+    note: "Nationwide private-pay cost calculator, not an insurance-company survey. Confirm the location before relying on a figure. This model’s state amounts are rounded planning medians. 24-hour home care is an illustrative 2.8 multiple of a 44-hour annual median (about 18 paid hours a day), not 168 billable hours and not an agency quote.",
   },
   {
     topic: "Care-cost inflation (CPI)",
@@ -342,12 +397,6 @@ export const HYPO_SOURCES: { topic: string; label: string; href: string; note: s
     note: "Trade association for life-settlement brokers, providers, and financing firms. Not a state license lookup and not a recommendation of any member.",
   },
   {
-    topic: "Example life-settlement company",
-    label: "Coventry",
-    href: "https://www.coventry.com/",
-    note: "Example of a company that buys life insurance policies on the secondary market. Named only as an illustration of a third-party buyer. Not an endorsement, a referral, or a quote.",
-  },
-  {
     topic: "NAIC Long-Term Care Insurance Model Act",
     label: "NAIC Model Act #640 (PDF)",
     href: "https://content.naic.org/sites/default/files/model-law-640.pdf",
@@ -403,15 +452,15 @@ export const HYPO_SOURCES: { topic: string; label: string; href: string; note: s
   },
   {
     topic: "Genworth claims experience",
-    label: "Genworth / CareScout — LTC claims experience",
+    label: "Genworth — LTC claims experience",
     href: "https://pro.genworth.com/riiproweb/productinfo/pdf/905101.pdf",
-    note: "Carrier materials: $32B+ paid and 389,000+ claims through 31 Dec 2024; ~$35B through 31 Dec 2025 (4Q 2025 earnings). One company, not the industry total.",
+    note: "One carrier’s claims record. Not the source of this calculator’s care prices. Confirm prices on the LTC News Cost of Care Calculator.",
   },
   {
     topic: "Genworth 10-K 2025",
     label: "Genworth Financial Form 10-K (year ended 31 Dec 2025)",
-    href: "https://www.publicnow.com/view/25B51FC130B5C34DBCB0A5A9127FAD93EEF50744",
-    note: "GAAP premiums, liability remeasurement, actual-to-expected (A/E) variances, and remaining expected benefits vs premiums. Not a statutory loss ratio.",
+    href: "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001276520&type=10-K",
+    note: "SEC EDGAR. GAAP premiums and liability discussion in the company’s own 10-K. Not a statutory loss ratio and not a source for this calculator’s care prices.",
   },
   {
     topic: "Genworth Choice I lifetime loss ratio",

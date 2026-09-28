@@ -46,9 +46,7 @@ export function LifeSettlementOptions({
         <Cite href={SRC.irsLifeProceeds}>IRS — life insurance proceeds</Cite>
       </p>
       <p>
-        Third-party buyers are life-settlement providers and the funds that finance them. One example is{" "}
-        <Cite href={SRC.coventry}>Coventry</Cite>
-        . Naming a company is an illustration of the type of buyer, not an endorsement, a referral, or a statement that a policy will qualify. Other licensed providers and brokers operate in this market. The{" "}
+        Third-party buyers are licensed life-settlement providers and the funds that finance them. Naming a company is not required for this model and is not an endorsement. The{" "}
         <Cite href={SRC.lisa}>Life Insurance Settlement Association (LISA)</Cite>
         {" "}is the industry trade group. Confirm that any provider or broker is licensed in the state of the policy before sharing medical or policy information. Compare the offer with the insurer’s surrender value, loan, and accelerated-death-benefit options first.
       </p>

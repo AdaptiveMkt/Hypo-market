@@ -100,10 +100,8 @@ function Root() {
                   Long Term Care Asset Utilization Modeling
                 </h1>
                 <p className="mt-2 max-w-2xl text-sm text-masthead-fg/85 sm:text-base">
-                  Enter assets that could pay for care. Compare nursing, assisted living,
-                  and 24-hour home care — and see how long-term care insurance inflation
-                  riders change how the assets are used. Care costs grow by CPI; unused
-                  assets compound at your assumed return.
+                  How quickly could long-term care consume the assets you’ve accumulated, and
+                  how could insurance change that?
                 </p>
                 <nav className="mt-4 flex flex-wrap gap-4 text-sm" aria-label="Site">
                   <Link to="/" className="text-masthead-fg underline underline-offset-4 hover:text-gold">
@@ -111,6 +109,9 @@ function Root() {
                   </Link>
                   <Link to="/about" className="text-masthead-fg underline underline-offset-4 hover:text-gold">
                     How this works
+                  </Link>
+                  <Link to="/sources" className="text-masthead-fg underline underline-offset-4 hover:text-gold">
+                    Sources
                   </Link>
                   <Link
                     to="/suitability"

@@ -17,7 +17,7 @@ export const DRA_DOES_NOT = [
   "Does not replace homestead, vehicle, or other ordinary Medicaid exemptions.",
   "Does not grant automatic Medicaid — medical/functional eligibility still applies.",
   "Does not add a federal tax credit; TQ premium deduction caps are the same as any tax-qualified policy.",
-  "Does not assume Medicaid will still be solvent or that the disregard will remain the same when care is needed.",
+  "Government program benefits, eligibility standards, and laws may change. Verify current requirements with the appropriate government agency or qualified professional.",
 ];
 
 export const DRA_LANE_ROWS: { lane: string; pays: string; medicaid: string; ifNoClaim: string }[] = [

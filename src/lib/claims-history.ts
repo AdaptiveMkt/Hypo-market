@@ -148,7 +148,7 @@ export const UW_DECLINES = {
   milliman2019Note:
     "2020 Milliman LTCI Survey (2019 applications), as reported by AALTCI: individual decline 19.4% at 40–49 and 53.6% at 75+. Probability that at least one spouse is declined: 35.0% at 40–49 and 78.5% when both are 75 or older.",
   reasons: [
-    "Build (height/weight) is often the single most common hard decline on fully underwritten individual business (carrier underwriting guides, including Genworth/CareScout).",
+    "Build (height/weight) is often the single most common hard decline on fully underwritten individual business.",
     "Conditions that commonly close the file: insulin-treated diabetes, stroke or TIA, early cognitive change or an abnormal cognitive screen, current use of a cane/walker, and any existing ADL limitation.",
     "Other frequent impairments: heart disease, arthritis and back pain, psychiatric illness, recent cancer treatment, and current smoking.",
     "A decline is not the same as a later claim denial. After issue, tax-qualified policies pay when two of six ADLs are expected to last 90+ days or there is severe cognitive impairment needing supervision — plus the elimination period. Unlicensed family care and care outside the U.S. are commonly limited.",
@@ -163,7 +163,7 @@ export const GENWORTH_CLAIMS = {
   paidThrough2025B: 35,
   closedNewSales: 2019,
   carescoutLaunch: 2025,
-  note: "Genworth Life and affiliates. Producer materials (experience through 31 Dec 2024): more than $32B paid and more than 389,000 claims; over $10M per business day. 4Q 2025 earnings: about $35B paid through 31 Dec 2025. Closed to new traditional sales in 2019; CareScout Care Assurance launched 2025.",
+  note: "Genworth Life and affiliates. Producer materials (experience through 31 Dec 2024): more than $32B paid and more than 389,000 claims; over $10M per business day. 4Q 2025 earnings: about $35B paid through 31 Dec 2025. Closed to new traditional sales in 2019. This is one carrier’s claims record, not the care-price source for this model.",
 };
 
 /** Calendar-year vs lifetime vs A/E — three different “claims ratios.” */
@@ -357,7 +357,7 @@ export const RATE_STABILITY = {
 
 export const REPORTING_HISTORY = {
   intro:
-    "The figures in this hypothetical come from several public reporting streams. They are not one database, and paid is not incurred.",
+    "The figures in this optional claims library come from several public reporting streams. They are not one database, and paid is not incurred. They are not the care prices used in the asset calculation.",
   rows: [
     {
       who: "AALTCI",
@@ -380,8 +380,8 @@ export const REPORTING_HISTORY = {
       years: "1984–2004; 2000–2011; 2000–2016; 2000–2023 update announced Aug 2025",
     },
     {
-      who: "Genworth / CareScout",
-      what: "Largest public carrier book: paid claims, rate-action NPV, A/E, and the Cost of Care survey this model uses for state medians.",
+      who: "Genworth",
+      what: "One public carrier’s paid claims, rate-action history, and actual-to-expected results. Not the source of care prices in this model.",
       years: "Ongoing; 4Q 2025 / 10-K 2025",
     },
     {

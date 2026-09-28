@@ -11,18 +11,18 @@ export function openDisclosureCard(hash = DISCLOSURE_HASH) {
   window.dispatchEvent(new CustomEvent("aum:open-disclosure", { detail: hash }));
 }
 
-export const HOLD_HARMLESS_TITLE = "Hold harmless — not professional advice";
+export const HOLD_HARMLESS_TITLE = "Important disclosure";
 
 export const HOLD_HARMLESS_SHORT =
-  "Hold harmless: Adaptive Marketing Group does not provide tax, legal, investment, insurance, financial-planning, eldercare-planning, or Medicaid advice and does not assume a fiduciary duty. CFP® professionals cannot waive their CFP Board fiduciary duty when they provide Financial Advice. Contact the appropriate licensed professional for your individual situation. Educational hypothetical only.";
+  "Important disclosure: Adaptive Marketing Group does not provide tax, legal, investment, insurance, financial-planning, eldercare-planning, or Medicaid advice and does not assume a fiduciary duty. CFP® professionals cannot waive their CFP Board fiduciary duty when they provide Financial Advice. Contact the appropriate licensed professional for your individual situation. Educational hypothetical only.";
 
 export const HOLD_HARMLESS_ACK =
-  "I have read and acknowledge the Adaptive Marketing Group hold-harmless disclaimer, including that the Publishers are not my (or my client’s) fiduciary and do not provide legal advice. This PDF is educational only and is not tax, legal, investment, insurance, financial-planning, eldercare-planning, or Medicaid advice. I will contact the appropriate licensed professional for my (or my client’s) situation, including a CERTIFIED FINANCIAL PLANNER™ professional (CFP®) where financial planning is involved. I understand a CFP® professional’s fiduciary duty under CFP Board Standard A.1 cannot be waived when they provide Financial Advice.";
+  "I have read and acknowledge the Important Disclosure, including that the Publishers are not my (or my client’s) fiduciary and do not provide legal advice. This PDF is educational only and is not tax, legal, investment, insurance, financial-planning, eldercare-planning, or Medicaid advice. I will contact the appropriate licensed professional for my (or my client’s) situation, including a CERTIFIED FINANCIAL PLANNER™ professional (CFP®) where financial planning is involved. I understand a CFP® professional’s fiduciary duty under CFP Board Standard A.1 cannot be waived when they provide Financial Advice.";
 
 export const HOLD_HARMLESS_PARAS = [
   {
     heading: "Who publishes this model",
-    body: "Adaptive Marketing Group (the “Publishers”) provide this Long Term Care Asset Utilization Modeling tool, the on-screen hypothetical, the View report, and any PDF solely as an educational illustration. By using the model or requesting a report, you agree to the following hold-harmless terms.",
+    body: "Adaptive Marketing Group (the “Publishers”) provide this Long Term Care Asset Utilization Modeling tool, the on-screen hypothetical, the View report, and any PDF solely as an educational illustration. By using the model or requesting a report, you agree to the terms of use on this page.",
   },
   {
     heading: "Accessibility",
@@ -45,8 +45,8 @@ export const HOLD_HARMLESS_PARAS = [
     body: "New sales and in-force books are not the same. LIMRA combination (life + LTC) individual premium was about $2.86 billion in 2023, versus $112.7 million of stand-alone new premium in the 2025 Milliman LTCI Survey of 2024 sales. Typical 2024 stand-alone issue (excluding one short-duration product): average initial monthly maximum $5,428 (~$178/day); 73.2% monthly determination; 3-year benefit period 55.1% (5-year 7.4%, 6-year 20.0%, lifetime* 0.1%); 89.8% used an 84–100 day elimination period; 3% compound 17.4% and FPO the majority inflation design; Shared Care on about 19% of 3-year policies. Buyers: 54.4% female; 27.2% ages 50–59 and 44.1% ages 60–69. Milliman does not publish benefit-size, period, EP, or inflation mix by gender — AALTCI Price Index premiums by age and sex are in the tables. Not a quote and not this carrier’s mix. * Lifetime long-term care insurance may not be available. Contact a licensed insurance agent in your state of residence.",
   },
   {
-    heading: "Hold harmless",
-    body: "You agree to hold Adaptive Marketing Group and its owners, officers, employees, contractors, and licensors harmless from any claim, loss, cost, or decision made in reliance on this hypothetical or any report generated from it. The Publishers have no duty to update figures after you leave the page. You — not the Publishers — are responsible for decisions about care, assets, insurance, investments, taxes, and public benefits.",
+    heading: "Decisions are yours",
+    body: "The Publishers have no duty to update figures after you leave the page. You — not the Publishers — are responsible for decisions about care, assets, insurance, investments, taxes, and public benefits. Limitation of liability and indemnification are stated only in the Terms of Use.",
   },
   {
     heading: "No fiduciary relationship — waiver as to the Publishers",
@@ -54,7 +54,7 @@ export const HOLD_HARMLESS_PARAS = [
   },
   {
     heading: "Not legal advice",
-    body: "Nothing on this site, in a View report, or in a PDF is legal advice. No attorney-client relationship is formed with Adaptive Marketing Group or anyone solely because you used this model. Medicaid, Partnership, spend-down, QIT, MAPT, homestead, VA, SSI, estate-recovery, and tax-qualified LTC rules are summaries of publicly described programs; they are not an opinion of counsel and are not a substitute for advice from a lawyer licensed in the state whose law applies. Only that lawyer can apply the law to your facts. Do not gift, retitle, spend down, or file a claim based only on this hypothetical. This model does not assume Medicaid will still be solvent, or that any Medicaid benefit will remain the same — solvency and benefits may be adjusted by legislation, regulation, or other government action.",
+    body: "Nothing on this site, in a View report, or in a PDF is legal advice. No attorney-client relationship is formed with Adaptive Marketing Group or anyone solely because you used this model. Medicaid, Partnership, spend-down, QIT, MAPT, homestead, VA, SSI, estate-recovery, and tax-qualified LTC rules are summaries of publicly described programs; they are not an opinion of counsel and are not a substitute for advice from a lawyer licensed in the state whose law applies. Only that lawyer can apply the law to your facts. Do not gift, retitle, spend down, or file a claim based only on this hypothetical. Government program benefits, eligibility standards, and laws may change. Verify current requirements with the appropriate government agency or qualified professional.",
   },
   {
     heading: "Contact the appropriate professional",
@@ -142,7 +142,7 @@ export const TERMS_MAY_NOT = [
 export const TERMS_LIABILITY_SECTIONS = [
   {
     heading: "Acceptance",
-    body: "By accessing this site, running a hypothetical, viewing a report, or downloading a PDF, you agree to these terms of use and to the hold-harmless disclosures on this page. If you do not agree, do not use the model. Use on behalf of a client is your use; you are responsible for what you show that client.",
+    body: "By accessing this site, running a hypothetical, viewing a report, or downloading a PDF, you agree to these terms of use and to the Important Disclosure on this page. If you do not agree, do not use the model. Use on behalf of a client is your use; you are responsible for what you show that client.",
   },
   {
     heading: "Provided “as is” — no warranty",
@@ -162,11 +162,11 @@ export const TERMS_LIABILITY_SECTIONS = [
   },
   {
     heading: "Not a public-benefits determination",
-    body: "Nothing on this site is a determination of Medicaid, SSI, Medicare, VA pension, Aid and Attendance, disability compensation, or tax eligibility or amount. Partnership “protected” assets, CSRA, QIT, MAPT, spend-down, SSI resource limits, and VA MAPR/compensation tables are educational summaries of published rules. This model does not assume Medicaid will still be solvent, or that any Medicaid benefit, payment rate, eligibility test, or Partnership disregard will remain the same when care is needed; Congress, CMS, the state legislature, or the state Medicaid agency may reduce, increase, delay, restructure, or otherwise adjust the program through legislation, regulation, budget action, or other government action. Only the relevant agency, a court, or a qualified attorney or VSO can apply those rules to a household. Do not spend down, gift, or file a claim solely on this model.",
+    body: "Nothing on this site is a determination of Medicaid, SSI, Medicare, VA pension, Aid and Attendance, disability compensation, or tax eligibility or amount. Partnership “protected” assets, CSRA, QIT, MAPT, spend-down, SSI resource limits, and VA MAPR/compensation tables are educational summaries of published rules. Government program benefits, eligibility standards, and laws may change. Verify current requirements with the appropriate government agency or qualified professional. Do not spend down, gift, or file a claim solely on this model.",
   },
   {
     heading: "Sources, dates, and no duty to update",
-    body: "Care costs are rounded annual medians from published Cost of Care surveys (CareScout https://www.carescout.com/cost-of-care and Genworth https://www.genworth.com/aging-and-you/finances/cost-of-care , 2025 survey published 2026, where used). SSI, Medicaid spousal, SIL, and related federal figures follow SSA (https://www.ssa.gov/oact/cola/SSI.html) and CMCS (https://www.medicaid.gov/federal-policy-guidance/downloads/cib12092025.pdf) publications for the stated year. VA pension MAPR, net worth, and disability compensation follow va.gov (https://www.va.gov/pension/veterans-pension-rates/ and https://www.va.gov/disability/compensation-rates/veteran-rates/) for the stated rate period (generally December 1–November 30). Full clickable list is on the Copyright & terms Sources section. The Publishers have no duty to notify you of later changes after you leave the page. Re-check official sources before any decision.",
+    body: "Care costs in this model are rounded planning medians. Confirm a location on the LTC News Cost of Care Calculator (https://www.ltcnews.com/long-term-care/cost-of-care). That calculator is not an insurance-company survey. SSI, Medicaid spousal, SIL, and related federal figures follow SSA (https://www.ssa.gov/oact/cola/SSI.html) and CMCS (https://www.medicaid.gov/federal-policy-guidance/downloads/cib12092025.pdf) publications for the stated year. VA pension MAPR, net worth, and disability compensation follow va.gov (https://www.va.gov/pension/veterans-pension-rates/ and https://www.va.gov/disability/compensation-rates/veteran-rates/) for the stated rate period (generally December 1–November 30). Sources are grouped on the Sources and methodology page. The Publishers have no duty to notify you of later changes after you leave the page. Re-check official sources before any decision.",
   },
   {
     heading: "Your inputs control the result",
@@ -174,7 +174,7 @@ export const TERMS_LIABILITY_SECTIONS = [
   },
   {
     heading: "Licensed professionals who use this with clients",
-    body: "If you are an insurance agent, investment adviser, CFP® professional, attorney, CPA, or other licensee, this tool does not replace your license, your E&O, your client agreement, or your required disclosures. You — not the Publishers — are responsible for advice you give, products you recommend, and how you describe this hypothetical. The Publishers do not supervise you. Do not remove copyright, disclaimer, or hold-harmless text from a report. A CFP® professional’s fiduciary duty under CFP Board Standard A.1 cannot be waived, disclaimed, or assigned away when they provide Financial Advice; running this model is not Financial Advice and does not satisfy that duty.",
+    body: "If you are an insurance agent, investment adviser, CFP® professional, attorney, CPA, or other licensee, this tool does not replace your license, your E&O, your client agreement, or your required disclosures. You — not the Publishers — are responsible for advice you give, products you recommend, and how you describe this hypothetical. The Publishers do not supervise you. Do not remove copyright, the Important Disclosure, or these terms from a report. A CFP® professional’s fiduciary duty under CFP Board Standard A.1 cannot be waived, disclaimed, or assigned away when they provide Financial Advice; running this model is not Financial Advice and does not satisfy that duty.",
   },
   {
     heading: "Limitation of liability",
@@ -194,6 +194,6 @@ export const TERMS_LIABILITY_SECTIONS = [
   },
   {
     heading: "Acknowledgment",
-    body: "You acknowledge that you have had an opportunity to read these terms and the hold-harmless disclosures, that you understand this is an educational hypothetical only and is not legal advice, and that you will contact the appropriate licensed professional for your (or your client’s) situation before acting: a CERTIFIED FINANCIAL PLANNER™ professional (CFP®) and, as fits the issue, ChFC®, CLU®, or RICP® for financial planning; a licensed long-term care insurance producer (CLTC or LTCP recommended) for insurance; a CPA, enrolled agent, or tax attorney for tax; a qualified Medicaid or elder-care planning attorney licensed in the relevant state (CELA or equivalent where appropriate) for legal, Medicaid, and eldercare planning; and an accredited veterans service officer (VSO) for VA pension or disability.",
+    body: "You acknowledge that you have had an opportunity to read these terms and the Important Disclosure, that you understand this is an educational hypothetical only and is not legal advice, and that you will contact the appropriate licensed professional for your (or your client’s) situation before acting: a CERTIFIED FINANCIAL PLANNER™ professional (CFP®) and, as fits the issue, ChFC®, CLU®, or RICP® for financial planning; a licensed long-term care insurance producer (CLTC or LTCP recommended) for insurance; a CPA, enrolled agent, or tax attorney for tax; a qualified Medicaid or elder-care planning attorney licensed in the relevant state (CELA or equivalent where appropriate) for legal, Medicaid, and eldercare planning; and an accredited veterans service officer (VSO) for VA pension or disability.",
   },
 ];

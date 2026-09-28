@@ -15,7 +15,7 @@ export const CPI_METHODS = [
   },
   {
     title: "CPI is not an LTC price index",
-    body: "Nursing facility, assisted living, and 24-hour home care are barely in the CPI basket. CareScout cost-of-care surveys and the AARP PPI March 2026 LTSS review are the yardsticks this model will cite. Recent assisted-living and home-care growth has run higher than medical CPI; CareScout’s 2025 survey cooled toward about 1–5% depending on the setting. This model lets you pick one annual rate and apply it to the selected setting.",
+    body: "Nursing facility, assisted living, and 24-hour home care are barely in the CPI basket. This model cites the LTC News Cost of Care Calculator for a current private-pay price and the AARP PPI March 2026 LTSS review for recent growth. Recent assisted-living and home-care growth has run higher than medical CPI; a later survey cooled toward about 1–5% depending on the setting. This model lets you pick one annual rate and apply it to the selected setting.",
   },
 ];
 
@@ -44,5 +44,5 @@ export const HEALTHCARE_CPI = {
     { label: "Nursing facility (private room)", yoy: 1 },
   ],
   source:
-    "Long-term care index uses CareScout / Genworth Cost of Care Survey year-over-year (released March 2026). BLS Medical Care CPI (CUSR0000SAM) and medical care services are shown for comparison only — they measure out-of-pocket consumer medical prices, not facility or home-care private-pay rates.",
+    "Long-term care inflation in this model is the rate you enter. BLS Medical Care CPI (CUSR0000SAM) and medical care services are shown for comparison only — they measure out-of-pocket consumer medical prices, not facility or home-care private-pay rates. Confirm a current private-pay price on the LTC News Cost of Care Calculator.",
 } as const;

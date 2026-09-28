@@ -271,10 +271,9 @@ export function DisclaimerCard({
       >
         <p className="text-sm text-muted">
           Figures change with the assumptions you enter (care setting, timing, CPI,
-          returns, tax rate, and any benefits). State care costs are rounded annual medians
-          from the <Cite href={SRC.carescout}>CareScout</Cite> /{" "}
-          <Cite href={SRC.genworth}>Genworth Cost of Care Survey 2025</Cite> (published
-          2026). A local provider’s price may differ.
+          returns, tax rate, and any benefits). State care costs are rounded planning medians.
+          Confirm the location on the <Cite href={SRC.ltcNews}>LTC News Cost of Care Calculator</Cite>.
+          A local provider’s price may differ.
         </p>
       </TitleCollapse>
       ) : null}

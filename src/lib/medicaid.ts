@@ -1,12 +1,12 @@
 /** 2026 long-term care Medicaid planning figures. Educational — not an eligibility determination. */
 
-/** Qualify Medicaid planning copy: future solvency and benefit levels are not assumed. */
+/** Qualify government-program copy. Do not speculate about program solvency. */
 export const MEDICAID_FUTURE_QUALIFIER =
-  "This hypothetical does not assume Medicaid will still be solvent, or that any Medicaid benefit, payment rate, eligibility test, resource or income limit, covered setting, personal-needs allowance, or Partnership asset disregard will remain the same when care is needed. Congress, CMS, the state legislature, or the state Medicaid agency may reduce, increase, delay, restructure, or otherwise adjust the program through legislation, regulation, budget action, or other government action. Figures here are today’s published planning rules only — confirm current law at planning and again at application with a qualified Medicaid or elder-care planning attorney.";
+  "Government program benefits, eligibility standards, and laws may change. Verify current requirements with the appropriate government agency or qualified professional. Figures here are today’s published planning rules only.";
 
 /** Short clause for sentences that say Medicaid “pays” or that assets must spend down first. */
 export const MEDICAID_PAYS_CAVEAT =
-  "That is current-rule planning only: it does not assume Medicaid will still be solvent or that the benefit will remain the same — solvency and benefits may be adjusted by legislation, regulation, or other government action.";
+  "Government program benefits, eligibility standards, and laws may change. Verify current requirements with the appropriate government agency or qualified professional.";
 
 export type MedicaidProfile = {
   individualLimit: number;
