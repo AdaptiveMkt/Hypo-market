@@ -80,8 +80,7 @@ import { ConfidencePanel } from "@/components/confidence-panel";
 import { AgiPremiumCallout } from "@/components/agi-premium-callout";
 import { IndustryInsightsPanel } from "@/components/industry-insights";
 import { ChartRegion } from "@/components/chart-region";
-import { pauseCeleste, playCelesteScript, resumeCeleste, stopCeleste, watchCeleste } from "@/lib/celeste";
-import { setVoiceOn, useVoiceOn } from "@/lib/voice-pref";
+import { stopCeleste } from "@/lib/celeste";
 import { LifeBenefitDefs } from "@/components/life-benefit-defs";
 import { LifeSettlementOptions } from "@/components/life-settlement-options";
 import { LtcGlossaryTerms } from "@/components/ltc-glossary";
@@ -352,18 +351,9 @@ export function ReportView({
     borderRadius: 8,
   };
   const premiumParts = targetPremiumParts(pool, annualIncome);
-  const [voice, setVoice] = useState<"idle" | "playing" | "paused">("idle");
-  const voiceOn = useVoiceOn();
   const reportRef = useRef<HTMLDivElement>(null);
-  const spoken = useMemo(() => {
-    const recs = recommendations
-      .map((r, i) => `Recommendation ${i + 1}. ${r}`)
-      .join(" ");
-    return `Descriptive summary. ${summary} Recommendations to consider. ${recs}`;
-  }, [summary, recommendations]);
 
   useEffect(() => {
-    const off = watchCeleste(setVoice);
     const root = reportRef.current;
     root?.focus();
     const inert = [
@@ -380,7 +370,6 @@ export function ReportView({
     };
     window.addEventListener("keydown", onKey);
     return () => {
-      off();
       stopCeleste();
       inert.forEach((n) => n?.removeAttribute("inert"));
       window.removeEventListener("keydown", onKey);
@@ -548,35 +537,8 @@ export function ReportView({
           role="toolbar"
           aria-label="Report controls"
         >
-          <div className="stack-actions md:grid-cols-2">
-          <button
-            type="button"
-            className="btn-block rounded-lg border border-card-border text-navy hover:bg-cream disabled:opacity-50"
-            onClick={pauseCeleste}
-            disabled={voice !== "playing"}
-          >
-            Stop speaking
-          </button>
-          <button
-            type="button"
-            className="btn-block rounded-lg bg-navy text-cream hover:bg-teal disabled:opacity-50"
-            onClick={() => {
-              if (!voiceOn) setVoiceOn(true);
-              if (voice === "paused") resumeCeleste();
-              else void playCelesteScript(spoken);
-            }}
-            disabled={voice === "playing"}
-          >
-            {voice === "paused" ? "Resume speaking" : "Listen to Summary"}
-          </button>
-          <p className="col-span-full text-xs leading-snug text-muted" aria-live="polite">
-            {voice === "playing"
-              ? "Celeste is reading the descriptive summary and recommendations…"
-              : voice === "paused"
-                ? "Paused. Resume speaking to continue."
-                : "Celeste does not start on its own. Tap Listen to Summary if you want this read aloud."}
-          </p>
-            <div className={`col-span-full grid gap-2 ${allowPdf ? "grid-cols-3" : "grid-cols-2"}`}>
+          <div className="stack-actions">
+            <div className={`grid gap-2 ${allowPdf ? "grid-cols-3" : "grid-cols-2"}`}>
             <button
               type="button"
               onClick={onPdf}

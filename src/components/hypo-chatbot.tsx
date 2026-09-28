@@ -175,10 +175,8 @@ export function HypoChatbot() {
           content: res.answer,
           usedAaltci: res.usedAaltci,
           sources: res.sources,
-          spoken: res.spoken,
         },
       ]);
-      await speak(res.spoken || res.answer, res.usedAaltci);
     } catch {
       setMessages((m) => [
         ...m,
@@ -272,7 +270,7 @@ export function HypoChatbot() {
           <p id="hypo-chat-title" className="font-display text-base text-navy">
             Educational assistant
           </p>
-          <p className="text-xs text-muted">Text or voice. Sourced from this hypothetical.</p>
+          <p className="text-xs text-muted">Text answers from this hypothetical.</p>
         </div>
           <button
           type="button"
@@ -280,7 +278,6 @@ export function HypoChatbot() {
           aria-label="Close educational assistant"
           onClick={() => {
             stopListen();
-            stopSpeak();
             setOpen(false);
           }}
         >
@@ -341,30 +338,7 @@ export function HypoChatbot() {
           void ask(input);
         }}
       >
-        <div className="flex flex-wrap items-center gap-2">
-          <label className="flex min-h-11 cursor-pointer items-center gap-2 text-xs text-muted">
-            <input
-              type="checkbox"
-              className="size-4 accent-teal"
-              checked={speakOn && voiceOn}
-              disabled={!voiceOn}
-              onChange={(e) => {
-                setSpeakOn(e.target.checked);
-                if (!e.target.checked) stopSpeak();
-              }}
-            />
-            Speak answers (Celeste)
-          </label>
-          <button
-            type="button"
-            className="min-h-11 rounded-lg border border-card-border px-3 text-sm font-semibold text-navy hover:bg-cream disabled:opacity-50"
-            onClick={stopSpeak}
-            disabled={!speaking}
-          >
-            Stop speaking
-          </button>
-        </div>
-        <div className="mt-2 flex gap-2">
+        <div className="flex gap-2">
           <label htmlFor="hypo-chat-q" className="sr-only">
             Question for the educational assistant
           </label>
@@ -377,16 +351,6 @@ export function HypoChatbot() {
             maxLength={500}
             disabled={busy}
           />
-          <button
-            type="button"
-            className="min-h-11 shrink-0 rounded-lg border border-card-border px-3 text-sm font-semibold text-navy hover:bg-cream disabled:opacity-60"
-            onClick={() => (listening ? stopListen() : startListen())}
-            disabled={busy}
-            aria-pressed={listening}
-            aria-label={listening ? "Stop microphone" : "Start microphone"}
-          >
-            {listening ? "Stop" : "Mic"}
-          </button>
           <button
             type="submit"
             className="min-h-11 shrink-0 rounded-lg bg-navy px-3 text-sm font-semibold text-cream hover:bg-teal disabled:opacity-60"

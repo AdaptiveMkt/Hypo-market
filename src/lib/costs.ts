@@ -58,7 +58,7 @@ export const STATE_NAMES = Object.keys(STATES);
 export type CareSetting = "al" | "nh" | "nhs" | "home24" | "memory";
 
 export const SETTING_LABELS: Record<CareSetting, string> = {
-  home24: "Home health / 24-hour home care",
+  home24: "Home Health Care",
   al: "Assisted Living Community Care",
   memory: "Memory Care Facility",
   nhs: "Nursing facility (semi-private room)",
@@ -66,7 +66,7 @@ export const SETTING_LABELS: Record<CareSetting, string> = {
 };
 
 export const SETTING_SHORT: Record<CareSetting, string> = {
-  home24: "home health / 24-hour home care",
+  home24: "home health care",
   al: "assisted living",
   memory: "memory care facility",
   nhs: "nursing facility (semi-private room)",

@@ -1,9 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { playCelesteScript, stopCeleste, watchCeleste } from "@/lib/celeste";
-import { setVoiceOn, useVoiceOn } from "@/lib/voice-pref";
-import { WELCOME_BODY, WELCOME_HEADING, WELCOME_SPOKEN } from "@/lib/welcome";
+import { WELCOME_BODY, WELCOME_HEADING } from "@/lib/welcome";
 
 const CAPTIONS: { start: number; end: number; text: string }[] = [
   { start: 0, end: 1.9, text: "Hello there." },
@@ -138,18 +136,6 @@ export function WelcomeVideo() {
 }
 
 export function WelcomeCard({ onReset }: { onReset?: () => void }) {
-  const [speaking, setSpeaking] = useState(false);
-  const [status, setStatus] = useState("");
-  const voiceOn = useVoiceOn();
-
-  useEffect(() => {
-    return watchCeleste((s) => {
-      const playing = s === "playing";
-      setSpeaking(playing);
-      setStatus(playing ? "Celeste is reading the welcome…" : "");
-    });
-  }, []);
-
   return (
     <section className="card-xl min-w-0 p-4 md:p-5" aria-labelledby="welcome-heading">
       <div className="flex items-center justify-between gap-3">
@@ -168,31 +154,6 @@ export function WelcomeCard({ onReset }: { onReset?: () => void }) {
         {WELCOME_HEADING}
       </h2>
       <p className="mt-3 text-sm leading-relaxed text-muted">{WELCOME_BODY}</p>
-      <div className="mt-4 stack-actions">
-        <button
-          type="button"
-          className="btn-block rounded-lg border border-navy bg-navy text-cream hover:bg-teal disabled:opacity-50"
-          onClick={() => {
-            if (!voiceOn) setVoiceOn(true);
-            void playCelesteScript(WELCOME_SPOKEN);
-          }}
-          disabled={speaking}
-        >
-          Hear welcome
-        </button>
-        <button
-          type="button"
-          className="btn-block rounded-lg border border-card-border text-navy hover:bg-cream disabled:opacity-50"
-          onClick={stopCeleste}
-          disabled={!speaking}
-        >
-          Stop speaking
-        </button>
-      </div>
-      <p className="mt-2 text-xs text-muted" aria-live="polite">
-        {status ||
-          "Voice does not start on its own. Tap Hear welcome if you want Celeste to read this. Disclaimer and privacy are in the footer."}
-      </p>
     </section>
   );
 }
