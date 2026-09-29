@@ -392,7 +392,7 @@ export function Calculator() {
 
   useEffect(() => {
     const saved = readQaCookie();
-    if (saved?.audience) setAudience(saved.audience);
+    if (saved?.audience === "licensed-client") setAudience(saved.audience);
     if (saved?.advisor) setAdvisor({ ...EMPTY_ADVISOR, ...saved.advisor });
     if (saved?.advisorCleared) setAdvisorCleared(true);
     if (saved && saved.finderIndex > 0) {
@@ -431,10 +431,6 @@ export function Calculator() {
       setFinderPersonal(Boolean(saved.finderPersonal));
       setFinderIndex(saved.finderIndex);
       if (saved.finderPersonal) {
-        setPersonalizeOpen(true);
-        setTheme(false);
-      } else if (saved.audience === "licensed-client") {
-        setFinderPersonal(true);
         setPersonalizeOpen(true);
         setTheme(false);
       } else {
@@ -1219,12 +1215,6 @@ export function Calculator() {
     window.setTimeout(() => scrollToHeader(false), 50);
   }
   function applyIncognito(on: boolean) {
-    if (audience === "licensed-client") {
-      setFinderPersonal(true);
-      setPersonalizeOpen(true);
-      setTheme(false);
-      return;
-    }
     if (on) {
       setPersonalizeOpen(false);
       setTheme(true);
@@ -1235,12 +1225,8 @@ export function Calculator() {
     themeBeforeIncognito.current = null;
   }
   useLayoutEffect(() => {
-    if (audience === "licensed-client") {
-      setTheme(false);
-      return;
-    }
     if (!personalizeOpen) setTheme(true);
-  }, [personalizeOpen, audience]);
+  }, [personalizeOpen]);
   const pdfUnlocked = ran && section2Confirmed && (insuranceLocked || section3Confirmed);
   const licensedPdf = audience === "licensed-client" || audience === "licensed-solo";
   const canPdf = pdfUnlocked && (audience === "interested" || licensedPdf);
@@ -1375,18 +1361,18 @@ export function Calculator() {
     !duration ? "Years of care to model" : "",
     pool <= 0 ? "Countable assets" : "",
   ].filter(Boolean);
+  const needsAdvisor = audience === "licensed-client";
+  const advisorOk = Boolean(
+    advisor.name.trim() && advisor.firm.trim() && advisor.email.includes("@") && advisor.phone.trim(),
+  );
   const missingRun = [
     ...missingInputs,
+    needsAdvisor && !advisorOk ? "Advisor name, firm, email, and phone" : "",
     !section2Confirmed ? "Confirm Section 2 selection" : "",
     !insuranceLocked && !section3Confirmed ? "Confirm Section 3 selection" : "",
   ].filter(Boolean);
 
   function executeHypo() {
-    if (audience === "licensed-client") {
-      setFinderPersonal(true);
-      setPersonalizeOpen(true);
-      setTheme(false);
-    }
     const locked = insuranceLockedOut(pool);
     setHypoRunId((n) => n + 1);
     setDetails(locked ? lockoutDetails() : withScenarioDetails({ ...CLIENT_SITTING }, false));
@@ -1446,6 +1432,7 @@ export function Calculator() {
     const section3Ok = insuranceLocked || section3Confirmed || (fromFinder && poolShown);
     if (section2Ok && !section2Confirmed) setSection2Confirmed(true);
     if (section3Ok && !section3Confirmed) setSection3Confirmed(true);
+    const missingAdvisor = needsAdvisor && !advisorOk;
     const missingState = !state;
     const missingSetting = !setting;
     const missingAge = ageToday < MIN_AGE_TODAY;
@@ -1457,7 +1444,7 @@ export function Calculator() {
     setSettingNeeded(missingSetting);
     setAgeNeeded(missingAge);
     setDurationNeeded(missingYears);
-    if (missingState || missingSetting || missingAge || missingYears || missingAssets || missingSection2 || missingSection3) {
+    if (missingAdvisor || missingState || missingSetting || missingAge || missingYears || missingAssets || missingSection2 || missingSection3) {
       setGapsOn(true);
       if (missingSection3) setSection3Open(true);
       const id = missingState
@@ -1486,7 +1473,12 @@ export function Calculator() {
                 : missingSection2
                   ? "confirm2"
                   : "section3";
-      if (!showFullForm) setFinderGoto(step);
+      if (missingAdvisor) {
+        window.setTimeout(() => {
+          scrollToId("advisor-required");
+          (document.getElementById("advisor-required") as HTMLElement | null)?.focus();
+        }, 50);
+      } else if (!showFullForm) setFinderGoto(step);
       else {
         window.setTimeout(() => {
           scrollToId(id);
@@ -1678,10 +1670,6 @@ export function Calculator() {
       window.clearTimeout(timer);
     };
   }, [showReport, hypoRunId, canShare, incognitoShare, client.name]);
-  const needsAdvisor = audience === "licensed-client" || audience === "licensed-solo";
-  const advisorOk = Boolean(
-    advisor.name.trim() && advisor.firm.trim() && advisor.email.includes("@") && advisor.phone.trim(),
-  );
   const showQuestions = booted && Boolean(audience) && (!needsAdvisor || advisorCleared);
 
   return (
@@ -1692,11 +1680,6 @@ export function Calculator() {
             onSelect={(role) => {
               setAudience(role);
               setAdvisorCleared(false);
-              if (role === "licensed-client") {
-                setFinderPersonal(true);
-                setPersonalizeOpen(true);
-                setTheme(false);
-              }
             }}
           />
         ) : (
@@ -1705,7 +1688,7 @@ export function Calculator() {
             <h2 className="mt-1 font-display text-xl text-navy">Advisor information is required</h2>
             <p className="mt-2 text-sm text-muted">
               A licensed insurance professional must enter advisor details before the fact finder starts.
-              {audience === "licensed-client" ? " This section stays in daylight with the client information." : ""}
+              You can then enter client information or run incognito.
             </p>
             <div className="mt-3">
               <AudienceBanner role={audience} />
@@ -1738,10 +1721,10 @@ export function Calculator() {
       {showFullForm ? null : (
       <>
       {audience === "licensed-client" ? (
-        <section className="card-xl mt-4 min-w-0 p-4 md:p-5">
+        <section id="advisor-required" className="card-xl mt-4 min-w-0 scroll-mt-8 p-4 md:p-5" tabIndex={-1}>
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-teal">Advisor</p>
           <h2 className="mt-1 font-display text-xl text-navy">Advisor information</h2>
-          <p className="mt-2 text-sm text-muted">Shown in daylight with the client fact finder.</p>
+          <p className="mt-2 text-sm text-muted">Required to run, with client information or incognito.</p>
           <div className="mt-4">
             <PartyFields
               idPrefix="advisor-daylight"
@@ -1753,7 +1736,7 @@ export function Calculator() {
         </section>
       ) : null}
       <FactFinder
-        daylight={audience === "licensed-client"}
+        daylight={false}
         index={finderIndex}
         onIndex={setFinderIndex}
         personalized={finderPersonal}

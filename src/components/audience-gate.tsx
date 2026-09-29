@@ -5,19 +5,9 @@ import { WelcomeVideo } from "@/components/welcome-card";
 
 const OPTIONS: { id: AudienceRole; n: string; title: string }[] = [
   {
-    id: "interested",
-    n: "1",
-    title: "Interested user concerned about future long-term care health costs",
-  },
-  {
     id: "licensed-client",
     n: "2",
     title: "Licensed insurance professional with client input",
-  },
-  {
-    id: "licensed-solo",
-    n: "3",
-    title: "Licensed insurance professional without client input",
   },
 ];
 
@@ -27,7 +17,9 @@ export function AudienceGate({ onSelect }: { onSelect: (role: AudienceRole) => v
       <div className="order-1 md:order-2 md:mt-4">
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-teal">Before you begin</p>
         <h2 className="mt-1 font-display text-xl text-navy">Which of these describes you?</h2>
-        <p className="mt-2 text-sm text-muted">Choose one. This choice controls what you can view and whether a PDF can be saved.</p>
+        <p className="mt-2 text-sm text-muted">
+          Advisor information is required before a run. After that, enter client information or run incognito.
+        </p>
         <div className="mt-4 grid gap-2">
           {OPTIONS.map((opt) => (
             <button
