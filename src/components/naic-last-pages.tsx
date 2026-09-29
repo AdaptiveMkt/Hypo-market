@@ -103,6 +103,7 @@ export function NaicLastPages() {
       >
         <AllDesignationNotice className="mt-0" />
       </TitleCollapse>
+      <SpecimenOutlineDisclaimer />
       <section id="disclosure-terms-report" className="card-xl mt-3 border-2 px-4 py-2 text-sm text-muted scroll-mt-8">
         <details className="pdf-stay-closed">
           <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal [&::-webkit-details-marker]:hidden [&::marker]:content-none">
@@ -112,7 +113,6 @@ export function NaicLastPages() {
           <DisclaimerCard className="mt-2" />
         </details>
       </section>
-      <SpecimenOutlineDisclaimer />
     </section>
   );
 }

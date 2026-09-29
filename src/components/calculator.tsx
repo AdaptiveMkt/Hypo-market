@@ -150,7 +150,7 @@ function snapshotReadyCards(): { label: string; value: string }[] {
 }
 import { ContactAskDialog, ContactRequestDialog, AdvisorCaptureDialog, PdfReadyDialog, PlanningAssistDialog } from "@/components/pdf-delivery-dialogs";
 import { MedicaidVaCard } from "@/components/medicaid-va-card";
-import { AdvisorProfessionalFolds, DisclaimerCard } from "@/components/disclaimer-card";
+import { AdvisorProfessionalFolds, DesignationNoticeFold, DisclaimerCard } from "@/components/disclaimer-card";
 import { WelcomeCard } from "@/components/welcome-card";
 import { FactFinder } from "@/components/fact-finder";
 import { AudienceBanner, AudienceGate } from "@/components/audience-gate";
@@ -3403,7 +3403,8 @@ export function Calculator() {
         </>
       ) : null}
 
-      <div id="disclosure-terms" className="mt-5 scroll-mt-8 card-xl border-2 px-4 py-2 text-sm text-muted">
+      <DesignationNoticeFold className="mt-5" details={details} onPdfChange={setDetail} />
+      <div id="disclosure-terms" className="mt-3 scroll-mt-8 card-xl border-2 px-4 py-2 text-sm text-muted">
         <TitleCollapse title={DISCLOSURE_CARD_TITLE} className="mt-0" openOnHash="disclosure-terms" pdfChecked={details.eduHypo} onPdfChange={(v) => setDetail("eduHypo", v)}>
           <DisclaimerCard className="mt-2" details={details} onPdfChange={setDetail} />
         </TitleCollapse>
