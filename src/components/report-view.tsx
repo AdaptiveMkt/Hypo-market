@@ -1490,10 +1490,13 @@ export function ReportView({
           </div>
         </details>
 
-        <section className="report-block">
-          <h3 className="mb-2 font-display text-lg text-navy">
-            Insurance designs — remaining assets, Partnership protection, shortfall
-          </h3>
+        <details className="pdf-stay-closed report-block report-fold">
+          <summary className="flex min-h-11 cursor-pointer list-none items-start gap-2 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal [&::-webkit-details-marker]:hidden [&::marker]:content-none">
+            <span aria-hidden="true" className="naic-chevron mt-1 inline-block text-gold-ink motion-reduce:transition-none">▸</span>
+            <h2 className="font-display text-lg text-navy">
+              Insurance designs — remaining assets, Partnership protection, shortfall
+            </h2>
+          </summary>
           <div className="report-chart mb-3 h-56 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <ComposedChart
@@ -1555,7 +1558,7 @@ export function ReportView({
             * Death benefits and cash surrender vary by company and policy type. Hybrids are
             generally not Partnership-certified. Premiums are not re-priced across designs.
           </p>
-        </section>
+        </details>
         </>
         ) : null}
 
@@ -2487,16 +2490,6 @@ export function ReportView({
         </details>
         ) : null}
 
-        <section id="disclosure-terms-report" className="report-block card-xl border-2 px-4 py-2 text-sm text-muted scroll-mt-8">
-          <details>
-            <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal [&::-webkit-details-marker]:hidden [&::marker]:content-none">
-              <span aria-hidden="true" className="naic-chevron inline-block text-gold-ink motion-reduce:transition-none">▸</span>
-              <h2 className="font-display text-xl text-navy">{DISCLOSURE_CARD_TITLE}</h2>
-            </summary>
-            <DisclaimerCard className="mt-2" />
-          </details>
-        </section>
-
         {details.edu ? (
         <>
         <section id="cpi-education" className="report-block scroll-mt-28 border-l-4 border-teal bg-paper px-4 py-2 text-sm text-muted">
@@ -2552,8 +2545,17 @@ export function ReportView({
         </>
         ) : null}
 
-        {policy.enabled ? <NaicLastPages /> : null}
-
+        {policy.enabled ? <NaicLastPages /> : (
+        <section id="disclosure-terms-report" className="report-block card-xl border-2 px-4 py-2 text-sm text-muted scroll-mt-8">
+          <details className="pdf-stay-closed">
+            <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal [&::-webkit-details-marker]:hidden [&::marker]:content-none">
+              <span aria-hidden="true" className="naic-chevron inline-block text-gold-ink motion-reduce:transition-none">▸</span>
+              <h2 className="font-display text-xl text-navy">{DISCLOSURE_CARD_TITLE}</h2>
+            </summary>
+            <DisclaimerCard className="mt-2" />
+          </details>
+        </section>
+        )}
         {insuranceLocked || details.dhContact || details.dhLicense || details.dhIar || details.dhCfp || audienceRole === "licensed-client" || audienceRole === "licensed-solo" ? (
         <section className="report-block">
           <TitleCollapse title="Find a qualified professional" className="mt-0" defaultOpen={false}>
