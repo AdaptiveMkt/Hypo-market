@@ -301,7 +301,7 @@ export function PrivacyPolicyBlock({
   expanded?: boolean;
 }) {
   return (
-    <div className={className}>
+    <div id="privacy-policy" className={`${className} scroll-mt-8`}>
       <TitleCollapse defaultOpen={expanded}
         title={PRIVACY_POLICY_TITLE}
         className="mt-0"

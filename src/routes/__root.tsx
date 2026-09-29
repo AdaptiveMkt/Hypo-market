@@ -139,12 +139,24 @@ function Root() {
               </p>
             </section>
             <HypoChatbot />
-            <footer className="bg-masthead px-4 py-5 text-center text-sm text-masthead-fg/70">
+            <footer className="bg-masthead px-4 py-5 text-sm text-masthead-fg">
+              <div className="mx-auto flex max-w-6xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <p>
-                  <CopyrightMark linkClass="text-gold underline underline-offset-4 hover:underline" />{" "}
-                  <DisclosureTermsLink className="text-gold underline-offset-4 hover:underline" />
+                  <CopyrightMark linkClass="text-gold underline underline-offset-4 hover:underline" />
                 </p>
-              </footer>
+                <nav aria-label="Legal" className="flex flex-wrap gap-x-4 gap-y-2 sm:justify-end">
+                  <DisclosureTermsLink className="text-gold underline underline-offset-4 hover:underline" />
+                  <a
+                    href="/copyright#privacy-policy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-gold underline underline-offset-4 hover:underline"
+                  >
+                    Privacy
+                  </a>
+                </nav>
+              </div>
+            </footer>
           </ContentGuard>
         </AuthProvider>
         <Scripts />
