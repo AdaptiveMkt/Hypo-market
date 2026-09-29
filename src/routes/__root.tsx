@@ -28,7 +28,7 @@ function FooterDownloadPdf() {
   return (
     <button
       type="button"
-      className="mt-3 inline-flex min-h-11 items-center justify-center rounded-lg border border-gold bg-gold px-4 py-2 text-sm font-semibold text-masthead hover:brightness-105"
+      className="ml-auto inline-flex min-h-11 items-center justify-center rounded-lg border border-gold bg-gold px-4 py-2 text-sm font-semibold text-masthead hover:brightness-105"
       onClick={() => window.dispatchEvent(new Event("aum-download-pdf"))}
     >
       Download PDF
@@ -103,7 +103,8 @@ function Root() {
                   How quickly could long-term care consume the assets you’ve accumulated, and
                   how could insurance change that?
                 </p>
-                <nav className="mt-4 flex flex-wrap gap-4 text-sm" aria-label="Site">
+                <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-3">
+                <nav className="flex flex-wrap gap-4 text-sm" aria-label="Site">
                   <Link to="/" className="text-masthead-fg underline underline-offset-4 hover:text-gold">
                     Calculator
                   </Link>
@@ -121,6 +122,8 @@ function Root() {
                   </Link>
                   <DisclosureTermsLink className="text-masthead-fg underline underline-offset-4 hover:text-gold" />
                 </nav>
+                <FooterDownloadPdf />
+                </div>
                 <div className="mt-4 max-w-xs">
                   <ThemeToggle />
                 </div>
@@ -141,7 +144,6 @@ function Root() {
                   <CopyrightMark linkClass="text-gold underline underline-offset-4 hover:underline" />{" "}
                   <DisclosureTermsLink className="text-gold underline-offset-4 hover:underline" />
                 </p>
-                <FooterDownloadPdf />
               </footer>
           </ContentGuard>
         </AuthProvider>
