@@ -747,25 +747,8 @@ html.pdf-capture [data-fold-region] [data-accordion="closed"] .accordion-panel {
   pointer-events: none !important;
 }
 
-.report-fold > h2 {
-  cursor: pointer;
-  display: flex;
-  align-items: flex-start;
-  gap: 0.5rem;
-}
-
-.report-fold > h2::before {
-  content: "▸";
-  color: var(--color-gold-ink);
-  flex: none;
-}
-
-.report-fold[open] > h2::before {
-  content: "▾";
-}
-
-.report-fold:not([open]) > :not(h2) {
-  display: none !important;
+details.report-fold > summary h2 {
+  margin-bottom: 0;
 }
 
 html.pdf-capture .report-block,
