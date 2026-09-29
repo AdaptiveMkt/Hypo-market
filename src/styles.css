@@ -737,6 +737,37 @@ html.pdf-capture .accordion-panel {
   pointer-events: auto !important;
 }
 
+/* From Year-by-year on, closed cards stay closed in the PDF capture. */
+html.pdf-capture [data-fold-region] [data-accordion="closed"] .accordion-panel {
+  max-height: 0 !important;
+  opacity: 0 !important;
+  overflow: hidden !important;
+  display: none !important;
+  transform: none !important;
+  pointer-events: none !important;
+}
+
+.report-fold > h2 {
+  cursor: pointer;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.report-fold > h2::before {
+  content: "▸";
+  color: var(--color-gold-ink);
+  flex: none;
+}
+
+.report-fold[open] > h2::before {
+  content: "▾";
+}
+
+.report-fold:not([open]) > :not(h2) {
+  display: none !important;
+}
+
 html.pdf-capture .report-block,
 html.pdf-capture .report-chart,
 html.pdf-capture .recharts-wrapper {

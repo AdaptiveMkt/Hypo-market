@@ -376,6 +376,30 @@ export function ReportView({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    const root = reportRef.current;
+    if (!root) return;
+    root.querySelectorAll<HTMLElement>(".report-fold > h2").forEach((h2) => {
+      h2.tabIndex = 0;
+      h2.setAttribute("role", "button");
+      h2.setAttribute("aria-expanded", h2.parentElement?.hasAttribute("open") ? "true" : "false");
+    });
+  });
+
+  function toggleFoldFromHeading(target: EventTarget | null) {
+    const node = target instanceof HTMLElement ? target : null;
+    if (!node || node.closest("a, button, input, textarea, select, label, summary")) return;
+    const h2 = node.closest("h2");
+    const section = h2?.parentElement;
+    if (!h2 || !section?.classList.contains("report-fold")) return;
+    const open = section.toggleAttribute("open");
+    h2.setAttribute("aria-expanded", open ? "true" : "false");
+    if (open) {
+      window.dispatchEvent(new Event("resize"));
+      window.setTimeout(() => window.dispatchEvent(new Event("resize")), 80);
+    }
+  }
   const linkedScenarios = useMemo(() => {
     if (!policy.enabled || !isLinkedKind(policy.kind)) return [];
     const holdings = holdingsFrom(assets, assetRois ?? DEFAULT_ASSET_ROIS, excludeHome);
@@ -444,6 +468,14 @@ export function ReportView({
         ref={reportRef}
         tabIndex={-1}
         className="mx-auto max-w-5xl space-y-8 bg-paper px-4 py-8 text-ink outline-none sm:px-8"
+        onClick={(e) => toggleFoldFromHeading(e.target)}
+        onKeyDown={(e) => {
+          if (e.key !== "Enter" && e.key !== " ") return;
+          const h2 = e.target instanceof HTMLElement ? e.target.closest("h2") : null;
+          if (!h2 || !h2.parentElement?.classList.contains("report-fold")) return;
+          e.preventDefault();
+          toggleFoldFromHeading(e.target);
+        }}
       >
         {audienceNote ? (
           <p className="no-print text-center text-xl font-bold leading-snug text-neutral-500">
@@ -1096,6 +1128,17 @@ export function ReportView({
         </section>
 
 
+        <section className="report-block">
+          <h2 className="font-display text-xl text-navy">Instructions</h2>
+          <p className="mt-2 text-sm text-muted">
+            Sections from Year-by-year through the end of this report start closed.
+            Select a title to view that section on this screen.
+            To include a section in a download or a print, open it first, then use Download PDF or your browser’s Print command.
+            Closed sections appear as titles only.
+          </p>
+        </section>
+        <div data-fold-region className="space-y-8">
+
         {details.yearByYear
           ? yearSets.flatMap((set) => {
               const chunks: typeof set.proj.rows[] = [];
@@ -1106,7 +1149,7 @@ export function ReportView({
               const setLater =
                 setDepleted != null ? set.proj.rows.filter((r) => r.year > setDepleted).length : 0;
               return chunks.map((chunk, idx) => (
-          <section key={`years-${set.key}-${idx}`} className="report-block">
+          <section key={`years-${set.key}-${idx}`} className="report-block report-fold">
             <h2 className="mb-2 font-display text-xl text-navy">
               Year-by-year projection{set.label ? ` — ${set.label}` : ""}{idx > 0 ? " (continued)" : " (View how funds are used)"}
             </h2>
@@ -1149,7 +1192,8 @@ export function ReportView({
             })
           : null}
 
-        <section className="report-block pb-4">
+        <section className="report-block report-fold pb-4">
+          <h2 className="mb-2 font-display text-xl text-navy">Shortfall</h2>
           <p className="text-xs leading-relaxed text-muted">
             <strong className="text-navy">Shortfall.</strong> Shortfall after insurance =
             annual cost − insurance on that year’s claim. Assets are used only as co-pay
@@ -1181,7 +1225,7 @@ export function ReportView({
 
 
         {policy.enabled && details.allocation && pie.length > 0 ? (
-          <section className="report-block break-inside-avoid">
+          <section className="report-block report-fold break-inside-avoid">
             <h2 className="mb-2 font-display text-xl text-navy">Explore asset allocation</h2>
             <div className="grid gap-4 lg:grid-cols-2">
               <div className="report-chart h-72">
@@ -1258,7 +1302,7 @@ export function ReportView({
         ) : null}
 
         {policy.enabled && details.allocation ? (
-        <section className="report-block break-inside-avoid">
+        <section className="report-block report-fold break-inside-avoid">
           <h2 className="mb-2 font-display text-xl text-navy">
             Asset utilization over time in <StateName name={state} />
           </h2>
@@ -1357,7 +1401,7 @@ export function ReportView({
         ) : null}
 
         {policy.enabled && details.compareCare ? (
-        <section className="report-block break-inside-avoid">
+        <section className="report-block report-fold break-inside-avoid">
           <h2 className="mb-2 font-display text-xl text-navy">Compare long-term care options</h2>
           <div className="report-chart mb-3 h-56 w-full">
             <ResponsiveContainer width="100%" height="100%">
@@ -1429,7 +1473,7 @@ export function ReportView({
 
         {policy.enabled && details.compareIns ? (
         <>
-        <section className="report-block">
+        <section className="report-block report-fold">
           <h2 className="mb-3 font-display text-xl text-navy">
             Compare long-term care insurance
           </h2>
@@ -1615,7 +1659,7 @@ export function ReportView({
         ) : null}
 
         {policy.enabled && inflationCompare.length > 0 && details.inflation ? (
-          <section className="report-block">
+          <section className="report-block report-fold">
             <h2 className="mb-2 font-display text-xl text-navy">Compare inflation riders</h2>
             <p className="mb-3 text-sm text-muted">
               Same traditional daily benefit ({money(policy.dailyBenefit)} today), period,
@@ -1760,7 +1804,7 @@ export function ReportView({
         ) : null}
 
         {policy.enabled && details.hybrid ? (
-        <section className="report-block">
+        <section className="report-block report-fold">
           <h2 className="mb-3 font-display text-xl text-navy">
             Explore Traditional, Asset-based, Hybrid, and LTC Annuity
           </h2>
@@ -1844,7 +1888,7 @@ export function ReportView({
 
         {policy.enabled && details.partnership ? (
         <>
-        <section className="report-block">
+        <section className="report-block report-fold">
           <h2 className="mb-3 font-display text-xl text-navy">
             Impact of Partnership on asset preservation
           </h2>
@@ -1925,7 +1969,7 @@ export function ReportView({
             </>
           );
           return (
-          <section className="report-block">
+          <section className="report-block report-fold">
             <h2 className="mb-3 font-display text-xl text-navy">Partnership by state</h2>
             <p className="mb-3 text-sm text-muted">
               Same claims as this run. Protected = benefits paid as a dollar-for-dollar
@@ -1992,10 +2036,10 @@ export function ReportView({
           );
         })()}
 
-        <section className="report-block card px-4 py-3 text-sm text-muted">
-          <p className="font-display text-base text-navy">
+        <section className="report-block report-fold card px-4 py-3 text-sm text-muted">
+          <h2 className="font-display text-xl text-navy">
             {assetProtectionLimits(state, medicaid.individualLimit).title}
-          </p>
+          </h2>
           <ul className="mt-2 list-disc space-y-1 pl-4">
             {assetProtectionLimits(state, medicaid.individualLimit).bullets.map((b) => (
               <li key={b.slice(0, 48)}>{b}</li>
@@ -2006,7 +2050,7 @@ export function ReportView({
         ) : null}
 
         {policy.enabled && details.reciprocity && reciprocity.issueState !== reciprocity.medicaidState ? (
-        <section className="report-block">
+        <section className="report-block report-fold">
           <h2 className="mb-3 font-display text-xl text-navy">
             Partnership reciprocity
           </h2>
@@ -2054,7 +2098,7 @@ export function ReportView({
         ) : null}
 
         <section id="medicaid-information" className="report-block scroll-mt-28" data-medicaid-fold data-medicaid-open={medicaidOpen ? "1" : "0"}>
-          <TitleCollapse title="Medicaid Information" className="mt-0" defaultOpen={medicaidOpen} openOnHash="medicaid-information">
+          <TitleCollapse title="Medicaid Information" className="mt-0" defaultOpen={false} openOnHash="medicaid-information">
             <MedicaidVaBody
               state={state}
               policy={policy}
@@ -2068,7 +2112,7 @@ export function ReportView({
 
         {policy.enabled && details.trends ? (
         <>
-        <section className="report-block">
+        <section className="report-block report-fold">
           <h2 className="mb-2 font-display text-xl text-navy">
             Compound rates and healthcare cost trends
           </h2>
@@ -2149,11 +2193,11 @@ export function ReportView({
         ) : null}
 
         {policy.enabled ? (
-        <section className="report-block">
+        <section className="report-block report-fold">
           <h2 className="mb-3 font-display text-xl text-navy">
             Sample policies (NAIC-style outlines)
           </h2>
-          <SamplePolicyPack policy={policy} state={state} countable={pool} defaultOpen />
+          <SamplePolicyPack policy={policy} state={state} countable={pool} />
         </section>
         ) : null}
 
@@ -2174,7 +2218,8 @@ export function ReportView({
         ) : null}
 
         {policy.enabled && details.tax ? (
-        <section className="report-block card px-4 py-3 text-sm text-muted">
+        <section className="report-block report-fold card px-4 py-3 text-sm text-muted">
+          <h2 className="mb-2 font-display text-xl text-navy">Federal long-term care tax treatment</h2>
           <FederalLtcDeductionPanel
             premium={
               policy.enabled && !isLinkedKind(policy.kind) ? policy.annualPremium : 0
@@ -2204,7 +2249,7 @@ export function ReportView({
 
         {policy.enabled && details.tax ? (
         <>
-        <section className="report-block">
+        <section className="report-block report-fold">
           <h2 className="mb-3 font-display text-xl text-navy">
             {TAX_SECTION_LABEL} (2026 planning)
           </h2>
@@ -2241,14 +2286,15 @@ export function ReportView({
             </table>
           </div>
         </section>
-        <section className="report-block">
+        <section className="report-block report-fold">
+          <h2 className="mb-3 font-display text-xl text-navy">Section 1035 exchanges</h2>
           <Irc1035Panel />
         </section>
         </>
         ) : null}
 
         {policy.enabled && details.fundingOptions ? (
-        <section className="report-block">
+        <section className="report-block report-fold">
           <h2 className="mb-3 font-display text-xl text-navy">
             Long-term care insurance and funding options
           </h2>
@@ -2282,7 +2328,7 @@ export function ReportView({
         ) : null}
 
         {details.nationalHistory ? (
-        <section className="report-block">
+        <section className="report-block report-fold">
           <h2 className="mb-2 font-display text-xl text-navy">
             National cost history — 5- and 10-year snapshots
           </h2>
@@ -2328,7 +2374,7 @@ export function ReportView({
         ) : null}
 
         {policy.enabled && details.insights ? (
-        <section className="report-block">
+        <section className="report-block report-fold">
           <h2 className="mb-2 font-display text-xl text-navy">Industry insights</h2>
           <IndustryInsightsPanel
             embedded
@@ -2344,7 +2390,7 @@ export function ReportView({
         ) : null}
 
         {details.compareHealth ? (
-        <section className="report-block">
+        <section className="report-block report-fold">
           <h2 className="mb-2 font-display text-xl text-navy">Compare health insurance types</h2>
           <p className="mb-3 text-sm text-muted">
             {HEALTH_INSURANCE_INTRO}{" "}
@@ -2415,14 +2461,14 @@ export function ReportView({
         ) : null}
 
         {policy.enabled && details.confidence ? (
-        <section className="report-block">
+        <section className="report-block report-fold">
           <h2 className="mb-3 font-display text-xl text-navy">Model confidence scores</h2>
           <ConfidencePanel confidence={confidence} />
         </section>
         ) : null}
 
         {policy.enabled && details.sensitivity ? (
-        <section className="report-block">
+        <section className="report-block report-fold">
           <h2 className="mb-3 font-display text-xl text-navy">Hypothesis sensitivity</h2>
           <p className="mb-3 text-sm text-muted">{sensitivity.insight}</p>
           <div className="report-chart mb-4 h-56 w-full">
@@ -2551,11 +2597,13 @@ export function ReportView({
 
         {insuranceLocked || details.dhContact || details.dhLicense || details.dhIar || details.dhCfp || audienceRole === "licensed-client" || audienceRole === "licensed-solo" ? (
         <section className="report-block">
-          <TitleCollapse title="Find a qualified professional" className="mt-0" defaultOpen={insuranceLocked}>
+          <TitleCollapse title="Find a qualified professional" className="mt-0" defaultOpen={false}>
             <AdvisorProfessionalFolds details={details} lockout={insuranceLocked} />
           </TitleCollapse>
         </section>
         ) : null}
+
+        </div>
 
         <p className="no-print border-t border-line pt-4 text-center text-xs text-muted">
           <CopyrightMark />{" "}
