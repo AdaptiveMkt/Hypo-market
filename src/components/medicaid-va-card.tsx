@@ -155,7 +155,7 @@ export function MedicaidVaBody({
       </Fold>
 
       <Step n="2" label="The eligibility tests" />
-      <Fold title={elig.title} defaultOpen>
+      <Fold title={elig.title}>
         <p className="mb-2">
           Educational planning notes for <StateName name={state} /> — not a determination of
           eligibility.
@@ -168,7 +168,7 @@ export function MedicaidVaBody({
       </Fold>
 
       <Step n="3" label="This state’s 2026 numbers and what is not counted" />
-      <Fold title={income.title}>
+      <Fold title={income.title} defaultOpen>
         <p className="mb-2"><LinkedCopy text={income.intro} /></p>
         <ul className="list-disc space-y-1 pl-4">
           {income.rows.map((r) => (
@@ -178,7 +178,7 @@ export function MedicaidVaBody({
           ))}
         </ul>
       </Fold>
-      <Fold title={`Exempt assets in ${state}`}>
+      <Fold title={`Exempt assets in ${state}`} defaultOpen>
         <p>
           Other assets often treated as exempt for Medicaid long-term care in{" "}
           <StateName name={state} /> (2026 planning figures). This model does not auto-exclude
@@ -212,7 +212,7 @@ export function MedicaidVaBody({
           threshold, and accounts not in payout.
         </p>
       </Fold>
-      <Fold title={ltc.impoverishment.title}>
+      <Fold title={ltc.impoverishment.title} defaultOpen>
         <p className="mb-2">{ltc.impoverishment.lead}</p>
         {ltc.impoverishment.bullets.map((b) => (
           <Fold key={b.heading} title={b.heading}>
