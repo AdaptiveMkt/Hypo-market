@@ -699,10 +699,14 @@ export function ReportView({
         </section>
 
         <section className="report-block">
-          <h2 className="mb-3 font-display text-xl text-navy">
-            1. Countable assets at risk — answers
-          </h2>
-          <table className="w-full text-sm">
+          <details>
+            <summary className="no-print inline-flex min-h-11 cursor-pointer list-none items-center justify-center rounded-lg bg-teal px-4 py-2.5 text-center text-sm font-semibold text-cream hover:brightness-110 [&::-webkit-details-marker]:hidden [&::marker]:content-none">
+              REVIEW INPUT
+            </summary>
+            <h2 className="mb-3 mt-4 font-display text-xl text-navy">
+              1. Countable assets at risk — answers
+            </h2>
+            <table className="w-full text-sm">
             <tbody>
               {ASSET_FIELDS.map((f) => (
                 <Qa
@@ -730,6 +734,7 @@ export function ReportView({
               <Qa q="Countable assets (this run)" a={money(pool)} />
             </tbody>
           </table>
+          </details>
         </section>
 
         {details.lifeFace ? (
@@ -772,10 +777,14 @@ export function ReportView({
         ) : null}
 
         <section className="report-block">
-          <h2 className="mb-3 font-display text-xl text-navy">
-            2. Care assumptions — answers
-          </h2>
-          <table className="w-full text-sm">
+          <details>
+            <summary className="no-print inline-flex min-h-11 cursor-pointer list-none items-center justify-center rounded-lg bg-teal px-4 py-2.5 text-center text-sm font-semibold text-cream hover:brightness-110 [&::-webkit-details-marker]:hidden [&::marker]:content-none">
+              REVIEW INPUT
+            </summary>
+            <h2 className="mb-3 mt-4 font-display text-xl text-navy">
+              2. Care assumptions — answers
+            </h2>
+            <table className="w-full text-sm">
             <tbody>
               <Qa q="State where care would be received" a={<StateName name={state} />} />
               <Qa
@@ -851,13 +860,18 @@ export function ReportView({
               />
             </tbody>
           </table>
+          </details>
         </section>
 
         <section className="report-block">
-          <h2 className="mb-3 font-display text-xl text-navy">
-            3. Insurance — answers
-          </h2>
-          <table className="w-full text-sm">
+          <details>
+            <summary className="no-print inline-flex min-h-11 cursor-pointer list-none items-center justify-center rounded-lg bg-teal px-4 py-2.5 text-center text-sm font-semibold text-cream hover:brightness-110 [&::-webkit-details-marker]:hidden [&::marker]:content-none">
+              REVIEW INPUT
+            </summary>
+            <h2 className="mb-3 mt-4 font-display text-xl text-navy">
+              3. Insurance — answers
+            </h2>
+            <table className="w-full text-sm">
             <tbody>
               <Qa q="Include insurance in the run" a={policy.enabled ? "Yes" : "No"} />
               <Qa
@@ -973,6 +987,7 @@ export function ReportView({
               ) : null}
             </tbody>
           </table>
+          </details>
         </section>
 
         {lifeFaceAmount > 0 || (assets.life ?? 0) > 0 || (policy.enabled && policy.kind === "hybridLife") ? (
