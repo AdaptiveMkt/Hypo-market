@@ -15,21 +15,21 @@ export function AudienceGate({ onSelect }: { onSelect: (role: AudienceRole) => v
   return (
     <section className="card-xl flex min-w-0 flex-col p-4 md:p-5" aria-label="Who is using this hypothetical">
       <div className="order-1 md:order-2 md:mt-4">
-        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-teal">Before you begin</p>
-        <h2 className="mt-1 font-display text-xl text-navy">Which of these describes you?</h2>
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-teal">Licensed insurance professionals</p>
+        <h2 className="mt-1 font-display text-xl text-navy">Start a client-ready hypothetical</h2>
         <p className="mt-2 text-sm text-muted">
-          Advisor information is required before a run. After that, enter client information or run incognito.
+          This page is for the agent, not a consumer self-assessment. Enter your advisor
+          information to continue. Then run incognito, or enter the client and use it in the meeting.
         </p>
         <div className="mt-4 grid gap-2">
           {OPTIONS.map((opt) => (
             <button
               key={opt.id}
               type="button"
-              className="rounded-lg border border-navy px-4 py-3 text-left text-sm font-semibold text-navy hover:bg-cream"
+              className="rounded-lg border border-navy bg-navy px-4 py-3 text-left text-sm font-semibold text-cream hover:bg-teal"
               onClick={() => onSelect(opt.id)}
             >
-              <span className="mr-2 text-teal">{opt.n}.</span>
-              {opt.title}
+              I am a licensed insurance professional
             </button>
           ))}
         </div>

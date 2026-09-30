@@ -139,7 +139,7 @@ export function WelcomeCard({ onReset }: { onReset?: () => void }) {
   return (
     <section className="card-xl min-w-0 p-4 md:p-5" aria-labelledby="welcome-heading">
       <div className="flex items-center justify-between gap-3">
-        <p className="text-xs uppercase tracking-[0.14em] text-teal">New visitor</p>
+        <p className="text-xs uppercase tracking-[0.14em] text-teal">For the licensed producer</p>
         {onReset ? (
           <button
             type="button"

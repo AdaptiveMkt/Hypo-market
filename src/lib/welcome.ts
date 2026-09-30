@@ -1,12 +1,12 @@
-/** Spoken and on-screen opening for new visitors. Keep under the TTS cap. */
+/** On-screen opening after a licensed producer starts a run. */
 
-export const WELCOME_HEADING = "Welcome — plan before care is urgent";
+export const WELCOME_HEADING = "Built for the meeting with your client";
 
 export const WELCOME_BODY = [
-  "If future long-term care costs worry you — and you want to see how today’s assets might hold up — this educational hypothetical is built for that conversation.",
-  "Enter countable assets, the state and setting where care might be received, when it might start, and how long it might last. Optionally include a long-term care insurance design. The model then shows how the pool is used against those costs, how long funds last, when a shortfall begins, and how insurance paying first can change the picture. View or download a report with your numbers, charts, and educational notes.",
-  "Run it incognito with no name, or add contact details. Nothing is retained on this site. A copy is shared only with you and, if you choose, an insurance professional or other representative you name. Disclaimer and privacy terms are in the footer.",
-  "You can type or use voice. The Ask the model assistant can answer related questions from this hypothetical’s sources. This is not a quote or advice. Contact a licensed professional for your situation.",
+  "This hypothetical is for a licensed insurance professional whose clients are concerned about future long-term care costs.",
+  "Your name, firm, email, and phone are required. Then run it incognito, with no client name, or enter the client and walk the numbers together.",
+  "The report shows how countable assets are used, when a shortfall can start, and how insurance paying first can change that picture.",
+  "It is an educational hypothetical, not a quote, illustration, or advice. Carrier quotes and illustrations still come from you.",
 ].join(" ");
 
-export const WELCOME_SPOKEN = `Welcome to Long Term Care Asset Utilization Modeling. ${WELCOME_BODY}`;
+export const WELCOME_SPOKEN = `Welcome. ${WELCOME_BODY}`;

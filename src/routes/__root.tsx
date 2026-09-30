@@ -47,7 +47,7 @@ export const Route = createRootRoute({
       {
         name: "description",
         content:
-          "Long-term care asset utilization model: compare care settings and insurance against a pool of assets.",
+          "A client-ready long-term care hypothetical for licensed insurance professionals. Run it incognito, or with the client.",
       },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "Preserve Your Assets" },
@@ -55,7 +55,7 @@ export const Route = createRootRoute({
       {
         property: "og:description",
         content:
-          "How quickly could long-term care consume the assets you’ve accumulated, and how could insurance change that?",
+          "Show a client how quickly long-term care could use the assets they have accumulated, and what changes if insurance pays first.",
       },
       { property: "og:url", content: "https://www.preserve-your-assets.com/" },
       { property: "og:image", content: "https://www.preserve-your-assets.com/cover/share.jpg" },
@@ -72,7 +72,7 @@ export const Route = createRootRoute({
       {
         name: "twitter:description",
         content:
-          "How quickly could long-term care consume the assets you’ve accumulated, and how could insurance change that?",
+          "Show a client how quickly long-term care could use the assets they have accumulated, and what changes if insurance pays first.",
       },
       { name: "twitter:image", content: "https://www.preserve-your-assets.com/cover/share.jpg" },
       {
@@ -126,14 +126,14 @@ function Root() {
             <header id="page-header" className="bg-masthead text-masthead-fg">
               <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
                 <p className="mb-1 text-xs tracking-[0.14em] text-gold">
-                  Long Term Care Hypothetical -Client | Family | Web Based Self Assessment
+                  For licensed insurance professionals
                 </p>
                 <h1 className="font-display text-2xl font-medium leading-tight sm:text-3xl lg:text-4xl">
                   Long Term Care Asset Utilization Modeling
                 </h1>
                 <p className="mt-2 max-w-2xl text-sm text-masthead-fg/85 sm:text-base">
-                  How quickly could long-term care consume the assets you’ve accumulated, and
-                  how could insurance change that?
+                  Show a client how quickly long-term care could use the assets they have
+                  accumulated, and what changes if insurance pays first.
                 </p>
                 <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-3">
                 <nav className="flex flex-wrap gap-4 text-sm" aria-label="Site">

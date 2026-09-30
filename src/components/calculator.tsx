@@ -1684,11 +1684,11 @@ export function Calculator() {
           />
         ) : (
           <section className="card-xl min-w-0 p-4 md:p-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-teal">Before the welcome</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-teal">Producer access</p>
             <h2 className="mt-1 font-display text-xl text-navy">Advisor information is required</h2>
             <p className="mt-2 text-sm text-muted">
-              A licensed insurance professional must enter advisor details before the fact finder starts.
-              You can then enter client information or run incognito.
+              Enter your name, firm, email, and phone. This identifies the licensed professional
+              on the run. Client information comes later, and it is optional if you run incognito.
             </p>
             <div className="mt-3">
               <AudienceBanner role={audience} />

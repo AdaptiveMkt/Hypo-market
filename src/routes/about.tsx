@@ -13,8 +13,8 @@ function About() {
           The question
         </h2>
         <p className="text-pretty text-lg text-navy">
-          How quickly could long-term care consume the assets you’ve accumulated, and how
-          could insurance change that?
+          Show a client how quickly long-term care could use the assets they have
+          accumulated, and what changes if insurance pays first.
         </p>
       </section>
       <section className="card-xl p-5">
