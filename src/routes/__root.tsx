@@ -58,11 +58,11 @@ export const Route = createRootRoute({
           "How quickly could long-term care consume the assets you’ve accumulated, and how could insurance change that?",
       },
       { property: "og:url", content: "https://www.preserve-your-assets.com/" },
-      { property: "og:image", content: "https://www.preserve-your-assets.com/cover/photo.jpg" },
-      { property: "og:image:secure_url", content: "https://www.preserve-your-assets.com/cover/photo.jpg" },
+      { property: "og:image", content: "https://www.preserve-your-assets.com/cover/share.jpg" },
+      { property: "og:image:secure_url", content: "https://www.preserve-your-assets.com/cover/share.jpg" },
       { property: "og:image:type", content: "image/jpeg" },
-      { property: "og:image:width", content: "1792" },
-      { property: "og:image:height", content: "1008" },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
       {
         property: "og:image:alt",
         content: "A couple sitting on a sofa reviewing a long-term care plan",
@@ -74,7 +74,7 @@ export const Route = createRootRoute({
         content:
           "How quickly could long-term care consume the assets you’ve accumulated, and how could insurance change that?",
       },
-      { name: "twitter:image", content: "https://www.preserve-your-assets.com/cover/photo.jpg" },
+      { name: "twitter:image", content: "https://www.preserve-your-assets.com/cover/share.jpg" },
       {
         name: "twitter:image:alt",
         content: "A couple sitting on a sofa reviewing a long-term care plan",
@@ -82,7 +82,7 @@ export const Route = createRootRoute({
     ],
     links: [
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
-      { rel: "image_src", href: "https://www.preserve-your-assets.com/cover/photo.jpg" },
+      { rel: "image_src", href: "https://www.preserve-your-assets.com/cover/share.jpg" },
       { rel: "stylesheet", href: appCss },
       { rel: "manifest", href: "/__grok/manifest.webmanifest" },
       { rel: "apple-touch-icon", href: "/__grok/icon-180.png" },
