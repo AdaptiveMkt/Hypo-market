@@ -618,9 +618,6 @@ export function ReportView({
                   </p>
                   {client.phone ? <p>{client.phone}</p> : null}
                   {client.email ? <p>{client.email}</p> : null}
-                  {veteran ? (
-                    <p className="mt-1 text-sm text-navy">Wartime veteran or surviving spouse</p>
-                  ) : null}
                 </div>
               ) : null}
               {(audienceRole === "licensed-client" || (policy.enabled && (partyFilled(advisor) || advisor.firm || advisor.designation))) ? (
@@ -792,25 +789,6 @@ export function ReportView({
             <table className="w-full text-sm">
             <tbody>
               <Qa q="State where care would be received" a={<StateName name={state} />} />
-              <Qa
-                q="Wartime veteran or surviving spouse"
-                a={veteran ? "Yes — VA pension limits illustrated" : "No"}
-              />
-              <Qa
-                q={
-                  <>
-                    Medicaid asset-protection strategies
-                    <a href="#medicaid-information" className="source-link ml-1 align-super text-xs font-semibold">
-                      *
-                    </a>
-                  </>
-                }
-                a={
-                  details.edu
-                    ? "Yes — illustrated in the Educational card"
-                    : "Select Medicaid, QIT, MAPT, SSI, CPI"
-                }
-              />
               <Qa
                 q="Full details report"
                 a={
