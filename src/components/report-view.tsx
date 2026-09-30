@@ -535,7 +535,7 @@ export function ReportView({
               {sharePending ? <p className="mt-1">Creating a link for this report…</p> : null}
               {shareUrl ? (
                 <p className="mt-1 break-all">
-                  <a href={shareUrl} className="font-semibold underline" target="_blank" rel="noopener noreferrer">
+                  <a href={shareUrl} className="font-semibold text-teal underline underline-offset-2" target="_blank" rel="noopener noreferrer">
                     {shareUrl}
                   </a>
                 </p>
