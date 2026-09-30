@@ -337,7 +337,7 @@ export function FactFinder({
       <div className="mt-4 rounded-lg border border-line bg-paper p-4">
         {step.kind === "mode" ? (
           <>
-            <p className="text-base font-semibold text-navy">Do you want to personalize the Asset Preservation Modeling or do you want to run Incognito?</p>
+            <p className="text-base font-semibold text-teal">Do you want to personalize the Asset Preservation Modeling or do you want to run Incognito?</p>
             <div className="mt-4 grid gap-2 sm:grid-cols-2">
               <button type="button" className="btn-block rounded-lg border border-navy bg-navy px-3 py-2.5 text-sm font-semibold text-cream" onClick={() => { onPersonalized(true); next(); }}>
                 Personalize
@@ -351,7 +351,7 @@ export function FactFinder({
 
         {step.kind === "contact" ? (
           <>
-            <p className="mb-3 text-base font-semibold text-navy">Who is this asset model for? You can leave any line blank.</p>
+            <p className="mb-3 text-base font-semibold text-teal">Who is this asset model for? You can leave any line blank.</p>
             {contact}
             <Nav back={back} next={next} />
           </>
@@ -359,7 +359,7 @@ export function FactFinder({
 
         {step.kind === "asset" ? (
           <>
-            <p className="text-base font-semibold text-navy">What is today’s value of your {step.label}?</p>
+            <p className="text-base font-semibold text-teal">What is today’s value of your {step.label}?</p>
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
               <div>
                 <label className={labelClass} htmlFor={`ff-${step.key}`}>{step.key === "life" ? "Cash Value Today" : "Value"}</label>
@@ -400,7 +400,7 @@ export function FactFinder({
 
         {step.kind === "tax" ? (
           <>
-            <p className="text-base font-semibold text-navy">What tax rate should apply to taxable return on investment?</p>
+            <p className="text-base font-semibold text-teal">What tax rate should apply to taxable return on investment?</p>
             <div className="mt-3">
               <FieldPicker
                 id="ff-tax"
@@ -419,7 +419,7 @@ export function FactFinder({
 
         {step.kind === "home" ? (
           <>
-            <p className="text-base font-semibold text-navy">What is the estimated market value of your primary residence?</p>
+            <p className="text-base font-semibold text-teal">What is the estimated market value of your primary residence?</p>
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
               <div>
                 <label className={labelClass} htmlFor="ff-home">Market value</label>
@@ -436,7 +436,7 @@ export function FactFinder({
 
         {step.kind === "exclude" ? (
           <>
-            <p className="text-base font-semibold text-navy">Do you wish to exclude your primary residence from countable assets?</p>
+            <p className="text-base font-semibold text-teal">Do you wish to exclude your primary residence from countable assets?</p>
             <div className="mt-4 grid gap-2 sm:grid-cols-2">
               <button type="button" className={`btn-block rounded-lg px-3 py-2.5 text-sm font-semibold ${excludeHome ? "bg-teal text-cream" : "border border-navy text-navy"}`} onClick={() => { onExcludeHome(true); next(); }}>
                 Yes, exclude it
@@ -451,7 +451,7 @@ export function FactFinder({
 
         {step.kind === "excludable" ? (
           <>
-            <p className="text-base font-semibold text-navy">Excludable assets are defaulted for the care state.</p>
+            <p className="text-base font-semibold text-teal">Excludable assets are defaulted for the care state.</p>
             <p className="mt-2 text-sm text-muted">
               Spouse-excluded assets start at the community-spouse amount for {state || "the care state"}. You can change the amount. Source:{" "}
               <a className="source-link" href="https://www.medicaid.gov/medicaid/eligibility/spousal-impoverishment" target="_blank" rel="noopener noreferrer">
@@ -469,7 +469,7 @@ export function FactFinder({
 
         {step.kind === "calculate" ? (
           <>
-            <p className="text-base font-semibold text-navy">Section 1 is ready to calculate.</p>
+            <p className="text-base font-semibold text-teal">Section 1 is ready to calculate.</p>
             <p className="mt-2 text-sm text-muted">Calculate countable assets from the values you entered.</p>
             <div className="mt-4">
               <label className={labelClass} htmlFor="ff-agi">Adjusted gross household income today</label>
@@ -513,7 +513,7 @@ export function FactFinder({
 
         {step.kind === "age" ? (
           <>
-            <p className="text-base font-semibold text-navy">What is your age today?</p>
+            <p className="text-base font-semibold text-teal">What is your age today?</p>
             <div className="mt-3">
               <StepperField id="ff-age" value={ageToday} onChange={onAge} step={1} min={minAge} max={110} />
             </div>
@@ -523,7 +523,7 @@ export function FactFinder({
 
         {step.kind === "state" ? (
           <>
-            <p className="text-base font-semibold text-navy">In what state would care be received?</p>
+            <p className="text-base font-semibold text-teal">In what state would care be received?</p>
             <div className="mt-3">
               <FieldPicker id="ff-state" value={state} options={STATE_NAMES.map((s) => ({ value: s, label: s }))} onChange={onState} />
             </div>
@@ -533,7 +533,7 @@ export function FactFinder({
 
         {step.kind === "city" ? (
           <>
-            <p className="text-base font-semibold text-navy">What city would care be received in?</p>
+            <p className="text-base font-semibold text-teal">What city would care be received in?</p>
             <p className="mt-1 text-xs leading-snug text-muted">
               The five largest cities in {state || "this state"}. The largest is selected first. A choice uses that city’s median from the{" "}
               <Cite href={SRC.ltcNews}>LTC News Cost of Care Calculator</Cite>.
@@ -558,7 +558,7 @@ export function FactFinder({
 
         {step.kind === "issue" ? (
           <>
-            <p className="text-base font-semibold text-navy">If insurance is to be considered, what state would the insurance become effective?</p>
+            <p className="text-base font-semibold text-teal">If insurance is to be considered, what state would the insurance become effective?</p>
             <p className="mt-1 text-xs text-muted">
               (* See{" "}
               <a className="source-link" href={SRC.ltcPartnership} target="_blank" rel="noopener noreferrer">
@@ -588,7 +588,7 @@ export function FactFinder({
 
         {step.kind === "setting" ? (
           <>
-            <p className="text-base font-semibold text-navy">Where do you think care would be received?</p>
+            <p className="text-base font-semibold text-teal">Where do you think care would be received?</p>
             <div className="mt-3">
               <FieldPicker
                 id="ff-setting"
@@ -611,7 +611,7 @@ export function FactFinder({
 
         {step.kind === "years" ? (
           <>
-            <p className="text-base font-semibold text-navy">How many years might care last?</p>
+            <p className="text-base font-semibold text-teal">How many years might care last?</p>
             <div className="mt-3">
               <FieldPicker
                 id="ff-years"
@@ -627,7 +627,7 @@ export function FactFinder({
 
         {step.kind === "cpi" ? (
           <>
-            <p className="text-base font-semibold text-navy">What care-cost inflation rate should this model use?</p>
+            <p className="text-base font-semibold text-teal">What care-cost inflation rate should this model use?</p>
             <div className="mt-3">
               <StepperField id="ff-cpi" value={Number(cpi.toFixed(1))} onChange={(v) => onCpi(Number(v))} step={0.1} min={0} max={12} decimals={1} />
             </div>
@@ -642,7 +642,7 @@ export function FactFinder({
 
         {step.kind === "claim" ? (
           <>
-            <p className="text-base font-semibold text-navy">At what age might care be needed?</p>
+            <p className="text-base font-semibold text-teal">At what age might care be needed?</p>
             <div className="mt-3">
               <StepperField id="ff-claim" value={claimAge} onChange={(v) => onClaimAge(Number(v) || claimAge)} step={1} min={ageToday + 1} max={120} />
             </div>
@@ -657,7 +657,7 @@ export function FactFinder({
 
         {step.kind === "cover" ? (
           <>
-            <p className="text-base font-semibold text-navy">Which long-term care insurance designs should this run include?</p>
+            <p className="text-base font-semibold text-teal">Which long-term care insurance designs should this run include?</p>
             <p className="mt-1 text-sm text-muted">Select one or more. You can change the benefits for each design you select. Leave all off to run without insurance.</p>
             <div className="mt-3 grid gap-2">
               {(
@@ -708,7 +708,7 @@ export function FactFinder({
 
         {step.kind === "confirm2" ? (
           <>
-            <p className="text-base font-semibold text-navy">Confirm where and when you think care might be needed.</p>
+            <p className="text-base font-semibold text-teal">Confirm where and when you think care might be needed.</p>
             <p className="mt-2 text-sm text-muted">Age {ageToday}, care in {state || "a state still to select"}, {setting ? SETTING_LABELS[setting as CareSetting] : "care setting still to select"}, {duration || "—"} years.</p>
             <button
               type="button"
@@ -725,7 +725,7 @@ export function FactFinder({
 
         {step.kind === "section3" ? (
           <>
-            <p className="text-base font-semibold text-navy">Confirm the insurance benefit used in this hypothetical.</p>
+            <p className="text-base font-semibold text-teal">Confirm the insurance benefit used in this hypothetical.</p>
             <p className="mt-2 text-sm text-muted">These start from the age-based planning default. Change any field, then confirm.</p>
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
               <div>
@@ -766,7 +766,7 @@ export function FactFinder({
 
         {step.kind === "run" ? (
           <>
-            <p className="text-base font-semibold text-navy">
+            <p className="text-base font-semibold text-teal">
               {insuranceLocked ? "Countable assets are under this model’s insurance screen. You can still run the hypothetical." : "Which hypothetical should run?"}
             </p>
             <div className="mt-4 grid gap-2 sm:grid-cols-2">
@@ -841,7 +841,7 @@ function BenefitEditor({
       : `${policy.benefitInflationPct}-${policy.inflationMethod}`;
   return (
     <>
-      <p className="text-base font-semibold text-navy">Adjust the benefits for each design you selected.</p>
+      <p className="text-base font-semibold text-teal">Adjust the benefits for each design you selected.</p>
       <div className="mt-3 flex gap-1 overflow-x-auto" role="tablist">
         {kinds.map((k) => (
           <button
