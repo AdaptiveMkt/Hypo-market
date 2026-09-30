@@ -5,20 +5,17 @@ import { WELCOME_BODY, WELCOME_HEADING } from "@/lib/welcome";
 
 const CAPTIONS: { start: number; end: number; text: string }[] = [
   { start: 0, end: 1.9, text: "Hello there." },
-  { start: 2, end: 9, text: "Let me ask, are you a financial services professional or licensed insurance agent that has clients concerned about the future costs of long-term care" },
-  { start: 9, end: 11.8, text: "and where their care might be needed?" },
-  { start: 12, end: 19, text: "Maybe you're just someone concerned whether or not your assets will last in the event of a chronic health challenge, and more importantly, what will be the consequences" },
-  { start: 19, end: 23, text: "to your family if and when long-term care is required in the future." },
-  { start: 23, end: 28.5, text: "If you are either one and you don't know where to start, consider taking this short online assessment." },
-  { start: 29, end: 35.5, text: "The assessment can be customized, or it can be run incognito without disclosing any personal contact or financial information." },
-  { start: 36, end: 43.5, text: "In fact, once the assessment is completed, you can view it privately and then download it to your personal computer or digital device." },
-  { start: 44, end: 48.5, text: "No personal or financial information is retained on any servers or this platform." },
-  { start: 49, end: 53.2, text: "So go on and see for yourself how this tool could be helpful in long-term care planning." },
-  { start: 53.2, end: 54.8, text: "You'll be glad you did." },
-  { start: 55, end: 57, text: "Oh, one more thing before I leave." },
-  { start: 57, end: 63, text: "If you are in the insurance or financial services industry and want to license and brand this tool, give us a call." },
-  { start: 63, end: 66.5, text: "Our information is provided and viewable within the terms of use." },
-  { start: 67, end: 69.7, text: "Thank you." },
+  { start: 2, end: 9, text: "If your clients are worried about what long-term care could do to the assets they have accumulated, this hypothetical is how you show them." },
+  { start: 10, end: 12.5, text: "It was built for licensed insurance professionals." },
+  { start: 13, end: 20, text: "Run it with the client's name, or run it incognito, with no client name and no client financial information stored on this site." },
+  { start: 20, end: 23, text: "Your own advisor information is required either way." },
+  { start: 23, end: 29.5, text: "You will see how quickly long-term care can use those assets, and what changes if insurance pays first." },
+  { start: 30, end: 38.5, text: "Traditional long-term care, asset-based design, annuity care, and a hybrid life and long-term care are all ready to test." },
+  { start: 39, end: 42.5, text: "This is not a quote. The carrier illustration still comes from you." },
+  { start: 43, end: 47, text: "Run it once, incognito, before your next long-term care appointment." },
+  { start: 47, end: 58.5, text: "If you want this platform branded with your name and your agency, call or text 321-795-7516 and ask about pricing and customization." },
+  { start: 59, end: 67, text: "Or email info@preserve-your-assets.com. You'll be glad you did." },
+  { start: 68, end: 70.1, text: "Thank you." },
 ];
 
 export function WelcomeVideo({ onStart }: { onStart?: () => void }) {
@@ -111,7 +108,7 @@ export function WelcomeVideo({ onStart }: { onStart?: () => void }) {
           autoPlay
           playsInline
           preload="auto"
-          poster="/welcome/asset-preservation-poster.jpg"
+          poster="/welcome/asset-preservation-poster.jpg?v=4"
           onTimeUpdate={syncCaption}
           onSeeked={syncCaption}
           onPlay={() => setEnded(false)}
@@ -120,7 +117,7 @@ export function WelcomeVideo({ onStart }: { onStart?: () => void }) {
             setEnded(true);
           }}
         >
-          <source src="/welcome/asset-preservation.mp4?v=3" type="video/mp4" />
+          <source src="/welcome/asset-preservation.mp4?v=4" type="video/mp4" />
           <track
             kind="captions"
             srcLang="en"
