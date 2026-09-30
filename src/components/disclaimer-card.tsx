@@ -258,7 +258,9 @@ export function DisclaimerCard({
         {...pdf("Assumptions and cost data")}
       >
         <p className="text-sm text-muted">
-          Figures change with the assumptions you enter (care setting, timing, CPI,
+          This hypothetical is based on assumed data, industry information, and the input
+          provided at the time of the proposal or report. Scenarios could change over time.
+          Figures also change with the assumptions you enter (care setting, timing, CPI,
           returns, tax rate, and any benefits). State care costs are rounded planning medians.
           Confirm the location on the <Cite href={SRC.ltcNews}>LTC News Cost of Care Calculator</Cite>.
           A local provider’s price may differ.
