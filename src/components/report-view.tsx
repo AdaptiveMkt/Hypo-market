@@ -64,7 +64,7 @@ import { LTC_COMPARE_FEATURES, LTC_INSURANCE_OPTIONS } from "@/lib/ltc-compare";
 import { HEALTH_INSURANCE_INTRO, HEALTH_INSURANCE_TYPES } from "@/lib/health-insurance-types";
 import { LTC_RIDER_EXAMPLES, LTC_RIDER_GLANCE, LTC_RIDER_HYBRID_NOTE, LTC_RIDER_INTRO, LTC_RIDERS } from "@/lib/ltc-riders";
 import { MedicaidVaBody } from "@/components/medicaid-va-card";
-import { AdvisorProfessionalFolds, DisclaimerCard } from "@/components/disclaimer-card";
+import { AdvisorProfessionalFolds, DesignationNoticeFold, DisclaimerCard } from "@/components/disclaimer-card";
 import { TitleCollapse } from "@/components/accordion";
 import { NaicLastPages } from "@/components/naic-last-pages";
 import { Cite, CopyrightMark, HomeHealthCostNote, LinkedCopy } from "@/components/source-links";
@@ -2094,19 +2094,6 @@ export function ReportView({
         </details>
         ) : null}
 
-        <section id="medicaid-information" className="report-block scroll-mt-28" data-medicaid-fold data-medicaid-open={medicaidOpen ? "1" : "0"}>
-          <TitleCollapse title="Medicaid Information" className="mt-0" defaultOpen={false} openOnHash="medicaid-information">
-            <MedicaidVaBody
-              state={state}
-              policy={policy}
-              medicaid={medicaid}
-              veteran={veteran}
-              preservation={preservation}
-              issueState={reciprocity.issueState}
-            />
-          </TitleCollapse>
-        </section>
-
         {policy.enabled && details.trends ? (
         <>
         <details className="pdf-stay-closed report-block report-fold"><summary className="flex min-h-11 cursor-pointer list-none items-start gap-2 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal [&::-webkit-details-marker]:hidden [&::marker]:content-none"><span aria-hidden="true" className="naic-chevron mt-1 inline-block text-gold-ink motion-reduce:transition-none">▸</span><h2 className="mb-2 font-display text-xl text-navy">
@@ -2569,7 +2556,34 @@ export function ReportView({
         </>
         ) : null}
 
-        {policy.enabled ? <NaicLastPages /> : (
+        {policy.enabled ? <NaicLastPages afterDesignation={
+          <section id="medicaid-information" className="report-block scroll-mt-28" data-medicaid-fold data-medicaid-open={medicaidOpen ? "1" : "0"}>
+            <TitleCollapse title="Medicaid Information" className="mt-3" defaultOpen={false} openOnHash="medicaid-information">
+              <MedicaidVaBody
+                state={state}
+                policy={policy}
+                medicaid={medicaid}
+                veteran={veteran}
+                preservation={preservation}
+                issueState={reciprocity.issueState}
+              />
+            </TitleCollapse>
+          </section>
+        } /> : (
+        <>
+        <DesignationNoticeFold className="report-block mt-0" />
+        <section id="medicaid-information" className="report-block scroll-mt-28" data-medicaid-fold data-medicaid-open={medicaidOpen ? "1" : "0"}>
+          <TitleCollapse title="Medicaid Information" className="mt-0" defaultOpen={false} openOnHash="medicaid-information">
+            <MedicaidVaBody
+              state={state}
+              policy={policy}
+              medicaid={medicaid}
+              veteran={veteran}
+              preservation={preservation}
+              issueState={reciprocity.issueState}
+            />
+          </TitleCollapse>
+        </section>
         <section id="disclosure-terms-report" className="report-block card-xl border-2 px-4 py-2 text-sm text-muted scroll-mt-8">
           <details className="pdf-stay-closed">
             <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal [&::-webkit-details-marker]:hidden [&::marker]:content-none">
@@ -2579,6 +2593,7 @@ export function ReportView({
             <DisclaimerCard className="mt-2" />
           </details>
         </section>
+        </>
         )}
         {insuranceLocked || details.dhContact || details.dhLicense || details.dhIar || details.dhCfp || audienceRole === "licensed-client" || audienceRole === "licensed-solo" ? (
         <section className="report-block">

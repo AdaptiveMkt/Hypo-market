@@ -27,32 +27,20 @@ export const ADVISOR_MOVED_HEADINGS = new Set([
 ]);
 
 export function DesignationNoticeFold({
-  details,
-  onPdfChange,
   className = "mt-3",
 }: {
   details?: DetailFlags;
   onPdfChange?: (id: DetailId, on: boolean) => void;
   className?: string;
 }) {
-  const id = DISCLAIMER_HEADING_ID["Designation non-endorsement notice"];
-  const pdf =
-    id && onPdfChange
-      ? {
-          pdfChecked: details ? Boolean(details[id]) : true,
-          onPdfChange: (v: boolean) => onPdfChange(id, v),
-        }
-      : {};
   return (
-    <TitleCollapse
-      title="Designation non-endorsement notice"
-      className={className}
-      defaultOpen={false}
-      pdfLocked
-      {...pdf}
-    >
-      <AllDesignationNotice className="mt-0" />
-    </TitleCollapse>
+    <details className={`pdf-stay-closed ${className}`}>
+      <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal [&::-webkit-details-marker]:hidden [&::marker]:content-none">
+        <span aria-hidden="true" className="naic-chevron inline-block text-gold-ink motion-reduce:transition-none">▸</span>
+        <span className="font-display text-base leading-snug text-navy">Designation non-endorsement notice</span>
+      </summary>
+      <AllDesignationNotice className="mt-2" />
+    </details>
   );
 }
 

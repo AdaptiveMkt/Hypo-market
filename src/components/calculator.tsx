@@ -3349,24 +3349,6 @@ export function Calculator() {
             </>
           ) : null}
 
-          {ran ? (
-            <MedicaidVaCard
-              key={`medicaid-${hypoRunId}-${countableExHome < NAIC_LOCKOUT_ASSETS ? "open" : "shut"}`}
-              state={state}
-              policy={policy}
-              medicaid={medicaid}
-              veteran={veteran}
-              onVeteranChange={setVeteran}
-              preservation={pImpact}
-              issueState={effectiveIssue || state}
-              preferTap={preferTap}
-              defaultOpen={countableExHome < NAIC_LOCKOUT_ASSETS}
-              pdfChecked={details.medicaidLtc}
-              onPdfChange={(v) => setDetail("medicaidLtc", v)}
-              pdfLocked
-            />
-          ) : null}
-
           {insuranceLocked ? (
             <div id="find-a-professional" className="mt-5 scroll-mt-8 card-xl px-4 py-2">
               <TitleCollapse title="Find a qualified professional" className="mt-0" defaultOpen openOnHash="find-a-professional" hint="Medicaid, elder-care, and estate-planning contacts — not a referral.">
@@ -3412,6 +3394,22 @@ export function Calculator() {
       ) : null}
 
       <DesignationNoticeFold className="mt-5" details={details} onPdfChange={setDetail} />
+      {ran ? (
+        <MedicaidVaCard
+          state={state}
+          policy={policy}
+          medicaid={medicaid}
+          veteran={veteran}
+          onVeteranChange={setVeteran}
+          preservation={pImpact}
+          issueState={effectiveIssue || state}
+          preferTap={preferTap}
+          defaultOpen={false}
+          pdfChecked={details.medicaidLtc}
+          onPdfChange={(v) => setDetail("medicaidLtc", v)}
+          pdfLocked
+        />
+      ) : null}
       <div id="disclosure-terms" className="mt-3 scroll-mt-8 card-xl border-2 px-4 py-2 text-sm text-muted">
         <TitleCollapse title={DISCLOSURE_CARD_TITLE} className="mt-0" openOnHash="disclosure-terms" pdfChecked={details.eduHypo} onPdfChange={(v) => setDetail("eduHypo", v)}>
           <DisclaimerCard className="mt-2" details={details} onPdfChange={setDetail} />
