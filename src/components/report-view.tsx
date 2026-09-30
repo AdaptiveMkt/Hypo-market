@@ -205,6 +205,7 @@ export function ReportView({
   policy,
   inflationCompare,
   insuranceCompare,
+  yearLanes = [],
   structureCompare = [],
   runKinds,
   onToggleStructure,
@@ -275,6 +276,7 @@ export function ReportView({
   policy: LtcPolicy;
   inflationCompare: InflationRow[];
   insuranceCompare: InsuranceCompareRow[];
+  yearLanes?: { key: string; label: string; proj: Projection; enabled: boolean; lifetime: boolean }[];
   structureCompare?: {
     key: PolicyKind;
     label: string;
@@ -327,8 +329,9 @@ export function ReportView({
     depletedYear != null ? result.rows.filter((r) => r.year > depletedYear).length : 0;
   const depletedWhen = depletionCalendar(result.rows, depletedYear, MODEL_START_YEAR);
   const lifetime = isLifetimeBenefit(policy.benefitYears);
-  const yearSets =
-    policy.enabled && insuranceCompare.length > 0
+  const yearSets = yearLanes.length
+    ? yearLanes
+    : policy.enabled && insuranceCompare.length > 0
       ? insuranceCompare.map((r) => ({
           key: r.key,
           label: r.label,

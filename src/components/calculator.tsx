@@ -897,6 +897,21 @@ export function Calculator() {
     });
   }, [policy, kindBook, runKinds, pool, state, setting, delay, duration, cpi, roi, taxRate, iraBal, iraRoi, holdings, partnershipOn, preferTap, selfFunded.endPool, cityCosts]);
 
+  const yearLanes = useMemo(() => {
+    if (!policy.enabled) return [];
+    return STRUCTURE_OPTIONS.map((o) => {
+      const p = policyForKind(o.key);
+      const proj = project({ ...baseArgs, policy: p });
+      return {
+        key: o.key,
+        label: o.label,
+        proj,
+        enabled: true,
+        lifetime: Boolean(proj.lifetimeBenefit),
+      };
+    });
+  }, [policy, kindBook, pool, state, setting, delay, duration, cpi, roi, taxRate, iraBal, iraRoi, holdings, cityCosts]);
+
   const structureCompare = insuranceCompare.map((r) => ({
     key: r.key as PolicyKind,
     label: r.label,
@@ -1584,6 +1599,7 @@ export function Calculator() {
     policy,
     inflationCompare,
     insuranceCompare,
+    yearLanes,
     structureCompare,
     runKinds,
     onToggleStructure: (kind: PolicyKind, on: boolean) => {
