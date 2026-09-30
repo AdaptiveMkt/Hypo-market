@@ -132,7 +132,7 @@ export function WelcomeVideo({ onStart }: { onStart?: () => void }) {
               {onStart ? (
                 <button
                   type="button"
-                  className="rounded-lg bg-gold px-3 py-2 text-sm font-semibold text-navy"
+                  className="rounded-lg border border-navy bg-navy px-4 py-2.5 text-sm font-semibold text-cream hover:bg-teal"
                   onClick={onStart}
                 >
                   Start the hypothetical
@@ -161,7 +161,7 @@ export function WelcomeVideo({ onStart }: { onStart?: () => void }) {
         {onStart ? (
           <button
             type="button"
-            className="rounded-lg bg-navy px-4 py-2.5 text-sm font-semibold text-cream hover:bg-teal"
+            className="rounded-lg border border-navy bg-navy px-4 py-2.5 text-sm font-semibold text-cream hover:bg-teal"
             onClick={onStart}
           >
             Start the hypothetical

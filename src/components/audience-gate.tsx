@@ -3,14 +3,6 @@
 import type { AudienceRole } from "@/lib/qa-cookie";
 import { WelcomeVideo } from "@/components/welcome-card";
 
-const OPTIONS: { id: AudienceRole; n: string; title: string }[] = [
-  {
-    id: "licensed-client",
-    n: "2",
-    title: "Licensed insurance professional with client input",
-  },
-];
-
 export function AudienceGate({ onSelect }: { onSelect: (role: AudienceRole) => void }) {
   return (
     <section className="card-xl flex min-w-0 flex-col p-4 md:p-5" aria-label="Who is using this hypothetical">
@@ -21,18 +13,6 @@ export function AudienceGate({ onSelect }: { onSelect: (role: AudienceRole) => v
           This page is for the agent, not a consumer self-assessment. Enter your advisor
           information to continue. Then run incognito, or enter the client and use it in the meeting.
         </p>
-        <div className="mt-4 grid gap-2">
-          {OPTIONS.map((opt) => (
-            <button
-              key={opt.id}
-              type="button"
-              className="rounded-lg border border-navy bg-navy px-4 py-3 text-left text-sm font-semibold text-cream hover:bg-teal"
-              onClick={() => onSelect(opt.id)}
-            >
-              I am a licensed insurance professional
-            </button>
-          ))}
-        </div>
       </div>
       <div className="order-2 md:order-1">
         <WelcomeVideo onStart={() => onSelect("licensed-client")} />
