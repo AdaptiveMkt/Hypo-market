@@ -224,7 +224,6 @@ export function ReportView({
   veteran = false,
   onVeteranChange,
   protectOn = false,
-  medicaidOpen = false,
   readyCards = [],
   details = ALL_DETAILS_ON,
   allowPdf = true,
@@ -318,6 +317,7 @@ export function ReportView({
   onNeedAdvisor?: () => void;
 }) {
   const [closeAsk, setCloseAsk] = useState(false);
+  const [medicaidSelected, setMedicaidSelected] = useState(false);
   const closeAskRef = useRef(false);
   closeAskRef.current = closeAsk;
   const advisorGaps = missingAdvisorFields(advisor);
@@ -455,7 +455,7 @@ export function ReportView({
       ) : null}
       <article
         id="aum-report"
-        data-medicaid-open={medicaidOpen ? "1" : "0"}
+        data-medicaid-open={medicaidSelected ? "1" : "0"}
         data-pdf-watermark={audienceRole === "interested" ? "1" : "0"}
         data-pdf-demo={pdfDemo ? "1" : "0"}
         data-pdf-banner={audienceRole ? (ROLE_HEADER[audienceRole] ?? "") : ""}
@@ -2537,8 +2537,8 @@ export function ReportView({
         ) : null}
 
         {policy.enabled ? <NaicLastPages afterDesignation={
-          <section id="medicaid-information" className="report-block scroll-mt-28" data-medicaid-fold data-medicaid-open={medicaidOpen ? "1" : "0"}>
-            <TitleCollapse title="Medicaid Information" className="mt-3" defaultOpen={false} openOnHash="medicaid-information">
+          <section id="medicaid-information" className="report-block scroll-mt-28" data-medicaid-fold data-medicaid-open={medicaidSelected ? "1" : "0"}>
+            <TitleCollapse title="Medicaid Information" className="mt-3" defaultOpen={false} openOnHash="medicaid-information" onOpenChange={setMedicaidSelected}>
               <MedicaidVaBody
                 state={state}
                 policy={policy}
@@ -2553,8 +2553,8 @@ export function ReportView({
         } /> : (
         <>
         <DesignationNoticeFold className="report-block mt-0" />
-        <section id="medicaid-information" className="report-block scroll-mt-28" data-medicaid-fold data-medicaid-open={medicaidOpen ? "1" : "0"}>
-          <TitleCollapse title="Medicaid Information" className="mt-0" defaultOpen={false} openOnHash="medicaid-information">
+        <section id="medicaid-information" className="report-block scroll-mt-28" data-medicaid-fold data-medicaid-open={medicaidSelected ? "1" : "0"}>
+          <TitleCollapse title="Medicaid Information" className="mt-0" defaultOpen={false} openOnHash="medicaid-information" onOpenChange={setMedicaidSelected}>
             <MedicaidVaBody
               state={state}
               policy={policy}

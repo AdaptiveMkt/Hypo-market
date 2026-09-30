@@ -29,10 +29,20 @@ import {
   VA_RATES_REVIEWED,
 } from "@/lib/va-aa";
 
-function Fold({ title, children, id }: { title: string; children: ReactNode; id?: string }) {
+function Fold({
+  title,
+  children,
+  id,
+  defaultOpen = false,
+}: {
+  title: string;
+  children: ReactNode;
+  id?: string;
+  defaultOpen?: boolean;
+}) {
   return (
     <div id={id} className={id ? "scroll-mt-28" : undefined}>
-      <TitleCollapse title={title} className="mt-2" openOnHash={id}>
+      <TitleCollapse title={title} className="mt-2" openOnHash={id} defaultOpen={defaultOpen}>
         {children}
       </TitleCollapse>
     </div>
@@ -136,7 +146,7 @@ export function MedicaidVaBody({
       ) : null}
 
       <Step n="1" label="What Medicaid long-term care can pay" />
-      <Fold title="Covered settings">
+      <Fold title="Covered settings" defaultOpen>
         <ul className="list-disc space-y-1 pl-4">
           {ltc.covers.map((b) => (
             <li key={b.slice(0, 40)}><LinkedCopy text={b} /></li>
@@ -145,7 +155,7 @@ export function MedicaidVaBody({
       </Fold>
 
       <Step n="2" label="The eligibility tests" />
-      <Fold title={elig.title}>
+      <Fold title={elig.title} defaultOpen>
         <p className="mb-2">
           Educational planning notes for <StateName name={state} /> — not a determination of
           eligibility.

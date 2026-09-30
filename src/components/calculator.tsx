@@ -1619,7 +1619,7 @@ export function Calculator() {
     reciprocityExamples: recipExamples,
     veteran,
     onVeteranChange: setVeteran,
-    medicaidOpen: countableExHome < NAIC_LOCKOUT_ASSETS,
+    medicaidOpen: false,
     readyCards: snapshotReadyCards(),
     details,
     allowPdf: audience === "interested" || audience === "licensed-client" || audience === "licensed-solo",
