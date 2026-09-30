@@ -21,10 +21,11 @@ const CAPTIONS: { start: number; end: number; text: string }[] = [
   { start: 67, end: 69.7, text: "Thank you." },
 ];
 
-export function WelcomeVideo() {
+export function WelcomeVideo({ onStart }: { onStart?: () => void }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [caption, setCaption] = useState("");
   const [sound, setSound] = useState<"starting" | "on" | "tap">("starting");
+  const [ended, setEnded] = useState(false);
 
   function syncCaption() {
     const t = videoRef.current?.currentTime ?? 0;
@@ -102,26 +103,54 @@ export function WelcomeVideo() {
 
   return (
     <figure className="mt-4 min-w-0 md:mt-0">
-      <video
-        ref={videoRef}
-        className="block w-full rounded-lg bg-navy"
-        controls
-        autoPlay
-        playsInline
-        preload="auto"
-        poster="/welcome/asset-preservation-poster.jpg"
-        onTimeUpdate={syncCaption}
-        onSeeked={syncCaption}
-        onEnded={() => setCaption("")}
-      >
-        <source src="/welcome/asset-preservation.mp4?v=3" type="video/mp4" />
-        <track
-          kind="captions"
-          srcLang="en"
-          label="English"
-          src="/welcome/asset-preservation.vtt"
-        />
-      </video>
+      <div className="relative">
+        <video
+          ref={videoRef}
+          className="block w-full rounded-lg bg-navy"
+          controls
+          autoPlay
+          playsInline
+          preload="auto"
+          poster="/welcome/asset-preservation-poster.jpg"
+          onTimeUpdate={syncCaption}
+          onSeeked={syncCaption}
+          onPlay={() => setEnded(false)}
+          onEnded={() => {
+            setCaption("");
+            setEnded(true);
+          }}
+        >
+          <source src="/welcome/asset-preservation.mp4?v=3" type="video/mp4" />
+          <track
+            kind="captions"
+            srcLang="en"
+            label="English"
+            src="/welcome/asset-preservation.vtt"
+          />
+        </video>
+        {ended ? (
+          <div className="absolute inset-x-3 bottom-14 rounded-lg bg-navy/95 p-3 text-cream shadow-lg sm:inset-x-4">
+            <p className="text-sm font-semibold">Run it once before your next appointment.</p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {onStart ? (
+                <button
+                  type="button"
+                  className="rounded-lg bg-gold px-3 py-2 text-sm font-semibold text-navy"
+                  onClick={onStart}
+                >
+                  Start the hypothetical
+                </button>
+              ) : null}
+              <a
+                className="rounded-lg border border-cream/40 px-3 py-2 text-sm font-semibold text-cream"
+                href="tel:+13217957516"
+              >
+                Call or text 321-795-7516
+              </a>
+            </div>
+          </div>
+        ) : null}
+      </div>
       <figcaption
         className="mt-2 min-h-16 rounded-lg border border-line bg-cream px-3 py-2 text-sm leading-snug text-navy"
         aria-live="polite"
@@ -131,6 +160,29 @@ export function WelcomeVideo() {
             ? "Playing. Tap the page once to turn the sound on."
             : "Closed captions show here, under the video, so they do not cover the picture.")}
       </figcaption>
+      <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+        {onStart ? (
+          <button
+            type="button"
+            className="rounded-lg bg-navy px-4 py-2.5 text-sm font-semibold text-cream hover:bg-teal"
+            onClick={onStart}
+          >
+            Start the hypothetical
+          </button>
+        ) : null}
+        <a
+          className="rounded-lg border border-navy px-4 py-2.5 text-center text-sm font-semibold text-navy hover:bg-cream"
+          href="tel:+13217957516"
+        >
+          Call or text 321-795-7516
+        </a>
+        <a
+          className="rounded-lg border border-navy px-4 py-2.5 text-center text-sm font-semibold text-navy hover:bg-cream"
+          href="mailto:info@preserve-your-assets.com"
+        >
+          Email info@preserve-your-assets.com
+        </a>
+      </div>
     </figure>
   );
 }

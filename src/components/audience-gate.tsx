@@ -35,7 +35,7 @@ export function AudienceGate({ onSelect }: { onSelect: (role: AudienceRole) => v
         </div>
       </div>
       <div className="order-2 md:order-1">
-        <WelcomeVideo />
+        <WelcomeVideo onStart={() => onSelect("licensed-client")} />
       </div>
     </section>
   );
