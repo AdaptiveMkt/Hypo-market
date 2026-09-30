@@ -1618,6 +1618,7 @@ export function Calculator() {
     reciprocity: recip,
     reciprocityExamples: recipExamples,
     veteran,
+    onVeteranChange: setVeteran,
     medicaidOpen: countableExHome < NAIC_LOCKOUT_ASSETS,
     readyCards: snapshotReadyCards(),
     details,

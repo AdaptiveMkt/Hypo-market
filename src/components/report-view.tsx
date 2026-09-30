@@ -222,6 +222,7 @@ export function ReportView({
   reciprocity,
   reciprocityExamples,
   veteran = false,
+  onVeteranChange,
   protectOn = false,
   medicaidOpen = false,
   readyCards = [],
@@ -298,6 +299,7 @@ export function ReportView({
   reciprocity: ReciprocityOutcome;
   reciprocityExamples: ReciprocityOutcome[];
   veteran?: boolean;
+  onVeteranChange?: (on: boolean) => void;
   protectOn?: boolean;
   medicaidOpen?: boolean;
   readyCards?: { label: string; value: string }[];
@@ -2564,6 +2566,7 @@ export function ReportView({
                 policy={policy}
                 medicaid={medicaid}
                 veteran={veteran}
+                onVeteranChange={onVeteranChange}
                 preservation={preservation}
                 issueState={reciprocity.issueState}
               />
@@ -2579,6 +2582,7 @@ export function ReportView({
               policy={policy}
               medicaid={medicaid}
               veteran={veteran}
+              onVeteranChange={onVeteranChange}
               preservation={preservation}
               issueState={reciprocity.issueState}
             />
