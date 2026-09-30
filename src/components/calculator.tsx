@@ -1250,7 +1250,7 @@ export function Calculator() {
   }, [personalizeOpen]);
   const pdfUnlocked = ran && section2Confirmed && (insuranceLocked || section3Confirmed);
   const licensedPdf = audience === "licensed-client" || audience === "licensed-solo";
-  const canPdf = pdfUnlocked && (audience === "interested" || licensedPdf);
+  const canPdf = pdfUnlocked && audience === "interested";
   function requestPdfDownload() {
     if (!pdfUnlocked) return;
     if (licensedPdf) {
@@ -1622,7 +1622,7 @@ export function Calculator() {
     medicaidOpen: false,
     readyCards: snapshotReadyCards(),
     details,
-    allowPdf: audience === "interested" || audience === "licensed-client" || audience === "licensed-solo",
+    allowPdf: audience === "interested",
     pdfDemo: audience === "licensed-client" || audience === "licensed-solo",
     audienceRole: audience,
     audienceNote: audience === "licensed-solo" ? "Contact Adaptive Marketing Group for terms of use and licensing agreement." : "",
@@ -1657,7 +1657,11 @@ export function Calculator() {
   };
 
   const incognitoShare = !finderPersonal;
-  const canShare = incognitoShare || (audience === "interested" && finderPersonal && partyFilled(client));
+  const canShare =
+    incognitoShare ||
+    audience === "licensed-client" ||
+    audience === "licensed-solo" ||
+    (audience === "interested" && finderPersonal && partyFilled(client));
   useEffect(() => {
     if (!showReport || !canShare) return;
     let cancel = false;
@@ -3429,7 +3433,9 @@ export function Calculator() {
             <p className="text-center text-xs leading-snug text-muted">
               {canPdf
                 ? "Open a title above to view more details. Check Add to PDF on each card you want in the download."
-                : "View only. A PDF download is not available for this selection."}
+                : licensedPdf
+                  ? "Open the report. Print to PDF is available after the report link is shown."
+                  : "View only. A PDF download is not available for this selection."}
             </p>
             {canPdf ? (
             <button

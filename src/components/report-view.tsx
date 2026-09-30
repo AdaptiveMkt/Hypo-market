@@ -350,6 +350,8 @@ export function ReportView({
             lifetime,
           },
         ];
+  const printReady = !pdfDemo || Boolean(shareUrl);
+  const showDownload = allowPdf && !pdfDemo;
   const tip = {
     background: "#fffdf8",
     border: "1px solid #d9cfc0",
@@ -381,6 +383,14 @@ export function ReportView({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    const lock = pdfDemo && !shareUrl;
+    document.documentElement.dataset.demoPrintLock = lock ? "1" : "0";
+    return () => {
+      document.documentElement.dataset.demoPrintLock = "0";
+    };
+  }, [pdfDemo, shareUrl]);
 
   useEffect(() => {
     const root = reportRef.current;
@@ -557,15 +567,17 @@ export function ReportView({
           aria-label="Report controls"
         >
           <div className="stack-actions">
-            <div className={`grid gap-2 ${allowPdf ? "grid-cols-3" : "grid-cols-2"}`}>
+            <div className={`grid gap-2 ${showDownload && printReady ? "grid-cols-3" : printReady || showDownload ? "grid-cols-2" : "grid-cols-1"}`}>
+            {showDownload ? (
             <button
               type="button"
               onClick={onPdf}
               className="flex min-h-11 items-center justify-center rounded-lg border border-gold bg-gold px-2 text-center text-sm font-semibold text-masthead hover:brightness-105"
-              hidden={!allowPdf}
             >
               Download PDF
             </button>
+            ) : null}
+            {printReady ? (
             <button
               type="button"
               onClick={() => (onClosePdf ?? onPdf)()}
@@ -573,6 +585,7 @@ export function ReportView({
             >
               Print to PDF
             </button>
+            ) : null}
             <button
               type="button"
               onClick={onClose}
@@ -2595,14 +2608,15 @@ export function ReportView({
           />
         </p>
         <div className="no-print mt-4 stack-actions md:grid-cols-2 md:mx-auto md:max-w-md">
+          {showDownload ? (
           <button
             type="button"
             onClick={onPdf}
-            hidden={!allowPdf}
             className="btn-block rounded-lg border border-gold bg-gold text-masthead"
           >
             Download PDF
           </button>
+          ) : null}
           <button
             type="button"
             onClick={() => setCloseAsk(true)}
@@ -2621,9 +2635,13 @@ export function ReportView({
         <div className="no-print fixed inset-0 z-[60] flex items-end justify-center bg-navy/55 p-4 sm:items-center" role="dialog" aria-modal="true" aria-labelledby="close-pdf-title">
           <div className="card-xl w-full max-w-md bg-paper p-5">
             <h2 id="close-pdf-title" className="font-display text-xl text-navy">Before you close</h2>
-            {advisorGaps.length === 0 ? (
+            {advisorGaps.length === 0 && printReady ? (
               <>
-                <p className="mt-2 text-sm text-navy">Advisor information is complete. You can download the PDF.</p>
+                <p className="mt-2 text-sm text-navy">
+                  {pdfDemo
+                    ? "The report link is ready. You can print to PDF."
+                    : "Advisor information is complete. You can download the PDF."}
+                </p>
                 <div className="mt-4 grid gap-2">
                   <button
                     type="button"
@@ -2633,12 +2651,19 @@ export function ReportView({
                       (onClosePdf ?? onPdf)();
                     }}
                   >
-                    Download PDF
+                    {pdfDemo ? "Print to PDF" : "Download PDF"}
                   </button>
                   <button type="button" className="btn-block rounded-lg border border-navy bg-navy text-cream" onClick={onClose}>
                     Close without downloading
                   </button>
                 </div>
+              </>
+            ) : advisorGaps.length === 0 ? (
+              <>
+                <p className="mt-2 text-sm text-navy">Print to PDF is available after the report link is shown.</p>
+                <button type="button" className="btn-block mt-4 rounded-lg border border-navy bg-navy text-cream" onClick={() => setCloseAsk(false)}>
+                  Stay on this view
+                </button>
               </>
             ) : (
               <>

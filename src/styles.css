@@ -935,6 +935,18 @@ html.pdf-capture #aum-report .tabular-nums.font-bold.amt-green {
     display: none !important;
   }
 
+  html[data-demo-print-lock="1"] body * {
+    display: none !important;
+  }
+
+  html[data-demo-print-lock="1"] body::before {
+    content: "Print to PDF is available after the report link is shown.";
+    display: block !important;
+    padding: 2rem;
+    font: 16px/1.4 Georgia, serif;
+    color: #1b3a4b;
+  }
+
   .report-chart,
   .recharts-wrapper,
   .break-inside-avoid,
