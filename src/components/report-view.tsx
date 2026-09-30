@@ -1049,13 +1049,13 @@ export function ReportView({
                 }
               />
             ) : null}
+            <Kpi label="First-year care cost" value={money(result.firstCost)} />
             {policy.enabled ? (
               <Kpi
                 label="Pool exhausted at claim"
                 value={formatYearsLast(yearsClaim)}
               />
             ) : null}
-            <Kpi label="First-year care cost" value={money(result.firstCost)} />
             <p className="col-span-full text-xs leading-snug text-muted">
               * Care-cost figures in this report, including today’s median, the first-year care cost, and year-by-year Annual Care Costs, are sourced from the{" "}
               <Cite href={SRC.ltcNews}>LTC News Cost of Care Calculator</Cite>.
