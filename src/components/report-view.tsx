@@ -685,12 +685,17 @@ export function ReportView({
         })()}
 
         <section className="report-block">
-          <h2 className="mb-3 font-display text-xl text-navy">Recommendations to consider</h2>
-          <ol className="list-decimal space-y-3 pl-5 text-sm leading-relaxed">
-            {recommendations.map((r) => (
-              <li key={r.slice(0, 52)}><LinkedCopy text={r} /></li>
-            ))}
-          </ol>
+          <details>
+            <summary className="no-print inline-flex min-h-11 cursor-pointer list-none items-center justify-center rounded-lg bg-teal px-4 py-2.5 text-center text-sm font-semibold text-cream hover:brightness-110 [&::-webkit-details-marker]:hidden [&::marker]:content-none">
+              Review LTC Planning Considerations
+            </summary>
+            <h2 className="mb-3 mt-4 font-display text-xl text-navy">Recommendations to consider</h2>
+            <ol className="list-decimal space-y-3 pl-5 text-sm leading-relaxed">
+              {recommendations.map((r) => (
+                <li key={r.slice(0, 52)}><LinkedCopy text={r} /></li>
+              ))}
+            </ol>
+          </details>
         </section>
 
         <section className="report-block">
