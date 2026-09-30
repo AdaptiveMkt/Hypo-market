@@ -701,7 +701,7 @@ export function ReportView({
         <section className="report-block">
           <details>
             <summary className="no-print inline-flex min-h-11 cursor-pointer list-none items-center justify-center rounded-lg bg-teal px-4 py-2.5 text-center text-sm font-semibold text-cream hover:brightness-110 [&::-webkit-details-marker]:hidden [&::marker]:content-none">
-              REVIEW INPUT
+              REVIEW INPUT — Countable assets
             </summary>
             <h2 className="mb-3 mt-4 font-display text-xl text-navy">
               1. Countable assets at risk — answers
@@ -779,7 +779,7 @@ export function ReportView({
         <section className="report-block">
           <details>
             <summary className="no-print inline-flex min-h-11 cursor-pointer list-none items-center justify-center rounded-lg bg-teal px-4 py-2.5 text-center text-sm font-semibold text-cream hover:brightness-110 [&::-webkit-details-marker]:hidden [&::marker]:content-none">
-              REVIEW INPUT
+              REVIEW INPUT — Care assumptions
             </summary>
             <h2 className="mb-3 mt-4 font-display text-xl text-navy">
               2. Care assumptions — answers
@@ -866,7 +866,7 @@ export function ReportView({
         <section className="report-block">
           <details>
             <summary className="no-print inline-flex min-h-11 cursor-pointer list-none items-center justify-center rounded-lg bg-teal px-4 py-2.5 text-center text-sm font-semibold text-cream hover:brightness-110 [&::-webkit-details-marker]:hidden [&::marker]:content-none">
-              REVIEW INPUT
+              REVIEW INPUT — Insurance
             </summary>
             <h2 className="mb-3 mt-4 font-display text-xl text-navy">
               3. Insurance — answers
@@ -1009,10 +1009,17 @@ export function ReportView({
         ) : null}
 
         <section className="report-block">
-          <h2 className="mb-3 font-display text-xl text-navy">
-            {policy.enabled ? "4. How the pool and policy are used" : "4. How the pool is used"}
-          </h2>
-          <div className="pdf-kpi-grid grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <details open className="pool-fold">
+            <summary className="flex cursor-pointer list-none flex-wrap items-center justify-between gap-3 [&::-webkit-details-marker]:hidden [&::marker]:content-none">
+              <h2 className="font-display text-xl text-navy">
+                {policy.enabled ? "4. How the pool and policy are used" : "4. How the pool is used"}
+              </h2>
+              <span className="no-print inline-flex min-h-11 items-center justify-center rounded-lg bg-teal px-4 py-2 text-sm font-semibold text-cream">
+                <span className="pool-when-closed">Expand</span>
+                <span className="pool-when-open">Collapse</span>
+              </span>
+            </summary>
+            <div className="pdf-kpi-grid mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <Kpi label="Countable assets today" value={money(pool)} />
             {policy.enabled ? (
               <Kpi
@@ -1071,6 +1078,7 @@ export function ReportView({
               <Kpi label="Funds depleted" value="Not in modeled years" />
             )}
           </div>
+          </details>
         </section>
 
         {policy.enabled && linkedScenarios.length ? (

@@ -751,6 +751,22 @@ details.report-fold > summary h2 {
   margin-bottom: 0;
 }
 
+details.pool-fold > summary .pool-when-open {
+  display: none;
+}
+
+details.pool-fold[open] > summary .pool-when-open {
+  display: inline;
+}
+
+details.pool-fold > summary .pool-when-closed {
+  display: inline;
+}
+
+details.pool-fold[open] > summary .pool-when-closed {
+  display: none;
+}
+
 html.pdf-capture .report-block,
 html.pdf-capture .report-chart,
 html.pdf-capture .recharts-wrapper {
