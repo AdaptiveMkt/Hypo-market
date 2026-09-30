@@ -235,7 +235,7 @@ export function analysisNarrative(opts: ReportOpts): string {
   }
 
   paras.push(
-    `An illustrative placeholder — not a recommended premium or insurance quote — is ${money(premium)} per year when income is entered at 7% of adjusted gross household income, otherwise 2.5% of countable assets. Asset-based, annuity care, and hybrid life use a placeholder deposit of 2.5% of countable assets or $75,000, whichever is greater. The 7% figure is not an industry suitability standard. ${SINGLE_PREMIUM_NOTE}`,
+    `An illustrative placeholder — not a recommended premium or insurance quote — is ${money(premium)} per year when income is entered at 7% of adjusted gross household income, otherwise 2.5% of countable assets. Asset-based single premium defaults to $100,000. Annuity care and hybrid life use a placeholder deposit of 2.5% of countable assets or $75,000, whichever is greater. The 7% figure is not an industry suitability standard. ${SINGLE_PREMIUM_NOTE}`,
   );
   paras.push(
     `Tax: there is no general federal LTC credit — only an age-capped deduction (2026: $500 to $6,200) after the 7.5% AGI medical floor if you itemize. A credit cuts tax dollar-for-dollar; a deduction only lowers taxable income. ${stateLtcTaxBreak(s.state).detail} This is not tax advice.`,

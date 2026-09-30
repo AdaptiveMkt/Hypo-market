@@ -523,9 +523,15 @@ export function Calculator() {
     mailRef.current = { client, advisor, state, attachAdvisor };
   }, [client, advisor, state, attachAdvisor]);
 
-  useEffect(() => {
-    setAdvisor((p) => (p.state === state ? p : { ...p, state }));
-  }, [state]);
+  function applyAgentState(next: string) {
+    if (!next) return;
+    setState(next);
+    setCareCity(defaultCareCity(next));
+    setStateNeeded(false);
+    setIssueState(next);
+    setIssueTouched(false);
+    if (!excludableTouched) setAssets((prev) => ({ ...prev, excludable: defaultExcludableAssets(next) }));
+  }
 
   useEffect(() => {
     if (!policy.enabled) return;
@@ -543,7 +549,7 @@ export function Calculator() {
     setKindBook((book) => {
       let changed = false;
       const next = { ...book };
-      for (const kind of ["assetBased", "ltcAnnuity", "hybridLife"] as const) {
+      for (const kind of ["ltcAnnuity", "hybridLife"] as const) {
         const row = next[kind];
         if (!row) continue;
         const sp = row.singlePremium;
@@ -1698,7 +1704,10 @@ export function Calculator() {
                 idPrefix="advisor-gate"
                 party={{ ...advisor, state: advisor.state || state }}
                 extra
-                onChange={(partial) => setAdvisor((p) => ({ ...p, ...partial }))}
+                onChange={(partial) => {
+                  setAdvisor((p) => ({ ...p, ...partial }));
+                  if (partial.state) applyAgentState(partial.state);
+                }}
               />
             </div>
             {advisorOk ? null : (
@@ -1730,7 +1739,10 @@ export function Calculator() {
               idPrefix="advisor-daylight"
               party={{ ...advisor, state: advisor.state || state }}
               extra
-              onChange={(partial) => setAdvisor((p) => ({ ...p, ...partial }))}
+              onChange={(partial) => {
+                setAdvisor((p) => ({ ...p, ...partial }));
+                if (partial.state) applyAgentState(partial.state);
+              }}
             />
           </div>
         </section>
@@ -1967,8 +1979,8 @@ export function Calculator() {
             />
             <p className="mt-1 text-xs leading-snug text-muted">
               {annualIncome > 0
-                ? `Suggested traditional premium ${money(Math.round(annualIncome * 0.07))} (7% of this income). Asset-based, annuity care, and hybrid life default the single premium to 2.5% of countable assets or $75,000, whichever is greater.`
-                : "Optional. Include this income to use 7% as the suggested traditional premium. Asset-based, annuity care, and hybrid life default the single premium to 2.5% of countable assets or $75,000, whichever is greater."}
+                ? `Suggested traditional premium ${money(Math.round(annualIncome * 0.07))} (7% of this income). Asset-based single premium defaults to $100,000. Annuity care and hybrid life default the single premium to 2.5% of countable assets or $75,000, whichever is greater.`
+                : "Optional. Include this income to use 7% as the suggested traditional premium. Asset-based single premium defaults to $100,000. Annuity care and hybrid life default the single premium to 2.5% of countable assets or $75,000, whichever is greater."}
             </p>
             <button
               type="button"
@@ -3349,11 +3361,8 @@ export function Calculator() {
             <div className="mt-5 card-xl px-4 py-2">
               <TitleCollapse title="Advisor / insurance professional (optional)" className="mt-0" defaultOpen hint="Click the title to add the advisor or agent on the report. Leave blank to omit.">
                 <PartyFields idPrefix="advisor" party={{ ...advisor, state }} extra details={details} onPdfChange={setDetail} onChange={(partial) => {
-                  if (partial.state && partial.state !== state) {
-                    setState(partial.state);
-                    setCareCity(defaultCareCity(partial.state));
-                  }
-                  setAdvisor((p) => ({ ...p, ...partial, state: partial.state || state }));
+                  if (partial.state) applyAgentState(partial.state);
+                  setAdvisor((p) => ({ ...p, ...partial, state: partial.state || p.state || state }));
                 }} />
                 <AdvisorProfessionalFolds details={details} onPdfChange={setDetail} />
               </TitleCollapse>
@@ -3449,7 +3458,10 @@ export function Calculator() {
           phone={advisor.phone}
           email={advisor.email}
           state={advisor.state || state}
-          onChange={(partial) => setAdvisor((p) => ({ ...p, ...partial }))}
+          onChange={(partial) => {
+            setAdvisor((p) => ({ ...p, ...partial }));
+            if (partial.state) applyAgentState(partial.state);
+          }}
           onCancel={() => setAdvisorCaptureOpen(false)}
           onSubmit={() => {
             setAdvisorCaptureOpen(false);

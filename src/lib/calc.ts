@@ -468,7 +468,7 @@ export function seedKindBook(
 
 export const DEFAULT_STRUCTURE_FLAGS: StructureFlags = {
   traditional: true,
-  assetBased: false,
+  assetBased: true,
   ltcAnnuity: false,
   hybridLife: false,
 };
@@ -480,14 +480,30 @@ export function policyForCompareLane(
   countable: number,
 ): LtcPolicy {
   if (kind === current.kind) return { ...current, enabled: true, kind };
-  if (kind === "traditional") {
-    return { ...current, enabled: true, kind: "traditional" };
-  }
+  if (kind === "traditional") return { ...current, enabled: true, kind: "traditional" };
   const monthly =
     current.monthlyBenefit > 0 ? current.monthlyBenefit : DEFAULT_HYBRID_LIFE.monthlyBenefit;
   const leverage = current.leverage > 1 ? current.leverage : DEFAULT_HYBRID_LIFE.leverage;
   const residual =
     current.residualPct > 0 ? current.residualPct : DEFAULT_HYBRID_LIFE.residualPct;
+  if (kind === "assetBased") {
+    const deposit =
+      current.kind === "assetBased" && current.singlePremium > 0
+        ? current.singlePremium
+        : DEFAULT_LINKED_SINGLE_PREMIUM;
+    return {
+      ...current,
+      enabled: true,
+      kind,
+      monthlyBenefit: monthly,
+      leverage,
+      residualPct: residual,
+      singlePremium: deposit,
+      elimDays: current.elimDays || DEFAULT_HYBRID_LIFE.elimDays,
+      benefitInflationPct: DEFAULT_HYBRID_LIFE.benefitInflationPct,
+      inflationMethod: DEFAULT_HYBRID_LIFE.inflationMethod,
+    };
+  }
   const face = hybridFaceForMonthly(monthly);
   const fromPool = linkedSingleFromPool(countable);
   const deposit =
@@ -538,7 +554,7 @@ export function inflateDaily(
 export const TARGET_PREMIUM_RATE = 0.025;
 export const TARGET_INCOME_RATE = 0.07;
 export const TARGET_PREMIUM_LABEL =
-  "Illustrative placeholder only. This is not a recommended premium or insurance quote. Enter the actual proposed premium or deposit. If none is entered, this model may show a placeholder: 7% of adjusted gross household income when income is entered, otherwise 2.5% of countable assets for a traditional annual figure, and 2.5% of countable assets or $75,000, whichever is greater, for an asset-based, annuity, or hybrid deposit. The 7% figure is not an industry suitability standard. A separate consumer worksheet notes that a premium above 7% of income may be hard to sustain. That is a caution, not a target.";
+  "Illustrative placeholder only. This is not a recommended premium or insurance quote. Enter the actual proposed premium or deposit. If none is entered, this model may show a placeholder: 7% of adjusted gross household income when income is entered, otherwise 2.5% of countable assets for a traditional annual figure. Asset-based single premium defaults to $100,000. Annuity care and hybrid life use 2.5% of countable assets or $75,000, whichever is greater. The 7% figure is not an industry suitability standard. A separate consumer worksheet notes that a premium above 7% of income may be hard to sustain. That is a caution, not a target.";
 export const TARGET_PREMIUM_FORMULA =
   "Illustrative placeholder only. This is not a recommended premium or insurance quote.";
 
