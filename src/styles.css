@@ -751,6 +751,26 @@ details.report-fold > summary h2 {
   margin-bottom: 0;
 }
 
+[data-fold-region] > .report-fold.report-block {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+[data-fold-region] > .report-fold.report-block[open] {
+  padding-bottom: 0.75rem;
+}
+
+[data-fold-region] > .report-fold + .report-fold {
+  border-top: 1px solid color-mix(in srgb, var(--color-line) 45%, transparent);
+}
+
+[data-fold-region] > .report-fold > summary {
+  min-height: 0;
+  padding-top: 0.35rem;
+  padding-bottom: 0.35rem;
+  align-items: center;
+}
+
 details.pool-fold > summary .pool-when-open {
   display: none;
 }

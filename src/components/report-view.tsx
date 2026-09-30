@@ -1147,30 +1147,24 @@ export function ReportView({
             Closed sections appear as titles only.
           </p>
         </section>
-        <div data-fold-region className="space-y-8">
+        <div data-fold-region className="flex flex-col">
 
         {details.yearByYear
-          ? yearSets.flatMap((set) => {
-              const chunks: typeof set.proj.rows[] = [];
-              for (let i = 0; i < set.proj.rows.length; i += 5) {
-                chunks.push(set.proj.rows.slice(i, i + 5));
-              }
+          ? yearSets.map((set) => {
               const setDepleted = set.proj.depletedYear;
               const setLater =
                 setDepleted != null ? set.proj.rows.filter((r) => r.year > setDepleted).length : 0;
-              return chunks.map((chunk, idx) => (
-          <details key={`years-${set.key}-${idx}`} className="pdf-stay-closed report-block report-fold"><summary className="flex min-h-11 cursor-pointer list-none items-start gap-2 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal [&::-webkit-details-marker]:hidden [&::marker]:content-none"><span aria-hidden="true" className="naic-chevron mt-1 inline-block text-gold-ink motion-reduce:transition-none">▸</span><h2 className="mb-2 font-display text-xl text-navy">
-              Year-by-year projection{set.label ? ` — ${set.label}` : ""}{idx > 0 ? " (continued)" : " (View how funds are used)"}
+              return (
+          <details key={`years-${set.key}`} className="pdf-stay-closed report-block report-fold"><summary className="flex cursor-pointer list-none items-center gap-2 rounded-sm py-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal [&::-webkit-details-marker]:hidden [&::marker]:content-none"><span aria-hidden="true" className="naic-chevron inline-block text-gold-ink motion-reduce:transition-none">▸</span><h2 className="font-display text-lg text-navy">
+              Year-by-year projection{set.label ? ` — ${set.label}` : ""} (View how funds are used)
             </h2></summary>
-            {idx === 0 ? (
-              <p className="mb-3 text-sm text-navy">
-                This model simplifies Long-Term Care Insurance. Actual benefits depend on
-                policy language, benefit eligibility, elimination periods, reimbursement or
-                cash provisions, benefit maximums, inflation provisions, and other
-                contractual terms.
-              </p>
-            ) : null}
-            {idx === 0 && setLater > 0 && setDepleted != null ? (
+            <p className="mb-3 text-sm text-navy">
+              This model simplifies Long-Term Care Insurance. Actual benefits depend on
+              policy language, benefit eligibility, elimination periods, reimbursement or
+              cash provisions, benefit maximums, inflation provisions, and other
+              contractual terms.
+            </p>
+            {setLater > 0 && setDepleted != null ? (
               <p className="mb-2 text-sm text-muted">
                 Funds depleted in {calendarYear(setDepleted)} (Y{setDepleted})
                 {set.enabled
@@ -1180,7 +1174,7 @@ export function ReportView({
                 run still appear below so the full wait-until-care plus care-duration window
                 stays visible.
               </p>
-            ) : idx === 0 ? (
+            ) : (
               <p className="mb-2 text-sm text-muted">
                 {set.proj.rows.length} years modeled
                 {delay > 0
@@ -1188,20 +1182,19 @@ export function ReportView({
                   : ` · ${duration} care year${duration === 1 ? "" : "s"}`}
                 . Every wait year and care year is listed.
               </p>
-            ) : null}
+            )}
             <YearByYearTable
-              rows={chunk}
+              rows={set.proj.rows}
               allRows={set.proj.rows}
               policyEnabled={set.enabled}
               lifetime={set.lifetime}
-              showNote={idx === chunks.length - 1}
             />
           </details>
-              ));
+              );
             })
           : null}
 
-        <details className="pdf-stay-closed report-block report-fold pb-4"><summary className="flex min-h-11 cursor-pointer list-none items-start gap-2 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal [&::-webkit-details-marker]:hidden [&::marker]:content-none"><span aria-hidden="true" className="naic-chevron mt-1 inline-block text-gold-ink motion-reduce:transition-none">▸</span><h2 className="mb-2 font-display text-xl text-navy">Shortfall</h2></summary>
+        <details className="pdf-stay-closed report-block report-fold"><summary className="flex min-h-11 cursor-pointer list-none items-start gap-2 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal [&::-webkit-details-marker]:hidden [&::marker]:content-none"><span aria-hidden="true" className="naic-chevron mt-1 inline-block text-gold-ink motion-reduce:transition-none">▸</span><h2 className="mb-2 font-display text-xl text-navy">Shortfall</h2></summary>
           <p className="text-xs leading-relaxed text-muted">
             <strong className="text-navy">Shortfall.</strong> Shortfall after insurance =
             annual cost − insurance on that year’s claim. Assets are used only as co-pay
