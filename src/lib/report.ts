@@ -4,13 +4,13 @@ import {
   ASSET_FIELDS,
   csvMilestones,
   formatYearsLast,
-  fiveYearIssueBand,
   isLifetimeBenefit,
   LIFETIME_BENEFIT_MARK,
   LIFETIME_BENEFIT_NOTE,
   isLinkedKind,
   policyKindLabel,
   netRoiPct,
+  PREMIUM_TBD,
   shortfallStart,
   targetPremium,
   TARGET_INCOME_RATE,
@@ -23,7 +23,6 @@ import {
 } from "./calc";
 import { LTC_NEWS_COST_URL, ltcNewsCostCite, SETTING_LABELS, type CareSetting } from "./costs";
 import { stateLtcTaxBreak } from "./ltc-tax";
-import { typicalPremiumHint } from "./what-consumers-buy";
 
 export const SAVE_KEY = "aum-scenario-v2";
 
@@ -212,23 +211,14 @@ export function analysisNarrative(opts: ReportOpts): string {
   } else {
     const structure = isLinkedKind(s.policy.kind)
       ? `a ${policyKindLabel(s.policy.kind).toLowerCase()} (premium ${money(s.policy.singlePremium)}, leverage ${s.policy.leverage}x)`
-      : `a traditional reimbursement policy (daily benefit ${money(s.policy.dailyBenefit)} today, benefit period ${isLifetimeBenefit(s.policy.benefitYears) ? `${LIFETIME_BENEFIT_MARK}. ${LIFETIME_BENEFIT_NOTE}` : `${s.policy.benefitYears} years`}, ${s.policy.elimDays}-day elimination, inflation ${s.policy.inflationMethod === "none" || s.policy.benefitInflationPct <= 0 ? "level" : `${s.policy.benefitInflationPct}% ${s.policy.inflationMethod}`}, annual premium ${money(s.policy.annualPremium)})`;
-    const industry = typicalPremiumHint(
-      Number(s.ageToday) || 0,
-      s.policy.benefitInflationPct,
-      s.policy.inflationMethod,
-    );
-    const industryNote =
-      !isLinkedKind(s.policy.kind) && industry.amount != null
-        ? ` Annual premium defaults to the ${industry.band} age-bracket industry midpoint, ${money(industry.amount)}, from the 2026 AALTCI Long-Term Care Insurance Price Index. Not a quote.`
-        : "";
+      : `a traditional reimbursement policy (daily benefit ${money(s.policy.dailyBenefit)} today, benefit period ${isLifetimeBenefit(s.policy.benefitYears) ? `${LIFETIME_BENEFIT_MARK}. ${LIFETIME_BENEFIT_NOTE}` : `${s.policy.benefitYears} years`}, ${s.policy.elimDays}-day elimination, inflation ${s.policy.inflationMethod === "none" || s.policy.benefitInflationPct <= 0 ? "level" : `${s.policy.benefitInflationPct}% ${s.policy.inflationMethod}`}. ${s.policy.annualPremium > 0 ? `Annual premium ${money(s.policy.annualPremium)}.` : PREMIUM_TBD})`;
     const agi = Math.max(0, Math.round(Number(s.annualIncome) || 0));
     const funding =
       agi > 0
         ? ` Based on the adjusted gross income entered, an illustrative placeholder — not a recommended premium or a quote — is no greater than ${money(Math.round(agi * TARGET_INCOME_RATE))}. That 7% figure is not an industry suitability standard. Other ways to fund a premium include reallocating assets and using part of the return on investment.`
         : " Premium funding options to consider are reallocating assets and using part of your return on investment to fund household premiums.";
     paras.push(
-      `This run includes ${structure}. Insurance is modeled to pay the claim first; countable assets co-pay only the leftover. LTC benefits at purchase are ${result.lifetimeBenefit ? `${LIFETIME_BENEFIT_MARK}. ${LIFETIME_BENEFIT_NOTE}` : money(result.benefitPoolAtPurchase ?? 0)}. At claim they are ${result.lifetimeBenefit ? LIFETIME_BENEFIT_MARK : money(result.benefitPoolAtClaim ?? 0)}.${industryNote}${funding}`,
+      `This run includes ${structure}. Insurance is modeled to pay the claim first; countable assets co-pay only the leftover. LTC benefits at purchase are ${result.lifetimeBenefit ? `${LIFETIME_BENEFIT_MARK}. ${LIFETIME_BENEFIT_NOTE}` : money(result.benefitPoolAtPurchase ?? 0)}. At claim they are ${result.lifetimeBenefit ? LIFETIME_BENEFIT_MARK : money(result.benefitPoolAtClaim ?? 0)}.${funding}`,
     );
     paras.push(
       `The combined pool (countable assets + LTC benefits) at today's cost is ${money(combinedToday)} and is ${formatYearsLast(yearsCombinedToday)}. At claim the combined pool is ${money(combinedClaim)} against ${money(result.firstCost)} per year${ltcNewsCostCite()} and is ${formatYearsLast(yearsCombinedClaim)}. Insurance paid over the modeled years is ${money(result.insuranceTotal)}. Countable assets remaining are ${money(result.endPool)}, which is ${preserved >= 0 ? money(preserved) + " higher" : money(Math.abs(preserved)) + " lower"} than if the same care had been paid from assets with no policy (${money(selfFunded.endPool)} left).`,
@@ -450,10 +440,11 @@ export function buildScenarioPdf(opts: ReportOpts): Blob {
     add(
       `Benefit Increase Option (i.e., Inflation Options): ${s.policy.inflationMethod === "none" || s.policy.benefitInflationPct <= 0 ? "None (level)" : `${s.policy.benefitInflationPct}% ${s.policy.inflationMethod}`}`,
     );
-    add(`Annual premium: ${money(s.policy.annualPremium)}*`);
-    add(
-      `* Annual premiums based on reported: ${fiveYearIssueBand(s.ageToday ?? 0) ?? "age-band"} average premiums. Source: 2026 AALTCI Long-Term Care Insurance Price Index (https://www.aaltci.org/2026-AALTCI-Long-Term-Care-Insurance-Price-Index/).`,
-    );
+    if (s.policy.annualPremium > 0) {
+      add(`Annual premium: ${money(s.policy.annualPremium)}`);
+    } else {
+      add(PREMIUM_TBD);
+    }
     add(`Insurance pool at purchase: ${money(result.benefitPoolAtPurchase ?? 0)}`);
   }
   add("");

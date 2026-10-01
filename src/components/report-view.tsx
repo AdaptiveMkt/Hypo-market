@@ -30,7 +30,6 @@ import {
   chartTickInterval,
   depletionCalendar,
   formatYearsLast,
-  fiveYearIssueBand,
   holdingsFrom,
   inflateDaily,
   isLifetimeBenefit,
@@ -39,6 +38,7 @@ import {
   isLinkedKind,
   leverageLabel,
   policyKindLabel,
+  PREMIUM_TBD,
   specifiedFaceAmount,
   STRUCTURE_OPTIONS,
   yearsPoolLasts,
@@ -962,13 +962,14 @@ export function ReportView({
                             : `${policy.benefitInflationPct}% ${policy.inflationMethod}`
                         }
                       />
-                      <Qa q="Annual premium" a={`${money(policy.annualPremium)}*`} />
-                      <tr className="border-t border-line">
-                        <td colSpan={2} className="py-1.5 text-left text-xs leading-snug text-muted">
-                          * Annual premiums based on reported: {fiveYearIssueBand(ageToday) ?? "age-band"} average premiums.{" "}
-                          <Cite href={SRC.aaltciPrice2026}>2026 AALTCI Long-Term Care Insurance Price Index</Cite>
-                        </td>
-                      </tr>
+                      <Qa q="Annual premium" a={policy.annualPremium > 0 ? money(policy.annualPremium) : "TBD"} />
+                      {policy.annualPremium > 0 ? null : (
+                        <tr className="border-t border-line">
+                          <td colSpan={2} className="py-1.5 text-left text-xs leading-snug text-muted">
+                            {PREMIUM_TBD}
+                          </td>
+                        </tr>
+                      )}
                     </>
                   )}
                   <Qa

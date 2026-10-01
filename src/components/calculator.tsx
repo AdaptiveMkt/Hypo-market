@@ -31,6 +31,8 @@ import {
   DEFAULT_LINKED_SINGLE_PREMIUM,
   STRUCTURE_OPTIONS,
   seedKindBook,
+  seedPlanningBook,
+  PREMIUM_TBD,
   bookWithAgi,
   policyWithAgi,
   assetBasedMonthlyCap,
@@ -97,7 +99,7 @@ import {
   MIN_AGE_TODAY,
   yearsUntilClaim,
 } from "@/lib/claim-age";
-import { typicalLinkedBuyerHints, typicalPremiumHint } from "@/lib/what-consumers-buy";
+import { typicalLinkedBuyerHints } from "@/lib/what-consumers-buy";
 import { TitleCollapse } from "@/components/accordion";
 import { isDarkTheme, setTheme } from "@/components/theme-toggle";
 import { StateName, Pct } from "@/components/state-name";
@@ -326,18 +328,10 @@ export function Calculator() {
   const [designTouched, setDesignTouched] = useState(false);
   const [yearPage, setYearPage] = useState(0);
   const [policy, setPolicy] = useState<LtcPolicy>(() => {
-    const typical = typicalPurchaseForAge(DEFAULT_AGE_TODAY);
-    const annual =
-      typicalPremiumHint(DEFAULT_AGE_TODAY, typical.benefitInflationPct, typical.inflationMethod)
-        .amount ?? 0;
-    return { ...seedKindBook(typical, annual).traditional, enabled: false };
+    return { ...seedPlanningBook(DEFAULT_AGE_TODAY).traditional, enabled: false };
   });
   const [kindBook, setKindBook] = useState<Record<PolicyKind, LtcPolicy>>(() => {
-    const typical = typicalPurchaseForAge(DEFAULT_AGE_TODAY);
-    const annual =
-      typicalPremiumHint(DEFAULT_AGE_TODAY, typical.benefitInflationPct, typical.inflationMethod)
-        .amount ?? 0;
-    return seedKindBook(typical, annual);
+    return seedPlanningBook(DEFAULT_AGE_TODAY);
   });
   const [excludeHome, setExcludeHome] = useState(true);
   const [ran, setRan] = useState(false);
@@ -577,13 +571,6 @@ export function Calculator() {
   const lifetime = isLifetimeBenefit(policy.benefitYears);
   const hybMonthly = assetBasedMonthlyCap(policy.singlePremium, policy.monthlyBenefit);
 
-  useEffect(() => {
-    if (premiumTouched) return;
-    const amount = typicalPremiumHint(ageToday, policy.benefitInflationPct, policy.inflationMethod)
-      .amount;
-    if (amount == null) return;
-    setPolicy((prev) => (prev.annualPremium === amount ? prev : { ...prev, annualPremium: amount }));
-  }, [ageToday, policy.benefitInflationPct, policy.inflationMethod, premiumTouched]);
 
   useEffect(() => {
     const was = insuranceWasSuitable.current;
@@ -951,10 +938,7 @@ export function Calculator() {
   }
   function applyIndustryOptions() {
     const typical = typicalPurchaseForAge(ageToday || DEFAULT_AGE_TODAY);
-    const prem =
-      typicalPremiumHint(ageToday || DEFAULT_AGE_TODAY, typical.benefitInflationPct, typical.inflationMethod)
-        .amount ?? 0;
-    const book = seedKindBook(typical, prem);
+    const book = seedKindBook(typical, 0);
     const next = {
       ...book.traditional,
       enabled: true,
@@ -965,7 +949,7 @@ export function Calculator() {
       monthlyBenefit: typical.monthlyBenefit,
       benefitInflationPct: typical.benefitInflationPct,
       inflationMethod: typical.inflationMethod,
-      annualPremium: prem,
+      annualPremium: premiumTouched ? policy.annualPremium : 0,
     };
     setKindBook({ ...book, traditional: next });
     setPolicy(next);
@@ -1150,11 +1134,7 @@ export function Calculator() {
     setTaxRate(DEFAULT_TAX_RATE);
     setAnnualIncome(0);
     setAgiIncluded(false);
-    const typical = typicalPurchaseForAge(DEFAULT_AGE_TODAY);
-    const annual =
-      typicalPremiumHint(DEFAULT_AGE_TODAY, typical.benefitInflationPct, typical.inflationMethod)
-        .amount ?? 0;
-    const book = seedKindBook(typical, annual);
+    const book = seedPlanningBook(DEFAULT_AGE_TODAY);
     setKindBook(book);
     setPolicy({ ...book.traditional, enabled: false });
     setRunKinds({ ...DEFAULT_STRUCTURE_FLAGS });
@@ -1330,12 +1310,9 @@ export function Calculator() {
     if (!claimAgeTouched) setClaimAge(nextClaim);
     else if (claimAge <= n) setClaimAge(nextClaim);
     if (!designTouched) {
-      const typical = typicalPurchaseForAge(n);
-      const prem =
-        typicalPremiumHint(n, typical.benefitInflationPct, typical.inflationMethod).amount ?? 0;
-      const book = seedKindBook(typical, prem);
+      const book = seedPlanningBook(n);
       setKindBook(book);
-      setPolicy((p) => ({ ...book[p.kind], enabled: p.enabled, kind: p.kind }));
+      setPolicy((p) => ({ ...book[p.kind], enabled: p.enabled, kind: p.kind, annualPremium: premiumTouched ? p.annualPremium : 0 }));
     }
   }
   const missingInputs = [
@@ -2019,9 +1996,9 @@ export function Calculator() {
             {ageToday >= MIN_AGE_TODAY && buyerHints && naicUnlocked ? (
               <div id="what-buyers-section2" className="mt-2 scroll-mt-8 rounded-lg border border-line bg-cream px-3 py-2 text-xs leading-snug text-muted">
                 <p>
-                  * Based on industry averages at your age bracket (
+                  * This model starts traditional benefits at $200/day and a 5-year period. {PREMIUM_TBD} Industry averages at your age bracket (
                   <span className="font-semibold text-deplete">{fiveYearIssueBand(ageToday)}</span>
-                  ), this hypo defaults traditional benefits to{" "}
+                  ) are{" "}
                   <span className="font-semibold text-deplete">{buyerHints.daily}</span>/day,{" "}
                   <span className="font-semibold text-deplete">{buyerHints.period}</span> period,{" "}
                   <span className="font-semibold text-deplete">{buyerHints.elim}</span> wait, and{" "}
@@ -2545,15 +2522,8 @@ export function Calculator() {
                           </p>
                         ) : null}
                         <label className={labelClass} htmlFor="premium">Annual premium</label>
-                        <StepperField id="premium" value={policy.annualPremium || 0} prefix="$" step={100} min={0} blankWhenZero onChange={(v) => { setPremiumTouched(true); patchPolicy({ annualPremium: Number(v) || 0 }); }} />
-                        {ageToday >= MIN_AGE_TODAY && typicalPremiumHint(ageToday, policy.benefitInflationPct, policy.inflationMethod).amount ? (
-                          <p className="mt-1 text-xs text-muted">
-                            * Annual premiums based on reported:{" "}
-                            <span className="font-semibold text-deplete">{fiveYearIssueBand(ageToday)}</span>{" "}
-                            average premiums.{" "}
-                            <Cite href={SRC.aaltciPrice2026}>2026 AALTCI Long-Term Care Insurance Price Index</Cite>
-                          </p>
-                        ) : null}
+                        <StepperField id="premium" value={policy.annualPremium || 0} prefix={policy.annualPremium ? "$" : undefined} placeholder="TBD" step={100} min={0} blankWhenZero onChange={(v) => { setPremiumTouched(true); patchPolicy({ annualPremium: Number(v) || 0 }); }} />
+                        <p className="mt-1 text-xs text-muted">{PREMIUM_TBD}</p>
                         <label className="flex min-h-11 cursor-pointer items-center gap-2 text-sm text-navy">
                           <input type="checkbox" className="size-4 accent-teal" checked={partnershipOn} onChange={(e) => setPartnershipOn(e.target.checked)} />
                           DRA Partnership (traditional tax-qualified LTC only)

@@ -9,6 +9,7 @@ import {
   monthlyFromDaily,
   policyForCompareLane,
   policyKindLabel,
+  PREMIUM_TBD,
   specifiedFaceAmount,
   type LtcPolicy,
 } from "@/lib/calc";
@@ -393,7 +394,9 @@ export function SampleLtcPolicy({
             <strong className="text-navy">Premium (this run). </strong>
             {linked
               ? `Linked / asset-based specimen: single premium or deposit illustrated at ${money(policy.singlePremium)} (or face/monthly as entered). Not a quoted rate.`
-              : `Illustrated annual premium ${money(policy.annualPremium)}. Premiums vary by issue state, age, underwriting & rate class, marital status, benefit selection, and riders. This is not a quote or a proposal of insurance.`}
+              : policy.annualPremium > 0
+                ? `Illustrated annual premium ${money(policy.annualPremium)}. Premiums vary by issue state, age, underwriting and rate class, marital status, benefit selection, and riders. This is not a quote or a proposal of insurance.`
+                : PREMIUM_TBD}
           </li>
           <li>
             <strong className="text-navy">Additional features (specimen). </strong>

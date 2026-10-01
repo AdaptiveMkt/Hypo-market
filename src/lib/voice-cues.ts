@@ -28,8 +28,8 @@ export function section2IndustryMessage(ageToday: number): string {
   const hints = typicalBuyerHints(ageToday);
   const band = fiveYearIssueBand(ageToday) ?? "your age";
   return (
-    `Based on industry averages within your age bracket (${band}), this hypo defaults traditional long term care insurance benefits to ` +
-    `${hints.daily}/day, a ${hints.period} period, a ${hints.elim} wait, and ${hints.inflation}. ` +
+    `This model starts traditional long-term care insurance at $200 a day and a 5-year benefit period. Premiums are to be determined. Contact a licensed professional for carrier specific quote and illustrations. ` +
+    `Industry averages within your age bracket (${band}) are ${hints.daily}/day, a ${hints.period} period, a ${hints.elim} wait, and ${hints.inflation}. ` +
     `* You can change any field in Section 3 to modify both the benefits shown in the hypothetical run.`
   );
 }

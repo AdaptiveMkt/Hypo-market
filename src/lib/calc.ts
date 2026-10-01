@@ -454,6 +454,26 @@ export function seedKindPolicy(
   };
 }
 
+export const TRADITIONAL_DEFAULT_DAILY = 200;
+export const TRADITIONAL_DEFAULT_YEARS = 5;
+export const PREMIUM_TBD =
+  "Premiums are to be determined. Contact a licensed professional for carrier specific quote and illustrations.";
+
+/** Opening traditional design. Industry sales-mix figures stay in typicalPurchaseForAge. */
+export function seedPlanningBook(ageToday: number): Record<PolicyKind, LtcPolicy> {
+  const typical = typicalPurchaseForAge(ageToday);
+  const book = seedKindBook(typical, 0);
+  const dailyBenefit = TRADITIONAL_DEFAULT_DAILY;
+  book.traditional = {
+    ...book.traditional,
+    dailyBenefit,
+    benefitYears: TRADITIONAL_DEFAULT_YEARS,
+    monthlyBenefit: Math.round((dailyBenefit * 365) / 12),
+    annualPremium: 0,
+  };
+  return book;
+}
+
 export function seedKindBook(
   typical: ReturnType<typeof typicalPurchaseForAge>,
   annualPremium = 0,

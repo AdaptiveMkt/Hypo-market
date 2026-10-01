@@ -16,6 +16,7 @@ import {
   hybridFaceForMonthly,
   leverageLabel,
   monthlyFromDaily,
+  PREMIUM_TBD,
   SINGLE_PREMIUM_NOTE,
   typicalBuyerHints,
   type AssetKey,
@@ -917,13 +918,15 @@ function BenefitEditor({
             <StepperField
               id="ff-kind-premium"
               value={policy.annualPremium || 0}
-              prefix="$"
+              prefix={policy.annualPremium ? "$" : undefined}
+              placeholder="TBD"
               commas
               step={100}
               min={0}
               blankWhenZero
               onChange={(v) => onPatch({ annualPremium: Number(v) || 0 })}
             />
+            <p className="mt-1 text-xs text-muted">{PREMIUM_TBD}</p>
           </div>
         </div>
       ) : (

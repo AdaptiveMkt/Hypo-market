@@ -60,7 +60,7 @@ export const WHAT_CONSUMERS_BUY_FEATURES = {
     { item: "Average (no lifetime)", share: "3.79 years" },
   ],
   benefitPeriodNote:
-    "Table 23, 2024 excluding one short-duration product. With that product included, 3-year falls to 33.2% and the average period is 2.81 years (46.7% two years or shorter). Lifetime* is essentially gone from new stand-alone sales. This model defaults to 3 years — the 2024 sales mode (55.1%). Milliman does not publish period mix by issue age. * Lifetime long-term care insurance may not be available. Contact a licensed insurance agent in your state of residence.",
+    "Table 23, 2024 excluding one short-duration product. With that product included, 3-year falls to 33.2% and the average period is 2.81 years (46.7% two years or shorter). Lifetime* is essentially gone from new stand-alone sales. This model starts at a 5-year benefit period. The 2024 sales mode is 3 years (55.1%). Milliman does not publish period mix by issue age. * Lifetime long-term care insurance may not be available. Contact a licensed insurance agent in your state of residence.",
   inflation: [
     { item: "4.5%+ compound for life", share: "2.7%" },
     { item: "3% compound for life", share: "17.4%" },
