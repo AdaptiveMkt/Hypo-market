@@ -110,9 +110,9 @@ export function SharedReportPage({ slug, code }: { slug: string; code: string })
           </Link>
         </section>
       )}
-      <section className="share-link-note mx-auto max-w-5xl px-4 py-6 text-sm leading-relaxed text-navy sm:px-8">
+      <section className="share-link-note mx-auto max-w-5xl px-4 py-6 text-center text-sm leading-relaxed text-navy sm:px-8">
         <p className="font-semibold">Report link</p>
-        <p className="mt-2">{shareDisclaimer(hours)}</p>
+        <p className="mx-auto mt-2 max-w-3xl">{shareDisclaimer(hours)}</p>
         {view?.status === "ready" && view.expiresAt ? (
           <p className="mt-2 text-xs text-muted">
             First opened {new Date(view.firstViewedAt).toLocaleString("en-US")}. Expires{" "}
@@ -122,7 +122,7 @@ export function SharedReportPage({ slug, code }: { slug: string; code: string })
         {view?.status === "ready" ? (
           <button
             type="button"
-            className="no-print btn-block mt-4 max-w-xs rounded-lg bg-navy px-4 py-2.5 text-sm font-semibold text-cream"
+            className="no-print btn-block mx-auto mt-4 max-w-xs rounded-lg bg-teal px-4 py-2.5 text-center text-sm font-semibold text-white hover:brightness-110"
             onClick={openPrintPicker}
           >
             Print to PDF
@@ -197,7 +197,7 @@ export function SharedReportPage({ slug, code }: { slug: string; code: string })
               </button>
               <button
                 type="button"
-                className="min-h-11 rounded-lg bg-navy px-4 text-sm font-semibold text-cream disabled:opacity-50"
+                className="min-h-11 rounded-lg bg-teal px-4 text-sm font-semibold text-white hover:brightness-110 disabled:opacity-50"
                 disabled={selectedCount === 0}
                 onClick={printSelected}
               >
