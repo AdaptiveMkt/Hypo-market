@@ -1662,7 +1662,7 @@ export function Calculator() {
               disabled={!advisorOk}
               onClick={() => setAdvisorCleared(true)}
             >
-              Continue
+              Confirm Your Information
             </button>
           </section>
         )
