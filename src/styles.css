@@ -1227,6 +1227,13 @@ html.pdf-capture #aum-report .tabular-nums.font-bold.amt-green {
     padding-top: 0 !important;
   }
 
+  #aum-report .print-page-start,
+  #aum-report details.print-page-start {
+    break-before: page !important;
+    page-break-before: always !important;
+    margin-top: 0 !important;
+  }
+
   #aum-report h1,
   #aum-report h2,
   #aum-report h3 {

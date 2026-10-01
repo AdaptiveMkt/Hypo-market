@@ -1138,7 +1138,7 @@ export function ReportView({
               const setLater =
                 setDepleted != null ? set.proj.rows.filter((r) => r.year > setDepleted).length : 0;
               return (
-          <details key={`years-${set.key}`} className="pdf-stay-closed report-block report-fold"><summary className="flex cursor-pointer list-none items-center gap-2 rounded-sm py-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal [&::-webkit-details-marker]:hidden [&::marker]:content-none"><span aria-hidden="true" className="naic-chevron inline-block text-gold-ink motion-reduce:transition-none">▸</span><h2 className="font-display text-lg text-navy">
+          <details key={`years-${set.key}`} className="print-page-start pdf-stay-closed report-block report-fold"><summary className="flex cursor-pointer list-none items-center gap-2 rounded-sm py-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal [&::-webkit-details-marker]:hidden [&::marker]:content-none"><span aria-hidden="true" className="naic-chevron inline-block text-gold-ink motion-reduce:transition-none">▸</span><h2 className="font-display text-lg text-navy">
               Year-by-year projection{set.label ? ` — ${set.label}` : ""} (View how funds are used)
             </h2></summary>
             <p className="mb-3 text-sm text-navy">
