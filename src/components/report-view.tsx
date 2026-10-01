@@ -1209,7 +1209,7 @@ export function ReportView({
 
 
         {policy.enabled && details.allocation && pie.length > 0 ? (
-          <details className="pdf-stay-closed report-block report-fold break-inside-avoid"><summary className="flex min-h-11 cursor-pointer list-none items-start gap-2 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal [&::-webkit-details-marker]:hidden [&::marker]:content-none"><span aria-hidden="true" className="naic-chevron mt-1 inline-block text-gold-ink motion-reduce:transition-none">▸</span><h2 className="mb-2 font-display text-xl text-navy">Explore asset allocation</h2></summary>
+          <details className="print-page-start pdf-stay-closed report-block report-fold break-inside-avoid"><summary className="flex min-h-11 cursor-pointer list-none items-start gap-2 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal [&::-webkit-details-marker]:hidden [&::marker]:content-none"><span aria-hidden="true" className="naic-chevron mt-1 inline-block text-gold-ink motion-reduce:transition-none">▸</span><h2 className="mb-2 font-display text-xl text-navy">Explore asset allocation</h2></summary>
             <p className="premium-note mb-3 w-full text-left text-sm leading-relaxed text-navy">
               {TARGET_PREMIUM_LABEL} This run’s traditional planning figure is {money(premiumTarget)}
               {annualIncome > 0
