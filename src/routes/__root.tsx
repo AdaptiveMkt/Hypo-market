@@ -107,6 +107,12 @@ export const Route = createRootRoute({
         defer: true,
         src: "https://js.hsforms.net/forms/embed/8744592.js",
       },
+      {
+        id: "hs-script-loader",
+        async: true,
+        defer: true,
+        src: "https://js.hs-scripts.com/8744592.js",
+      },
     ],
   }),
   component: Root,
