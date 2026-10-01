@@ -1136,8 +1136,8 @@ export function ReportView({
           <h2 className="font-display text-xl text-navy">Instructions</h2>
           <p className="mt-2 text-sm text-muted">
             Sections from Year-by-year through the end of this report start closed on this screen.
-            Open a title to view that section. Print to PDF is on the report link, not on this screen.
-            Only a section you have opened is included in the PDF. A closed toggle prints as a title only.
+            Open a title to view that section. Print to PDF is on the report link.
+            A section you open there is already selected for the PDF. A section you leave closed is not included unless you check it.
           </p>
         </section>
         <div data-fold-region className="flex flex-col">

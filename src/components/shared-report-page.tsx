@@ -3,18 +3,55 @@ import { Link } from "@tanstack/react-router";
 import { setTheme } from "@/components/theme-toggle";
 import { readShare, shareDisclaimer, type ShareView } from "@/lib/share-report";
 
-type PrintRow = { id: string; label: string };
+type PrintRow = { id: string; label: string; opened: boolean };
+
+function ownLabel(el: HTMLElement): string {
+  const nodes = el.querySelectorAll("h1, h2, h3, summary");
+  for (const node of nodes) {
+    const owner = node.closest("details");
+    if (el instanceof HTMLDetailsElement) {
+      if (owner !== el) continue;
+    } else if (owner) continue;
+    const text = (node.textContent || "").replace(/\s+/g, " ").trim();
+    if (text) return text.slice(0, 160);
+  }
+  return "";
+}
 
 function reportSections(): PrintRow[] {
   const root = document.getElementById("aum-report");
   if (!root) return [];
-  return Array.from(root.children).flatMap((node, i) => {
-    if (!(node instanceof HTMLElement)) return [];
-    if (node.classList.contains("no-print")) return [];
-    const heading = node.querySelector("h1, h2, h3");
-    const label = (heading?.textContent || "").replace(/\s+/g, " ").trim();
-    if (!label) return [];
-    return [{ id: String(i), label: label.slice(0, 160) }];
+  const rows: PrintRow[] = [];
+  let n = 0;
+  const mark = (el: HTMLElement, opened: boolean) => {
+    const label = ownLabel(el);
+    if (!label || el.closest(".no-print")) return;
+    const id = `p${n++}`;
+    el.setAttribute("data-print-id", id);
+    rows.push({ id, label, opened });
+  };
+
+  root.querySelectorAll("details").forEach((node) => {
+    if (node instanceof HTMLDetailsElement) mark(node, node.open);
+  });
+
+  Array.from(root.children).forEach((node) => {
+    if (!(node instanceof HTMLElement) || node.classList.contains("no-print")) return;
+    if (node instanceof HTMLDetailsElement) return;
+    const copy = node.cloneNode(true) as HTMLElement;
+    copy.querySelectorAll("details").forEach((d) => d.remove());
+    const outside = (copy.textContent || "").replace(/\s+/g, " ").trim();
+    if (outside.length > 24) mark(node, true);
+  });
+  return rows;
+}
+
+function kept(el: HTMLElement, picked: Record<string, boolean>): boolean {
+  const id = el.getAttribute("data-print-id");
+  if (id && picked[id]) return true;
+  return Array.from(el.querySelectorAll<HTMLElement>("[data-print-id]")).some((node) => {
+    const child = node.getAttribute("data-print-id");
+    return Boolean(child && picked[child]);
   });
 }
 
@@ -46,28 +83,35 @@ export function SharedReportPage({ slug, code }: { slug: string; code: string })
   function openPrintPicker() {
     const next = reportSections();
     setRows(next);
-    setPicked(Object.fromEntries(next.map((row) => [row.id, true])));
+    setPicked(Object.fromEntries(next.map((row) => [row.id, row.opened])));
     setPicker(true);
   }
 
   function printSelected() {
     const root = document.getElementById("aum-report");
     if (!root) return;
-    const kids = Array.from(root.children);
-    kids.forEach((node, i) => {
-      if (!(node instanceof HTMLElement)) return;
-      const listed = rows.some((row) => row.id === String(i));
-      const keep = picked[String(i)] !== false && listed;
-      if (listed && !keep) node.classList.add("print-omit");
-      else node.classList.remove("print-omit");
+    const marked = Array.from(root.querySelectorAll<HTMLElement>("[data-print-id]"));
+    const details = Array.from(root.querySelectorAll("details")).filter(
+      (node): node is HTMLDetailsElement => node instanceof HTMLDetailsElement,
+    );
+    const wasOpen = details.map((node) => ({ node, open: node.open }));
+    marked.forEach((el) => {
+      if (kept(el, picked)) el.classList.remove("print-omit");
+      else el.classList.add("print-omit");
+      if (el instanceof HTMLDetailsElement && el.getAttribute("data-print-id") && picked[el.getAttribute("data-print-id") || ""]) {
+        el.open = true;
+      }
     });
     setPicker(false);
     const clear = () => {
-      kids.forEach((node) => node.classList.remove("print-omit"));
+      marked.forEach((el) => el.classList.remove("print-omit"));
+      wasOpen.forEach(({ node, open }) => {
+        node.open = open;
+      });
       window.removeEventListener("afterprint", clear);
     };
     window.addEventListener("afterprint", clear);
-    window.setTimeout(() => window.print(), 60);
+    window.setTimeout(() => window.print(), 80);
   }
 
   return (
@@ -127,7 +171,8 @@ export function SharedReportPage({ slug, code }: { slug: string; code: string })
               Select sections for the PDF
             </h2>
             <p className="mt-2 text-sm text-muted">
-              Every section in this report is listed. Uncheck any you do not want in the PDF, then print.
+              Sections you opened on this page are already checked, including a section such as DRA.
+              Closed sections are left out unless you check them. A checked section is printed in full.
               {rows.length ? ` ${selectedCount} of ${rows.length} selected.` : ""}
             </p>
             <div className="mt-3 flex flex-wrap gap-2">

@@ -935,6 +935,32 @@ html.pdf-capture #aum-report .tabular-nums.font-bold.amt-green {
     display: none !important;
   }
 
+  details[open] > summary ~ * {
+    visibility: visible !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  details[open] > summary ~ div,
+  details[open] > summary ~ section,
+  details[open] > summary ~ p,
+  details[open] > summary ~ ul,
+  details[open] > summary ~ ol {
+    display: block !important;
+  }
+
+  details[open] table {
+    display: table !important;
+    width: 100%;
+  }
+
+  details[open] thead { display: table-header-group !important; }
+  details[open] tbody { display: table-row-group !important; }
+  details[open] tr { display: table-row !important; }
+  details[open] th,
+  details[open] td { display: table-cell !important; }
+
   [data-accordion="open"] > .accordion-panel {
     max-height: none !important;
     opacity: 1 !important;

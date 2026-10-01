@@ -8,7 +8,7 @@ export const SHARE_HOURS = 72;
 export const INCOGNITO_HOURS = 24;
 
 export function shareDisclaimer(hours: number) {
-  return `This web address is visible to anyone who has the link. It expires ${hours} hours after it is first opened. To save the content, open this report link and use Print to PDF, then save the file on your computer. This site does not keep a copy after the link expires. Collapsed sections print as titles only. Open each section you want included so the text is visible, then print to PDF. Content behind a closed toggle is not printed.`;
+  return `This web address is visible to anyone who has the link. It expires ${hours} hours after it is first opened. To save the content, open this report link and use Print to PDF, then save the file on your computer. This site does not keep a copy after the link expires. Open any collapsed section you want in the file. Those opened sections are already selected when you press Print to PDF. A section you leave closed is not included unless you check it.`;
 }
 
 export const SHARE_DISCLAIMER = shareDisclaimer(SHARE_HOURS);
