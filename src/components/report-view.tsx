@@ -477,7 +477,7 @@ export function ReportView({
             {audienceNote}
           </p>
         ) : null}
-        <section className="report-block" data-pdf-break-after="1">
+        <section className="report-block print-flow" data-pdf-break-after="1">
           <div className="overflow-hidden rounded-xl border border-line bg-paper">
             <img
               src="/cover/logo.jpg?v=2"
@@ -512,7 +512,7 @@ export function ReportView({
             </div>
           </div>
         </section>
-        <header className="report-block border-b-2 border-gold pb-4">
+        <header className="report-block print-flow border-b-2 border-gold pb-4">
           <h1 id="report-title" className="font-display text-3xl text-navy">
             Long Term Care Asset Utilization Modeling
           </h1>
@@ -602,7 +602,7 @@ export function ReportView({
         ) : null}
 
         {(audienceRole === "licensed-client" || partyFilled(client) || veteran || (policy.enabled && (partyFilled(advisor) || advisor.firm || advisor.designation))) ? (
-          <section className="report-block">
+          <section className="report-block print-flow">
             <h2 className="mb-3 font-display text-xl text-navy">Prepared for</h2>
             <div className="grid gap-4 sm:grid-cols-2 text-sm">
               {audienceRole === "licensed-client" || partyFilled(client) || veteran ? (
@@ -635,7 +635,7 @@ export function ReportView({
           </section>
         ) : null}
 
-        <section className="report-block">
+        <section className="report-block print-flow">
           <div className={`rounded-lg border-2 px-4 py-3 ${depletedWhen ? "border-deplete bg-cream" : "border-gold bg-paper"}`}>
             <p className="text-xs uppercase tracking-wide text-muted">Funds depleted</p>
             <p className={`font-display text-2xl ${depletedWhen ? "text-deplete" : "text-navy"}`}>
@@ -650,7 +650,7 @@ export function ReportView({
         </section>
 
         {readyCards.length ? (
-          <section className="report-block">
+          <section className="report-block print-flow">
             <h2 className="mb-3 font-display text-xl text-navy">Your hypothetical is ready</h2>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {readyCards.map((card) => (
@@ -668,7 +668,7 @@ export function ReportView({
           const chunks: string[][] = [];
           for (let i = 0; i < paras.length; i += 2) chunks.push(paras.slice(i, i + 2));
           return chunks.map((chunk, idx) => (
-            <section key={`sum-${idx}`} className="report-block">
+            <section key={`sum-${idx}`} className="report-block print-flow">
               {idx === 0 ? (
                 <h2 className="mb-3 font-display text-xl text-navy">Descriptive summary</h2>
               ) : null}
@@ -1138,7 +1138,7 @@ export function ReportView({
               const setLater =
                 setDepleted != null ? set.proj.rows.filter((r) => r.year > setDepleted).length : 0;
               return (
-          <details key={`years-${set.key}`} className={`${index === 0 ? "print-keep-with-prev " : ""}pdf-stay-closed report-block report-fold`}><summary className="flex cursor-pointer list-none items-center gap-2 rounded-sm py-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal [&::-webkit-details-marker]:hidden [&::marker]:content-none"><span aria-hidden="true" className="naic-chevron inline-block text-gold-ink motion-reduce:transition-none">▸</span><h2 className="font-display text-lg text-navy">
+          <details key={`years-${set.key}`} className={`${index === 0 ? "print-keep-with-prev " : "print-page-start "}pdf-stay-closed report-block report-fold`}><summary className="flex cursor-pointer list-none items-center gap-2 rounded-sm py-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal [&::-webkit-details-marker]:hidden [&::marker]:content-none"><span aria-hidden="true" className="naic-chevron inline-block text-gold-ink motion-reduce:transition-none">▸</span><h2 className="font-display text-lg text-navy">
               Year-by-year projection{set.label ? ` — ${set.label}` : ""} (View how funds are used)
             </h2></summary>
             <p className="mb-3 text-sm text-navy">
@@ -1177,7 +1177,7 @@ export function ReportView({
             })
           : null}
 
-        <details className="pdf-stay-closed report-block report-fold"><summary className="flex min-h-11 cursor-pointer list-none items-start gap-2 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal [&::-webkit-details-marker]:hidden [&::marker]:content-none"><span aria-hidden="true" className="naic-chevron mt-1 inline-block text-gold-ink motion-reduce:transition-none">▸</span><h2 className="mb-2 font-display text-xl text-navy">Shortfall</h2></summary>
+        <details className="print-page-start pdf-stay-closed report-block report-fold"><summary className="flex min-h-11 cursor-pointer list-none items-start gap-2 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal [&::-webkit-details-marker]:hidden [&::marker]:content-none"><span aria-hidden="true" className="naic-chevron mt-1 inline-block text-gold-ink motion-reduce:transition-none">▸</span><h2 className="mb-2 font-display text-xl text-navy">Shortfall</h2></summary>
           <p className="text-xs leading-relaxed text-muted">
             <strong className="text-navy">Shortfall.</strong> Shortfall after insurance =
             annual cost − insurance on that year’s claim. Assets are used only as co-pay
@@ -1285,7 +1285,7 @@ export function ReportView({
         ) : null}
 
         {policy.enabled && details.allocation ? (
-        <details className="pdf-stay-closed report-block report-fold break-inside-avoid"><summary className="flex min-h-11 cursor-pointer list-none items-start gap-2 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal [&::-webkit-details-marker]:hidden [&::marker]:content-none"><span aria-hidden="true" className="naic-chevron mt-1 inline-block text-gold-ink motion-reduce:transition-none">▸</span><h2 className="mb-2 font-display text-xl text-navy">
+        <details className="print-page-start pdf-stay-closed report-block report-fold break-inside-avoid"><summary className="flex min-h-11 cursor-pointer list-none items-start gap-2 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal [&::-webkit-details-marker]:hidden [&::marker]:content-none"><span aria-hidden="true" className="naic-chevron mt-1 inline-block text-gold-ink motion-reduce:transition-none">▸</span><h2 className="mb-2 font-display text-xl text-navy">
             Asset utilization over time in <StateName name={state} />
           </h2></summary>
           <div className="report-chart h-96 w-full overflow-visible">
@@ -1383,7 +1383,7 @@ export function ReportView({
         ) : null}
 
         {policy.enabled && details.compareCare ? (
-        <details className="pdf-stay-closed report-block report-fold break-inside-avoid"><summary className="flex min-h-11 cursor-pointer list-none items-start gap-2 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal [&::-webkit-details-marker]:hidden [&::marker]:content-none"><span aria-hidden="true" className="naic-chevron mt-1 inline-block text-gold-ink motion-reduce:transition-none">▸</span><h2 className="mb-2 font-display text-xl text-navy">Compare long-term care options</h2></summary>
+        <details className="print-page-start pdf-stay-closed report-block report-fold break-inside-avoid"><summary className="flex min-h-11 cursor-pointer list-none items-start gap-2 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal [&::-webkit-details-marker]:hidden [&::marker]:content-none"><span aria-hidden="true" className="naic-chevron mt-1 inline-block text-gold-ink motion-reduce:transition-none">▸</span><h2 className="mb-2 font-display text-xl text-navy">Compare long-term care options</h2></summary>
           <div className="report-chart mb-3 h-56 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <ComposedChart
@@ -1501,7 +1501,7 @@ export function ReportView({
           </div>
         </details>
 
-        <details className="pdf-stay-closed report-block report-fold">
+        <details className="print-page-start pdf-stay-closed report-block report-fold">
           <summary className="flex min-h-11 cursor-pointer list-none items-start gap-2 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal [&::-webkit-details-marker]:hidden [&::marker]:content-none">
             <span aria-hidden="true" className="naic-chevron mt-1 inline-block text-gold-ink motion-reduce:transition-none">▸</span>
             <h2 className="font-display text-lg text-navy">
@@ -1649,7 +1649,7 @@ export function ReportView({
         ) : null}
 
         {policy.enabled && inflationCompare.length > 0 && details.inflation ? (
-          <details className="pdf-stay-closed report-block report-fold"><summary className="flex min-h-11 cursor-pointer list-none items-start gap-2 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal [&::-webkit-details-marker]:hidden [&::marker]:content-none"><span aria-hidden="true" className="naic-chevron mt-1 inline-block text-gold-ink motion-reduce:transition-none">▸</span><h2 className="mb-2 font-display text-xl text-navy">Compare inflation riders</h2></summary>
+          <details className="print-page-start pdf-stay-closed report-block report-fold"><summary className="flex min-h-11 cursor-pointer list-none items-start gap-2 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal [&::-webkit-details-marker]:hidden [&::marker]:content-none"><span aria-hidden="true" className="naic-chevron mt-1 inline-block text-gold-ink motion-reduce:transition-none">▸</span><h2 className="mb-2 font-display text-xl text-navy">Compare inflation riders</h2></summary>
             <p className="mb-3 text-sm text-muted">
               Same traditional daily benefit ({money(policy.dailyBenefit)} today), period,
               and care CPI (<Pct>{cpi.toFixed(1)}%</Pct>). Compound multiplies last year’s daily.
@@ -1876,7 +1876,7 @@ export function ReportView({
 
         {policy.enabled && details.partnership ? (
         <>
-        <details className="pdf-stay-closed report-block report-fold"><summary className="flex min-h-11 cursor-pointer list-none items-start gap-2 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal [&::-webkit-details-marker]:hidden [&::marker]:content-none"><span aria-hidden="true" className="naic-chevron mt-1 inline-block text-gold-ink motion-reduce:transition-none">▸</span><h2 className="mb-3 font-display text-xl text-navy">
+        <details className="print-page-start pdf-stay-closed report-block report-fold"><summary className="flex min-h-11 cursor-pointer list-none items-start gap-2 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal [&::-webkit-details-marker]:hidden [&::marker]:content-none"><span aria-hidden="true" className="naic-chevron mt-1 inline-block text-gold-ink motion-reduce:transition-none">▸</span><h2 className="mb-3 font-display text-xl text-navy">
             Impact of Partnership on asset preservation
           </h2></summary>
           <p className="mb-3 text-sm text-muted"><LinkedCopy text={partnership.info.summary} /></p>

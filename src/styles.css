@@ -1249,12 +1249,13 @@ html.pdf-capture #aum-report .tabular-nums.font-bold.amt-green {
   }
 
   #aum-report section.report-block,
+  #aum-report .report-block,
   #aum-report .report-fold {
-    break-before: page !important;
-    page-break-before: always !important;
+    break-before: auto !important;
+    page-break-before: auto !important;
     break-inside: auto !important;
     page-break-inside: auto !important;
-    margin-top: 0 !important;
+    margin-top: 8pt !important;
     padding-top: 0 !important;
   }
 
@@ -1262,6 +1263,7 @@ html.pdf-capture #aum-report .tabular-nums.font-bold.amt-green {
   #aum-report > header.report-block {
     break-before: auto !important;
     page-break-before: auto !important;
+    margin-top: 0 !important;
   }
 
   #aum-report .print-page-start,
@@ -1271,6 +1273,13 @@ html.pdf-capture #aum-report .tabular-nums.font-bold.amt-green {
     break-inside: auto !important;
     page-break-inside: auto !important;
     margin-top: 0 !important;
+  }
+
+  #aum-report .print-flow,
+  #aum-report .print-flow.report-block,
+  #aum-report .print-flow.report-fold {
+    break-before: auto !important;
+    page-break-before: auto !important;
   }
 
   #aum-report .print-keep-with-next {

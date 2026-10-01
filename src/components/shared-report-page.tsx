@@ -132,26 +132,33 @@ function applyPrintVisibility(root: HTMLElement) {
   });
   let firstYear = true;
   root.querySelectorAll("h2").forEach((heading) => {
-    const text = heading.textContent || "";
-    if (/^instructions$/i.test(text.trim())) {
+    const text = (heading.textContent || "").replace(/\s+/g, " ").trim();
+    if (/^(prepared for|your hypothetical is ready|descriptive summary|recommendations to consider|instructions)$/i.test(text) || /countable assets at risk|care assumptions|insurance — answers/i.test(text)) {
+      heading.closest("section, details, .report-block")?.classList.add("print-flow");
+      heading.closest("section, details, .report-block")?.classList.remove("print-page-start");
+    }
+    if (/^instructions$/i.test(text)) {
       const block = heading.closest("section, .report-block");
       block?.classList.add("print-page-start", "print-keep-with-next");
+      block?.classList.remove("print-flow");
     }
     if (!/year-by-year projection/i.test(text)) return;
-    if (!firstYear) return;
-    firstYear = false;
     const block = heading.closest("details, .report-block");
-    block?.classList.add("print-keep-with-prev");
-    block?.classList.remove("print-page-start");
-  });
-  root.querySelectorAll("h2").forEach((heading) => {
-    if (!/how the pool|explore asset allocation|compare long-term care insurance|explore traditional, asset-based/i.test(heading.textContent || "")) return;
-    const block = heading.closest("section, details, .report-block");
+    if (firstYear) {
+      firstYear = false;
+      block?.classList.add("print-keep-with-prev");
+      block?.classList.remove("print-page-start");
+      return;
+    }
     block?.classList.add("print-page-start");
+    block?.classList.remove("print-keep-with-prev");
   });
-  root.querySelectorAll("h3").forEach((heading) => {
-    if (!/compare dra partnership benefits|^this run in /i.test(heading.textContent || "")) return;
-    heading.parentElement?.classList.add("print-page-start");
+  root.querySelectorAll("h2, h3").forEach((heading) => {
+    const text = heading.textContent || "";
+    if (!/how the pool|explore asset allocation|asset utilization over time|compare long-term care options|compare long-term care insurance|insurance designs|compare inflation riders|explore traditional, asset-based|impact of partnership|compare dra partnership benefits|^this run in /i.test(text)) return;
+    const block = heading.closest("section, details, .report-block") || heading.parentElement;
+    block?.classList.add("print-page-start");
+    block?.classList.remove("print-flow");
   });
 }
 
