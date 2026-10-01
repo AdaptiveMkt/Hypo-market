@@ -2163,7 +2163,7 @@ export function ReportView({
         ) : null}
 
         {policy.enabled ? (
-        <details className="pdf-stay-closed report-block report-fold"><summary className="flex min-h-11 cursor-pointer list-none items-start gap-2 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal [&::-webkit-details-marker]:hidden [&::marker]:content-none"><span aria-hidden="true" className="naic-chevron mt-1 inline-block text-gold-ink motion-reduce:transition-none">▸</span><h2 className="mb-3 font-display text-xl text-navy">
+        <details className="print-page-start pdf-stay-closed report-block report-fold"><summary className="flex min-h-11 cursor-pointer list-none items-start gap-2 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal [&::-webkit-details-marker]:hidden [&::marker]:content-none"><span aria-hidden="true" className="naic-chevron mt-1 inline-block text-gold-ink motion-reduce:transition-none">▸</span><h2 className="mb-3 font-display text-xl text-navy">
             Sample policies (NAIC-style outlines)
           </h2></summary>
           <SamplePolicyPack policy={policy} state={state} countable={pool} />
@@ -2171,7 +2171,7 @@ export function ReportView({
         ) : null}
 
         {policy.enabled ? (
-        <section className="report-block">
+        <section className="report-block print-page-start">
           <details>
             <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal [&::-webkit-details-marker]:hidden [&::marker]:content-none">
               <span aria-hidden="true" className="naic-chevron inline-block text-gold-ink motion-reduce:transition-none">▸</span>
@@ -2388,7 +2388,7 @@ export function ReportView({
         ) : null}
 
         {details.naicGuide ? (
-        <section className="report-block">
+        <section className="report-block print-page-start">
           <details>
             <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal [&::-webkit-details-marker]:hidden [&::marker]:content-none">
               <span aria-hidden="true" className="naic-chevron inline-block text-gold-ink motion-reduce:transition-none">▸</span>
@@ -2404,7 +2404,7 @@ export function ReportView({
         ) : null}
 
         {details.naicWorksheet ? (
-        <section className="report-block">
+        <section className="report-block print-page-start">
           <details>
             <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal [&::-webkit-details-marker]:hidden [&::marker]:content-none">
               <span aria-hidden="true" className="naic-chevron inline-block text-gold-ink motion-reduce:transition-none">▸</span>

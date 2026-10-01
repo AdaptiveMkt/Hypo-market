@@ -155,7 +155,7 @@ function applyPrintVisibility(root: HTMLElement) {
   });
   root.querySelectorAll("h2, h3").forEach((heading) => {
     const text = heading.textContent || "";
-    if (!/how the pool|explore asset allocation|asset utilization over time|compare long-term care options|compare long-term care insurance|insurance designs|compare inflation riders|explore traditional, asset-based|impact of partnership|compare dra partnership benefits|^this run in /i.test(text)) return;
+    if (!/how the pool|explore asset allocation|asset utilization over time|compare long-term care options|compare long-term care insurance|insurance designs|compare inflation riders|explore traditional, asset-based|impact of partnership|compare dra partnership benefits|^this run in |sample policies|glossary of terms|naic /i.test(text)) return;
     const block = heading.closest("section, details, .report-block") || heading.parentElement;
     block?.classList.add("print-page-start");
     block?.classList.remove("print-flow");
