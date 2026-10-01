@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import type { AdvisorParty } from "@/lib/report";
 
 const PORTAL_ID = "8744592";
@@ -79,16 +79,14 @@ async function readSubmission(event: Event) {
 }
 
 export function HubspotAdvisorForm({
-  instanceId,
   onSubmitted,
 }: {
-  instanceId: string;
   onSubmitted: (partial: Partial<AdvisorParty>) => void;
+  /** Ignored. Kept so an older call site still typechecks. */
+  instanceId?: string;
 }) {
   const onSubmittedRef = useRef(onSubmitted);
   onSubmittedRef.current = onSubmitted;
-  const frameRef = useRef<HTMLDivElement>(null);
-  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     const onSuccess = (event: Event) => {
@@ -97,25 +95,16 @@ export function HubspotAdvisorForm({
       void readSubmission(event).then((partial) => onSubmittedRef.current(partial));
     };
     window.addEventListener("hs-form-event:on-submission:success", onSuccess);
-    const timer = window.setTimeout(() => {
-      if (!frameRef.current?.querySelector("iframe") && attempt < 2) setAttempt((n) => n + 1);
-    }, 1200);
-    return () => {
-      window.clearTimeout(timer);
-      window.removeEventListener("hs-form-event:on-submission:success", onSuccess);
-    };
-  }, [attempt, instanceId]);
+    return () => window.removeEventListener("hs-form-event:on-submission:success", onSuccess);
+  }, []);
 
   return (
     <div className="min-w-0 rounded-lg bg-white p-3 text-navy" style={{ colorScheme: "light" }}>
       <div
-        key={attempt}
-        ref={frameRef}
         className="hs-form-frame min-h-64 min-w-0"
         data-region="na1"
         data-form-id={FORM_ID}
         data-portal-id={PORTAL_ID}
-        data-instance-id={`${instanceId}-${attempt}`}
       />
     </div>
   );
