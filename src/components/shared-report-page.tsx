@@ -150,7 +150,7 @@ function applyPrintVisibility(root: HTMLElement) {
     block?.classList.add("print-page-start");
   });
   root.querySelectorAll("h3").forEach((heading) => {
-    if (!/compare dra partnership benefits/i.test(heading.textContent || "")) return;
+    if (!/compare dra partnership benefits|^this run in /i.test(heading.textContent || "")) return;
     heading.parentElement?.classList.add("print-page-start");
   });
 }

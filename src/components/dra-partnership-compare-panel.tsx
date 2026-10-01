@@ -71,7 +71,7 @@ export function DraPartnershipComparePanel({
       </div>
 
       {preservation ? (
-        <div className="rounded-lg border border-gold bg-cream px-3 py-3">
+        <div className="print-page-start rounded-lg border border-gold bg-cream px-3 py-3">
           <h3 className="font-display text-base text-navy">This run in {state}</h3>
           <p className="mt-1 leading-relaxed text-muted">
             Insurance paid <strong className="tabular-nums text-navy">{money(paid)}</strong>. Countable remaining{" "}
