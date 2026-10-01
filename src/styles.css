@@ -867,7 +867,7 @@ html.pdf-capture #aum-report .tabular-nums.font-bold.amt-green {
 
 @page {
   size: letter;
-  margin: 0.7in 0.55in 0.85in;
+  margin: 0.48in 0.5in 0.58in;
 
   @top-right {
     content: "Page " counter(page) " of " counter(pages);
@@ -1184,5 +1184,47 @@ html.pdf-capture #aum-report .tabular-nums.font-bold.amt-green {
 
   .card-xl {
     box-shadow: none;
+  }
+
+  #aum-report .report-block,
+  #aum-report details,
+  #aum-report .pool-fold {
+    break-before: auto !important;
+    page-break-before: auto !important;
+    break-inside: auto !important;
+    page-break-inside: auto !important;
+    margin-top: 6pt !important;
+    padding-top: 0 !important;
+  }
+
+  #aum-report h1,
+  #aum-report h2,
+  #aum-report h3 {
+    break-after: avoid-page !important;
+    page-break-after: avoid !important;
+    break-inside: avoid !important;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+
+  details.print-show > summary ~ .pdf-kpi-grid,
+  #aum-report .pdf-kpi-grid {
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    break-inside: auto !important;
+    page-break-inside: auto !important;
+  }
+
+  #aum-report .pdf-kpi {
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 0 8px !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+    overflow: visible !important;
   }
 }
