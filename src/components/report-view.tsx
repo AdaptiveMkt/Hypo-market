@@ -545,18 +545,24 @@ export function ReportView({
             </p>
           ) : null}
           {sharePending || shareUrl || shareError ? (
-            <section data-share-omit className="mt-4 rounded-lg border border-gold bg-cream px-4 py-3 text-left text-sm text-navy">
+            <section data-share-omit className="mt-4 rounded-lg border border-gold bg-cream px-4 py-3 text-center text-sm text-navy">
               <p className="font-semibold">Report link</p>
               {sharePending ? <p className="mt-1">Creating a link for this report…</p> : null}
               {shareUrl ? (
-                <p className="mt-1 break-all">
-                  <a href={shareUrl} className="font-semibold text-teal underline underline-offset-2" target="_blank" rel="noopener noreferrer">
-                    {shareUrl}
+                <p className="mt-2">
+                  <a
+                    href={shareUrl}
+                    className="text-lg font-bold uppercase underline underline-offset-2"
+                    style={{ color: "#ff1a1a" }}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Open Report Link
                   </a>
                 </p>
               ) : null}
               {shareError ? <p className="mt-1 font-semibold text-deplete">{shareError}</p> : null}
-              <p className="mt-2 text-xs leading-relaxed">{shareDisclaimer(shareHours)}</p>
+              <p className="mx-auto mt-2 max-w-3xl text-xs leading-relaxed">{shareDisclaimer(shareHours)}</p>
             </section>
           ) : null}
         </header>
