@@ -484,23 +484,19 @@ const html2opts = (scale: number, extra: Record<string, unknown> = {}) => ({
     el.style.maxHeight = "none";
     el.querySelectorAll("details").forEach((d) => {
       const det = d as HTMLDetailsElement;
-      if (!det.open) return;
-      if (det.classList.contains("no-print") || det.closest(".no-print") || det.closest(".print-omit")) return;
+      if (det.classList.contains("no-print") || det.closest(".no-print")) return;
       det.open = true;
+    });
+    el.querySelectorAll<HTMLElement>("[data-accordion]").forEach((node) => {
+      node.setAttribute("data-accordion", "open");
+    });
+    el.querySelectorAll<HTMLElement>("[data-medicaid-fold]").forEach((node) => {
+      node.setAttribute("data-medicaid-open", "1");
     });
     unwrapDetails(el);
     el.querySelectorAll(".accordion-panel").forEach((p) => {
       const panel = p as HTMLElement;
-      const accordion = panel.closest("[data-accordion]");
-      const opened = accordion?.getAttribute("data-accordion") === "open";
-      const fold = panel.closest("[data-medicaid-fold]");
-      if (!opened || fold?.getAttribute("data-medicaid-open") === "0") {
-        panel.style.setProperty("max-height", "0px", "important");
-        panel.style.setProperty("opacity", "0", "important");
-        panel.style.setProperty("overflow", "hidden", "important");
-        panel.style.setProperty("display", "none", "important");
-        return;
-      }
+      if (panel.closest(".no-print")) return;
       panel.style.setProperty("max-height", "none", "important");
       panel.style.setProperty("opacity", "1", "important");
       panel.style.setProperty("transform", "none", "important");
@@ -522,8 +518,8 @@ function unwrapDetails(root: HTMLElement) {
   });
   nodes.forEach((node) => {
     if (!(node instanceof HTMLDetailsElement)) return;
-    if (!node.open) return;
-    if (node.classList.contains("no-print") || node.closest(".no-print") || node.closest(".print-omit")) return;
+    if (!node.open) node.open = true;
+    if (node.classList.contains("no-print") || node.closest(".no-print")) return;
     const parent = node.parentNode;
     if (!parent) return;
     const marker = document.createComment("pdf-details");
@@ -554,19 +550,23 @@ function unwrapDetails(root: HTMLElement) {
 }
 
 function expandLive(root: HTMLElement) {
+  const details = Array.from(root.querySelectorAll("details")).filter(
+    (node): node is HTMLDetailsElement => node instanceof HTMLDetailsElement,
+  );
+  const wasOpen = details.map((node) => ({ node, open: node.open }));
+  details.forEach((node) => {
+    if (!node.classList.contains("no-print") && !node.closest(".no-print")) node.open = true;
+  });
+  const accordions = Array.from(root.querySelectorAll<HTMLElement>("[data-accordion]"));
+  const wasAcc = accordions.map((node) => node.getAttribute("data-accordion"));
+  accordions.forEach((node) => node.setAttribute("data-accordion", "open"));
+  const folds = Array.from(root.querySelectorAll<HTMLElement>("[data-medicaid-fold]"));
+  const wasFold = folds.map((node) => node.getAttribute("data-medicaid-open"));
+  folds.forEach((node) => node.setAttribute("data-medicaid-open", "1"));
   const panels = Array.from(root.querySelectorAll<HTMLElement>(".accordion-panel"));
   const prev = panels.map((p) => ({ p, css: p.getAttribute("style") }));
-  const keepMedicaidClosed = root.dataset.medicaidOpen !== "1";
   panels.forEach((p) => {
-    const accordion = p.closest("[data-accordion]");
-    const opened = accordion?.getAttribute("data-accordion") === "open";
-    if (!opened || (keepMedicaidClosed && p.closest("[data-medicaid-fold]"))) {
-      p.style.setProperty("max-height", "0px", "important");
-      p.style.setProperty("opacity", "0", "important");
-      p.style.setProperty("overflow", "hidden", "important");
-      p.style.setProperty("display", "none", "important");
-      return;
-    }
+    if (p.closest(".no-print")) return;
     p.style.setProperty("max-height", "none", "important");
     p.style.setProperty("opacity", "1", "important");
     p.style.setProperty("overflow", "visible", "important");
@@ -577,6 +577,19 @@ function expandLive(root: HTMLElement) {
   const restoreDetails = unwrapDetails(root);
   return () => {
     restoreDetails();
+    wasOpen.forEach(({ node, open }) => {
+      node.open = open;
+    });
+    accordions.forEach((node, i) => {
+      const state = wasAcc[i];
+      if (state == null) node.removeAttribute("data-accordion");
+      else node.setAttribute("data-accordion", state);
+    });
+    folds.forEach((node, i) => {
+      const state = wasFold[i];
+      if (state == null) node.removeAttribute("data-medicaid-open");
+      else node.setAttribute("data-medicaid-open", state);
+    });
     prev.forEach(({ p, css }) => {
       if (css == null) p.removeAttribute("style");
       else p.setAttribute("style", css);

@@ -321,6 +321,7 @@ export function Calculator() {
   } | null>(null);
   const [pdfError, setPdfError] = useState("");
   const pdfJob = useRef(0);
+  const pdfDetailsSnapshot = useRef<typeof details | null>(null);
   const pdfNameState = useRef(state);
   pdfNameState.current = state;
   const [premiumTouched, setPremiumTouched] = useState(false);
@@ -1214,6 +1215,8 @@ export function Calculator() {
   }, [canPdf, insuranceLocked, showReciprocity]);
   function runPdfDownload(force = false) {
     if (!force && audience !== "interested") return;
+    pdfDetailsSnapshot.current = details;
+    setDetails(withScenarioDetails({ ...ALL_DETAILS_ON, medicaidLtc: true, reciprocity: true }, insuranceLocked));
     setPdfError("");
     setPdfPick(false);
     setShowReport(true);
@@ -1233,6 +1236,7 @@ export function Calculator() {
           if (pdfJob.current !== job) return;
           setPrintAfterOpen(false);
           setShowReport(false);
+          if (pdfDetailsSnapshot.current) setDetails(pdfDetailsSnapshot.current);
           const snap = mailRef.current;
           const demoRun = audience === "licensed-client" || audience === "licensed-solo";
           let note = "Save the PDF on this computer.";
@@ -1256,11 +1260,12 @@ export function Calculator() {
           if (pdfJob.current !== job) return;
           setPrintAfterOpen(false);
           setShowReport(false);
+          if (pdfDetailsSnapshot.current) setDetails(pdfDetailsSnapshot.current);
           const msg = err instanceof Error ? err.message : "PDF could not be created.";
           setPdfError(msg);
           setSaveMsg(`PDF did not download. ${msg}`);
         });
-    }, 400);
+    }, 800);
     return () => {
       window.clearTimeout(t);
     };

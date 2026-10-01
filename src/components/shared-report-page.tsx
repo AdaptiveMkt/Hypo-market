@@ -117,32 +117,23 @@ function widenPremiumNotes(root: HTMLElement) {
   });
 }
 
-function applyPrintVisibility(root: HTMLElement, picked: Record<string, boolean>) {
+function applyPrintVisibility(root: HTMLElement) {
+  root.querySelectorAll(".print-omit").forEach((el) => el.classList.remove("print-omit"));
   root.querySelectorAll("details").forEach((node) => {
     if (!(node instanceof HTMLDetailsElement)) return;
-    const id = node.getAttribute("data-print-id") || "";
-    const show = node.open || picked[id] === true;
-    if (show) {
-      node.open = true;
-      node.classList.add("print-show");
-      node.classList.remove("print-omit");
-    } else {
-      node.classList.remove("print-show");
-      node.classList.add("print-omit");
-    }
+    if (node.classList.contains("no-print") || node.closest(".no-print")) return;
+    node.open = true;
+    node.classList.add("print-show");
   });
-  root.querySelectorAll<HTMLElement>("[data-print-id]").forEach((el) => {
-    if (el instanceof HTMLDetailsElement) return;
-    const id = el.getAttribute("data-print-id") || "";
-    const childOpen = Array.from(el.querySelectorAll("details")).some(
-      (node) => node instanceof HTMLDetailsElement && node.classList.contains("print-show"),
-    );
-    if (picked[id] === false && !childOpen) el.classList.add("print-omit");
-    else el.classList.remove("print-omit");
+  root.querySelectorAll<HTMLElement>("[data-accordion]").forEach((node) => {
+    node.setAttribute("data-accordion", "open");
+  });
+  root.querySelectorAll<HTMLElement>("[data-medicaid-fold]").forEach((node) => {
+    node.setAttribute("data-medicaid-open", "1");
   });
 }
 
-function printCheckedSections(picked: Record<string, boolean>, done: () => void) {
+function printCheckedSections(_picked: Record<string, boolean>, done: () => void) {
   const root = document.getElementById("aum-report");
   if (!root) return;
   widenPremiumNotes(root);
@@ -150,7 +141,11 @@ function printCheckedSections(picked: Record<string, boolean>, done: () => void)
   const wasOpen = Array.from(root.querySelectorAll("details")).flatMap((node) =>
     node instanceof HTMLDetailsElement ? [{ node, open: node.open }] : [],
   );
-  const apply = () => applyPrintVisibility(root, picked);
+  const accordions = Array.from(root.querySelectorAll<HTMLElement>("[data-accordion]"));
+  const wasAcc = accordions.map((node) => node.getAttribute("data-accordion"));
+  const folds = Array.from(root.querySelectorAll<HTMLElement>("[data-medicaid-fold]"));
+  const wasFold = folds.map((node) => node.getAttribute("data-medicaid-open"));
+  const apply = () => applyPrintVisibility(root);
   apply();
   const onBefore = () => apply();
   let cleared = false;
@@ -165,6 +160,16 @@ function printCheckedSections(picked: Record<string, boolean>, done: () => void)
     });
     wasOpen.forEach(({ node, open }) => {
       node.open = open;
+    });
+    accordions.forEach((node, i) => {
+      const state = wasAcc[i];
+      if (state == null) node.removeAttribute("data-accordion");
+      else node.setAttribute("data-accordion", state);
+    });
+    folds.forEach((node, i) => {
+      const state = wasFold[i];
+      if (state == null) node.removeAttribute("data-medicaid-open");
+      else node.setAttribute("data-medicaid-open", state);
     });
     dialog?.classList.remove("print-omit");
     done();

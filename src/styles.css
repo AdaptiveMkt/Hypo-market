@@ -729,21 +729,23 @@ html.pdf-capture a[data-source-href]::after {
   word-break: break-all;
 }
 
-html.pdf-capture [data-accordion="open"] > .accordion-panel {
+html.pdf-capture .accordion-panel,
+html.pdf-capture [data-accordion="closed"] > .accordion-panel,
+html.pdf-capture [data-accordion="open"] > .accordion-panel,
+html.pdf-capture [data-medicaid-fold] .accordion-panel,
+html.pdf-capture details > summary ~ * {
   max-height: none !important;
   opacity: 1 !important;
   transform: none !important;
   overflow: visible !important;
   pointer-events: auto !important;
   display: block !important;
+  visibility: visible !important;
+  height: auto !important;
 }
 
-html.pdf-capture [data-accordion="closed"] > .accordion-panel,
-html.pdf-capture [data-medicaid-fold][data-medicaid-open="0"] .accordion-panel {
-  max-height: 0 !important;
-  opacity: 0 !important;
-  overflow: hidden !important;
-  display: none !important;
+html.pdf-capture details > summary ~ table {
+  display: table !important;
 }
 
 details.report-fold > summary h2 {
