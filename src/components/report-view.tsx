@@ -350,7 +350,7 @@ export function ReportView({
           },
         ];
   const printReady = !pdfDemo || Boolean(shareUrl);
-  const showDownload = allowPdf && !pdfDemo;
+  const showDownload = true;
   const tip = {
     background: "#fffdf8",
     border: "1px solid #d9cfc0",
@@ -579,7 +579,7 @@ export function ReportView({
               onClick={onPdf}
               className="flex min-h-11 items-center justify-center rounded-lg border border-gold bg-gold px-2 text-center text-sm font-semibold text-masthead hover:brightness-105"
             >
-              Download PDF
+              Export PDF
             </button>
             ) : null}
             <button
