@@ -225,7 +225,7 @@ export function ReportView({
   protectOn = false,
   readyCards = [],
   details = ALL_DETAILS_ON,
-  allowPdf = true,
+  allowPdf: _allowPdf = true,
   pdfDemo = false,
   audienceRole = null,
   audienceNote = "",
@@ -234,7 +234,7 @@ export function ReportView({
   sharePending = false,
   shareError = "",
   onClose,
-  onPdf,
+  onPdf: _onPdf,
   onClosePdf: _onClosePdf,
   onNeedAdvisor,
 }: {
@@ -350,7 +350,6 @@ export function ReportView({
           },
         ];
   const printReady = !pdfDemo || Boolean(shareUrl);
-  const showDownload = allowPdf && !pdfDemo;
   const tip = {
     background: "#fffdf8",
     border: "1px solid #d9cfc0",
@@ -572,24 +571,13 @@ export function ReportView({
           aria-label="Report controls"
         >
           <div className="stack-actions">
-            <div className={`grid gap-2 ${showDownload ? "grid-cols-2" : "grid-cols-1"}`}>
-            {showDownload ? (
-            <button
-              type="button"
-              onClick={onPdf}
-              className="flex min-h-11 items-center justify-center rounded-lg border border-gold bg-gold px-2 text-center text-sm font-semibold text-masthead hover:brightness-105"
-            >
-              Export PDF
-            </button>
-            ) : null}
             <button
               type="button"
               onClick={onClose}
-              className="flex min-h-11 items-center justify-center rounded-lg border border-white bg-black px-2 text-center text-sm font-semibold text-white hover:bg-neutral-900"
+              className="flex min-h-11 w-full items-center justify-center rounded-lg border border-white bg-black px-2 text-center text-sm font-semibold text-white hover:bg-neutral-900"
             >
               Edit
             </button>
-            </div>
           </div>
         </div>
 

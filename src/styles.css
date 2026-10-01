@@ -892,7 +892,7 @@ html.pdf-capture #aum-report .tabular-nums.font-bold.amt-green {
 
 @page {
   size: letter;
-  margin: 0.48in 0.5in 0.58in;
+  margin: 0.7in 0.65in 0.75in;
 
   @top-right {
     content: "Page " counter(page) " of " counter(pages);
@@ -1158,9 +1158,20 @@ html.pdf-capture #aum-report .tabular-nums.font-bold.amt-green {
     display: none !important;
   }
 
+  html,
   body {
+    margin: 0 !important;
+    padding: 0 !important;
     background: #fff !important;
     user-select: text !important;
+  }
+
+  #aum-report {
+    max-width: none !important;
+    width: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
   }
 
   .red-wave,
@@ -1188,12 +1199,6 @@ html.pdf-capture #aum-report .tabular-nums.font-bold.amt-green {
     animation: none !important;
     color: var(--color-remain-draw) !important;
     -webkit-text-fill-color: var(--color-remain-draw) !important;
-  }
-
-  #aum-report {
-    max-width: none !important;
-    padding: 0 !important;
-    box-shadow: none !important;
   }
 
   #aum-report .h-72,
