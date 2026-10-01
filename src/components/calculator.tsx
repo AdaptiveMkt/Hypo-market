@@ -147,7 +147,7 @@ function snapshotReadyCards(): { label: string; value: string }[] {
     value: node.querySelector("p.font-display")?.textContent?.trim() ?? "",
   })).filter((card) => card.label && card.value);
 }
-import { ContactAskDialog, ContactRequestDialog, AdvisorCaptureDialog, PdfReadyDialog, PlanningAssistDialog } from "@/components/pdf-delivery-dialogs";
+import { ContactAskDialog, ContactRequestDialog, PdfReadyDialog, PlanningAssistDialog } from "@/components/pdf-delivery-dialogs";
 import { MedicaidVaCard } from "@/components/medicaid-va-card";
 import { AdvisorProfessionalFolds, DesignationNoticeFold, DisclaimerCard } from "@/components/disclaimer-card";
 import { WelcomeCard } from "@/components/welcome-card";
@@ -314,7 +314,6 @@ export function Calculator() {
   const [sharePending, setSharePending] = useState(false);
   const [shareError, setShareError] = useState("");
   const [printAfterOpen, setPrintAfterOpen] = useState(false);
-  const [advisorCaptureOpen, setAdvisorCaptureOpen] = useState(false);
   const [pdfPick, setPdfPick] = useState(false);
   const [personalizeOpen, setPersonalizeOpen] = useState(false);
   const [finderIndex, setFinderIndex] = useState(0);
@@ -1235,7 +1234,7 @@ export function Calculator() {
   function requestPdfDownload() {
     if (!pdfUnlocked) return;
     if (licensedPdf) {
-      setAdvisorCaptureOpen(true);
+      runPdfDownload(true);
       return;
     }
     if (audience !== "interested") return;
@@ -1348,9 +1347,16 @@ export function Calculator() {
   );
 
   function acceptHubspotAdvisor(partial: Partial<AdvisorParty>) {
-    const stateName = partial.state && STATE_NAMES.includes(partial.state) ? partial.state : "";
+    const rawState = (partial.state ?? "").trim();
+    const stateName = STATE_NAMES.includes(rawState)
+      ? rawState
+      : STATE_NAMES.find((name) => name.toLowerCase() === rawState.toLowerCase()) ?? "";
     setHubspotAdvisor(true);
-    setAdvisor((current) => ({ ...current, ...partial, state: stateName || current.state }));
+    setAdvisor((current) => ({
+      ...current,
+      ...partial,
+      state: stateName || rawState || current.state,
+    }));
     if (stateName) applyAgentState(stateName);
     setAdvisorCleared(true);
   }
@@ -1609,10 +1615,6 @@ export function Calculator() {
     },
     onPdf: requestPdfDownload,
     onClosePdf: () => {
-      if (audience === "licensed-client" || audience === "licensed-solo") {
-        setAdvisorCaptureOpen(true);
-        return;
-      }
       runPdfDownload(true);
     },
     onNeedAdvisor: () => {
@@ -1699,16 +1701,7 @@ export function Calculator() {
       <WelcomeCard onReset={resetAll} />
       {showFullForm ? null : (
       <>
-      {audience === "licensed-client" ? (
-        <section id="advisor-required" className="card-xl mt-4 min-w-0 scroll-mt-8 p-4 md:p-5" tabIndex={-1}>
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-teal">Advisor</p>
-          <h2 className="mt-1 font-display text-xl text-navy">Advisor information</h2>
-          <p className="mt-2 text-sm text-muted">Required to run, with client information or incognito. Submit the form below.</p>
-          <div className="mt-4">
-            <HubspotAdvisorForm instanceId="advisor-card" onSubmitted={acceptHubspotAdvisor} />
-          </div>
-        </section>
-      ) : null}
+      {audience === "licensed-client" ? <AdvisorOnRun advisor={advisor} /> : null}
       <FactFinder
         daylight={false}
         index={finderIndex}
@@ -3280,8 +3273,8 @@ export function Calculator() {
             </div>
           ) : policy.enabled ? (
             <div className="mt-5 card-xl px-4 py-2">
-              <TitleCollapse title="Advisor / insurance professional (optional)" className="mt-0" defaultOpen hint="Submit the form to add the advisor or agent on the report.">
-                <HubspotAdvisorForm instanceId="advisor-report" onSubmitted={acceptHubspotAdvisor} />
+              <TitleCollapse title="Advisor / insurance professional" className="mt-0" defaultOpen hint="Taken from the contact form submitted before this hypothetical.">
+                <AdvisorOnRun advisor={advisor} bare />
                 <AdvisorProfessionalFolds details={details} onPdfChange={setDetail} />
               </TitleCollapse>
             </div>
@@ -3384,18 +3377,6 @@ export function Calculator() {
           filenamePreview={pdfFilename(state)}
           onCancel={() => setPdfPick(false)}
           onConfirm={runPdfDownload}
-        />,
-        document.body,
-      ) : null}
-      {advisorCaptureOpen ? createPortal(
-        <AdvisorCaptureDialog
-          open
-          onCancel={() => setAdvisorCaptureOpen(false)}
-          onSubmit={(partial) => {
-            acceptHubspotAdvisor(partial);
-            setAdvisorCaptureOpen(false);
-            runPdfDownload(true);
-          }}
         />,
         document.body,
       ) : null}
@@ -3890,6 +3871,34 @@ function MovableKpiGrid({
 
 function RedAmt({ children }: { children: ReactNode }) {
   return <span className="text-shortfall">{children}</span>;
+}
+
+function AdvisorOnRun({ advisor, bare }: { advisor: AdvisorParty; bare?: boolean }) {
+  const lines = [
+    advisor.name,
+    advisor.firm,
+    advisor.address,
+    [advisor.state, advisor.zip].filter(Boolean).join(" "),
+    advisor.phone,
+    advisor.email,
+  ].filter(Boolean);
+  const body = (
+    <div id={bare ? undefined : "advisor-required"} className="text-sm text-navy">
+      {lines.length ? (
+        lines.map((line) => <p key={line}>{line}</p>)
+      ) : (
+        <p className="text-muted">Advisor contact was submitted.</p>
+      )}
+    </div>
+  );
+  if (bare) return body;
+  return (
+    <section className="card-xl mt-4 min-w-0 scroll-mt-8 p-4 md:p-5">
+      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-teal">Advisor</p>
+      <h2 className="mt-1 font-display text-xl text-navy">Advisor information</h2>
+      <div className="mt-3">{body}</div>
+    </section>
+  );
 }
 
 function PartyFields({

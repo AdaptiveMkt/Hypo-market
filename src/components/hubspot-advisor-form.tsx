@@ -16,16 +16,27 @@ type HsGlobal = {
   getFormFromEvent?: (event: Event) => HsFormApi;
 };
 
-function textValue(value: unknown) {
-  if (Array.isArray(value)) return String(value[0] ?? "").trim();
+function textValue(value: unknown): string {
   if (value == null) return "";
-  return String(value).trim();
+  if (typeof value === "string" || typeof value === "number") return String(value).trim();
+  if (Array.isArray(value)) return value.map(textValue).filter(Boolean).join(", ");
+  if (typeof value === "object") {
+    const row = value as Record<string, unknown>;
+    const phone = [row.countryCode, row.dialCode, row.number, row.phone, row.nationalNumber]
+      .map(textValue)
+      .filter(Boolean)
+      .join(" ");
+    if (phone) return phone;
+    if ("value" in row) return textValue(row.value);
+  }
+  return "";
 }
 
 function mapHubspotFields(values: HsField[]): Partial<AdvisorParty> {
   const byName = new Map<string, string>();
   for (const row of values) {
-    const key = String(row.name ?? "").toLowerCase().replace(/[\s_-]+/g, "");
+    const raw = String(row.name ?? "").toLowerCase();
+    const key = (raw.split("/").pop() ?? raw).replace(/[\s_|-]+/g, "");
     const value = textValue(row.value);
     if (key && value) byName.set(key, value);
   }
@@ -39,18 +50,20 @@ function mapHubspotFields(values: HsField[]): Partial<AdvisorParty> {
   const name =
     pick("name", "fullname") ||
     [pick("firstname"), pick("lastname")].filter(Boolean).join(" ");
+  const street = pick("address", "streetaddress", "address1");
+  const city = pick("city");
   const next: Partial<AdvisorParty> = {};
   const set = (key: keyof AdvisorParty, value: string) => {
     if (value) next[key] = value;
   };
   set("name", name);
   set("email", pick("email"));
-  set("phone", pick("phone", "mobilephone", "phonenumber"));
+  set("phone", pick("mobilephone", "phone", "phonenumber", "mobile"));
   set("firm", pick("company", "firm", "companyname"));
   set("designation", pick("jobtitle", "designation", "title"));
-  set("state", pick("state", "stateregion"));
+  set("state", pick("state", "stateregion", "region"));
   set("zip", pick("zip", "zipcode", "postalcode", "postal"));
-  set("address", pick("address", "address1", "street"));
+  set("address", [street, city].filter(Boolean).join(", "));
   return next;
 }
 
