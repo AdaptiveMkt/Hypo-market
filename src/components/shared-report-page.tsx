@@ -133,10 +133,16 @@ function applyPrintVisibility(root: HTMLElement) {
   let firstYear = true;
   root.querySelectorAll("h2").forEach((heading) => {
     const text = heading.textContent || "";
-    if (!firstYear || !/year-by-year projection/i.test(text)) return;
+    if (/^instructions$/i.test(text.trim())) {
+      const block = heading.closest("section, .report-block");
+      block?.classList.add("print-page-start", "print-keep-with-next");
+    }
+    if (!/year-by-year projection/i.test(text)) return;
+    if (!firstYear) return;
     firstYear = false;
     const block = heading.closest("details, .report-block");
-    block?.classList.add("print-page-start");
+    block?.classList.add("print-keep-with-prev");
+    block?.classList.remove("print-page-start");
   });
   root.querySelectorAll("h2").forEach((heading) => {
     if (!/how the pool/i.test(heading.textContent || "")) return;
