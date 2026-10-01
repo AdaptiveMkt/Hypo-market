@@ -487,29 +487,22 @@ const html2opts = (scale: number, extra: Record<string, unknown> = {}) => ({
       if (det.classList.contains("no-print") || det.closest(".no-print") || det.closest(".print-omit")) return;
       det.open = true;
     });
+    unwrapDetails(el);
     el.querySelectorAll(".accordion-panel").forEach((p) => {
       const panel = p as HTMLElement;
       const fold = panel.closest("[data-medicaid-fold]");
-      const inFoldRegion = panel.closest("[data-fold-region]");
-      const accordion = panel.closest("[data-accordion]");
-      if (inFoldRegion && accordion?.getAttribute("data-accordion") !== "open") {
-        panel.style.maxHeight = "0px";
-        panel.style.opacity = "0";
-        panel.style.overflow = "hidden";
-        panel.style.display = "none";
-        return;
-      }
       if (fold?.getAttribute("data-medicaid-open") === "0") {
-        panel.style.maxHeight = "0px";
-        panel.style.opacity = "0";
-        panel.style.overflow = "hidden";
-        panel.style.display = "none";
+        panel.style.setProperty("max-height", "0px", "important");
+        panel.style.setProperty("opacity", "0", "important");
+        panel.style.setProperty("overflow", "hidden", "important");
+        panel.style.setProperty("display", "none", "important");
         return;
       }
-      panel.style.maxHeight = "none";
-      panel.style.opacity = "1";
-      panel.style.transform = "none";
-      panel.style.overflow = "visible";
+      panel.style.setProperty("max-height", "none", "important");
+      panel.style.setProperty("opacity", "1", "important");
+      panel.style.setProperty("transform", "none", "important");
+      panel.style.setProperty("overflow", "visible", "important");
+      panel.style.setProperty("display", "block", "important");
     });
     doc.querySelectorAll(".no-print").forEach((n) => {
       (n as HTMLElement).style.display = "none";
@@ -517,59 +510,70 @@ const html2opts = (scale: number, extra: Record<string, unknown> = {}) => ({
   },
 });
 
-function expandLive(root: HTMLElement) {
-  const panels = Array.from(root.querySelectorAll<HTMLElement>(".accordion-panel"));
-  const prev = panels.map((p) => ({
-    p,
-    maxH: p.style.maxHeight,
-    op: p.style.opacity,
-    ov: p.style.overflow,
-    tf: p.style.transform,
-    display: p.style.display,
-  }));
-  const keepMedicaidClosed = root.dataset.medicaidOpen !== "1";
-  panels.forEach((p) => {
-    const inFoldRegion = p.closest("[data-fold-region]");
-    const accordion = p.closest("[data-accordion]");
-    if (inFoldRegion && accordion?.getAttribute("data-accordion") !== "open") {
-      p.style.maxHeight = "0px";
-      p.style.opacity = "0";
-      p.style.overflow = "hidden";
-      p.style.display = "none";
-      p.style.transform = "none";
-      return;
-    }
-    if (keepMedicaidClosed && p.closest("[data-medicaid-fold]")) {
-      p.style.maxHeight = "0px";
-      p.style.opacity = "0";
-      p.style.overflow = "hidden";
-      p.style.display = "none";
-      p.style.transform = "none";
-      return;
-    }
-    p.style.maxHeight = "none";
-    p.style.opacity = "1";
-    p.style.overflow = "visible";
-    p.style.transform = "none";
-    p.style.pointerEvents = "auto";
-    p.style.display = "";
+function unwrapDetails(root: HTMLElement) {
+  const restores: Array<() => void> = [];
+  const nodes = Array.from(root.querySelectorAll("details")).sort((a, b) => {
+    if (a.contains(b)) return 1;
+    if (b.contains(a)) return -1;
+    return 0;
   });
-  const detailNodes = Array.from(root.querySelectorAll("details"));
-  const detailsPrev = detailNodes.map((d) => ({ d: d as HTMLDetailsElement, open: (d as HTMLDetailsElement).open }));
-  detailNodes.forEach((d) => {
-    if (d.classList.contains("no-print") || d.closest(".no-print") || d.closest(".print-omit")) return;
-    (d as HTMLDetailsElement).open = true;
+  nodes.forEach((node) => {
+    if (!(node instanceof HTMLDetailsElement)) return;
+    if (node.classList.contains("no-print") || node.closest(".no-print") || node.closest(".print-omit")) return;
+    const parent = node.parentNode;
+    if (!parent) return;
+    const marker = document.createComment("pdf-details");
+    parent.insertBefore(marker, node);
+    const box = document.createElement("div");
+    Array.from(node.attributes).forEach((attr) => {
+      if (attr.name !== "open") box.setAttribute(attr.name, attr.value);
+    });
+    while (node.firstChild) box.appendChild(node.firstChild);
+    box.querySelectorAll("summary").forEach((summary) => {
+      if (summary instanceof HTMLElement) summary.style.display = "flex";
+    });
+    parent.insertBefore(box, node);
+    node.remove();
+    restores.push(() => {
+      box.querySelectorAll("summary").forEach((summary) => {
+        if (summary instanceof HTMLElement) summary.style.display = "";
+      });
+      while (box.firstChild) node.appendChild(box.firstChild);
+      parent.insertBefore(node, marker);
+      marker.remove();
+      box.remove();
+    });
   });
   return () => {
-    prev.forEach(({ p, maxH, op, ov, tf, display }) => {
-      p.style.maxHeight = maxH;
-      p.style.opacity = op;
-      p.style.overflow = ov;
-      p.style.transform = tf;
-      p.style.display = display;
-    });
-    detailsPrev.forEach(({ d, open }) => {
-      d.open = open;
+    restores.reverse().forEach((fn) => fn());
+  };
+}
+
+function expandLive(root: HTMLElement) {
+  const panels = Array.from(root.querySelectorAll<HTMLElement>(".accordion-panel"));
+  const prev = panels.map((p) => ({ p, css: p.getAttribute("style") }));
+  const keepMedicaidClosed = root.dataset.medicaidOpen !== "1";
+  panels.forEach((p) => {
+    if (keepMedicaidClosed && p.closest("[data-medicaid-fold]")) {
+      p.style.setProperty("max-height", "0px", "important");
+      p.style.setProperty("opacity", "0", "important");
+      p.style.setProperty("overflow", "hidden", "important");
+      p.style.setProperty("display", "none", "important");
+      return;
+    }
+    p.style.setProperty("max-height", "none", "important");
+    p.style.setProperty("opacity", "1", "important");
+    p.style.setProperty("overflow", "visible", "important");
+    p.style.setProperty("transform", "none", "important");
+    p.style.setProperty("display", "block", "important");
+    p.style.setProperty("pointer-events", "auto", "important");
+  });
+  const restoreDetails = unwrapDetails(root);
+  return () => {
+    restoreDetails();
+    prev.forEach(({ p, css }) => {
+      if (css == null) p.removeAttribute("style");
+      else p.setAttribute("style", css);
     });
   };
 }

@@ -735,16 +735,14 @@ html.pdf-capture .accordion-panel {
   transform: none !important;
   overflow: visible !important;
   pointer-events: auto !important;
+  display: block !important;
 }
 
-/* From Year-by-year on, closed cards stay closed in the PDF capture. */
-html.pdf-capture [data-fold-region] [data-accordion="closed"] .accordion-panel {
+html.pdf-capture [data-medicaid-fold][data-medicaid-open="0"] .accordion-panel {
   max-height: 0 !important;
   opacity: 0 !important;
   overflow: hidden !important;
   display: none !important;
-  transform: none !important;
-  pointer-events: none !important;
 }
 
 details.report-fold > summary h2 {
@@ -933,6 +931,21 @@ html.pdf-capture #aum-report .tabular-nums.font-bold.amt-green {
   footer,
   .no-print,
   .print-omit {
+    display: none !important;
+  }
+
+  .accordion-panel {
+    max-height: none !important;
+    opacity: 1 !important;
+    overflow: visible !important;
+    display: block !important;
+    transform: none !important;
+  }
+
+  [data-medicaid-fold][data-medicaid-open="0"] .accordion-panel {
+    max-height: 0 !important;
+    opacity: 0 !important;
+    overflow: hidden !important;
     display: none !important;
   }
 

@@ -37,7 +37,7 @@ export function Accordion({
           {leading}
           <button
             type="button"
-            className="flex min-h-11 min-w-0 flex-1 cursor-pointer items-start gap-2 text-left no-print"
+            className="flex min-h-11 min-w-0 flex-1 cursor-pointer items-start gap-2 text-left"
             aria-expanded={open}
             onClick={onToggle}
           >
