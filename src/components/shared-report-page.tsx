@@ -145,7 +145,7 @@ function applyPrintVisibility(root: HTMLElement) {
     block?.classList.remove("print-page-start");
   });
   root.querySelectorAll("h2").forEach((heading) => {
-    if (!/how the pool|explore asset allocation/i.test(heading.textContent || "")) return;
+    if (!/how the pool|explore asset allocation|compare long-term care insurance/i.test(heading.textContent || "")) return;
     const block = heading.closest("section, details, .report-block");
     block?.classList.add("print-page-start");
   });
