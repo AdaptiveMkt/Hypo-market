@@ -931,7 +931,8 @@ html.pdf-capture #aum-report .tabular-nums.font-bold.amt-green {
 
   header,
   footer,
-  .no-print {
+  .no-print,
+  .print-omit {
     display: none !important;
   }
 
