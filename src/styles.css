@@ -1216,21 +1216,36 @@ html.pdf-capture #aum-report .tabular-nums.font-bold.amt-green {
     box-shadow: none;
   }
 
-  #aum-report .report-block,
-  #aum-report details,
+  #aum-report details:not(.report-fold),
   #aum-report .pool-fold {
     break-before: auto !important;
     page-break-before: auto !important;
     break-inside: auto !important;
     page-break-inside: auto !important;
-    margin-top: 6pt !important;
+  }
+
+  #aum-report section.report-block,
+  #aum-report details.report-fold {
+    break-before: page !important;
+    page-break-before: always !important;
+    break-inside: auto !important;
+    page-break-inside: auto !important;
+    margin-top: 0 !important;
     padding-top: 0 !important;
+  }
+
+  #aum-report > section.report-block:first-of-type,
+  #aum-report > header.report-block {
+    break-before: auto !important;
+    page-break-before: auto !important;
   }
 
   #aum-report .print-page-start,
   #aum-report details.print-page-start {
     break-before: page !important;
     page-break-before: always !important;
+    break-inside: auto !important;
+    page-break-inside: auto !important;
     margin-top: 0 !important;
   }
 
@@ -1244,6 +1259,14 @@ html.pdf-capture #aum-report .tabular-nums.font-bold.amt-green {
     break-before: avoid !important;
     page-break-before: avoid !important;
     margin-top: 8pt !important;
+  }
+
+  #aum-report .report-block .card,
+  #aum-report details.report-fold .card,
+  #aum-report .report-block table,
+  #aum-report details.report-fold table {
+    break-inside: auto !important;
+    page-break-inside: auto !important;
   }
 
   #aum-report h1,
