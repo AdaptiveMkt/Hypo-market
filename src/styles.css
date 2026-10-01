@@ -937,17 +937,8 @@ html.pdf-capture #aum-report .tabular-nums.font-bold.amt-green {
 
   details[open] > summary ~ * {
     visibility: visible !important;
-    height: auto !important;
     max-height: none !important;
     overflow: visible !important;
-  }
-
-  details[open] > summary ~ div,
-  details[open] > summary ~ section,
-  details[open] > summary ~ p,
-  details[open] > summary ~ ul,
-  details[open] > summary ~ ol {
-    display: block !important;
   }
 
   details[open] table {
@@ -960,6 +951,39 @@ html.pdf-capture #aum-report .tabular-nums.font-bold.amt-green {
   details[open] tr { display: table-row !important; }
   details[open] th,
   details[open] td { display: table-cell !important; }
+
+  h1, h2, h3, h4, summary {
+    break-after: avoid;
+    page-break-after: avoid;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .pdf-kpi-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+    break-inside: auto;
+    page-break-inside: auto;
+  }
+
+  .pdf-kpi,
+  .card,
+  .card-xl,
+  tr,
+  li,
+  figure,
+  .chart-frame,
+  .chart-page {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+    overflow: visible !important;
+  }
+
+  p, li {
+    orphans: 3;
+    widows: 3;
+  }
 
   [data-accordion="open"] > .accordion-panel {
     max-height: none !important;
