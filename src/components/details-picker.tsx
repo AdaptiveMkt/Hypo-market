@@ -286,7 +286,7 @@ export function PdfSectionsDialog({
           className="mt-4 card px-4 py-3"
           onDownload={onConfirm}
         />
-        <div className="mt-4 stack-actions md:grid-cols-3">
+        <div className="mt-4 stack-actions md:grid-cols-4">
           <button
             type="button"
             className="btn-block rounded-lg border border-card-border text-navy hover:bg-cream"
@@ -296,7 +296,14 @@ export function PdfSectionsDialog({
           </button>
           <button
             type="button"
-            className="btn-block rounded-lg border border-card-border text-navy hover:bg-cream"
+            className="btn-block rounded-lg border border-navy bg-navy text-cream hover:bg-teal"
+            onClick={() => onChange(lockoutMode ? lockoutDetails() : withScenarioDetails({ ...ALL_DETAILS_ON }, false))}
+          >
+            Select all
+          </button>
+          <button
+            type="button"
+            className="btn-block rounded-lg border border-white bg-black text-white hover:bg-neutral-900"
             onClick={() => onChange(lockoutMode ? lockoutDetails() : withRequiredDetails({ ...ALL_DETAILS_OFF }))}
           >
             Deselect all

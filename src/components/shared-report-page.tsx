@@ -168,6 +168,20 @@ export function SharedReportPage({ slug, code }: { slug: string; code: string })
             <div className="mt-4 grid gap-2 sm:grid-cols-2">
               <button
                 type="button"
+                className="min-h-11 rounded-lg border border-navy bg-navy px-4 text-sm font-semibold text-cream hover:bg-teal"
+                onClick={() => setPicked(Object.fromEntries(rows.map((row) => [row.id, true])))}
+              >
+                Select all
+              </button>
+              <button
+                type="button"
+                className="min-h-11 rounded-lg border border-white bg-black px-4 text-sm font-semibold text-white hover:bg-neutral-900"
+                onClick={() => setPicked(Object.fromEntries(rows.map((row) => [row.id, false])))}
+              >
+                Deselect all
+              </button>
+              <button
+                type="button"
                 className="min-h-11 rounded-lg border border-white bg-black px-4 text-sm font-semibold text-white"
                 onClick={() => setPicker(false)}
               >
