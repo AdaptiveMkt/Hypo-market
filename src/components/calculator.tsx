@@ -168,7 +168,6 @@ import {
   type ContactParty,
 } from "@/lib/report";
 import { downloadReportPdf } from "@/lib/download-report-pdf";
-import { emailAdvisorPdf } from "@/lib/send-report-mail";
 import { pdfFilename } from "@/lib/email-attachment";
 import { publishShare } from "@/lib/share-report";
 import { hypothesisSensitivity } from "@/lib/sensitivity";
@@ -1230,37 +1229,16 @@ export function Calculator() {
       downloadReportPdf(name, (msg) => {
         if (pdfJob.current === job) setSaveMsg(msg);
       })
-        .then(async (file) => {
+        .then((file) => {
           if (pdfJob.current !== job) return;
           setPrintAfterOpen(false);
           setShowReport(false);
           const snap = mailRef.current;
           const demoRun = audience === "licensed-client" || audience === "licensed-solo";
-          let note = "The file is not on this computer until you choose Save PDF to this computer.";
+          let note = "Save the PDF on this computer.";
           let next: "contact" | "done" = "contact";
-          if (!demoRun && advisorReceivesPdf(snap.advisor, snap.client) && snap.attachAdvisor) {
-            try {
-              const r = await emailAdvisorPdf({
-                data: {
-                  advisorName: snap.advisor.name || "Advisor",
-                  advisorEmail: snap.advisor.email,
-                  advisorFirm: snap.advisor.firm,
-                  clientName: snap.client.name || "End user",
-                  clientEmail: snap.client.email,
-                  filename: file.filename,
-                  pdfBase64: file.base64,
-                  state: snap.client.state || snap.state,
-                },
-              });
-              note = r.emailed
-                ? "A copy was emailed to the advisor from info@fundingltcmarketplace.com. Save your copy below."
-                : "The advisor copy could not be emailed. Save your copy below.";
-            } catch {
-              note = "The advisor copy could not be emailed. Save your copy below.";
-            }
-            next = "done";
-          } else if (demoRun) {
-            note = "DEMO report. Advisor name, phone, email, and state were recorded on this device. Nothing was emailed.";
+          if (demoRun) {
+            note = "DEMO report. Advisor name, phone, email, and state were recorded on this device.";
             next = "done";
           } else {
             setContactDraft({
@@ -1269,7 +1247,6 @@ export function Calculator() {
               email: snap.client.email,
               state: snap.client.state || snap.state,
             });
-            note = "Save the PDF on this computer. It was not emailed — no advisor email on this run.";
             next = "contact";
           }
           setPdfReady({ filename: file.filename, url: file.url, pages: file.previews, note, next });
@@ -3968,11 +3945,6 @@ function PartyFields({
       <div>
         <label className={labelClass} htmlFor={`${idPrefix}-email`}>Email</label>
         <input id={`${idPrefix}-email`} className={fieldClass} autoComplete="email" value={party.email} onChange={(e) => onChange({ email: e.target.value })} />
-        {extra ? (
-          <p className="mt-1 text-xs text-muted">
-            If the end user’s contact is also on this run, a copy of the PDF is emailed to this address from info@fundingltcmarketplace.com.
-          </p>
-        ) : null}
       </div>
     </div>
   );

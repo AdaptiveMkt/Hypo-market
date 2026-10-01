@@ -82,7 +82,7 @@ export const PRIVACY_POLICY_INTRO =
 export const PRIVACY_POLICY_PARAS = [
   {
     heading: "Who we are",
-    body: "Adaptive Marketing Group operates this educational hypothetical. Policy questions: kim@adaptivesolutionsonline.com. Advisor PDF copies are sent from info@fundingltcmarketplace.com. Contact-request forms are sent to Info@preserve-your-assets.com. This is not a Notice of Privacy Practices under HIPAA. This site is an educational calculator, not a medical record, health plan, or health-care provider portal.",
+    body: "Adaptive Marketing Group operates this educational hypothetical. Policy questions: kim@adaptivesolutionsonline.com. Contact-request forms are sent to Info@preserve-your-assets.com. This is not a Notice of Privacy Practices under HIPAA. This site is an educational calculator, not a medical record, health plan, or health-care provider portal.",
   },
   {
     heading: "If no client information is submitted, none is retained",
@@ -90,19 +90,19 @@ export const PRIVACY_POLICY_PARAS = [
   },
   {
     heading: "PDF download",
-    body: "Download PDF saves a print picture of the View on the end user’s device. If an advisor name and email and the end user’s contact are both on the run, a copy of that PDF is emailed to the advisor from info@fundingltcmarketplace.com. If there is no advisor email, only the end user downloads the file. Optional names or contact you typed on the run may appear in the file. Do not enter Social Security numbers, account numbers, or medical diagnoses. The PDF is not a tagged accessible file — for screen readers, use the on-screen View.",
+    body: "Download PDF saves a print picture of the View on the end user’s device. The PDF is not emailed. Optional names or contact you typed on the run may appear in the file. Do not enter Social Security numbers, account numbers, or medical diagnoses. The PDF is not a tagged accessible file — for screen readers, use the on-screen View.",
   },
   {
     heading: "Who receives a copy of a generated report",
-    body: "The end user always downloads the PDF on their device. When both the advisor’s email and the end user’s (client) information are entered, the advisor also receives the PDF as an email attachment from info@fundingltcmarketplace.com. Adaptive Marketing Group does not keep a publisher-side archive of the PDF. If no advisor email is entered, no advisor copy is sent.",
+    body: "The end user downloads the PDF on their device. A copy of the PDF is not emailed. Adaptive Marketing Group does not keep a publisher-side archive of the PDF.",
   },
   {
     heading: "What is sent when you request a PDF or submit a form",
-    body: "Requesting a PDF always saves the file locally for the end user. If advisor and client contact are both present, the same file is emailed to the advisor from info@fundingltcmarketplace.com. If you ask someone to contact you (when no advisor email is on the run), the required Name, Phone, Email, and State on that form are emailed to Info@preserve-your-assets.com so a representative can follow up with the contact information of at least two long-term care professionals in your state. Do not enter Social Security numbers, account numbers, medical diagnoses, or other sensitive identifiers.",
+    body: "Requesting a PDF saves the file locally for the end user. The PDF is not emailed. If you ask someone to contact you, the required Name, Phone, Email, and State on that form are emailed to Info@preserve-your-assets.com so a representative can follow up with the contact information of at least two long-term care professionals in your state. Do not enter Social Security numbers, account numbers, medical diagnoses, or other sensitive identifiers.",
   },
   {
     heading: "How we use information",
-    body: "Optional client and advisor fields stay in that run, in any PDF the end user saves, and — when both parties are completed — in the copy emailed to the advisor. Contact-request forms go only to Info@preserve-your-assets.com. We do not sell personal information. We do not use this site to make automated eligibility, underwriting, or credit decisions.",
+    body: "Optional client and advisor fields stay in that run and in any PDF the end user saves. Contact-request forms go only to Info@preserve-your-assets.com. We do not sell personal information. We do not use this site to make automated eligibility, underwriting, or credit decisions.",
   },
   {
     heading: "Cookies, local storage, and hosting",
@@ -110,7 +110,7 @@ export const PRIVACY_POLICY_PARAS = [
   },
   {
     heading: "Sharing and retention",
-    body: "When an advisor email is on the run with the end user’s information, that advisor receives the PDF. Contact-request submissions are sent to Info@preserve-your-assets.com. If no client information is submitted and you do not ask to be contacted, none is retained by the Publishers. You may email Info@preserve-your-assets.com with a privacy question about this policy.",
+    body: "Contact-request submissions are sent to Info@preserve-your-assets.com. The PDF is not emailed. If no client information is submitted and you do not ask to be contacted, none is retained by the Publishers. You may email Info@preserve-your-assets.com with a privacy question about this policy.",
   },
   {
     heading: "Children and state rights",

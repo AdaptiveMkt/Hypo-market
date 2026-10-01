@@ -33,8 +33,7 @@ export function ContactAskDialog({
           Would you like someone to contact you?
         </h2>
         <p className="mt-2 text-sm text-muted">
-          Your PDF is saved on this device. No advisor email was on this run, so no
-          copy was emailed. If you would like a representative to follow up, we will
+          Your PDF is saved on this device. If you would like a representative to follow up, we will
           ask for your name, phone, email, and state. That request is sent to{" "}
           {CONTACT_EMAIL}.
         </p>
