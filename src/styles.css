@@ -952,6 +952,21 @@ html.pdf-capture #aum-report .tabular-nums.font-bold.amt-green {
   details[open] th,
   details[open] td { display: table-cell !important; }
 
+  .print-include > summary ~ *,
+  .print-include > :not(summary) {
+    display: block !important;
+    visibility: visible !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  .print-include > .pdf-kpi-grid,
+  .print-include > summary ~ .pdf-kpi-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+  }
+
   h1, h2, h3, h4, summary {
     break-after: avoid;
     page-break-after: avoid;

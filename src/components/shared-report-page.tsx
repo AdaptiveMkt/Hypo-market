@@ -57,6 +57,78 @@ function kept(el: HTMLElement, picked: Record<string, boolean>): boolean {
   });
 }
 
+function unwrapForPrint(nodes: HTMLDetailsElement[]) {
+  const restores: Array<() => void> = [];
+  const ordered = [...nodes].sort((a, b) => (a.contains(b) ? 1 : b.contains(a) ? -1 : 0));
+  ordered.forEach((det) => {
+    if (!det.isConnected) return;
+    const parent = det.parentNode;
+    if (!parent) return;
+    const marker = document.createComment("print-restore");
+    parent.insertBefore(marker, det);
+    const box = document.createElement("div");
+    Array.from(det.attributes).forEach((attr) => {
+      if (attr.name !== "open") box.setAttribute(attr.name, attr.value);
+    });
+    box.classList.add("print-include");
+    box.classList.remove("print-omit");
+    while (det.firstChild) box.appendChild(det.firstChild);
+    box.querySelectorAll("summary").forEach((summary) => {
+      if (summary instanceof HTMLElement) summary.style.display = "block";
+    });
+    parent.insertBefore(box, det);
+    det.remove();
+    restores.push(() => {
+      box.querySelectorAll("summary").forEach((summary) => {
+        if (summary instanceof HTMLElement) summary.style.display = "";
+      });
+      while (box.firstChild) det.appendChild(box.firstChild);
+      if (marker.parentNode) marker.parentNode.insertBefore(det, marker);
+      marker.remove();
+      box.remove();
+    });
+  });
+  return () => {
+    restores.reverse().forEach((fn) => fn());
+  };
+}
+
+function printCheckedSections(picked: Record<string, boolean>, done: () => void) {
+  const root = document.getElementById("aum-report");
+  if (!root) return;
+  const dialog = document.getElementById("share-print-dialog");
+  dialog?.classList.add("print-omit");
+  const reveal = new Set<HTMLDetailsElement>();
+  root.querySelectorAll<HTMLElement>("[data-print-id]").forEach((el) => {
+    const id = el.getAttribute("data-print-id") || "";
+    if (!picked[id]) return;
+    let node: HTMLElement | null = el;
+    while (node && node !== root) {
+      if (node instanceof HTMLDetailsElement) reveal.add(node);
+      node = node.parentElement;
+    }
+  });
+  const restore = unwrapForPrint([...reveal]);
+  root.querySelectorAll<HTMLElement>("[data-print-id]").forEach((el) => {
+    if (kept(el, picked)) el.classList.remove("print-omit");
+    else el.classList.add("print-omit");
+  });
+  let cleared = false;
+  const clear = () => {
+    if (cleared) return;
+    cleared = true;
+    window.clearTimeout(backup);
+    root.querySelectorAll(".print-omit").forEach((el) => el.classList.remove("print-omit"));
+    dialog?.classList.remove("print-omit");
+    restore();
+    window.removeEventListener("afterprint", clear);
+    done();
+  };
+  const backup = window.setTimeout(clear, 60000);
+  window.addEventListener("afterprint", clear);
+  window.setTimeout(() => window.print(), 150);
+}
+
 export function SharedReportPage({ slug, code }: { slug: string; code: string }) {
   const [view, setView] = useState<ShareView | null>(null);
   const [error, setError] = useState("");
@@ -90,30 +162,7 @@ export function SharedReportPage({ slug, code }: { slug: string; code: string })
   }
 
   function printSelected() {
-    const root = document.getElementById("aum-report");
-    if (!root) return;
-    const marked = Array.from(root.querySelectorAll<HTMLElement>("[data-print-id]"));
-    const details = Array.from(root.querySelectorAll("details")).filter(
-      (node): node is HTMLDetailsElement => node instanceof HTMLDetailsElement,
-    );
-    const wasOpen = details.map((node) => ({ node, open: node.open }));
-    marked.forEach((el) => {
-      if (kept(el, picked)) el.classList.remove("print-omit");
-      else el.classList.add("print-omit");
-      if (el instanceof HTMLDetailsElement && el.getAttribute("data-print-id") && picked[el.getAttribute("data-print-id") || ""]) {
-        el.open = true;
-      }
-    });
-    setPicker(false);
-    const clear = () => {
-      marked.forEach((el) => el.classList.remove("print-omit"));
-      wasOpen.forEach(({ node, open }) => {
-        node.open = open;
-      });
-      window.removeEventListener("afterprint", clear);
-    };
-    window.addEventListener("afterprint", clear);
-    window.setTimeout(() => window.print(), 80);
+    printCheckedSections(picked, () => setPicker(false));
   }
 
   return (
@@ -186,6 +235,7 @@ export function SharedReportPage({ slug, code }: { slug: string; code: string })
       </section>
       {picker ? (
         <div
+          id="share-print-dialog"
           className="no-print fixed inset-0 z-[70] flex items-start justify-center overflow-y-auto bg-navy/55 p-4 pt-8"
           role="dialog"
           aria-modal="true"
