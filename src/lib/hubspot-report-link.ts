@@ -24,13 +24,31 @@ let remembered: AdvisorLeadNotice = {
   reportUrl: "",
 };
 
+const LEAD_KEY = "aum-advisor-lead";
+
 export function rememberAdvisorLead(partial: Partial<AdvisorLeadNotice>) {
   const next = { ...remembered };
   for (const [key, value] of Object.entries(partial) as [keyof AdvisorLeadNotice, string | undefined][]) {
     if (value?.trim()) next[key] = value.trim();
   }
   remembered = next;
+  try {
+    sessionStorage.setItem(LEAD_KEY, JSON.stringify(next));
+  } catch {
+    /* private mode can block storage */
+  }
   return remembered;
+}
+
+function storedLead(): AdvisorLeadNotice {
+  try {
+    const raw = sessionStorage.getItem(LEAD_KEY);
+    if (!raw) return remembered;
+    const parsed = JSON.parse(raw) as Partial<AdvisorLeadNotice>;
+    return rememberAdvisorLead(parsed);
+  } catch {
+    return remembered;
+  }
 }
 
 function fields(lead: AdvisorLeadNotice, includeLink: boolean) {
@@ -72,35 +90,32 @@ async function postLead(lead: AdvisorLeadNotice, includeLink: boolean) {
   return res.ok;
 }
 
-/** Updates the advisor's HubSpot contact with the temporary report address. */
+/** Sends the finished report address to the same HubSpot contact. */
 export async function sendReportLinkToHubspot(lead: { email: string; name: string; phone: string; firm: string; url: string }) {
-  const full = rememberAdvisorLead({
+  const full = storedLead();
+  rememberAdvisorLead({
     email: lead.email,
     name: lead.name,
     phone: lead.phone,
     firm: lead.firm,
     reportUrl: lead.url,
   });
-  if (!full.email.includes("@") || !full.reportUrl) return;
+  const ready = storedLead();
+  if (!ready.reportUrl.startsWith("https://")) return;
+  try {
+    const { notifyAdvisorLead } = await import("@/lib/send-report-mail");
+    void notifyAdvisorLead({ data: ready });
+  } catch {
+    /* site mail is optional; HubSpot is the notice that is already working */
+  }
+  if (!ready.email.includes("@")) return;
   try {
     const hsq = ((window as unknown as { _hsq?: unknown[] })._hsq ??= []);
-    hsq.push(["identify", { email: full.email.trim(), report_link: full.reportUrl }]);
+    hsq.push(["identify", { email: ready.email.trim(), report_link: ready.reportUrl }]);
     hsq.push(["trackPageView"]);
   } catch {
     /* tracking is optional */
   }
-  try {
-    const { notifyAdvisorLead } = await import("@/lib/send-report-mail");
-    void notifyAdvisorLead({ data: full });
-  } catch {
-    /* mail is optional */
-  }
-  try {
-    const saved = await postLead(full, true);
-    if (saved) return;
-    const again = await postLead(full, false);
-    if (!again) await postLead({ ...full, name: "", phone: "", firm: "", address: "", state: "", zip: "" }, false);
-  } catch {
-    /* the hypothetical still runs if HubSpot is unavailable */
-  }
+  const posted = await postLead(ready, true);
+  if (!posted) await postLead(ready, false);
 }
