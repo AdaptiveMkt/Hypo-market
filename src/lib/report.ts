@@ -128,8 +128,10 @@ export type ReportOpts = {
   partnershipOn?: boolean;
   preferTap?: boolean;
   lifeFaceAmount?: number;
-  /** Benefits the visitor had entered if they chose Keep My Selection instead of the industry-average option. */
-  keepSelection?: { policy: LtcPolicy; result: Projection };
+  /** Which benefit choice the visitor made on the industry-averages notice. */
+  benefitChoice?: "keep" | "industry";
+  /** The design that was not used for the year-by-year, shown beside the run summary. */
+  otherDesign?: { label: string; policy: LtcPolicy; result: Projection };
 };
 
 /** Plain-language description of this run for the Analysis sheet and emails. */
@@ -220,7 +222,7 @@ export function analysisNarrative(opts: ReportOpts): string {
         ? ` Based on the adjusted gross income entered, an illustrative placeholder — not a recommended premium or a quote — is no greater than ${money(Math.round(agi * TARGET_INCOME_RATE))}. That 7% figure is not an industry suitability standard. Other ways to fund a premium include reallocating assets and using part of the return on investment.`
         : " Premium funding options to consider are reallocating assets and using part of your return on investment to fund household premiums.";
     paras.push(
-      `This run includes ${structure}. Insurance is modeled to pay the claim first; countable assets co-pay only the leftover. LTC benefits at purchase are ${result.lifetimeBenefit ? `${LIFETIME_BENEFIT_MARK}. ${LIFETIME_BENEFIT_NOTE}` : money(result.benefitPoolAtPurchase ?? 0)}. At claim they are ${result.lifetimeBenefit ? LIFETIME_BENEFIT_MARK : money(result.benefitPoolAtClaim ?? 0)}.${funding}`,
+      `${opts.benefitChoice === "keep" ? "Keep My Options. " : ""}This run includes ${structure}. Insurance is modeled to pay the claim first; countable assets co-pay only the leftover. LTC benefits at purchase are ${result.lifetimeBenefit ? `${LIFETIME_BENEFIT_MARK}. ${LIFETIME_BENEFIT_NOTE}` : money(result.benefitPoolAtPurchase ?? 0)}. At claim they are ${result.lifetimeBenefit ? LIFETIME_BENEFIT_MARK : money(result.benefitPoolAtClaim ?? 0)}.${funding}`,
     );
     paras.push(
       `The combined pool (countable assets + LTC benefits) at today's cost is ${money(combinedToday)} and is ${formatYearsLast(yearsCombinedToday)}. At claim the combined pool is ${money(combinedClaim)} against ${money(result.firstCost)} per year${ltcNewsCostCite()} and is ${formatYearsLast(yearsCombinedClaim)}. Insurance paid over the modeled years is ${money(result.insuranceTotal)}. Countable assets remaining are ${money(result.endPool)}, which is ${preserved >= 0 ? money(preserved) + " higher" : money(Math.abs(preserved)) + " lower"} than if the same care had been paid from assets with no policy (${money(selfFunded.endPool)} left).`,
@@ -228,31 +230,31 @@ export function analysisNarrative(opts: ReportOpts): string {
     paras.push(
       `Cumulative unpaid shortfall after insurance and asset co-pay is ${result.shortfallTotal ? money(result.shortfallTotal) : "none"}. ${when ? `A shortfall first appears in model year ${when.year}, month ${when.monthInYear} (${when.monthsFromToday} months from today).` : "No unpaid shortfall appears in the modeled window."} ${result.depletedYear ? `Countable assets are depleted in model year ${result.depletedYear}.` : "Countable assets are not fully depleted in the modeled window."}`,
     );
-    if (opts.keepSelection && opts.keepSelection.policy.enabled) {
-      const kept = opts.keepSelection;
-      const keptInsToday = kept.result.lifetimeBenefit ? null : Number(kept.result.benefitPoolAtPurchase ?? 0);
-      const keptInsClaim = kept.result.lifetimeBenefit ? null : Number(kept.result.benefitPoolAtClaim ?? 0);
-      const keptCombinedToday = pool + (keptInsToday ?? 0);
-      const keptCombinedClaim = kept.result.startPoolNet + (keptInsClaim ?? 0);
-      const keptYearsToday = kept.result.lifetimeBenefit
+    if (opts.otherDesign?.policy.enabled) {
+      const other = opts.otherDesign;
+      const otherInsToday = other.result.lifetimeBenefit ? null : Number(other.result.benefitPoolAtPurchase ?? 0);
+      const otherInsClaim = other.result.lifetimeBenefit ? null : Number(other.result.benefitPoolAtClaim ?? 0);
+      const otherCombinedToday = pool + (otherInsToday ?? 0);
+      const otherCombinedClaim = other.result.startPoolNet + (otherInsClaim ?? 0);
+      const otherYearsToday = other.result.lifetimeBenefit
         ? Number.POSITIVE_INFINITY
-        : yearsPoolLasts(keptCombinedToday, todayCost);
-      const keptYearsClaim = kept.result.lifetimeBenefit
+        : yearsPoolLasts(otherCombinedToday, todayCost);
+      const otherYearsClaim = other.result.lifetimeBenefit
         ? Number.POSITIVE_INFINITY
-        : yearsPoolLasts(keptCombinedClaim, kept.result.firstCost);
-      const keptWhen = shortfallStart(kept.result.rows);
-      const keptPreserved = kept.result.endPool - selfFunded.endPool;
-      const keptStructure = isLinkedKind(kept.policy.kind)
-        ? `a ${policyKindLabel(kept.policy.kind).toLowerCase()} (premium ${money(kept.policy.singlePremium)}, leverage ${kept.policy.leverage}x)`
-        : `a traditional reimbursement policy (daily benefit ${money(kept.policy.dailyBenefit)} today, benefit period ${isLifetimeBenefit(kept.policy.benefitYears) ? `${LIFETIME_BENEFIT_MARK}. ${LIFETIME_BENEFIT_NOTE}` : `${kept.policy.benefitYears} years`}, ${kept.policy.elimDays}-day elimination, inflation ${kept.policy.inflationMethod === "none" || kept.policy.benefitInflationPct <= 0 ? "level" : `${kept.policy.benefitInflationPct}% ${kept.policy.inflationMethod}`}. ${kept.policy.annualPremium > 0 ? `Annual premium ${money(kept.policy.annualPremium)}.` : PREMIUM_TBD})`;
+        : yearsPoolLasts(otherCombinedClaim, other.result.firstCost);
+      const otherWhen = shortfallStart(other.result.rows);
+      const otherPreserved = other.result.endPool - selfFunded.endPool;
+      const otherStructure = isLinkedKind(other.policy.kind)
+        ? `a ${policyKindLabel(other.policy.kind).toLowerCase()} (premium ${money(other.policy.singlePremium)}, leverage ${other.policy.leverage}x)`
+        : `a traditional reimbursement policy (daily benefit ${money(other.policy.dailyBenefit)} today, benefit period ${isLifetimeBenefit(other.policy.benefitYears) ? `${LIFETIME_BENEFIT_MARK}. ${LIFETIME_BENEFIT_NOTE}` : `${other.policy.benefitYears} years`}, ${other.policy.elimDays}-day elimination, inflation ${other.policy.inflationMethod === "none" || other.policy.benefitInflationPct <= 0 ? "level" : `${other.policy.benefitInflationPct}% ${other.policy.inflationMethod}`}. ${other.policy.annualPremium > 0 ? `Annual premium ${money(other.policy.annualPremium)}.` : PREMIUM_TBD})`;
       paras.push(
-        `Keep My Selection. If the benefits already entered are kept instead of the design above, this run includes ${keptStructure}. Insurance is modeled to pay the claim first; countable assets co-pay only the leftover. LTC benefits at purchase are ${kept.result.lifetimeBenefit ? `${LIFETIME_BENEFIT_MARK}. ${LIFETIME_BENEFIT_NOTE}` : money(kept.result.benefitPoolAtPurchase ?? 0)}. At claim they are ${kept.result.lifetimeBenefit ? LIFETIME_BENEFIT_MARK : money(kept.result.benefitPoolAtClaim ?? 0)}.${funding}`,
+        `${other.label}. This selection includes ${otherStructure}. Insurance is modeled to pay the claim first; countable assets co-pay only the leftover. LTC benefits at purchase are ${other.result.lifetimeBenefit ? `${LIFETIME_BENEFIT_MARK}. ${LIFETIME_BENEFIT_NOTE}` : money(other.result.benefitPoolAtPurchase ?? 0)}. At claim they are ${other.result.lifetimeBenefit ? LIFETIME_BENEFIT_MARK : money(other.result.benefitPoolAtClaim ?? 0)}.${funding}`,
       );
       paras.push(
-        `Under Keep My Selection, the combined pool (countable assets + LTC benefits) at today's cost is ${money(keptCombinedToday)} and is ${formatYearsLast(keptYearsToday)}. At claim the combined pool is ${money(keptCombinedClaim)} against ${money(kept.result.firstCost)} per year${ltcNewsCostCite()} and is ${formatYearsLast(keptYearsClaim)}. Insurance paid over the modeled years is ${money(kept.result.insuranceTotal)}. Countable assets remaining are ${money(kept.result.endPool)}, which is ${keptPreserved >= 0 ? money(keptPreserved) + " higher" : money(Math.abs(keptPreserved)) + " lower"} than if the same care had been paid from assets with no policy (${money(selfFunded.endPool)} left).`,
+        `Under ${other.label}, the combined pool (countable assets + LTC benefits) at today's cost is ${money(otherCombinedToday)} and is ${formatYearsLast(otherYearsToday)}. At claim the combined pool is ${money(otherCombinedClaim)} against ${money(other.result.firstCost)} per year${ltcNewsCostCite()} and is ${formatYearsLast(otherYearsClaim)}. Insurance paid over the modeled years is ${money(other.result.insuranceTotal)}. Countable assets remaining are ${money(other.result.endPool)}, which is ${otherPreserved >= 0 ? money(otherPreserved) + " higher" : money(Math.abs(otherPreserved)) + " lower"} than if the same care had been paid from assets with no policy (${money(selfFunded.endPool)} left).`,
       );
       paras.push(
-        `Under Keep My Selection, cumulative unpaid shortfall after insurance and asset co-pay is ${kept.result.shortfallTotal ? money(kept.result.shortfallTotal) : "none"}. ${keptWhen ? `A shortfall first appears in model year ${keptWhen.year}, month ${keptWhen.monthInYear} (${keptWhen.monthsFromToday} months from today).` : "No unpaid shortfall appears in the modeled window."} ${kept.result.depletedYear ? `Countable assets are depleted in model year ${kept.result.depletedYear}.` : "Countable assets are not fully depleted in the modeled window."}`,
+        `Under ${other.label}, cumulative unpaid shortfall after insurance and asset co-pay is ${other.result.shortfallTotal ? money(other.result.shortfallTotal) : "none"}. ${otherWhen ? `A shortfall first appears in model year ${otherWhen.year}, month ${otherWhen.monthInYear} (${otherWhen.monthsFromToday} months from today).` : "No unpaid shortfall appears in the modeled window."} ${other.result.depletedYear ? `Countable assets are depleted in model year ${other.result.depletedYear}.` : "Countable assets are not fully depleted in the modeled window."}`,
       );
     }
   }

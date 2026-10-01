@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { StepperField } from "@/components/field-picker";
 
-export type CueActionId = "industry" | "protect" | "copay-alt";
+export type CueActionId = "industry" | "protect" | "copay-alt" | "keep";
 
 export type CueLink = {
   kicker?: string;
@@ -17,6 +17,8 @@ export type CueMessage = {
   title: string;
   body: ReactNode;
   closeLabel?: string;
+  /** When set, the close button runs this action and does not apply `action`. */
+  closeAction?: CueActionId;
   applyOnClose?: boolean;
   actionLabel?: string;
   actionHint?: string;
@@ -51,6 +53,11 @@ export function CuePopup({
 
   function closeAndUse() {
     if (cue.action) onAction?.(cue.action);
+    onClose();
+  }
+
+  function closeKeep() {
+    if (cue.closeAction) onAction?.(cue.closeAction);
     onClose();
   }
 
@@ -167,7 +174,7 @@ export function CuePopup({
               <button
                 ref={closeRef}
                 type="button"
-                onClick={cue.applyOnClose ? closeAndUse : closeOnly}
+                onClick={cue.closeAction ? closeKeep : cue.applyOnClose ? closeAndUse : closeOnly}
                 className="inline-flex min-h-11 w-full items-center justify-center rounded-lg border border-white bg-black px-4 text-sm font-semibold text-white hover:bg-neutral-900"
               >
                 {cue.closeLabel ?? "Close"}

@@ -380,7 +380,7 @@ export function Calculator() {
   const [section3Open, setSection3Open] = useState(false);
   const [alternativeRun, setAlternativeRun] = useState(false);
   const [keptPolicy, setKeptPolicy] = useState<LtcPolicy | null>(null);
-  const [industryApplied, setIndustryApplied] = useState(false);
+  const [benefitChoice, setBenefitChoice] = useState<null | "keep" | "industry">(null);
 
   useEffect(() => {
     if (!alternativeRun) return;
@@ -675,12 +675,25 @@ export function Calculator() {
     () => project({ ...baseArgs, policy: disabledPolicy(policy) }),
     [pool, state, setting, delay, duration, cpi, roi, taxRate, iraBal, iraRoi, policy, holdings, cityCosts],
   );
-  const keepSelection = useMemo(() => {
-    if (!industryApplied || !keptPolicy || !policy.enabled) return null;
-    const kept = { ...keptPolicy, enabled: true };
-    if (sameBenefitDesign(kept, policy)) return null;
-    return { policy: kept, result: project({ ...baseArgs, policy: kept }) };
-  }, [industryApplied, keptPolicy, policy, pool, state, setting, delay, duration, cpi, roi, taxRate, iraBal, iraRoi, holdings, cityCosts]);
+  const otherDesign = useMemo(() => {
+    if (!policy.enabled || !benefitChoice) return null;
+    if (benefitChoice === "industry" && keptPolicy) {
+      const kept = { ...keptPolicy, enabled: true };
+      if (sameBenefitDesign(kept, policy)) return null;
+      return { label: "Keep My Options", policy: kept, result: project({ ...baseArgs, policy: kept }) };
+    }
+    if (benefitChoice === "keep") {
+      const typical = typicalPurchaseForAge(ageToday || 65);
+      const industry = {
+        ...seedKindBook(typical, 0).traditional,
+        enabled: true,
+        annualPremium: policy.annualPremium,
+      };
+      if (sameBenefitDesign(industry, policy)) return null;
+      return { label: "Use this Options", policy: industry, result: project({ ...baseArgs, policy: industry }) };
+    }
+    return null;
+  }, [benefitChoice, keptPolicy, policy, ageToday, pool, state, setting, delay, duration, cpi, roi, taxRate, iraBal, iraRoi, holdings, cityCosts]);
   const yearView = useMemo(() => {
     if (!policy.enabled || yearKind === policy.kind || !runKinds[yearKind]) return result;
     return project({ ...baseArgs, policy: policyForKind(yearKind) });
@@ -921,7 +934,8 @@ export function Calculator() {
     partnershipOn: partnershipApplies,
     preferTap,
     lifeFaceAmount,
-    keepSelection: keepSelection ?? undefined,
+    benefitChoice: benefitChoice ?? undefined,
+    otherDesign: otherDesign ?? undefined,
   });
   const recommendations = recommendationsNarrative({
     scenario,
@@ -975,7 +989,6 @@ export function Calculator() {
     setYearKind("traditional");
     setRunKinds((prev) => ({ ...prev, traditional: true }));
     setDesignTouched(true);
-    setIndustryApplied(true);
     setSection3Open(true);
     window.setTimeout(() => scrollToId("daily"), 80);
   }
@@ -1026,7 +1039,7 @@ export function Calculator() {
       return true;
     }
     setSection3Open(true);
-    if (!industryApplied) setKeptPolicy({ ...policy, enabled: true });
+    if (benefitChoice !== "industry") setKeptPolicy({ ...policy, enabled: true });
     setCue({
       title: "Industry averages for your age",
       body: section2IndustryMessage(ageToday),
@@ -1046,8 +1059,8 @@ export function Calculator() {
         },
       ],
       actionHint: "* Select these benefits for insurance run.",
-      closeLabel: "Keep My Selection",
-      applyOnClose: false,
+      closeLabel: "Keep My Options",
+      closeAction: "keep",
       actionLabel: "Use this Options",
       action: "industry",
       secondaryLabel: `RUN ${protectPct}% Co-Pay ALTERNATIVE`,
@@ -1149,7 +1162,7 @@ export function Calculator() {
     setSection3Open(false);
     setAlternativeRun(false);
     setKeptPolicy(null);
-    setIndustryApplied(false);
+    setBenefitChoice(null);
     setClaimAge(actuarialClaimAge(DEFAULT_AGE_TODAY));
     setClaimAgeTouched(false);
     setDuration(10);
@@ -3535,7 +3548,11 @@ export function Calculator() {
           cue={cue}
           onClose={() => setCue(null)}
           onAction={(id, extra) => {
-            if (id === "industry") applyIndustryOptions();
+            if (id === "keep") setBenefitChoice("keep");
+            if (id === "industry") {
+              setBenefitChoice("industry");
+              applyIndustryOptions();
+            }
             if (id === "protect") applyProtectDesign();
             if (id === "copay-alt") runCopayAlternative(extra?.copayPct);
           }}
