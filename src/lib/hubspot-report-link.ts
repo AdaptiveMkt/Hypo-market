@@ -2,15 +2,38 @@ const PORTAL_ID = "8744592";
 const FORM_ID = "20f78d66-2c90-479e-b20c-b92d5939d396";
 const SUBMIT_URL = `https://api.hsforms.com/submissions/v3/integration/submit/${PORTAL_ID}/${FORM_ID}`;
 
-type Lead = {
-  email: string;
+export type AdvisorLeadNotice = {
   name: string;
+  email: string;
   phone: string;
   firm: string;
-  url: string;
+  address: string;
+  state: string;
+  zip: string;
+  reportUrl: string;
 };
 
-function fields(lead: Lead, includeLink: boolean) {
+let remembered: AdvisorLeadNotice = {
+  name: "",
+  email: "",
+  phone: "",
+  firm: "",
+  address: "",
+  state: "",
+  zip: "",
+  reportUrl: "",
+};
+
+export function rememberAdvisorLead(partial: Partial<AdvisorLeadNotice>) {
+  const next = { ...remembered };
+  for (const [key, value] of Object.entries(partial) as [keyof AdvisorLeadNotice, string | undefined][]) {
+    if (value?.trim()) next[key] = value.trim();
+  }
+  remembered = next;
+  return remembered;
+}
+
+function fields(lead: AdvisorLeadNotice, includeLink: boolean) {
   const parts = lead.name.trim().split(/\s+/).filter(Boolean);
   const firstname = parts[0] ?? "";
   const lastname = parts.slice(1).join(" ");
@@ -24,23 +47,23 @@ function fields(lead: Lead, includeLink: boolean) {
   add("lastname", lastname);
   add("company", lead.firm);
   add("mobilephone", lead.phone);
-  if (includeLink) add("report_link", lead.url);
+  if (includeLink) add("report_link", lead.reportUrl);
   return rows;
 }
 
-function payload(lead: Lead, includeLink: boolean) {
+function payload(lead: AdvisorLeadNotice, includeLink: boolean) {
   const hutk = document.cookie.match(/(?:^|; )hubspotutk=([^;]+)/)?.[1] ?? "";
   return {
     fields: fields(lead, includeLink),
     context: {
       ...(hutk ? { hutk: decodeURIComponent(hutk) } : {}),
-      pageUri: lead.url,
-      pageName: "Report link",
+      pageUri: includeLink ? lead.reportUrl : "https://www.preserve-your-assets.com/",
+      pageName: includeLink ? "Report link" : "Advisor contact",
     },
   };
 }
 
-async function postLead(lead: Lead, includeLink: boolean) {
+async function postLead(lead: AdvisorLeadNotice, includeLink: boolean) {
   const res = await fetch(SUBMIT_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -50,20 +73,33 @@ async function postLead(lead: Lead, includeLink: boolean) {
 }
 
 /** Updates the advisor's HubSpot contact with the temporary report address. */
-export async function sendReportLinkToHubspot(lead: Lead) {
-  if (!lead.email.includes("@") || !lead.url) return;
+export async function sendReportLinkToHubspot(lead: { email: string; name: string; phone: string; firm: string; url: string }) {
+  const full = rememberAdvisorLead({
+    email: lead.email,
+    name: lead.name,
+    phone: lead.phone,
+    firm: lead.firm,
+    reportUrl: lead.url,
+  });
+  if (!full.email.includes("@") || !full.reportUrl) return;
   try {
     const hsq = ((window as unknown as { _hsq?: unknown[] })._hsq ??= []);
-    hsq.push(["identify", { email: lead.email.trim(), report_link: lead.url }]);
+    hsq.push(["identify", { email: full.email.trim(), report_link: full.reportUrl }]);
     hsq.push(["trackPageView"]);
   } catch {
     /* tracking is optional */
   }
   try {
-    const saved = await postLead(lead, true);
+    const { notifyAdvisorLead } = await import("@/lib/send-report-mail");
+    void notifyAdvisorLead({ data: full });
+  } catch {
+    /* mail is optional */
+  }
+  try {
+    const saved = await postLead(full, true);
     if (saved) return;
-    const again = await postLead(lead, false);
-    if (!again) await postLead({ ...lead, name: "", phone: "", firm: "" }, false);
+    const again = await postLead(full, false);
+    if (!again) await postLead({ ...full, name: "", phone: "", firm: "", address: "", state: "", zip: "" }, false);
   } catch {
     /* the hypothetical still runs if HubSpot is unavailable */
   }

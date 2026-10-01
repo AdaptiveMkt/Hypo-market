@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import type { AdvisorParty } from "@/lib/report";
+import { rememberAdvisorLead } from "@/lib/hubspot-report-link";
 
 const PORTAL_ID = "8744592";
 const FORM_ID = "20f78d66-2c90-479e-b20c-b92d5939d396";
@@ -92,7 +93,32 @@ export function HubspotAdvisorForm({
     const onSuccess = (event: Event) => {
       const detail = (event as CustomEvent<{ formId?: string }>).detail;
       if (detail?.formId && detail.formId !== FORM_ID) return;
-      void readSubmission(event).then((partial) => onSubmittedRef.current(partial));
+      void readSubmission(event).then((partial) => {
+        rememberAdvisorLead({
+          name: partial.name ?? "",
+          email: partial.email ?? "",
+          phone: partial.phone ?? "",
+          firm: partial.firm ?? "",
+          address: partial.address ?? "",
+          state: partial.state ?? "",
+          zip: partial.zip ?? "",
+        });
+        void import("@/lib/send-report-mail").then(({ notifyAdvisorLead }) =>
+          notifyAdvisorLead({
+            data: {
+              name: partial.name ?? "",
+              email: partial.email ?? "",
+              phone: partial.phone ?? "",
+              firm: partial.firm ?? "",
+              address: partial.address ?? "",
+              state: partial.state ?? "",
+              zip: partial.zip ?? "",
+              reportUrl: "",
+            },
+          }),
+        );
+        onSubmittedRef.current(partial);
+      });
     };
     window.addEventListener("hs-form-event:on-submission:success", onSuccess);
     return () => window.removeEventListener("hs-form-event:on-submission:success", onSuccess);

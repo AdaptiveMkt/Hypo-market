@@ -177,6 +177,57 @@ export const emailAdvisorPdf = createServerFn({ method: "POST" })
     }
   });
 
+export const notifyAdvisorLead = createServerFn({ method: "POST" })
+  .validator((data: unknown) => {
+    if (!data || typeof data !== "object") throw new Error("Advisor lead is required.");
+    const o = data as Record<string, unknown>;
+    const clip = (key: string, max: number) => String(o[key] ?? "").trim().slice(0, max);
+    const email = clip("email", 120).toLowerCase();
+    if (email && !validEmail(email)) throw new Error("Advisor email is not valid.");
+    return {
+      name: clip("name", 120),
+      email,
+      phone: clip("phone", 40),
+      firm: clip("firm", 160),
+      address: clip("address", 200),
+      state: clip("state", 80),
+      zip: clip("zip", 20),
+      reportUrl: clip("reportUrl", 300),
+    };
+  })
+  .handler(async ({ data }): Promise<{ ok: true; emailed: boolean }> => {
+    const link = data.reportUrl.startsWith("https://") ? data.reportUrl : "";
+    const lines = [
+      ["Name", data.name],
+      ["Firm", data.firm],
+      ["Phone", data.phone],
+      ["Email", data.email],
+      ["Address", data.address],
+      ["State", data.state],
+      ["Postal code", data.zip],
+      ["Report link", link],
+    ].filter(([, value]) => value);
+    const html = `<p>${link ? "The report link is ready for this advisor lead." : "A licensed advisor submitted the contact form."}</p>
+<ul>${lines.map(([label, value]) => `<li>${escapeHtml(label)}: ${escapeHtml(value)}</li>`).join("")}</ul>
+<p>The same contact is sent to HubSpot. This is not a quote, illustration, or application.</p>
+<p>${escapeHtml(HOLD_HARMLESS_SHORT)}</p>
+<p>${escapeHtml(COPYRIGHT_LINE)}</p>`;
+    const text = `${lines.map(([label, value]) => `${label}: ${value}`).join("\n")}\n\nThe same contact is sent to HubSpot.\n\n${HOLD_HARMLESS_SHORT}\n\n${COPYRIGHT_LINE}`;
+    try {
+      const emailed = await sendMail({
+        to: [TEST_MAIL_TO],
+        reply_to: validEmail(data.email) ? data.email : undefined,
+        subject: link ? `Report link — ${data.name || data.email || "advisor"}` : `Advisor lead — ${data.name || data.email || "new submission"}`,
+        html,
+        text,
+      });
+      return { ok: true, emailed };
+    } catch (err) {
+      console.info("[advisor-lead]", data.email, err);
+      return { ok: true, emailed: false };
+    }
+  });
+
 export const submitContactRequest = createServerFn({ method: "POST" })
   .validator((data: unknown) => parseContact(data))
   .handler(async ({ data }): Promise<{ ok: true; emailed: boolean }> => {
