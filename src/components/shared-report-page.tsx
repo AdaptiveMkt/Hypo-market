@@ -138,6 +138,11 @@ function applyPrintVisibility(root: HTMLElement) {
     const block = heading.closest("details, .report-block");
     block?.classList.add("print-page-start");
   });
+  root.querySelectorAll("h2").forEach((heading) => {
+    if (!/how the pool/i.test(heading.textContent || "")) return;
+    const block = heading.closest("section, details, .report-block");
+    block?.classList.add("print-page-start");
+  });
 }
 
 function printCheckedSections(_picked: Record<string, boolean>, done: () => void) {

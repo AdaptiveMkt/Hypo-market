@@ -992,7 +992,7 @@ export function ReportView({
         </section>
         ) : null}
 
-        <section className="report-block">
+        <section className="report-block print-page-start">
           <details open className="pool-fold">
             <summary className="flex cursor-pointer list-none flex-wrap items-center justify-between gap-3 [&::-webkit-details-marker]:hidden [&::marker]:content-none">
               <h2 className="font-display text-xl text-navy">
