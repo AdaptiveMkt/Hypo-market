@@ -863,6 +863,9 @@ export function ReportView({
             <h2 className="mb-3 mt-4 font-display text-xl text-navy">
               3. Insurance — answers
             </h2>
+            <p className="premium-note mb-3 w-full text-left text-sm leading-relaxed text-navy">
+              {TARGET_PREMIUM_LABEL}
+            </p>
             <table className="w-full text-sm">
             <tbody>
               <Qa q="Include insurance in the run" a={policy.enabled ? "Yes" : "No"} />
@@ -876,7 +879,7 @@ export function ReportView({
               />
               <Qa q="Adjusted gross household income today" a={annualIncome > 0 ? money(annualIncome) : "Not entered"} />
               <Qa
-                q={TARGET_PREMIUM_LABEL}
+                q="Illustrative planning figure"
                 a={
                   annualIncome > 0
                     ? `${money(premiumTarget)} (7% of adjusted gross household income)`
@@ -1219,6 +1222,12 @@ export function ReportView({
 
         {policy.enabled && details.allocation && pie.length > 0 ? (
           <details className="pdf-stay-closed report-block report-fold break-inside-avoid"><summary className="flex min-h-11 cursor-pointer list-none items-start gap-2 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal [&::-webkit-details-marker]:hidden [&::marker]:content-none"><span aria-hidden="true" className="naic-chevron mt-1 inline-block text-gold-ink motion-reduce:transition-none">▸</span><h2 className="mb-2 font-display text-xl text-navy">Explore asset allocation</h2></summary>
+            <p className="premium-note mb-3 w-full text-left text-sm leading-relaxed text-navy">
+              {TARGET_PREMIUM_LABEL} This run’s traditional planning figure is {money(premiumTarget)}
+              {annualIncome > 0
+                ? ` (7% of adjusted gross household income ${money(annualIncome)}). Asset-based, annuity care, and hybrid life single premiums default to $100,000, unless a different deposit was entered.`
+                : " (2.5% of countable assets, because adjusted gross household income was not entered)."}
+            </p>
             <div className="grid gap-4 lg:grid-cols-2">
               <div className="report-chart h-72">
                 <ChartRegion
@@ -1250,12 +1259,6 @@ export function ReportView({
               </div>
               <div>
                 <AgiPremiumCallout agi={annualIncome} className="mb-2" />
-                <p className="mb-2 text-sm text-muted">
-                  {TARGET_PREMIUM_LABEL} This run’s traditional planning figure is {money(premiumTarget)}
-                  {annualIncome > 0
-                    ? ` (7% of adjusted gross household income ${money(annualIncome)}). Asset-based, annuity care, and hybrid life single premiums default to $100,000, unless a different deposit was entered.`
-                    : " (2.5% of countable assets, because adjusted gross household income was not entered)."}
-                </p>
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="text-left text-xs uppercase tracking-wide text-muted">
@@ -1279,7 +1282,7 @@ export function ReportView({
                       </tr>
                     ))}
                     <tr className="border-t border-gold tabular-nums font-semibold">
-                      <td className="py-2 pr-2">{TARGET_PREMIUM_LABEL}</td>
+                      <td className="py-2 pr-2">Illustrative planning figure</td>
                       <td className="py-2 pr-2">Planning</td>
                       <td className="py-2 pr-2 text-right">{money(premiumTarget)}</td>
                       <td className="py-2 text-right">
