@@ -3390,16 +3390,9 @@ export function Calculator() {
       {advisorCaptureOpen ? createPortal(
         <AdvisorCaptureDialog
           open
-          name={advisor.name}
-          phone={advisor.phone}
-          email={advisor.email}
-          state={advisor.state || state}
-          onChange={(partial) => {
-            setAdvisor((p) => ({ ...p, ...partial }));
-            if (partial.state) applyAgentState(partial.state);
-          }}
           onCancel={() => setAdvisorCaptureOpen(false)}
-          onSubmit={() => {
+          onSubmit={(partial) => {
+            acceptHubspotAdvisor(partial);
             setAdvisorCaptureOpen(false);
             runPdfDownload(true);
           }}
