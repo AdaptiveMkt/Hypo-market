@@ -130,10 +130,11 @@ function applyPrintVisibility(root: HTMLElement) {
   root.querySelectorAll<HTMLElement>("[data-medicaid-fold]").forEach((node) => {
     node.setAttribute("data-medicaid-open", "1");
   });
+  let firstYear = true;
   root.querySelectorAll("h2").forEach((heading) => {
     const text = heading.textContent || "";
-    if (!/year-by-year projection/i.test(text)) return;
-    if (/annuity|hybrid/i.test(text)) return;
+    if (!firstYear || !/year-by-year projection/i.test(text)) return;
+    firstYear = false;
     const block = heading.closest("details, .report-block");
     block?.classList.add("print-page-start");
   });
