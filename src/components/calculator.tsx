@@ -171,7 +171,7 @@ import {
 import { downloadReportPdf } from "@/lib/download-report-pdf";
 import { pdfFilename } from "@/lib/email-attachment";
 import { publishShare } from "@/lib/share-report";
-import { sendReportLinkToHubspot } from "@/lib/hubspot-report-link";
+import { sendReportLinkToHubspot, reservedReportCode } from "@/lib/hubspot-report-link";
 import { hypothesisSensitivity } from "@/lib/sensitivity";
 import { modelConfidence } from "@/lib/confidence";
 import {
@@ -1649,7 +1649,7 @@ export function Calculator() {
       }
       const clone = root.cloneNode(true) as HTMLElement;
       clone.querySelectorAll("[data-share-omit], [role='toolbar']").forEach((node) => node.remove());
-      publishShare({ data: { name, html: clone.innerHTML, incognito: incognitoShare } })
+      publishShare({ data: { name, html: clone.innerHTML, incognito: incognitoShare, code: reservedReportCode() } })
         .then((res) => {
           if (!cancel) {
             setShareUrl(res.url);
@@ -1700,7 +1700,7 @@ export function Calculator() {
               <AudienceBanner role={audience} />
             </div>
             <div className="mt-4">
-              <HubspotAdvisorForm instanceId="advisor-gate" onSubmitted={acceptHubspotAdvisor} />
+              <HubspotAdvisorForm onSubmitted={acceptHubspotAdvisor} />
             </div>
           </section>
         )

@@ -49,14 +49,15 @@ function cleanHtml(raw: string) {
     .replace(/javascript:/gi, "");
 }
 
-function parsePublish(raw: unknown): { name: string; html: string; incognito: boolean } {
+function parsePublish(raw: unknown): { name: string; html: string; incognito: boolean; code: string } {
   if (!raw || typeof raw !== "object") throw new Error("Report content is required.");
   const name = String((raw as { name?: unknown }).name ?? "").trim().slice(0, 80);
   const incognito = Boolean((raw as { incognito?: unknown }).incognito);
+  const code = String((raw as { code?: unknown }).code ?? "").trim();
   const html = cleanHtml(String((raw as { html?: unknown }).html ?? ""));
   if (html.length < 200) throw new Error("The report is not ready to share yet.");
   if (html.length > 1_500_000) throw new Error("This report is too large to share as a link.");
-  return { name, html, incognito };
+  return { name, html, incognito, code: /^[a-z0-9]{16}$/.test(code) ? code : "" };
 }
 
 function parseRead(raw: unknown): { slug: string; code: string } {
@@ -73,7 +74,7 @@ export const publishShare = createServerFn({ method: "POST" })
   .validator(parsePublish)
   .handler(async ({ data }) => {
     const { saveShare } = await import("./share-blob.server");
-    return saveShare(data.name, data.html, data.incognito);
+    return saveShare(data.name, data.html, data.incognito, data.code);
   });
 
 export const readShare = createServerFn({ method: "POST" })

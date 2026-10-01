@@ -24,7 +24,49 @@ let remembered: AdvisorLeadNotice = {
   reportUrl: "",
 };
 
+const CODE_KEY = "aum-report-code";
 const LEAD_KEY = "aum-advisor-lead";
+
+function newCode() {
+  const alphabet = "abcdefghijkmnopqrstuvwxyz23456789";
+  const bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, (b) => alphabet[b % alphabet.length]).join("");
+}
+
+/** The address written into HubSpot Registration Message before the form is submitted. */
+export function reserveReportLink() {
+  let code = "";
+  try {
+    code = sessionStorage.getItem(CODE_KEY) || "";
+  } catch {
+    code = "";
+  }
+  if (!/^[a-z0-9]{16}$/.test(code)) {
+    code = newCode();
+    try {
+      sessionStorage.setItem(CODE_KEY, code);
+    } catch {
+      /* the link can still be created later */
+    }
+  }
+  const url = `https://preserve-your-assets.com/incognito-${code}`;
+  rememberAdvisorLead({ reportUrl: url });
+  return { code, url };
+}
+
+export function reservedReportCode() {
+  return reserveReportLink().code;
+}
+
+export function fillRegistrationMessage(url: string) {
+  const hs = (window as unknown as {
+    HubSpotFormsV4?: { getForms?: () => { setFieldValue?: (name: string, value: string) => void }[] };
+  }).HubSpotFormsV4;
+  for (const form of hs?.getForms?.() ?? []) {
+    form.setFieldValue?.("0-1/registration_message", url);
+  }
+}
 
 export function rememberAdvisorLead(partial: Partial<AdvisorLeadNotice>) {
   const next = { ...remembered };
@@ -63,13 +105,9 @@ function fields(lead: AdvisorLeadNotice, includeLink: boolean) {
   };
   add("firstname", firstname);
   add("lastname", lastname);
-  if (includeLink && lead.reportUrl) {
-    add("company", [lead.firm, lead.reportUrl].filter(Boolean).join(" | "));
-    add("report_link", lead.reportUrl);
-  } else {
-    add("company", lead.firm);
-  }
+  add("company", lead.firm);
   add("mobilephone", lead.phone);
+  if (includeLink && lead.reportUrl) add("registration_message", lead.reportUrl);
   return rows;
 }
 
@@ -114,7 +152,7 @@ export async function sendReportLinkToHubspot(lead: { email: string; name: strin
   if (!ready.email.includes("@")) return;
   try {
     const hsq = ((window as unknown as { _hsq?: unknown[] })._hsq ??= []);
-    hsq.push(["identify", { email: ready.email.trim(), report_link: ready.reportUrl }]);
+    hsq.push(["identify", { email: ready.email.trim(), registration_message: ready.reportUrl }]);
     hsq.push(["trackPageView"]);
   } catch {
     /* tracking is optional */

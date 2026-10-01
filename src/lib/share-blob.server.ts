@@ -57,10 +57,11 @@ async function writeRaw(code: string, json: string) {
   }
 }
 
-export async function saveShare(name: string, html: string, incognito = false) {
-  const code = randomCode();
+export async function saveShare(name: string, html: string, incognito = false, presetCode = "") {
+  const reserved = /^[a-z0-9]{16}$/.test(presetCode);
+  const code = reserved ? presetCode : randomCode();
   const hours = incognito ? INCOGNITO_HOURS : SHARE_HOURS;
-  const slug = incognito ? `incognito-${code}` : shareSlug(name);
+  const slug = reserved || incognito ? `incognito-${code}` : shareSlug(name);
   const record: StoredShare = {
     slug,
     html,
@@ -70,7 +71,7 @@ export async function saveShare(name: string, html: string, incognito = false) {
     expiresAt: null,
   };
   await writeRaw(code, JSON.stringify(record));
-  return { url: incognito ? incognitoShareUrl(code) : shareUrl(slug, code), slug, code, hours };
+  return { url: slug.startsWith("incognito-") ? incognitoShareUrl(code) : shareUrl(slug, code), slug, code, hours };
 }
 
 export async function openShare(slug: string, code: string) {

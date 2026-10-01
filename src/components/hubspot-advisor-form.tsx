@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import type { AdvisorParty } from "@/lib/report";
-import { rememberAdvisorLead } from "@/lib/hubspot-report-link";
+import { fillRegistrationMessage, rememberAdvisorLead, reserveReportLink } from "@/lib/hubspot-report-link";
 
 const PORTAL_ID = "8744592";
 const FORM_ID = "20f78d66-2c90-479e-b20c-b92d5939d396";
@@ -90,10 +90,18 @@ export function HubspotAdvisorForm({
   onSubmittedRef.current = onSubmitted;
 
   useEffect(() => {
+    const { url } = reserveReportLink();
+    const apply = () => fillRegistrationMessage(url);
+    apply();
+    const onReady = () => apply();
+    window.addEventListener("hs-form-event:on-ready", onReady);
+    const timer = window.setInterval(apply, 600);
+    const stop = window.setTimeout(() => window.clearInterval(timer), 10000);
     const onSuccess = (event: Event) => {
       const detail = (event as CustomEvent<{ formId?: string }>).detail;
       if (detail?.formId && detail.formId !== FORM_ID) return;
       void readSubmission(event).then((partial) => {
+        const reportUrl = reserveReportLink().url;
         rememberAdvisorLead({
           name: partial.name ?? "",
           email: partial.email ?? "",
@@ -102,6 +110,7 @@ export function HubspotAdvisorForm({
           address: partial.address ?? "",
           state: partial.state ?? "",
           zip: partial.zip ?? "",
+          reportUrl,
         });
         void import("@/lib/send-report-mail").then(({ notifyAdvisorLead }) =>
           notifyAdvisorLead({
@@ -113,7 +122,7 @@ export function HubspotAdvisorForm({
               address: partial.address ?? "",
               state: partial.state ?? "",
               zip: partial.zip ?? "",
-              reportUrl: "",
+              reportUrl,
             },
           }),
         );
@@ -121,7 +130,12 @@ export function HubspotAdvisorForm({
       });
     };
     window.addEventListener("hs-form-event:on-submission:success", onSuccess);
-    return () => window.removeEventListener("hs-form-event:on-submission:success", onSuccess);
+    return () => {
+      window.clearInterval(timer);
+      window.clearTimeout(stop);
+      window.removeEventListener("hs-form-event:on-ready", onReady);
+      window.removeEventListener("hs-form-event:on-submission:success", onSuccess);
+    };
   }, []);
 
   return (
