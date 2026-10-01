@@ -152,6 +152,7 @@ import { MedicaidVaCard } from "@/components/medicaid-va-card";
 import { AdvisorProfessionalFolds, DesignationNoticeFold, DisclaimerCard } from "@/components/disclaimer-card";
 import { WelcomeCard } from "@/components/welcome-card";
 import { FactFinder } from "@/components/fact-finder";
+import { HubspotAdvisorForm } from "@/components/hubspot-advisor-form";
 import { AudienceBanner, AudienceGate } from "@/components/audience-gate";
 import { clearQaCookie, readQaCookie, writeQaCookie, type AudienceRole } from "@/lib/qa-cookie";
 import { ChartRegion, useNarrow } from "@/components/chart-region";
@@ -322,6 +323,7 @@ export function Calculator() {
   const [showFullForm, setShowFullForm] = useState(false);
   const [audience, setAudience] = useState<AudienceRole | null>(null);
   const [advisorCleared, setAdvisorCleared] = useState(false);
+  const [hubspotAdvisor, setHubspotAdvisor] = useState(false);
   const [booted, setBooted] = useState(false);
   const themeBeforeIncognito = useRef<"light" | "dark" | null>(null);
   const qaReady = useRef(false);
@@ -1185,6 +1187,7 @@ export function Calculator() {
     setShowFullForm(false);
     setAudience(null);
     setAdvisorCleared(false);
+    setHubspotAdvisor(false);
     themeBeforeIncognito.current = null;
     setTheme(true);
     setHypoRunId(0);
@@ -1340,9 +1343,17 @@ export function Calculator() {
     pool <= 0 ? "Countable assets" : "",
   ].filter(Boolean);
   const needsAdvisor = audience === "licensed-client";
-  const advisorOk = Boolean(
+  const advisorOk = hubspotAdvisor || Boolean(
     advisor.name.trim() && advisor.firm.trim() && advisor.email.includes("@") && advisor.phone.trim(),
   );
+
+  function acceptHubspotAdvisor(partial: Partial<AdvisorParty>) {
+    const stateName = partial.state && STATE_NAMES.includes(partial.state) ? partial.state : "";
+    setHubspotAdvisor(true);
+    setAdvisor((current) => ({ ...current, ...partial, state: stateName || current.state }));
+    if (stateName) applyAgentState(stateName);
+    setAdvisorCleared(true);
+  }
   const missingRun = [
     ...missingInputs,
     needsAdvisor && !advisorOk ? "Advisor name, firm, email, and phone" : "",
@@ -1671,34 +1682,15 @@ export function Calculator() {
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-teal">Producer access</p>
             <h2 className="mt-1 font-display text-xl text-navy">Advisor information is required</h2>
             <p className="mt-2 text-sm text-muted">
-              Enter your name, firm, email, and phone. This identifies the licensed professional
-              on the run. Client information comes later, and it is optional if you run incognito.
+              Submit the form. This identifies the licensed professional on the run.
+              Client information comes later, and it is optional if you run incognito.
             </p>
             <div className="mt-3">
               <AudienceBanner role={audience} />
             </div>
             <div className="mt-4">
-              <PartyFields
-                idPrefix="advisor-gate"
-                party={{ ...advisor, state: advisor.state || state }}
-                extra
-                onChange={(partial) => {
-                  setAdvisor((p) => ({ ...p, ...partial }));
-                  if (partial.state) applyAgentState(partial.state);
-                }}
-              />
+              <HubspotAdvisorForm onSubmitted={acceptHubspotAdvisor} />
             </div>
-            {advisorOk ? null : (
-              <p className="mt-3 text-sm font-semibold text-deplete">Name, firm, email, and phone are required.</p>
-            )}
-            <button
-              type="button"
-              className="btn-block mt-4 rounded-lg bg-navy px-4 py-2.5 text-sm font-semibold text-cream disabled:opacity-40"
-              disabled={!advisorOk}
-              onClick={() => setAdvisorCleared(true)}
-            >
-              Confirm Your Information
-            </button>
           </section>
         )
       ) : (
@@ -1711,17 +1703,9 @@ export function Calculator() {
         <section id="advisor-required" className="card-xl mt-4 min-w-0 scroll-mt-8 p-4 md:p-5" tabIndex={-1}>
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-teal">Advisor</p>
           <h2 className="mt-1 font-display text-xl text-navy">Advisor information</h2>
-          <p className="mt-2 text-sm text-muted">Required to run, with client information or incognito.</p>
+          <p className="mt-2 text-sm text-muted">Required to run, with client information or incognito. Submit the form below.</p>
           <div className="mt-4">
-            <PartyFields
-              idPrefix="advisor-daylight"
-              party={{ ...advisor, state: advisor.state || state }}
-              extra
-              onChange={(partial) => {
-                setAdvisor((p) => ({ ...p, ...partial }));
-                if (partial.state) applyAgentState(partial.state);
-              }}
-            />
+            <HubspotAdvisorForm onSubmitted={acceptHubspotAdvisor} />
           </div>
         </section>
       ) : null}
@@ -3296,11 +3280,8 @@ export function Calculator() {
             </div>
           ) : policy.enabled ? (
             <div className="mt-5 card-xl px-4 py-2">
-              <TitleCollapse title="Advisor / insurance professional (optional)" className="mt-0" defaultOpen hint="Click the title to add the advisor or agent on the report. Leave blank to omit.">
-                <PartyFields idPrefix="advisor" party={{ ...advisor, state }} extra details={details} onPdfChange={setDetail} onChange={(partial) => {
-                  if (partial.state) applyAgentState(partial.state);
-                  setAdvisor((p) => ({ ...p, ...partial, state: partial.state || p.state || state }));
-                }} />
+              <TitleCollapse title="Advisor / insurance professional (optional)" className="mt-0" defaultOpen hint="Submit the form to add the advisor or agent on the report.">
+                <HubspotAdvisorForm onSubmitted={acceptHubspotAdvisor} />
                 <AdvisorProfessionalFolds details={details} onPdfChange={setDetail} />
               </TitleCollapse>
             </div>
