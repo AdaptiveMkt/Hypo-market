@@ -1022,7 +1022,51 @@ html.pdf-capture #aum-report .tabular-nums.font-bold.amt-green {
     widows: 3;
   }
 
-  [data-accordion="open"] > .accordion-panel {
+  [data-fold-region] {
+    display: block !important;
+  }
+
+  details.print-show {
+    display: block !important;
+    break-inside: auto !important;
+    page-break-inside: auto !important;
+  }
+
+  details.print-show > summary ~ * {
+    display: block !important;
+    visibility: visible !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    opacity: 1 !important;
+  }
+
+  details.print-show > summary ~ table,
+  details.print-show table {
+    display: table !important;
+    width: 100% !important;
+  }
+
+  details.print-show thead { display: table-header-group !important; }
+  details.print-show tbody { display: table-row-group !important; }
+  details.print-show tr { display: table-row !important; }
+  details.print-show th,
+  details.print-show td { display: table-cell !important; }
+
+  details.print-show .card,
+  details.print-show .card-xl,
+  details.print-show table,
+  details.print-show tr {
+    break-inside: auto !important;
+    page-break-inside: auto !important;
+  }
+
+  details.print-omit {
+    display: none !important;
+  }
+
+  [data-accordion="open"] > .accordion-panel,
+  details.print-show [data-accordion] > .accordion-panel {
     max-height: none !important;
     opacity: 1 !important;
     overflow: visible !important;
@@ -1036,6 +1080,14 @@ html.pdf-capture #aum-report .tabular-nums.font-bold.amt-green {
     opacity: 0 !important;
     overflow: hidden !important;
     display: none !important;
+  }
+
+  details.print-show [data-accordion="closed"] > .accordion-panel,
+  details.print-show[data-medicaid-open="0"] .accordion-panel {
+    max-height: none !important;
+    opacity: 1 !important;
+    overflow: visible !important;
+    display: block !important;
   }
 
   html[data-demo-print-lock="1"] body * {

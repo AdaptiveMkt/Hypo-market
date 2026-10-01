@@ -116,41 +116,68 @@ function widenPremiumNotes(root: HTMLElement) {
   });
 }
 
+function applyPrintVisibility(root: HTMLElement, picked: Record<string, boolean>) {
+  root.querySelectorAll("details").forEach((node) => {
+    if (!(node instanceof HTMLDetailsElement)) return;
+    const id = node.getAttribute("data-print-id") || "";
+    const show = node.open || picked[id] === true;
+    if (show) {
+      node.open = true;
+      node.classList.add("print-show");
+      node.classList.remove("print-omit");
+    } else {
+      node.classList.remove("print-show");
+      node.classList.add("print-omit");
+    }
+  });
+  root.querySelectorAll<HTMLElement>("[data-print-id]").forEach((el) => {
+    if (el instanceof HTMLDetailsElement) return;
+    const id = el.getAttribute("data-print-id") || "";
+    const childOpen = Array.from(el.querySelectorAll("details")).some(
+      (node) => node instanceof HTMLDetailsElement && node.classList.contains("print-show"),
+    );
+    if (picked[id] === false && !childOpen) el.classList.add("print-omit");
+    else el.classList.remove("print-omit");
+  });
+}
+
 function printCheckedSections(picked: Record<string, boolean>, done: () => void) {
   const root = document.getElementById("aum-report");
   if (!root) return;
   widenPremiumNotes(root);
   const dialog = document.getElementById("share-print-dialog");
-  dialog?.classList.add("print-omit");
-  const reveal = new Set<HTMLDetailsElement>();
-  root.querySelectorAll<HTMLElement>("[data-print-id]").forEach((el) => {
-    const id = el.getAttribute("data-print-id") || "";
-    if (!picked[id]) return;
-    let node: HTMLElement | null = el;
-    while (node && node !== root) {
-      if (node instanceof HTMLDetailsElement) reveal.add(node);
-      node = node.parentElement;
-    }
-  });
-  const restore = unwrapForPrint([...reveal]);
-  root.querySelectorAll<HTMLElement>("[data-print-id]").forEach((el) => {
-    if (kept(el, picked)) el.classList.remove("print-omit");
-    else el.classList.add("print-omit");
-  });
+  const wasOpen = Array.from(root.querySelectorAll("details")).flatMap((node) =>
+    node instanceof HTMLDetailsElement ? [{ node, open: node.open }] : [],
+  );
+  const apply = () => applyPrintVisibility(root, picked);
+  apply();
+  const onBefore = () => apply();
   let cleared = false;
   const clear = () => {
     if (cleared) return;
     cleared = true;
     window.clearTimeout(backup);
-    root.querySelectorAll(".print-omit").forEach((el) => el.classList.remove("print-omit"));
+    window.removeEventListener("beforeprint", onBefore);
+    window.removeEventListener("afterprint", onAfter);
+    root.querySelectorAll(".print-omit, .print-show").forEach((el) => {
+      el.classList.remove("print-omit", "print-show");
+    });
+    wasOpen.forEach(({ node, open }) => {
+      node.open = open;
+    });
     dialog?.classList.remove("print-omit");
-    restore();
-    window.removeEventListener("afterprint", clear);
     done();
   };
+  const started = Date.now();
+  const onAfter = () => {
+    if (Date.now() - started < 700) return;
+    window.setTimeout(clear, 200);
+  };
   const backup = window.setTimeout(clear, 60000);
-  window.addEventListener("afterprint", clear);
-  window.setTimeout(() => window.print(), 150);
+  window.addEventListener("beforeprint", onBefore);
+  window.addEventListener("afterprint", onAfter);
+  dialog?.classList.add("print-omit");
+  window.setTimeout(() => window.print(), 200);
 }
 
 export function SharedReportPage({ slug, code }: { slug: string; code: string }) {
