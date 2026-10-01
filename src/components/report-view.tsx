@@ -1919,7 +1919,7 @@ export function ReportView({
               </div>
             ))}
           </div>
-          <div className="mt-4 border-t border-gold pt-4">
+          <div className="print-page-start mt-4 border-t border-gold pt-4">
             <h3 className="mb-2 font-display text-lg text-navy">Compare DRA Partnership benefits</h3>
             <DraPartnershipComparePanel state={state} preservation={preservation} />
           </div>

@@ -149,6 +149,10 @@ function applyPrintVisibility(root: HTMLElement) {
     const block = heading.closest("section, details, .report-block");
     block?.classList.add("print-page-start");
   });
+  root.querySelectorAll("h3").forEach((heading) => {
+    if (!/compare dra partnership benefits/i.test(heading.textContent || "")) return;
+    heading.parentElement?.classList.add("print-page-start");
+  });
 }
 
 function printCheckedSections(_picked: Record<string, boolean>, done: () => void) {
