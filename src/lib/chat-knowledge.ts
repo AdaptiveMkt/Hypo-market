@@ -69,7 +69,7 @@ const CORE: KnowledgeChunk[] = [
     label: "NAIC Shopper’s Guide / Personal Worksheet",
     url: "https://content.naic.org/sites/default/files/publication-ltc-lp-shoppers-guide-long-term.pdf",
     aaltci: false,
-    text: `This model locks insurance options when countable assets are under $${NAIC_LOCKOUT_ASSETS.toLocaleString("en-US")} and warns under $${NAIC_WARN_ASSETS.toLocaleString("en-US")}. Those floors are educational only — not a filed NAIC statutory minimum. Premium and deposit fields are illustrative placeholders, not recommended premiums or quotes. Enter the actual proposed premium or deposit. If a placeholder is shown, it may be 7% of adjusted gross household income when income is entered, otherwise 2.5% of countable assets. Asset-based single premium defaults to $100,000. Annuity care and hybrid life use 2.5% of countable assets or $75,000, whichever is greater. The 7% figure is not an industry suitability standard.`,
+    text: `This model locks insurance options when countable assets are under $${NAIC_LOCKOUT_ASSETS.toLocaleString("en-US")} and warns under $${NAIC_WARN_ASSETS.toLocaleString("en-US")}. Those floors are educational only — not a filed NAIC statutory minimum. Premium and deposit fields are illustrative placeholders, not recommended premiums or quotes. Enter the actual proposed premium or deposit. If a placeholder is shown, it may be 7% of adjusted gross household income when income is entered, otherwise 2.5% of countable assets. Asset-based, annuity care, and hybrid life single premiums default to $100,000. The 7% figure is not an industry suitability standard.`,
   },
   {
     id: "structures",

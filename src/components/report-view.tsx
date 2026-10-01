@@ -589,7 +589,7 @@ export function ReportView({
             <button
               type="button"
               onClick={onClose}
-              className="flex min-h-11 items-center justify-center rounded-lg border border-navy bg-white px-2 text-center text-sm font-semibold text-navy hover:bg-cream"
+              className="flex min-h-11 items-center justify-center rounded-lg border border-white bg-black px-2 text-center text-sm font-semibold text-white hover:bg-neutral-900"
             >
               Edit
             </button>
@@ -1257,7 +1257,7 @@ export function ReportView({
                 <p className="mb-2 text-sm text-muted">
                   {TARGET_PREMIUM_LABEL} This run’s traditional planning figure is {money(premiumTarget)}
                   {annualIncome > 0
-                    ? ` (7% of adjusted gross household income ${money(annualIncome)}). Asset-based single premium defaults to $100,000. Annuity care and hybrid life default the single premium to 2.5% of countable assets or $75,000, whichever is greater, unless a different deposit was entered.`
+                    ? ` (7% of adjusted gross household income ${money(annualIncome)}). Asset-based, annuity care, and hybrid life single premiums default to $100,000, unless a different deposit was entered.`
                     : " (2.5% of countable assets, because adjusted gross household income was not entered)."}
                 </p>
                 <table className="w-full text-sm">

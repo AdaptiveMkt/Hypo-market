@@ -132,7 +132,7 @@ export const LTC_RIDER_EXAMPLES: LtcRiderExample[] = [
     rider: "Shared care (couples)",
     setup: "Two matching $200 / day, 5-year policies ($365,000 each). Spouse A needs 7 years of care; Spouse B needs none in the illustration.",
     without: "Spouse A exhausts $365,000 in about 5 years, then countable assets (or Medicaid) pay years 6–7. Spouse B’s unused $365,000 stays locked.",
-    withRider: "After A’s pool is gone, A may draw B’s unused pool. Years 6–7 can stay on insurance instead of a $150,000+ asset spend (at $75,000 / year).",
+    withRider: "After A’s pool is gone, A may draw B’s unused pool. Years 6–7 can stay on insurance instead of a $200,000+ asset spend (at $100,000 / year).",
     takeaway: "Shared care is a couples tool. If both are on claim at once, the combined pool empties faster. Confirm survivor inheritance of leftovers.",
   },
   {

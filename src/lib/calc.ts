@@ -477,7 +477,7 @@ export const DEFAULT_STRUCTURE_FLAGS: StructureFlags = {
 export function policyForCompareLane(
   kind: PolicyKind,
   current: LtcPolicy,
-  countable: number,
+  _countable: number,
 ): LtcPolicy {
   if (kind === current.kind) return { ...current, enabled: true, kind };
   if (kind === "traditional") return { ...current, enabled: true, kind: "traditional" };
@@ -504,12 +504,10 @@ export function policyForCompareLane(
       inflationMethod: DEFAULT_HYBRID_LIFE.inflationMethod,
     };
   }
-  const face = hybridFaceForMonthly(monthly);
-  const fromPool = linkedSingleFromPool(countable);
   const deposit =
     current.singlePremium > 0 && current.singlePremium !== DEFAULT_LINKED_SINGLE_PREMIUM
       ? current.singlePremium
-      : fromPool;
+      : DEFAULT_LINKED_SINGLE_PREMIUM;
   return {
     ...current,
     enabled: true,
@@ -554,7 +552,7 @@ export function inflateDaily(
 export const TARGET_PREMIUM_RATE = 0.025;
 export const TARGET_INCOME_RATE = 0.07;
 export const TARGET_PREMIUM_LABEL =
-  "Illustrative placeholder only. This is not a recommended premium or insurance quote. Enter the actual proposed premium or deposit. If none is entered, this model may show a placeholder: 7% of adjusted gross household income when income is entered, otherwise 2.5% of countable assets for a traditional annual figure. Asset-based single premium defaults to $100,000. Annuity care and hybrid life use 2.5% of countable assets or $75,000, whichever is greater. The 7% figure is not an industry suitability standard. A separate consumer worksheet notes that a premium above 7% of income may be hard to sustain. That is a caution, not a target.";
+  "Illustrative placeholder only. This is not a recommended premium or insurance quote. Enter the actual proposed premium or deposit. If none is entered, this model may show a placeholder: 7% of adjusted gross household income when income is entered, otherwise 2.5% of countable assets for a traditional annual figure. Asset-based, annuity care, and hybrid life single premiums default to $100,000. The 7% figure is not an industry suitability standard. A separate consumer worksheet notes that a premium above 7% of income may be hard to sustain. That is a caution, not a target.";
 export const TARGET_PREMIUM_FORMULA =
   "Illustrative placeholder only. This is not a recommended premium or insurance quote.";
 
@@ -576,7 +574,7 @@ export function targetPremiumParts(countableAssets: number, annualIncome = 0) {
   };
 }
 
-export const LINKED_SINGLE_FLOOR = 75_000;
+export const LINKED_SINGLE_FLOOR = 100_000;
 
 export const SINGLE_PREMIUM_NOTE =
   "(*) Single premium options vary on deposit amounts, benefit selections, age, health, gender, and state of issue. Contact a licensed insurance professional in your state for accurate premium and single premium calculations.";

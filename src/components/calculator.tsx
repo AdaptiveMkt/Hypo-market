@@ -42,10 +42,7 @@ import {
   hybridFaceForMonthly,
   isAssetBased,
   isLifetimeBenefit,
-  isLinkedKind,
-  linkedSingleFromPool,
   SINGLE_PREMIUM_NOTE,
-  TARGET_PREMIUM_RATE,
   LIFETIME_BENEFIT_MARK,
   LIFETIME_BENEFIT_NOTE,
   leverageLabel,
@@ -541,40 +538,6 @@ export function Calculator() {
 
   const grossPool = poolTotal({ ...assets, excludable: 0 }, false);
   const pool = poolTotal(assets, excludeHome);
-  const linkedAuto = useRef(DEFAULT_LINKED_SINGLE_PREMIUM);
-  useEffect(() => {
-    if (!poolShown || pool <= 0) return;
-    const deposit = linkedSingleFromPool(pool);
-    const prior = linkedAuto.current;
-    setKindBook((book) => {
-      let changed = false;
-      const next = { ...book };
-      for (const kind of ["ltcAnnuity", "hybridLife"] as const) {
-        const row = next[kind];
-        if (!row) continue;
-        const sp = row.singlePremium;
-        const plain = pool > 0 ? Math.round(pool * TARGET_PREMIUM_RATE) : 0;
-        if (sp === 0 || sp === DEFAULT_LINKED_SINGLE_PREMIUM || sp === prior || sp === plain) {
-          next[kind] = { ...row, singlePremium: deposit };
-          changed = true;
-        }
-      }
-      return changed ? next : book;
-    });
-    setPolicy((p) => {
-      if (!isLinkedKind(p.kind)) return p;
-      if (
-        p.singlePremium === 0 ||
-        p.singlePremium === DEFAULT_LINKED_SINGLE_PREMIUM ||
-        p.singlePremium === prior ||
-        p.singlePremium === Math.round(pool * TARGET_PREMIUM_RATE)
-      ) {
-        return { ...p, singlePremium: deposit };
-      }
-      return p;
-    });
-    linkedAuto.current = deposit;
-  }, [pool, poolShown]);
   const homeEquity = Number(assets.home) || 0;
   const countableExHome = Math.max(0, pool - (excludeHome ? 0 : homeEquity));
   const naicUnlocked = poolShown && countableExHome >= NAIC_LOCKOUT_ASSETS;
@@ -1078,7 +1041,7 @@ export function Calculator() {
         },
       ],
       actionHint: "* Select these benefits for insurance run.",
-      closeLabel: "Keep Options",
+      closeLabel: "Keep My Selection",
       applyOnClose: true,
       actionLabel: "Use this Options",
       action: "industry",
@@ -2000,8 +1963,8 @@ export function Calculator() {
             />
             <p className="mt-1 text-xs leading-snug text-muted">
               {annualIncome > 0
-                ? `Suggested traditional premium ${money(Math.round(annualIncome * 0.07))} (7% of this income). Asset-based single premium defaults to $100,000. Annuity care and hybrid life default the single premium to 2.5% of countable assets or $75,000, whichever is greater.`
-                : "Optional. Include this income to use 7% as the suggested traditional premium. Asset-based single premium defaults to $100,000. Annuity care and hybrid life default the single premium to 2.5% of countable assets or $75,000, whichever is greater."}
+                ? `Suggested traditional premium ${money(Math.round(annualIncome * 0.07))} (7% of this income). Asset-based, annuity care, and hybrid life single premiums default to $100,000.`
+                : "Optional. Include this income to use 7% as the suggested traditional premium. Asset-based, annuity care, and hybrid life single premiums default to $100,000."}
             </p>
             <button
               type="button"
