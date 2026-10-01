@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { AdvisorParty } from "@/lib/report";
 
 const PORTAL_ID = "8744592";
 const FORM_ID = "20f78d66-2c90-479e-b20c-b92d5939d396";
-const SCRIPT_SRC = `https://js.hsforms.net/forms/embed/${PORTAL_ID}.js`;
 
 type HsField = { name?: string; value?: unknown };
 
@@ -67,36 +66,44 @@ async function readSubmission(event: Event) {
 }
 
 export function HubspotAdvisorForm({
+  instanceId,
   onSubmitted,
 }: {
+  instanceId: string;
   onSubmitted: (partial: Partial<AdvisorParty>) => void;
 }) {
   const onSubmittedRef = useRef(onSubmitted);
   onSubmittedRef.current = onSubmitted;
+  const frameRef = useRef<HTMLDivElement>(null);
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
-    if (!document.getElementById("hs-forms-embed-8744592")) {
-      const script = document.createElement("script");
-      script.id = "hs-forms-embed-8744592";
-      script.src = SCRIPT_SRC;
-      script.defer = true;
-      document.body.appendChild(script);
-    }
     const onSuccess = (event: Event) => {
       const detail = (event as CustomEvent<{ formId?: string }>).detail;
       if (detail?.formId && detail.formId !== FORM_ID) return;
       void readSubmission(event).then((partial) => onSubmittedRef.current(partial));
     };
     window.addEventListener("hs-form-event:on-submission:success", onSuccess);
-    return () => window.removeEventListener("hs-form-event:on-submission:success", onSuccess);
-  }, []);
+    const timer = window.setTimeout(() => {
+      if (!frameRef.current?.querySelector("iframe") && attempt < 2) setAttempt((n) => n + 1);
+    }, 1200);
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("hs-form-event:on-submission:success", onSuccess);
+    };
+  }, [attempt, instanceId]);
 
   return (
-    <div
-      className="hs-form-frame min-h-40 min-w-0"
-      data-region="na1"
-      data-form-id={FORM_ID}
-      data-portal-id={PORTAL_ID}
-    />
+    <div className="min-w-0 rounded-lg bg-white p-3 text-navy" style={{ colorScheme: "light" }}>
+      <div
+        key={attempt}
+        ref={frameRef}
+        className="hs-form-frame min-h-64 min-w-0"
+        data-region="na1"
+        data-form-id={FORM_ID}
+        data-portal-id={PORTAL_ID}
+        data-instance-id={`${instanceId}-${attempt}`}
+      />
+    </div>
   );
 }

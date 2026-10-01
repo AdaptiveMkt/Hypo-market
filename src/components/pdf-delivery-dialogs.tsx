@@ -85,7 +85,7 @@ export function AdvisorCaptureDialog({
           Submit the form before this report can be saved. Delivery is not sent from this screen.
         </p>
         <div className="mt-4">
-          <HubspotAdvisorForm onSubmitted={onSubmit} />
+          <HubspotAdvisorForm instanceId="advisor-save" onSubmitted={onSubmit} />
         </div>
         <button type="button" className="btn-block mt-4 rounded-lg border border-card-border text-navy hover:bg-cream" onClick={onCancel}>
           Cancel

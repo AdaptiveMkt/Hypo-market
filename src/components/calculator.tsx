@@ -1689,7 +1689,7 @@ export function Calculator() {
               <AudienceBanner role={audience} />
             </div>
             <div className="mt-4">
-              <HubspotAdvisorForm onSubmitted={acceptHubspotAdvisor} />
+              <HubspotAdvisorForm instanceId="advisor-gate" onSubmitted={acceptHubspotAdvisor} />
             </div>
           </section>
         )
@@ -1705,7 +1705,7 @@ export function Calculator() {
           <h2 className="mt-1 font-display text-xl text-navy">Advisor information</h2>
           <p className="mt-2 text-sm text-muted">Required to run, with client information or incognito. Submit the form below.</p>
           <div className="mt-4">
-            <HubspotAdvisorForm onSubmitted={acceptHubspotAdvisor} />
+            <HubspotAdvisorForm instanceId="advisor-card" onSubmitted={acceptHubspotAdvisor} />
           </div>
         </section>
       ) : null}
@@ -3281,7 +3281,7 @@ export function Calculator() {
           ) : policy.enabled ? (
             <div className="mt-5 card-xl px-4 py-2">
               <TitleCollapse title="Advisor / insurance professional (optional)" className="mt-0" defaultOpen hint="Submit the form to add the advisor or agent on the report.">
-                <HubspotAdvisorForm onSubmitted={acceptHubspotAdvisor} />
+                <HubspotAdvisorForm instanceId="advisor-report" onSubmitted={acceptHubspotAdvisor} />
                 <AdvisorProfessionalFolds details={details} onPdfChange={setDetail} />
               </TitleCollapse>
             </div>

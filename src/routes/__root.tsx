@@ -103,6 +103,10 @@ export const Route = createRootRoute({
         async: true,
         src: "https://www.googletagmanager.com/gtag/js?id=G-C34YXPEQM1",
       },
+      {
+        defer: true,
+        src: "https://js.hsforms.net/forms/embed/8744592.js",
+      },
     ],
   }),
   component: Root,
