@@ -489,8 +489,8 @@ export function seedKindBook(
 export const DEFAULT_STRUCTURE_FLAGS: StructureFlags = {
   traditional: true,
   assetBased: true,
-  ltcAnnuity: false,
-  hybridLife: false,
+  ltcAnnuity: true,
+  hybridLife: true,
 };
 
 /** Build a runnable policy for a comparison lane. Active kind uses this run; other linked kinds use planning defaults so the row is not $0. */
