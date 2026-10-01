@@ -484,14 +484,17 @@ const html2opts = (scale: number, extra: Record<string, unknown> = {}) => ({
     el.style.maxHeight = "none";
     el.querySelectorAll("details").forEach((d) => {
       const det = d as HTMLDetailsElement;
+      if (!det.open) return;
       if (det.classList.contains("no-print") || det.closest(".no-print") || det.closest(".print-omit")) return;
       det.open = true;
     });
     unwrapDetails(el);
     el.querySelectorAll(".accordion-panel").forEach((p) => {
       const panel = p as HTMLElement;
+      const accordion = panel.closest("[data-accordion]");
+      const opened = accordion?.getAttribute("data-accordion") === "open";
       const fold = panel.closest("[data-medicaid-fold]");
-      if (fold?.getAttribute("data-medicaid-open") === "0") {
+      if (!opened || fold?.getAttribute("data-medicaid-open") === "0") {
         panel.style.setProperty("max-height", "0px", "important");
         panel.style.setProperty("opacity", "0", "important");
         panel.style.setProperty("overflow", "hidden", "important");
@@ -519,6 +522,7 @@ function unwrapDetails(root: HTMLElement) {
   });
   nodes.forEach((node) => {
     if (!(node instanceof HTMLDetailsElement)) return;
+    if (!node.open) return;
     if (node.classList.contains("no-print") || node.closest(".no-print") || node.closest(".print-omit")) return;
     const parent = node.parentNode;
     if (!parent) return;
@@ -554,7 +558,9 @@ function expandLive(root: HTMLElement) {
   const prev = panels.map((p) => ({ p, css: p.getAttribute("style") }));
   const keepMedicaidClosed = root.dataset.medicaidOpen !== "1";
   panels.forEach((p) => {
-    if (keepMedicaidClosed && p.closest("[data-medicaid-fold]")) {
+    const accordion = p.closest("[data-accordion]");
+    const opened = accordion?.getAttribute("data-accordion") === "open";
+    if (!opened || (keepMedicaidClosed && p.closest("[data-medicaid-fold]"))) {
       p.style.setProperty("max-height", "0px", "important");
       p.style.setProperty("opacity", "0", "important");
       p.style.setProperty("overflow", "hidden", "important");

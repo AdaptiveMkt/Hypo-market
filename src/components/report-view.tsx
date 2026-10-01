@@ -236,7 +236,7 @@ export function ReportView({
   shareError = "",
   onClose,
   onPdf,
-  onClosePdf,
+  onClosePdf: _onClosePdf,
   onNeedAdvisor,
 }: {
   state: string;
@@ -404,33 +404,6 @@ export function ReportView({
     };
     nodes.forEach((n) => n.addEventListener("toggle", onToggle));
     return () => nodes.forEach((n) => n.removeEventListener("toggle", onToggle));
-  }, []);
-
-  useEffect(() => {
-    const root = reportRef.current;
-    if (!root) return;
-    let opened: HTMLDetailsElement[] = [];
-    const onBefore = () => {
-      opened = [];
-      root.querySelectorAll("details").forEach((node) => {
-        const d = node as HTMLDetailsElement;
-        if (d.closest(".print-omit") || d.closest(".no-print")) return;
-        if (!d.open) opened.push(d);
-        d.open = true;
-      });
-    };
-    const onAfter = () => {
-      opened.forEach((d) => {
-        d.open = false;
-      });
-      opened = [];
-    };
-    window.addEventListener("beforeprint", onBefore);
-    window.addEventListener("afterprint", onAfter);
-    return () => {
-      window.removeEventListener("beforeprint", onBefore);
-      window.removeEventListener("afterprint", onAfter);
-    };
   }, []);
   const linkedScenarios = useMemo(() => {
     if (!policy.enabled || !isLinkedKind(policy.kind)) return [];
@@ -618,7 +591,7 @@ export function ReportView({
           aria-label="Report controls"
         >
           <div className="stack-actions">
-            <div className={`grid gap-2 ${showDownload && printReady ? "grid-cols-3" : printReady || showDownload ? "grid-cols-2" : "grid-cols-1"}`}>
+            <div className={`grid gap-2 ${showDownload ? "grid-cols-2" : "grid-cols-1"}`}>
             {showDownload ? (
             <button
               type="button"
@@ -626,15 +599,6 @@ export function ReportView({
               className="flex min-h-11 items-center justify-center rounded-lg border border-gold bg-gold px-2 text-center text-sm font-semibold text-masthead hover:brightness-105"
             >
               Download PDF
-            </button>
-            ) : null}
-            {printReady ? (
-            <button
-              type="button"
-              onClick={() => (onClosePdf ?? onPdf)()}
-              className="flex min-h-11 items-center justify-center rounded-lg bg-teal px-2 text-center text-sm font-semibold text-cream hover:brightness-110"
-            >
-              Print to PDF
             </button>
             ) : null}
             <button
@@ -1190,8 +1154,8 @@ export function ReportView({
           <h2 className="font-display text-xl text-navy">Instructions</h2>
           <p className="mt-2 text-sm text-muted">
             Sections from Year-by-year through the end of this report start closed on this screen.
-            Select a title to view that section here.
-            If a section is selected for Download PDF or Print to PDF, the full section is included — not only the collapsed title.
+            Open a title to view that section. Print to PDF is on the report link, not on this screen.
+            Only a section you have opened is included in the PDF. A closed toggle prints as a title only.
           </p>
         </section>
         <div data-fold-region className="flex flex-col">
@@ -2659,25 +2623,11 @@ export function ReportView({
             {advisorGaps.length === 0 && printReady ? (
               <>
                 <p className="mt-2 text-sm text-navy">
-                  {pdfDemo
-                    ? "The report link is ready. You can print to PDF."
-                    : "Advisor information is complete. You can download the PDF."}
+                  Print to PDF is on the report link. Open any collapsed section you want in the file so its text is visible, then use Print to PDF there. A closed toggle is not printed.
                 </p>
-                <div className="mt-4 grid gap-2">
-                  <button
-                    type="button"
-                    className="btn-block rounded-lg border border-gold bg-gold text-masthead"
-                    onClick={() => {
-                      setCloseAsk(false);
-                      (onClosePdf ?? onPdf)();
-                    }}
-                  >
-                    {pdfDemo ? "Print to PDF" : "Download PDF"}
-                  </button>
-                  <button type="button" className="btn-block rounded-lg border border-navy bg-navy text-cream" onClick={onClose}>
-                    Close without downloading
-                  </button>
-                </div>
+                <button type="button" className="btn-block mt-4 rounded-lg border border-navy bg-navy text-cream" onClick={onClose}>
+                  Close
+                </button>
               </>
             ) : advisorGaps.length === 0 ? (
               <>

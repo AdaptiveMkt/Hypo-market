@@ -54,30 +54,16 @@ export function SharedReportPage({ slug, code }: { slug: string; code: string })
     const root = document.getElementById("aum-report");
     if (!root) return;
     const kids = Array.from(root.children);
-    const opened: HTMLDetailsElement[] = [];
     kids.forEach((node, i) => {
       if (!(node instanceof HTMLElement)) return;
-      const keep = picked[String(i)] !== false && Boolean(rows.find((row) => row.id === String(i)));
       const listed = rows.some((row) => row.id === String(i));
+      const keep = picked[String(i)] !== false && listed;
       if (listed && !keep) node.classList.add("print-omit");
       else node.classList.remove("print-omit");
-      if (keep) {
-        const folds = [
-          ...(node instanceof HTMLDetailsElement ? [node] : []),
-          ...Array.from(node.querySelectorAll("details")),
-        ];
-        folds.forEach((d) => {
-          if (!d.open) opened.push(d);
-          d.open = true;
-        });
-      }
     });
     setPicker(false);
     const clear = () => {
       kids.forEach((node) => node.classList.remove("print-omit"));
-      opened.forEach((d) => {
-        d.open = false;
-      });
       window.removeEventListener("afterprint", clear);
     };
     window.addEventListener("afterprint", clear);

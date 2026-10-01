@@ -729,7 +729,7 @@ html.pdf-capture a[data-source-href]::after {
   word-break: break-all;
 }
 
-html.pdf-capture .accordion-panel {
+html.pdf-capture [data-accordion="open"] > .accordion-panel {
   max-height: none !important;
   opacity: 1 !important;
   transform: none !important;
@@ -738,6 +738,7 @@ html.pdf-capture .accordion-panel {
   display: block !important;
 }
 
+html.pdf-capture [data-accordion="closed"] > .accordion-panel,
 html.pdf-capture [data-medicaid-fold][data-medicaid-open="0"] .accordion-panel {
   max-height: 0 !important;
   opacity: 0 !important;
@@ -934,7 +935,7 @@ html.pdf-capture #aum-report .tabular-nums.font-bold.amt-green {
     display: none !important;
   }
 
-  .accordion-panel {
+  [data-accordion="open"] > .accordion-panel {
     max-height: none !important;
     opacity: 1 !important;
     overflow: visible !important;
@@ -942,6 +943,7 @@ html.pdf-capture #aum-report .tabular-nums.font-bold.amt-green {
     transform: none !important;
   }
 
+  [data-accordion="closed"] > .accordion-panel,
   [data-medicaid-fold][data-medicaid-open="0"] .accordion-panel {
     max-height: 0 !important;
     opacity: 0 !important;
