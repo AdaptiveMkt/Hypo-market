@@ -861,6 +861,31 @@ html.pdf-capture #aum-report .tabular-nums.font-bold.amt-green {
   -webkit-text-fill-color: #009e73 !important;
 }
 
+.compare-table,
+.year-table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.compare-table th,
+.compare-table td,
+.year-table th,
+.year-table td {
+  overflow-wrap: break-word;
+  word-break: normal;
+  white-space: normal;
+  vertical-align: top;
+}
+
+.year-table {
+  min-width: 64rem;
+}
+
+.year-table td {
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
 .site-print-terms {
   display: none;
 }
@@ -1215,6 +1240,27 @@ html.pdf-capture #aum-report .tabular-nums.font-bold.amt-green {
     min-height: 0 !important;
     break-inside: auto !important;
     page-break-inside: auto !important;
+  }
+
+  #aum-report .overflow-x-auto {
+    overflow: visible !important;
+  }
+
+  #aum-report table,
+  #aum-report .compare-table,
+  #aum-report .year-table {
+    width: 100% !important;
+    min-width: 0 !important;
+    table-layout: fixed !important;
+  }
+
+  #aum-report th,
+  #aum-report td {
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    overflow: visible !important;
+    hyphens: auto;
   }
 
   #aum-report .pdf-kpi {

@@ -89,7 +89,7 @@ import { lookupLtcNewsCity, type LtcNewsCityCosts } from "@/lib/ltc-news-cost";
 import { nearbyCounties } from "@/lib/nearby-counties";
 import { DEFAULT_TAX_RATE, TAX_RATE_GROUPS, TAX_RATE_OPTIONS } from "@/lib/tax-brackets";
 import { careCostCompound } from "@/lib/cpi";
-import { compactMoney, money, moneyCents } from "@/lib/utils";
+import { compactMoney, money } from "@/lib/utils";
 import { DEFAULT_PROTECT_PCT, sizeInsuranceToProtectAssets } from "@/lib/protect-assets";
 import { CHART, PIE_COLORS } from "@/lib/palette";
 import {
@@ -2706,7 +2706,7 @@ export function Calculator() {
                     ]
                   : []),
                 ...(policy.enabled && featureRow
-                  ? [{ id: "col-pool", group: "column" as const, label: "Insurance Benefit Pool · beginning", value: lifetime ? LIFETIME_BENEFIT_MARK : moneyCents(featureRow.insurancePoolStart) }]
+                  ? [{ id: "col-pool", group: "column" as const, label: "Insurance Benefit Pool · beginning", value: lifetime ? LIFETIME_BENEFIT_MARK : money(featureRow.insurancePoolStart) }]
                   : []),
                 ...(featureRow
                   ? [
@@ -2716,21 +2716,21 @@ export function Calculator() {
                         label: "Total Remaining · beginning",
                         value:
                           policy.enabled && lifetime
-                            ? `${moneyCents(featureRow.remainingNet)} + lifetime*`
-                            : moneyCents(
+                            ? `${money(featureRow.remainingNet)} + lifetime*`
+                            : money(
                                 policy.enabled
                                   ? featureRow.remainingNet + Math.max(0, featureRow.insurancePoolRemaining)
                                   : featureRow.remainingNet,
                               ),
                       },
-                      { id: "col-cost", group: "column" as const, label: "Annual Care Costs* (est) · beginning", value: <RedAmt>{moneyCents(featureRow.cost)}</RedAmt>, amount: featureRow.cost },
+                      { id: "col-cost", group: "column" as const, label: "Annual Care Costs* (est) · beginning", value: <RedAmt>{money(featureRow.cost)}</RedAmt>, amount: featureRow.cost },
                     ]
                   : []),
                 ...(policy.enabled && featureRow
                   ? [
-                      { id: "col-benefits", group: "column" as const, label: "Insurance Benefits · beginning", value: moneyCents(featureRow.insurance), amount: featureRow.insurance },
-                      { id: "col-benefits-cum", group: "column" as const, label: "Accumulative insurance paid · beginning", value: moneyCents(featureRow.insuranceCumulative), amount: featureRow.insuranceCumulative },
-                      { id: "col-balance", group: "column" as const, label: "Insurance Balance · beginning", value: lifetime ? LIFETIME_BENEFIT_MARK : moneyCents(featureRow.insurancePoolRemaining) },
+                      { id: "col-benefits", group: "column" as const, label: "Insurance Benefits · beginning", value: money(featureRow.insurance), amount: featureRow.insurance },
+                      { id: "col-benefits-cum", group: "column" as const, label: "Accumulative insurance paid · beginning", value: money(featureRow.insuranceCumulative), amount: featureRow.insuranceCumulative },
+                      { id: "col-balance", group: "column" as const, label: "Insurance Balance · beginning", value: lifetime ? LIFETIME_BENEFIT_MARK : money(featureRow.insurancePoolRemaining) },
                     ]
                   : []),
                 ...(featureRow
@@ -2749,7 +2749,7 @@ export function Calculator() {
                         id: "col-shortfall",
                         group: "column" as const,
                         label: "Cumulative Shortfall · beginning",
-                        value: featureRow.shortfallCumulative ? <RedAmt>{moneyCents(featureRow.shortfallCumulative)}</RedAmt> : "—",
+                        value: featureRow.shortfallCumulative ? <RedAmt>{money(featureRow.shortfallCumulative)}</RedAmt> : "—",
                       },
                     ]
                   : []),
@@ -2761,7 +2761,7 @@ export function Calculator() {
                     ]
                   : []),
                 ...(policy.enabled && depletionRow
-                  ? [{ id: "dep-pool", group: "depletion" as const, label: "Insurance Benefit Pool · end", value: lifetime ? LIFETIME_BENEFIT_MARK : moneyCents(depletionRow.insurancePoolStart) }]
+                  ? [{ id: "dep-pool", group: "depletion" as const, label: "Insurance Benefit Pool · end", value: lifetime ? LIFETIME_BENEFIT_MARK : money(depletionRow.insurancePoolStart) }]
                   : []),
                 ...(depletionRow
                   ? [
@@ -2771,22 +2771,22 @@ export function Calculator() {
                         label: "Total Remaining · end",
                         value:
                           policy.enabled && lifetime
-                            ? `${moneyCents(depletionRow.remainingNet)} + lifetime*`
-                            : moneyCents(
+                            ? `${money(depletionRow.remainingNet)} + lifetime*`
+                            : money(
                                 policy.enabled
                                   ? depletionRow.remainingNet + Math.max(0, depletionRow.insurancePoolRemaining)
                                   : depletionRow.remainingNet,
                               ),
                       },
-                      { id: "dep-cost", group: "depletion" as const, label: "Annual Care Costs* (est) · end", value: <RedAmt>{moneyCents(depletionRow.cost)}</RedAmt> },
-                      { id: "dep-cost-cum", group: "depletion" as const, label: "Total cumulative care cost · end", value: <RedAmt>{moneyCents(depletionRow.costCumulative)}</RedAmt>, amount: depletionRow.costCumulative },
+                      { id: "dep-cost", group: "depletion" as const, label: "Annual Care Costs* (est) · end", value: <RedAmt>{money(depletionRow.cost)}</RedAmt> },
+                      { id: "dep-cost-cum", group: "depletion" as const, label: "Total cumulative care cost · end", value: <RedAmt>{money(depletionRow.costCumulative)}</RedAmt>, amount: depletionRow.costCumulative },
                     ]
                   : []),
                 ...(policy.enabled && depletionRow
                   ? [
-                      { id: "dep-benefits", group: "depletion" as const, label: "Insurance Benefits · end", value: moneyCents(depletionRow.insurance) },
-                      { id: "dep-benefits-cum", group: "depletion" as const, label: "Accumulative insurance paid · end", value: moneyCents(depletionRow.insuranceCumulative), amount: depletionRow.insuranceCumulative },
-                      { id: "dep-balance", group: "depletion" as const, label: "Insurance Balance · end", value: lifetime ? LIFETIME_BENEFIT_MARK : moneyCents(depletionRow.insurancePoolRemaining) },
+                      { id: "dep-benefits", group: "depletion" as const, label: "Insurance Benefits · end", value: money(depletionRow.insurance) },
+                      { id: "dep-benefits-cum", group: "depletion" as const, label: "Accumulative insurance paid · end", value: money(depletionRow.insuranceCumulative), amount: depletionRow.insuranceCumulative },
+                      { id: "dep-balance", group: "depletion" as const, label: "Insurance Balance · end", value: lifetime ? LIFETIME_BENEFIT_MARK : money(depletionRow.insurancePoolRemaining) },
                     ]
                   : []),
                 ...(depletionRow
@@ -2807,14 +2807,14 @@ export function Calculator() {
                         group: "depletion" as const,
                         label: "Cumulative Shortfall · end",
                         amount: depletionRow.shortfallCumulative,
-                        value: depletionRow.shortfallCumulative ? <RedAmt>{moneyCents(depletionRow.shortfallCumulative)}</RedAmt> : "—",
+                        value: depletionRow.shortfallCumulative ? <RedAmt>{money(depletionRow.shortfallCumulative)}</RedAmt> : "—",
                       },
                       {
                         id: "dep-gap",
                         group: "depletion" as const,
                         label: "Care cost − insurance (copay + unpaid) · end",
                         amount: Math.max(0, depletionRow.costCumulative - depletionRow.insuranceCumulative),
-                        value: <RedAmt>{moneyCents(Math.max(0, depletionRow.costCumulative - depletionRow.insuranceCumulative))}</RedAmt>,
+                        value: <RedAmt>{money(Math.max(0, depletionRow.costCumulative - depletionRow.insuranceCumulative))}</RedAmt>,
                       },
                     ]
                   : []),
@@ -2831,7 +2831,7 @@ export function Calculator() {
                         id: "cum-cost",
                         group: "cumulative" as const,
                         label: "Total cumulative care cost",
-                        value: <RedAmt>{moneyCents(yearRowsShown.at(-1)!.costCumulative)}</RedAmt>,
+                        value: <RedAmt>{money(yearRowsShown.at(-1)!.costCumulative)}</RedAmt>,
                         amount: yearRowsShown.at(-1)!.costCumulative,
                       },
                       ...(policy.enabled
@@ -2840,7 +2840,7 @@ export function Calculator() {
                               id: "cum-ins",
                               group: "cumulative" as const,
                               label: "Accumulative insurance paid",
-                              value: moneyCents(yearRowsShown.at(-1)!.insuranceCumulative),
+                              value: money(yearRowsShown.at(-1)!.insuranceCumulative),
                               amount: yearRowsShown.at(-1)!.insuranceCumulative,
                             },
                           ]
@@ -2864,7 +2864,7 @@ export function Calculator() {
                         label: "Cumulative unpaid shortfall",
                         amount: yearRowsShown.at(-1)!.shortfallCumulative,
                         value: yearRowsShown.at(-1)!.shortfallCumulative ? (
-                          <RedAmt>{moneyCents(yearRowsShown.at(-1)!.shortfallCumulative)}</RedAmt>
+                          <RedAmt>{money(yearRowsShown.at(-1)!.shortfallCumulative)}</RedAmt>
                         ) : (
                           "—"
                         ),
@@ -2879,7 +2879,7 @@ export function Calculator() {
                         ),
                         value: (
                           <RedAmt>
-                            {moneyCents(
+                            {money(
                               Math.max(
                                 0,
                                 yearRowsShown.at(-1)!.costCumulative - yearRowsShown.at(-1)!.insuranceCumulative,
@@ -2892,28 +2892,28 @@ export function Calculator() {
                         id: "cum-premium",
                         group: "cumulative" as const,
                         label: "Premium paid (this run)",
-                        value: moneyCents(result.premiumTotal),
+                        value: money(result.premiumTotal),
                       },
                     ]
                   : []),
-                { id: "claim-assets", group: "more" as const, label: "Countable assets at claim (net after tax)", value: <RedAmt>{moneyCents(result.startPoolNet)}</RedAmt> },
-                { id: "assets-today", group: "more" as const, label: "Countable assets today", value: moneyCents(pool) },
-                { id: "first-cost", group: "more" as const, label: "First-year care cost", value: moneyCents(result.firstCost), amount: result.firstCost },
+                { id: "claim-assets", group: "more" as const, label: "Countable assets at claim (net after tax)", value: <RedAmt>{money(result.startPoolNet)}</RedAmt> },
+                { id: "assets-today", group: "more" as const, label: "Countable assets today", value: money(pool) },
+                { id: "first-cost", group: "more" as const, label: "First-year care cost", value: money(result.firstCost), amount: result.firstCost },
                 ...(policy.enabled
                   ? [
-                      { id: "col-benefits-total", group: "more" as const, label: "Insurance Benefits (this run)", value: <RedAmt>{moneyCents(result.insuranceTotal)}</RedAmt>, amount: result.insuranceTotal },
-                      { id: "ltc-purchase", group: "more" as const, label: "LTC pool at purchase", value: result.lifetimeBenefit ? LIFETIME_BENEFIT_MARK : moneyCents(insToday) },
-                      { id: "ltc-claim", group: "more" as const, label: "LTC benefits at claim", value: result.lifetimeBenefit ? LIFETIME_BENEFIT_MARK : moneyCents(insClaim) },
+                      { id: "col-benefits-total", group: "more" as const, label: "Insurance Benefits (this run)", value: <RedAmt>{money(result.insuranceTotal)}</RedAmt>, amount: result.insuranceTotal },
+                      { id: "ltc-purchase", group: "more" as const, label: "LTC pool at purchase", value: result.lifetimeBenefit ? LIFETIME_BENEFIT_MARK : money(insToday) },
+                      { id: "ltc-claim", group: "more" as const, label: "LTC benefits at claim", value: result.lifetimeBenefit ? LIFETIME_BENEFIT_MARK : money(insClaim) },
                     ]
                   : []),
                 {
                   id: "combined-today",
                   group: "more" as const,
                   label: policy.enabled ? "Combined pool today (assets + LTC)" : "Countable pool today",
-                  value: policy.enabled && result.lifetimeBenefit ? `${money(pool)} + lifetime*` : moneyCents(combinedToday),
+                  value: policy.enabled && result.lifetimeBenefit ? `${money(pool)} + lifetime*` : money(combinedToday),
                 },
-                { id: "end-assets", group: "more" as const, label: "Assets remaining (end of run)", value: <RedAmt>{moneyCents(result.endPool)}</RedAmt>, amount: result.endPool },
-                { id: "end-short", group: "more" as const, label: "Unpaid shortfall (end of run)", value: <RedAmt>{result.shortfallTotal ? moneyCents(result.shortfallTotal) : "None"}</RedAmt>, amount: result.shortfallTotal },
+                { id: "end-assets", group: "more" as const, label: "Assets remaining (end of run)", value: <RedAmt>{money(result.endPool)}</RedAmt>, amount: result.endPool },
+                { id: "end-short", group: "more" as const, label: "Unpaid shortfall (end of run)", value: <RedAmt>{result.shortfallTotal ? money(result.shortfallTotal) : "None"}</RedAmt>, amount: result.shortfallTotal },
               ]}
             />
             <p className="mt-3 text-xs leading-snug text-muted">

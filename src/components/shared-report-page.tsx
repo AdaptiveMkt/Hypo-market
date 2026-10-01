@@ -4,7 +4,6 @@ import { setTheme } from "@/components/theme-toggle";
 import { readShare, shareDisclaimer, type ShareView } from "@/lib/share-report";
 import { CopyrightMark } from "@/components/source-links";
 import { DisclosureTermsLink } from "@/components/disclosure-link";
-import { downloadReportPdf } from "@/lib/download-report-pdf";
 
 type PrintRow = { id: string; label: string; opened: boolean };
 
@@ -190,8 +189,6 @@ export function SharedReportPage({ slug, code }: { slug: string; code: string })
   const [view, setView] = useState<ShareView | null>(null);
   const [error, setError] = useState("");
   const [picker, setPicker] = useState(false);
-  const [exporting, setExporting] = useState(false);
-  const [exportError, setExportError] = useState("");
   const [rows, setRows] = useState<PrintRow[]>([]);
   const [picked, setPicked] = useState<Record<string, boolean>>({});
 
@@ -222,31 +219,6 @@ export function SharedReportPage({ slug, code }: { slug: string; code: string })
 
   function printSelected() {
     printCheckedSections(picked, () => setPicker(false));
-  }
-
-  async function exportPdf() {
-    const root = document.getElementById("aum-report");
-    if (!root || exporting) return;
-    setExportError("");
-    setExporting(true);
-    root.querySelectorAll("details").forEach((node) => {
-      if (!(node instanceof HTMLDetailsElement)) return;
-      if (node.open) node.classList.add("print-show");
-    });
-    try {
-      const file = await downloadReportPdf("asset-preservation-report.pdf", (msg) => setExportError(msg));
-      const link = document.createElement("a");
-      link.href = file.url;
-      link.download = file.filename;
-      link.click();
-      window.setTimeout(() => URL.revokeObjectURL(file.url), 4000);
-      setExportError("");
-    } catch (err) {
-      setExportError(err instanceof Error ? err.message : "PDF could not be exported.");
-    } finally {
-      root.querySelectorAll(".print-show").forEach((el) => el.classList.remove("print-show"));
-      setExporting(false);
-    }
   }
 
   return (
@@ -285,26 +257,14 @@ export function SharedReportPage({ slug, code }: { slug: string; code: string })
           </p>
         ) : null}
         {view?.status === "ready" ? (
-          <div className="no-print mx-auto mt-4 grid max-w-lg gap-2 sm:grid-cols-2">
-            <button
-              type="button"
-              className="btn-block rounded-lg bg-teal px-4 py-2.5 text-center text-sm font-semibold text-white hover:brightness-110 disabled:opacity-60"
-              onClick={exportPdf}
-              disabled={exporting}
-            >
-              {exporting ? "Exporting PDF…" : "Export PDF"}
-            </button>
-            <button
-              type="button"
-              className="btn-block rounded-lg border border-navy bg-navy px-4 py-2.5 text-center text-sm font-semibold text-cream hover:bg-teal"
-              onClick={openPrintPicker}
-              disabled={exporting}
-            >
-              Print to PDF
-            </button>
-          </div>
+          <button
+            type="button"
+            className="no-print btn-block mx-auto mt-4 max-w-xs rounded-lg bg-teal px-4 py-2.5 text-center text-sm font-semibold text-white hover:brightness-110"
+            onClick={openPrintPicker}
+          >
+            Print to PDF
+          </button>
         ) : null}
-        {exportError ? <p className="no-print mx-auto mt-2 max-w-lg text-sm text-navy">{exportError}</p> : null}
         <div className="no-print mt-8 border-t border-line pt-4 text-center">
           <p className="text-xs text-muted">
             <CopyrightMark />{" "}

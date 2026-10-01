@@ -350,7 +350,7 @@ export function ReportView({
           },
         ];
   const printReady = !pdfDemo || Boolean(shareUrl);
-  const showDownload = true;
+  const showDownload = allowPdf && !pdfDemo;
   const tip = {
     background: "#fffdf8",
     border: "1px solid #d9cfc0",
@@ -1481,24 +1481,31 @@ export function ReportView({
             not a quote.
           </p>
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[800px] text-sm">
+            <table className="compare-table w-full text-sm">
+              <colgroup>
+                <col className="w-[16%]" />
+                <col className="w-[21%]" />
+                <col className="w-[21%]" />
+                <col className="w-[21%]" />
+                <col className="w-[21%]" />
+              </colgroup>
               <thead>
                 <tr className="text-left text-xs uppercase tracking-wide text-muted">
-                  <th className="py-2 pr-2">Feature</th>
-                  <th className="py-2 pr-2">No policy</th>
-                  <th className="py-2 pr-2">Traditional</th>
-                  <th className="py-2 pr-2">+ Partnership</th>
-                  <th className="py-2">Asset-based hybrid</th>
+                  <th className="py-2 pr-2 align-bottom">Feature</th>
+                  <th className="py-2 pr-2 align-bottom">No policy</th>
+                  <th className="py-2 pr-2 align-bottom">Traditional</th>
+                  <th className="py-2 pr-2 align-bottom">+ Partnership</th>
+                  <th className="py-2 align-bottom">Asset-based hybrid</th>
                 </tr>
               </thead>
               <tbody>
                 {LTC_COMPARE_FEATURES.map((row) => (
                   <tr key={row.feature} className="border-t border-line align-top">
-                    <td className="py-2 pr-2 font-semibold text-navy">{row.feature}</td>
-                    <td className="py-2 pr-2 text-muted">{row.none}</td>
-                    <td className="py-2 pr-2 text-muted">{row.traditional}</td>
-                    <td className="py-2 pr-2 text-muted">{row.partnership}</td>
-                    <td className="py-2 text-muted">{row.hybrid}</td>
+                    <td className="py-2 pr-2 align-top font-semibold break-words text-navy">{row.feature}</td>
+                    <td className="py-2 pr-2 align-top break-words text-muted">{row.none}</td>
+                    <td className="py-2 pr-2 align-top break-words text-muted">{row.traditional}</td>
+                    <td className="py-2 pr-2 align-top break-words text-muted">{row.partnership}</td>
+                    <td className="py-2 align-top break-words text-muted">{row.hybrid}</td>
                   </tr>
                 ))}
               </tbody>

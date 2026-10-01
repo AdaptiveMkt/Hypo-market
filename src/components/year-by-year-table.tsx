@@ -10,7 +10,7 @@ import {
 import { Cite } from "@/components/source-links";
 import { KIND_TAB } from "@/lib/kind-tabs";
 import { SRC } from "@/lib/sources";
-import { money, moneyCents } from "@/lib/utils";
+import { money } from "@/lib/utils";
 
 const MODEL_START_YEAR = new Date().getFullYear();
 
@@ -91,7 +91,7 @@ export function YearByYearTable({
 
   return (
     <div className="overflow-x-auto pb-4">
-      <table className="w-full min-w-[720px] table-fixed text-sm">
+      <table className="year-table w-full text-sm">
         <thead>
           <tr className="border-b border-gold text-[11px] font-semibold leading-tight text-muted">
             <th className="w-[3.25rem] py-2 px-1 text-center align-bottom">Year</th>
@@ -148,7 +148,7 @@ export function YearByYearTable({
                 {policyEnabled ? (
                   <td className={cell}>
                     <Num
-                      text={lifetime ? LIFETIME_BENEFIT_MARK : moneyCents(r.insurancePoolStart)}
+                      text={lifetime ? LIFETIME_BENEFIT_MARK : money(r.insurancePoolStart)}
                       value={lifetime ? 0 : r.insurancePoolStart}
                     />
                   </td>
@@ -157,19 +157,19 @@ export function YearByYearTable({
                   <Num
                     text={
                       lifetime && policyEnabled
-                        ? `${moneyCents(r.remainingNet)} + lifetime*`
-                        : moneyCents(totalLeft)
+                        ? `${money(r.remainingNet)} + lifetime*`
+                        : money(totalLeft)
                     }
                     value={lifetime && policyEnabled ? r.remainingNet : totalLeft}
                   />
                 </td>
-                <td className={`${cell} ${r.cost ? "font-bold amt-red" : ""}`}>{moneyCents(r.cost)}</td>
+                <td className={`${cell} ${r.cost ? "font-bold amt-red" : ""}`}>{money(r.cost)}</td>
                 {policyEnabled ? (
                   <>
-                    <td className={cell}>{moneyCents(r.insurance)}</td>
+                    <td className={cell}>{money(r.insurance)}</td>
                     <td className={cell}>
                       <Num
-                        text={lifetime ? LIFETIME_BENEFIT_MARK : moneyCents(r.insurancePoolRemaining)}
+                        text={lifetime ? LIFETIME_BENEFIT_MARK : money(r.insurancePoolRemaining)}
                         value={lifetime ? 0 : r.insurancePoolRemaining}
                       />
                     </td>
@@ -180,7 +180,7 @@ export function YearByYearTable({
                 </td>
                 <td className="py-2 px-1 text-center">
                   <Num
-                    text={r.shortfallCumulative ? moneyCents(r.shortfallCumulative) : "—"}
+                    text={r.shortfallCumulative ? money(r.shortfallCumulative) : "—"}
                     value={r.shortfallCumulative}
                     shortfall
                   />
@@ -196,11 +196,11 @@ export function YearByYearTable({
             {policyEnabled ? <td className="py-2 px-1 text-center">—</td> : null}
             <td className="py-2 px-1 text-center">—</td>
             <td className="py-2 px-1 text-center font-bold amt-red">
-              {moneyCents(last?.costCumulative ?? 0)}
+              {money(last?.costCumulative ?? 0)}
             </td>
             {policyEnabled ? (
               <>
-                <td className="py-2 px-1 text-center">{moneyCents(last?.insuranceCumulative ?? 0)}</td>
+                <td className="py-2 px-1 text-center">{money(last?.insuranceCumulative ?? 0)}</td>
                 <td className="py-2 px-1 text-center">—</td>
               </>
             ) : null}
@@ -216,7 +216,7 @@ export function YearByYearTable({
             </td>
             <td className="py-2 px-1 text-center">
               <Num
-                text={last?.shortfallCumulative ? moneyCents(last.shortfallCumulative) : "—"}
+                text={last?.shortfallCumulative ? money(last.shortfallCumulative) : "—"}
                 value={last?.shortfallCumulative ?? 0}
                 shortfall
               />
