@@ -223,6 +223,20 @@ function disabledPolicy(p: LtcPolicy): LtcPolicy {
   return { ...p, enabled: false };
 }
 
+function sameBenefitDesign(a: LtcPolicy, b: LtcPolicy) {
+  return (
+    a.kind === b.kind &&
+    a.dailyBenefit === b.dailyBenefit &&
+    a.benefitYears === b.benefitYears &&
+    a.elimDays === b.elimDays &&
+    a.benefitInflationPct === b.benefitInflationPct &&
+    a.inflationMethod === b.inflationMethod &&
+    a.singlePremium === b.singlePremium &&
+    a.monthlyBenefit === b.monthlyBenefit &&
+    a.leverage === b.leverage
+  );
+}
+
 function Section1CueBody({
   pool,
   home,
@@ -365,6 +379,8 @@ export function Calculator() {
   const [section3Confirmed, setSection3Confirmed] = useState(false);
   const [section3Open, setSection3Open] = useState(false);
   const [alternativeRun, setAlternativeRun] = useState(false);
+  const [keptPolicy, setKeptPolicy] = useState<LtcPolicy | null>(null);
+  const [industryApplied, setIndustryApplied] = useState(false);
 
   useEffect(() => {
     if (!alternativeRun) return;
@@ -659,6 +675,12 @@ export function Calculator() {
     () => project({ ...baseArgs, policy: disabledPolicy(policy) }),
     [pool, state, setting, delay, duration, cpi, roi, taxRate, iraBal, iraRoi, policy, holdings, cityCosts],
   );
+  const keepSelection = useMemo(() => {
+    if (!industryApplied || !keptPolicy || !policy.enabled) return null;
+    const kept = { ...keptPolicy, enabled: true };
+    if (sameBenefitDesign(kept, policy)) return null;
+    return { policy: kept, result: project({ ...baseArgs, policy: kept }) };
+  }, [industryApplied, keptPolicy, policy, pool, state, setting, delay, duration, cpi, roi, taxRate, iraBal, iraRoi, holdings, cityCosts]);
   const yearView = useMemo(() => {
     if (!policy.enabled || yearKind === policy.kind || !runKinds[yearKind]) return result;
     return project({ ...baseArgs, policy: policyForKind(yearKind) });
@@ -899,6 +921,7 @@ export function Calculator() {
     partnershipOn: partnershipApplies,
     preferTap,
     lifeFaceAmount,
+    keepSelection: keepSelection ?? undefined,
   });
   const recommendations = recommendationsNarrative({
     scenario,
@@ -952,6 +975,7 @@ export function Calculator() {
     setYearKind("traditional");
     setRunKinds((prev) => ({ ...prev, traditional: true }));
     setDesignTouched(true);
+    setIndustryApplied(true);
     setSection3Open(true);
     window.setTimeout(() => scrollToId("daily"), 80);
   }
@@ -1002,6 +1026,7 @@ export function Calculator() {
       return true;
     }
     setSection3Open(true);
+    if (!industryApplied) setKeptPolicy({ ...policy, enabled: true });
     setCue({
       title: "Industry averages for your age",
       body: section2IndustryMessage(ageToday),
@@ -1022,7 +1047,7 @@ export function Calculator() {
       ],
       actionHint: "* Select these benefits for insurance run.",
       closeLabel: "Keep My Selection",
-      applyOnClose: true,
+      applyOnClose: false,
       actionLabel: "Use this Options",
       action: "industry",
       secondaryLabel: `RUN ${protectPct}% Co-Pay ALTERNATIVE`,
@@ -1123,6 +1148,8 @@ export function Calculator() {
     setSection3Confirmed(false);
     setSection3Open(false);
     setAlternativeRun(false);
+    setKeptPolicy(null);
+    setIndustryApplied(false);
     setClaimAge(actuarialClaimAge(DEFAULT_AGE_TODAY));
     setClaimAgeTouched(false);
     setDuration(10);
