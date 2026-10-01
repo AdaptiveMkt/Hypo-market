@@ -63,9 +63,13 @@ function fields(lead: AdvisorLeadNotice, includeLink: boolean) {
   };
   add("firstname", firstname);
   add("lastname", lastname);
-  add("company", lead.firm);
+  if (includeLink && lead.reportUrl) {
+    add("company", [lead.firm, lead.reportUrl].filter(Boolean).join(" | "));
+    add("report_link", lead.reportUrl);
+  } else {
+    add("company", lead.firm);
+  }
   add("mobilephone", lead.phone);
-  if (includeLink) add("report_link", lead.reportUrl);
   return rows;
 }
 
@@ -92,7 +96,6 @@ async function postLead(lead: AdvisorLeadNotice, includeLink: boolean) {
 
 /** Sends the finished report address to the same HubSpot contact. */
 export async function sendReportLinkToHubspot(lead: { email: string; name: string; phone: string; firm: string; url: string }) {
-  const full = storedLead();
   rememberAdvisorLead({
     email: lead.email,
     name: lead.name,
