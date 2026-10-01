@@ -484,8 +484,8 @@ const html2opts = (scale: number, extra: Record<string, unknown> = {}) => ({
     el.style.maxHeight = "none";
     el.querySelectorAll("details").forEach((d) => {
       const det = d as HTMLDetailsElement;
-      if (det.closest("[data-fold-region]")) return;
-      if (!det.classList.contains("no-print") && !det.classList.contains("pdf-stay-closed")) det.open = true;
+      if (det.classList.contains("no-print") || det.closest(".no-print") || det.closest(".print-omit")) return;
+      det.open = true;
     });
     el.querySelectorAll(".accordion-panel").forEach((p) => {
       const panel = p as HTMLElement;
@@ -554,9 +554,11 @@ function expandLive(root: HTMLElement) {
     p.style.pointerEvents = "auto";
     p.style.display = "";
   });
-  root.querySelectorAll("details").forEach((d) => {
-    if (d.closest("[data-fold-region]")) return;
-    if (!d.classList.contains("no-print") && !d.classList.contains("pdf-stay-closed")) (d as HTMLDetailsElement).open = true;
+  const detailNodes = Array.from(root.querySelectorAll("details"));
+  const detailsPrev = detailNodes.map((d) => ({ d: d as HTMLDetailsElement, open: (d as HTMLDetailsElement).open }));
+  detailNodes.forEach((d) => {
+    if (d.classList.contains("no-print") || d.closest(".no-print") || d.closest(".print-omit")) return;
+    (d as HTMLDetailsElement).open = true;
   });
   return () => {
     prev.forEach(({ p, maxH, op, ov, tf, display }) => {
@@ -565,6 +567,9 @@ function expandLive(root: HTMLElement) {
       p.style.overflow = ov;
       p.style.transform = tf;
       p.style.display = display;
+    });
+    detailsPrev.forEach(({ d, open }) => {
+      d.open = open;
     });
   };
 }
@@ -729,7 +734,7 @@ export async function downloadReportPdf(
   document.documentElement.classList.add("pdf-capture");
   const restoreAccordions = expandLive(root);
   window.dispatchEvent(new Event("resize"));
-  await wait(280);
+  await wait(500);
 
   try {
     const blocks = Array.from(root.querySelectorAll<HTMLElement>(".report-block")).filter(

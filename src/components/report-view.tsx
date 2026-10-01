@@ -405,6 +405,33 @@ export function ReportView({
     nodes.forEach((n) => n.addEventListener("toggle", onToggle));
     return () => nodes.forEach((n) => n.removeEventListener("toggle", onToggle));
   }, []);
+
+  useEffect(() => {
+    const root = reportRef.current;
+    if (!root) return;
+    let opened: HTMLDetailsElement[] = [];
+    const onBefore = () => {
+      opened = [];
+      root.querySelectorAll("details").forEach((node) => {
+        const d = node as HTMLDetailsElement;
+        if (d.closest(".print-omit") || d.closest(".no-print")) return;
+        if (!d.open) opened.push(d);
+        d.open = true;
+      });
+    };
+    const onAfter = () => {
+      opened.forEach((d) => {
+        d.open = false;
+      });
+      opened = [];
+    };
+    window.addEventListener("beforeprint", onBefore);
+    window.addEventListener("afterprint", onAfter);
+    return () => {
+      window.removeEventListener("beforeprint", onBefore);
+      window.removeEventListener("afterprint", onAfter);
+    };
+  }, []);
   const linkedScenarios = useMemo(() => {
     if (!policy.enabled || !isLinkedKind(policy.kind)) return [];
     const holdings = holdingsFrom(assets, assetRois ?? DEFAULT_ASSET_ROIS, excludeHome);
@@ -1138,10 +1165,9 @@ export function ReportView({
         <section className="report-block">
           <h2 className="font-display text-xl text-navy">Instructions</h2>
           <p className="mt-2 text-sm text-muted">
-            Sections from Year-by-year through the end of this report start closed.
-            Select a title to view that section on this screen.
-            To include a section in a download or a print, open it first, then use Download PDF or your browser’s Print command.
-            Closed sections appear as titles only.
+            Sections from Year-by-year through the end of this report start closed on this screen.
+            Select a title to view that section here.
+            If a section is selected for Download PDF or Print to PDF, the full section is included — not only the collapsed title.
           </p>
         </section>
         <div data-fold-region className="flex flex-col">
