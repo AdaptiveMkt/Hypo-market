@@ -167,9 +167,19 @@ function printCheckedSections(_picked: Record<string, boolean>, done: () => void
   const wasAcc = accordions.map((node) => node.getAttribute("data-accordion"));
   const folds = Array.from(root.querySelectorAll<HTMLElement>("[data-medicaid-fold]"));
   const wasFold = folds.map((node) => node.getAttribute("data-medicaid-open"));
-  const apply = () => applyPrintVisibility(root);
+  const apply = () => {
+    applyPrintVisibility(root);
+  };
   apply();
-  const onBefore = () => apply();
+  const restoreUnwrap = unwrapForPrint(
+    Array.from(root.querySelectorAll("details")).filter(
+      (node): node is HTMLDetailsElement =>
+        node instanceof HTMLDetailsElement &&
+        !node.classList.contains("no-print") &&
+        !node.closest(".no-print"),
+    ),
+  );
+  const onBefore = () => applyPrintVisibility(root);
   let cleared = false;
   const clear = () => {
     if (cleared) return;
@@ -177,6 +187,7 @@ function printCheckedSections(_picked: Record<string, boolean>, done: () => void
     window.clearTimeout(backup);
     window.removeEventListener("beforeprint", onBefore);
     window.removeEventListener("afterprint", onAfter);
+    restoreUnwrap();
     root.querySelectorAll(".print-omit, .print-show").forEach((el) => {
       el.classList.remove("print-omit", "print-show");
     });
@@ -198,7 +209,7 @@ function printCheckedSections(_picked: Record<string, boolean>, done: () => void
   };
   const started = Date.now();
   const onAfter = () => {
-    if (Date.now() - started < 700) return;
+    if (Date.now() - started < 1500) return;
     window.setTimeout(clear, 200);
   };
   const backup = window.setTimeout(clear, 60000);

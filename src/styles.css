@@ -962,6 +962,18 @@ html.pdf-capture #aum-report .tabular-nums.font-bold.amt-green {
     display: none !important;
   }
 
+  #aum-report header,
+  #aum-report footer {
+    display: block !important;
+  }
+
+  html,
+  body,
+  #aum-report {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
   details[open] > summary ~ * {
     visibility: visible !important;
     max-height: none !important;
@@ -987,6 +999,18 @@ html.pdf-capture #aum-report .tabular-nums.font-bold.amt-green {
     max-height: none !important;
     overflow: visible !important;
   }
+
+  #aum-report .print-include table,
+  #aum-report .print-include > summary ~ table {
+    display: table !important;
+    width: 100% !important;
+  }
+
+  #aum-report .print-include thead { display: table-header-group !important; }
+  #aum-report .print-include tbody { display: table-row-group !important; }
+  #aum-report .print-include tr { display: table-row !important; }
+  #aum-report .print-include th,
+  #aum-report .print-include td { display: table-cell !important; }
 
   .print-include > .pdf-kpi-grid,
   .print-include > summary ~ .pdf-kpi-grid {
@@ -1225,7 +1249,7 @@ html.pdf-capture #aum-report .tabular-nums.font-bold.amt-green {
   }
 
   #aum-report section.report-block,
-  #aum-report details.report-fold {
+  #aum-report .report-fold {
     break-before: page !important;
     page-break-before: always !important;
     break-inside: auto !important;
