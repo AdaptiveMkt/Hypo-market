@@ -1793,7 +1793,7 @@ export function ReportView({
         ) : null}
 
         {policy.enabled && details.hybrid ? (
-        <details className="pdf-stay-closed report-block report-fold"><summary className="flex min-h-11 cursor-pointer list-none items-start gap-2 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal [&::-webkit-details-marker]:hidden [&::marker]:content-none"><span aria-hidden="true" className="naic-chevron mt-1 inline-block text-gold-ink motion-reduce:transition-none">▸</span><h2 className="mb-3 font-display text-xl text-navy">
+        <details className="print-page-start pdf-stay-closed report-block report-fold"><summary className="flex min-h-11 cursor-pointer list-none items-start gap-2 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal [&::-webkit-details-marker]:hidden [&::marker]:content-none"><span aria-hidden="true" className="naic-chevron mt-1 inline-block text-gold-ink motion-reduce:transition-none">▸</span><h2 className="mb-3 font-display text-xl text-navy">
             Explore Traditional, Asset-based, Hybrid, and LTC Annuity
           </h2></summary>
           <p className="mb-3 text-sm text-muted">
