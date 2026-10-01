@@ -131,7 +131,9 @@ function applyPrintVisibility(root: HTMLElement) {
     node.setAttribute("data-medicaid-open", "1");
   });
   root.querySelectorAll("h2").forEach((heading) => {
-    if (!/year-by-year projection/i.test(heading.textContent || "")) return;
+    const text = heading.textContent || "";
+    if (!/year-by-year projection/i.test(text)) return;
+    if (/annuity|hybrid/i.test(text)) return;
     const block = heading.closest("details, .report-block");
     block?.classList.add("print-page-start");
   });
