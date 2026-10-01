@@ -171,6 +171,7 @@ import {
 import { downloadReportPdf } from "@/lib/download-report-pdf";
 import { pdfFilename } from "@/lib/email-attachment";
 import { publishShare } from "@/lib/share-report";
+import { sendReportLinkToHubspot } from "@/lib/hubspot-report-link";
 import { hypothesisSensitivity } from "@/lib/sensitivity";
 import { modelConfidence } from "@/lib/confidence";
 import {
@@ -1653,6 +1654,14 @@ export function Calculator() {
           if (!cancel) {
             setShareUrl(res.url);
             setShareHours(res.hours);
+            const lead = mailRef.current.advisor;
+            void sendReportLinkToHubspot({
+              email: lead.email,
+              name: lead.name,
+              phone: lead.phone,
+              firm: lead.firm,
+              url: res.url,
+            });
           }
         })
         .catch((err: unknown) => {
