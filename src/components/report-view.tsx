@@ -1228,7 +1228,7 @@ export function ReportView({
                 ? ` (7% of adjusted gross household income ${money(annualIncome)}). Asset-based, annuity care, and hybrid life single premiums default to $100,000, unless a different deposit was entered.`
                 : " (2.5% of countable assets, because adjusted gross household income was not entered)."}
             </p>
-            <div className="grid gap-4 lg:grid-cols-2">
+            <div className="grid w-full gap-4">
               <div className="report-chart h-72">
                 <ChartRegion
                   title="Asset allocation pie"

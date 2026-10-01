@@ -93,9 +93,33 @@ function unwrapForPrint(nodes: HTMLDetailsElement[]) {
   };
 }
 
+function widenPremiumNotes(root: HTMLElement) {
+  root.querySelectorAll("td, th").forEach((cell) => {
+    if (!(cell instanceof HTMLElement)) return;
+    const text = (cell.textContent || "").replace(/\s+/g, " ").trim();
+    if (text.length < 160 || !/illustrative placeholder only/i.test(text)) return;
+    const table = cell.closest("table");
+    const note = document.createElement("p");
+    note.className = "premium-note";
+    note.textContent = text;
+    if (table?.parentElement) table.parentElement.insertBefore(note, table);
+    else cell.parentElement?.insertBefore(note, cell);
+    cell.textContent = "Illustrative planning figure";
+  });
+  root.querySelectorAll(".premium-note, .lg\\:grid-cols-2").forEach((node) => {
+    if (!(node instanceof HTMLElement)) return;
+    node.style.width = "100%";
+    node.style.maxWidth = "100%";
+    node.style.textAlign = "left";
+    node.style.display = "block";
+    node.style.gridTemplateColumns = "1fr";
+  });
+}
+
 function printCheckedSections(picked: Record<string, boolean>, done: () => void) {
   const root = document.getElementById("aum-report");
   if (!root) return;
+  widenPremiumNotes(root);
   const dialog = document.getElementById("share-print-dialog");
   dialog?.classList.add("print-omit");
   const reveal = new Set<HTMLDetailsElement>();

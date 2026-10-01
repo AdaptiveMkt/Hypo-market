@@ -967,13 +967,26 @@ html.pdf-capture #aum-report .tabular-nums.font-bold.amt-green {
     grid-template-columns: 1fr 1fr !important;
   }
 
-  .premium-note {
+  .premium-note,
+  .lg\:grid-cols-2,
+  .lg\:grid-cols-2 > * {
     display: block !important;
     width: 100% !important;
-    max-width: none !important;
+    max-width: 100% !important;
     text-align: left !important;
-    break-inside: auto;
-    page-break-inside: auto;
+    margin-left: 0 !important;
+    float: none !important;
+  }
+
+  .pdf-kpi-grid,
+  .pdf-kpi-grid > * {
+    text-align: left !important;
+  }
+
+  .pdf-kpi-grid {
+    display: grid !important;
+    width: 100% !important;
+    grid-template-columns: 1fr 1fr !important;
   }
 
   h1, h2, h3, h4, summary {
