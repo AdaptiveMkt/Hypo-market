@@ -588,6 +588,30 @@ export function ReportView({
           ) : null}
         </header>
 
+        <div className="no-print border-t border-line pt-4 text-center">
+          <p className="text-xs text-muted">
+            <CopyrightMark />{" "}
+            <DisclosureTermsLink
+              hash={disclosureSelected(details) ? "disclosure-terms-report" : "disclosure-terms"}
+              className="font-semibold text-navy underline-offset-4 hover:underline"
+            />
+          </p>
+          <div className="mx-auto mt-4 max-w-xs">
+            <button
+              type="button"
+              onClick={() => setCloseAsk(true)}
+              className="btn-block rounded-lg border border-navy bg-navy text-cream"
+            >
+              Close
+            </button>
+          </div>
+          <p className="mx-auto mt-3 max-w-xl text-center text-xs text-muted">
+            The PDF is a print picture of this page, not a tagged accessible file. Stay on this
+            View or use your browser’s Print dialog for selectable text and screen-reader
+            support. Escape closes this report.
+          </p>
+        </div>
+
         <div
           className="no-print sticky top-0 z-20 border-b border-line bg-paper/95 py-3 backdrop-blur-sm"
           role="toolbar"
@@ -2627,36 +2651,6 @@ export function ReportView({
 
         </div>
 
-        <p className="no-print border-t border-line pt-4 text-center text-xs text-muted">
-          <CopyrightMark />{" "}
-          <DisclosureTermsLink
-            hash={disclosureSelected(details) ? "disclosure-terms-report" : "disclosure-terms"}
-            className="font-semibold text-navy underline-offset-4 hover:underline"
-          />
-        </p>
-        <div className="no-print mt-4 stack-actions md:grid-cols-2 md:mx-auto md:max-w-md">
-          {showDownload ? (
-          <button
-            type="button"
-            onClick={onPdf}
-            className="btn-block rounded-lg border border-gold bg-gold text-masthead"
-          >
-            Download PDF
-          </button>
-          ) : null}
-          <button
-            type="button"
-            onClick={() => setCloseAsk(true)}
-            className="btn-block rounded-lg border border-navy bg-navy text-cream"
-          >
-            Close
-          </button>
-        </div>
-        <p className="no-print mx-auto mt-3 max-w-xl text-center text-xs text-muted">
-          The PDF is a print picture of this page, not a tagged accessible file. Stay on this
-          View or use your browser’s Print dialog for selectable text and screen-reader
-          support. Escape closes this report.
-        </p>
       </article>
       {closeAsk ? (
         <div className="no-print fixed inset-0 z-[60] flex items-end justify-center bg-navy/55 p-4 sm:items-center" role="dialog" aria-modal="true" aria-labelledby="close-pdf-title">
