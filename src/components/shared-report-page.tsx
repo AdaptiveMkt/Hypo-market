@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { setTheme } from "@/components/theme-toggle";
 import { readShare, shareDisclaimer, type ShareView } from "@/lib/share-report";
+import { CopyrightMark } from "@/components/source-links";
+import { DisclosureTermsLink } from "@/components/disclosure-link";
 
 type PrintRow = { id: string; label: string; opened: boolean };
 
@@ -158,6 +160,29 @@ export function SharedReportPage({ slug, code }: { slug: string; code: string })
             Print to PDF
           </button>
         ) : null}
+        <div className="no-print mt-8 border-t border-line pt-4 text-center">
+          <p className="text-xs text-muted">
+            <CopyrightMark />{" "}
+            <DisclosureTermsLink className="font-semibold text-navy underline-offset-4 hover:underline" />
+          </p>
+          <div className="mx-auto mt-4 max-w-xs">
+            <button
+              type="button"
+              className="btn-block rounded-lg border border-navy bg-navy text-cream"
+              onClick={() => {
+                window.close();
+                window.location.href = "/";
+              }}
+            >
+              Close
+            </button>
+          </div>
+          <p className="mx-auto mt-3 max-w-xl text-center text-xs text-muted">
+            The PDF is a print picture of this page, not a tagged accessible file. Stay on this
+            View or use your browser’s Print dialog for selectable text and screen-reader
+            support. Escape closes this report.
+          </p>
+        </div>
       </section>
       {picker ? (
         <div

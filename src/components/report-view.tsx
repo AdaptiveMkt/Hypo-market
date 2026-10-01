@@ -67,13 +67,12 @@ import { MedicaidVaBody } from "@/components/medicaid-va-card";
 import { AdvisorProfessionalFolds, DesignationNoticeFold, DisclaimerCard } from "@/components/disclaimer-card";
 import { TitleCollapse } from "@/components/accordion";
 import { NaicLastPages } from "@/components/naic-last-pages";
-import { Cite, CopyrightMark, HomeHealthCostNote, LinkedCopy } from "@/components/source-links";
+import { Cite, HomeHealthCostNote, LinkedCopy } from "@/components/source-links";
 import { SRC } from "@/lib/sources";
 import { DISCLOSURE_CARD_TITLE } from "@/lib/disclaimer";
-import { DisclosureTermsLink } from "@/components/disclosure-link";
 import { NAIC_LOCKOUT_ASSETS, NAIC_SUITABILITY_BANNER, NAIC_SUITABILITY_WARN, NAIC_WARN_ASSETS, insuranceLockedOut, insuranceNeedsWarning } from "@/lib/naic-suitability";
 import { FilledNaicWorksheet } from "@/components/naic-filled-worksheet";
-import { ALL_DETAILS_ON, TAX_SECTION_LABEL, disclosureSelected, type DetailFlags } from "@/lib/report-options";
+import { ALL_DETAILS_ON, TAX_SECTION_LABEL, type DetailFlags } from "@/lib/report-options";
 import type { SensitivityResult } from "@/lib/sensitivity";
 import type { ConfidenceResult } from "@/lib/confidence";
 import { ConfidencePanel } from "@/components/confidence-panel";
@@ -2595,30 +2594,6 @@ export function ReportView({
         </section>
         ) : null}
 
-        </div>
-
-        <div className="no-print border-t border-line pt-4 text-center">
-          <p className="text-xs text-muted">
-            <CopyrightMark />{" "}
-            <DisclosureTermsLink
-              hash={disclosureSelected(details) ? "disclosure-terms-report" : "disclosure-terms"}
-              className="font-semibold text-navy underline-offset-4 hover:underline"
-            />
-          </p>
-          <div className="mx-auto mt-4 max-w-xs">
-            <button
-              type="button"
-              onClick={() => setCloseAsk(true)}
-              className="btn-block rounded-lg border border-navy bg-navy text-cream"
-            >
-              Close
-            </button>
-          </div>
-          <p className="mx-auto mt-3 max-w-xl text-center text-xs text-muted">
-            The PDF is a print picture of this page, not a tagged accessible file. Stay on this
-            View or use your browser’s Print dialog for selectable text and screen-reader
-            support. Escape closes this report.
-          </p>
         </div>
 
       </article>
