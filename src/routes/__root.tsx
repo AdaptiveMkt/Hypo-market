@@ -94,7 +94,7 @@ export const Route = createRootRoute({
     ],
     scripts: [
       {
-        children: `(function(){try{var r=document.documentElement;r.classList.add("dark","antialiased");r.style.colorScheme="dark";if(document.body)document.body.classList.add("dark");var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("content","#0f1c24");localStorage.setItem("aum-theme","dark");}catch(e){}})();`,
+        children: `(function(){try{var r=document.documentElement;r.classList.add("dark","antialiased");r.style.colorScheme="dark";if(document.body)document.body.classList.add("dark");var m=document.querySelector('meta[name=\"theme-color\"]');if(m)m.setAttribute("content","#0f1c24");localStorage.setItem("aum-theme","dark");}catch(e){}})();`,
       },
       {
         children: `(function(){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}window.gtag=gtag;var analytics="denied";try{var m=document.cookie.match(/(?:^|; )aum-consent=([^;]+)/);if(m&&decodeURIComponent(m[1])==="analytics")analytics="granted";}catch(e){}gtag("consent","default",{ad_storage:"denied",ad_user_data:"denied",ad_personalization:"denied",analytics_storage:analytics,functionality_storage:"granted",security_storage:"granted"});gtag("js",new Date());gtag("config","G-C34YXPEQM1");})();`,
@@ -172,12 +172,12 @@ function Root() {
             </section>
             <HypoChatbot />
             <CookieConsent />
-            <footer className="bg-masthead px-4 py-5 text-sm text-masthead-fg">
-              <div className="mx-auto flex max-w-6xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <footer className="bg-masthead px-4 py-5 text-center text-sm text-masthead-fg sm:text-left">
+              <div className="mx-auto flex max-w-6xl flex-col items-center gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <p>
                   <CopyrightMark linkClass="text-gold underline underline-offset-4 hover:underline" />
                 </p>
-                <nav aria-label="Legal" className="flex flex-wrap gap-x-4 gap-y-2 sm:justify-end">
+                <nav aria-label="Legal" className="flex max-w-full flex-wrap items-center justify-center gap-x-4 gap-y-2 sm:justify-end">
                   <DisclosureTermsLink className="text-gold underline underline-offset-4 hover:underline" />
                   <a
                     href="/copyright#privacy-policy"
