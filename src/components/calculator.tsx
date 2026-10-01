@@ -645,7 +645,7 @@ export function Calculator() {
 
   function annualFor(settingKey: CareSetting): number {
     if (cityCosts && cityCosts.state === state) {
-      if (settingKey === "home24") return cityCosts.home24Annual;
+      if (settingKey === "home24") return cityCosts.home44Annual;
       if (settingKey === "al") return cityCosts.assistedAnnual;
       if (settingKey === "memory") return cityCosts.memoryAnnual;
       return cityCosts.nursingAnnual;
@@ -2083,8 +2083,7 @@ export function Calculator() {
               <p className="mt-1 text-xs leading-snug text-muted">
                 * {cityCosts.label} costs are from the{" "}
                 <Cite href={SRC.ltcNews}>LTC News Cost of Care Calculator</Cite>.
-                Home health, 44-hour week: {money(cityCosts.home44Annual)} / year.
-                This model’s around-the-clock home health is {money(cityCosts.home24Annual)} / year (44-hour median × 2.8).
+                Home health, 44-hour week: {money(cityCosts.home44Annual)} / year ({money(Math.round(cityCosts.home44Annual / 12))} / month).
                 Assisted living {money(cityCosts.assistedAnnual)}.
                 Memory care {money(cityCosts.memoryAnnual)}.
                 Nursing home {money(cityCosts.nursingAnnual)}.

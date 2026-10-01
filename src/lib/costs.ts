@@ -144,15 +144,15 @@ export const SETTING_SHORT: Record<CareSetting, string> = {
 export const MEMORY_CARE_AL_FACTOR = 1.25;
 
 /**
- * 24-hour home care as a planning multiple of the published 44-hour annual median.
- * Not 168 ÷ 44 (3.82). Around-the-clock care is not priced here as 168 paid hours.
- * Illustrative live-in schedule: about 18 paid hours a day (two daytime shifts;
- * overnight presence is not a third full hourly shift). 18 × 7 = 126 hours a week.
- * 126 ÷ 44 = 2.86, shown as 2.8. Not an agency quote.
+ * Home health in this model is the published 44-hour week, not around-the-clock care.
+ * The annual cost is the LTC News monthly rate × 12. That monthly × 12 figure is what
+ * a full year of the 44-hour bill costs. The calculator’s own “annual” column is the
+ * daily rate × 365 and can be a few hundred dollars lower. This model does not multiply
+ * the 44-hour median by 2.8.
  */
-export const HOME24_FROM_44HR = 2.8;
+export const HOME24_FROM_44HR = 1;
 export const HOME24_METHOD =
-  "Published home-care medians are for about 44 hours a week. This model does not multiply that rate by 168 hours (168 ÷ 44 = 3.82). Around-the-clock care is priced as an illustrative live-in schedule of about 18 paid hours a day: two daytime shifts, with overnight presence not billed as a third full hourly shift. 18 × 7 = 126 hours a week, and 126 ÷ 44 = 2.86, shown as 2.8 times the 44-hour annual median. Agencies also use daily live-in rates and different shift patterns. Confirm a local quote. This is not an agency price.";
+  "Home health care in this model is the 44-hour-a-week median from the LTC News Cost of Care Calculator. The annual cost is that monthly rate times 12. It is not an around-the-clock bill, and it is not 2.8 times the 44-hour median. Confirm the city on the calculator. This is not an agency quote.";
 
 export function annualCost(state: string, setting: CareSetting): number {
   const row = STATES[state];
@@ -162,7 +162,7 @@ export function annualCost(state: string, setting: CareSetting): number {
   if (setting === "nh") return nh * 12;
   if (setting === "nhs") return nhs * 12;
   if (setting === "memory") return al * 12 * MEMORY_CARE_AL_FACTOR;
-  return home * 12 * HOME24_FROM_44HR;
+  return home * 12;
 }
 
 export const NATIONAL_HOME44_ANNUAL = 80080;
@@ -170,7 +170,7 @@ export const NATIONAL_AL_ANNUAL = 74400;
 export const NATIONAL_MEMORY_ANNUAL = 93000;
 export const NATIONAL_NHS_ANNUAL = 114975;
 export const NATIONAL_NH_ANNUAL = 129575;
-export const NATIONAL_HOME24_ANNUAL = Math.round(NATIONAL_HOME44_ANNUAL * HOME24_FROM_44HR);
+export const NATIONAL_HOME24_ANNUAL = NATIONAL_HOME44_ANNUAL;
 
 export const NATIONAL_COSTS: { key: CareSetting; label: string; annual: number }[] = [
   { key: "al", label: SETTING_LABELS.al, annual: NATIONAL_AL_ANNUAL },
@@ -189,10 +189,10 @@ export function stateCostSnapshot(state: string) {
 }
 
 /**
- * National median annual costs. 44-hour home, AL, NH semi, and NH private are
- * planning medians from the LTC News Cost of Care Calculator. 24-hour home care
- * is that 44-hour median × 2.8. AALTCI publishes separate national home health
- * aide figures and is not the state table. Memory care = assisted living × 1.25.
+ * National median annual costs. Home health, assisted living, and nursing
+ * medians follow the LTC News Cost of Care Calculator. Home health is the
+ * 44-hour week (monthly rate × 12), not a 24-hour multiple. Memory care is
+ * assisted living × 1.25.
  */
 export type CostHistoryPoint = {
   year: number;

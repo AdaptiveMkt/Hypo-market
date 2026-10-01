@@ -1,5 +1,3 @@
-import { HOME24_FROM_44HR } from "@/lib/costs";
-
 const PAGE = "https://www.ltcnews.com/long-term-care/cost-of-care";
 const UA =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
@@ -17,9 +15,9 @@ export type LtcNewsCityCosts = {
   state: string;
   label: string;
   source: string;
-  /** 44-hour-week home health annual median from LTC News. */
+  /** 44-hour-week home health annual: the calculator’s monthly rate × 12. */
   home44Annual: number;
-  /** This model's around-the-clock figure: 44-hour annual × 2.8. */
+  /** Same 44-hour annual. Home health is not inflated to a 24-hour multiple. */
   home24Annual: number;
   assistedAnnual: number;
   memoryAnnual: number;
@@ -36,9 +34,9 @@ function decodeSnap(raw: string): string {
   return raw.split("&" + "quot;").join('"').split("&" + "#039;").join("'").split("&" + "amp;").join("&");
 }
 
-function annualFromCard(html: string, title: string): number {
+function cityRates(html: string, title: string): { monthly: number; annual: number } {
   const start = html.indexOf(`>${title}<`);
-  if (start < 0) return 0;
+  if (start < 0) return { monthly: 0, annual: 0 };
   let end = html.length;
   for (const other of SERVICES) {
     if (other === title) continue;
@@ -46,9 +44,15 @@ function annualFromCard(html: string, title: string): number {
     if (at > start && at < end) end = at;
   }
   const amounts = [...html.slice(start, end).matchAll(/\$([0-9,]+)/g)].map((m) => dollars(m[1]));
-  if (amounts.length >= 9) return amounts[8];
-  if (amounts.length >= 6) return amounts[5];
-  return 0;
+  if (amounts.length >= 9) return { monthly: amounts[7], annual: amounts[8] };
+  if (amounts.length >= 3) return { monthly: amounts[amounts.length - 2], annual: amounts[amounts.length - 1] };
+  return { monthly: 0, annual: 0 };
+}
+
+/** A year of the published monthly rate. LTC News also prints a daily × 365 annual that does not equal monthly × 12. */
+function yearOfMonthly(monthly: number, publishedAnnual: number): number {
+  if (monthly > 0) return monthly * 12;
+  return publishedAnnual;
 }
 
 function cookieHeader(res: Response): string {
@@ -125,12 +129,15 @@ export async function fetchLtcNewsCityCosts(city: string, state: string): Promis
     },
   ]);
   const card = priced.components[0]?.effects?.html ?? "";
-  const home44 = annualFromCard(card, "Home Healthcare");
-  const assisted = annualFromCard(card, "Assisted Living");
-  const memory = annualFromCard(card, "Memory Care");
-  const nursing = annualFromCard(card, "Nursing Home");
-  const adult = annualFromCard(card, "Adult Day Care");
-  if (!home44 || !assisted || !nursing) {
+  const home = cityRates(card, "Home Healthcare");
+  const assisted = cityRates(card, "Assisted Living");
+  const memory = cityRates(card, "Memory Care");
+  const nursing = cityRates(card, "Nursing Home");
+  const adult = cityRates(card, "Adult Day Care");
+  const home44 = yearOfMonthly(home.monthly, home.annual);
+  const assistedAnnual = yearOfMonthly(assisted.monthly, assisted.annual);
+  const nursingAnnual = yearOfMonthly(nursing.monthly, nursing.annual);
+  if (!home44 || !assistedAnnual || !nursingAnnual) {
     throw new Error(`LTC News did not publish a full cost set for ${query}.`);
   }
   return {
@@ -139,10 +146,10 @@ export async function fetchLtcNewsCityCosts(city: string, state: string): Promis
     label: `${place}, ${region}`,
     source: PAGE,
     home44Annual: home44,
-    home24Annual: Math.round(home44 * HOME24_FROM_44HR),
-    assistedAnnual: assisted,
-    memoryAnnual: memory || Math.round(assisted * 1.25),
-    nursingAnnual: nursing,
-    adultDayAnnual: adult || null,
+    home24Annual: home44,
+    assistedAnnual,
+    memoryAnnual: yearOfMonthly(memory.monthly, memory.annual) || Math.round(assistedAnnual * 1.25),
+    nursingAnnual,
+    adultDayAnnual: yearOfMonthly(adult.monthly, adult.annual) || null,
   };
 }

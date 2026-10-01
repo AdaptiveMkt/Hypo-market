@@ -198,7 +198,7 @@ export const HYPO_SOURCES: { topic: string; label: string; href: string; note: s
     topic: "State care costs",
     label: "LTC News Cost of Care Calculator",
     href: "https://www.ltcnews.com/long-term-care/cost-of-care",
-    note: "Nationwide private-pay cost calculator, not an insurance-company survey. Confirm the location before relying on a figure. This model’s state amounts are rounded planning medians. 24-hour home care is an illustrative 2.8 multiple of a 44-hour annual median (about 18 paid hours a day), not 168 billable hours and not an agency quote.",
+    note: "Nationwide private-pay cost calculator, not an insurance-company survey. Confirm the location before relying on a figure. Home health in this model is the 44-hour week. The annual cost is the calculator’s monthly rate × 12, not a 24-hour multiple.",
   },
   {
     topic: "Care-cost inflation (CPI)",

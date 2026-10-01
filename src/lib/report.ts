@@ -167,6 +167,10 @@ export function analysisNarrative(opts: ReportOpts): string {
   const premium = targetPremium(pool, s.annualIncome ?? 0);
 
   const where = s.careCity?.trim() ? `${s.careCity.trim()}, ${s.state}` : s.state;
+  const homeHealth = s.setting === "home24";
+  const costPhrase = homeHealth
+    ? `${money(todayCost)} per year (about ${money(Math.round(todayCost / 12))} per month, 44-hour week)`
+    : `${money(todayCost)} per year (about ${money(Math.round(daily))} per day)`;
   const paras = [
     (() => {
       const settingPhrase = SETTING_LABELS[s.setting];
@@ -186,7 +190,7 @@ export function analysisNarrative(opts: ReportOpts): string {
       return `This is an AI-generated hypothetical generated from the information submitted through this platform. For your review and download, this is the Hypothetical Long-Term Care Asset Utilization Modeling report based on that information. Other factors taken into account were the projected future costs of care in ${art} ${settingPhrase.toLowerCase()} setting and ${last}.`;
     })(),
     `Countable assets at risk in this run are ${money(pool)}. Gross assets are ${money(grossPool)}. Primary residence of ${money(s.assets.home)} is ${s.excludeHome ? "held out of the countable pool (homestead excluded)" : "included in the countable pool"}. Spouse-excluded (excludable) assets are ${money(s.assets.excludable)}.`,
-    `Care is modeled to start ${startWhen} and last ${s.duration} year${s.duration === 1 ? "" : "s"}. Today's median ${setting.toLowerCase()} cost in ${where} is ${money(todayCost)} per year (about ${money(daily)} per day)${ltcNewsCostCite()}. Care costs inflate at ${s.cpi}% per year. Taxable assets are assumed to earn ${s.roi}% gross, with a ${s.taxRate ?? 0}% tax on that return (net ${net.toFixed(2)}%). Deferred annuities, life insurance cash value, and IRA / 401(k) grow tax-deferred at their own R.O.I. (IRA / 401(k) at ${s.iraRoi ?? s.roi}%). Roth IRA grows tax-free.`,
+    `Care is modeled to start ${startWhen} and last ${s.duration} year${s.duration === 1 ? "" : "s"}. Today's median ${setting.toLowerCase()} cost in ${where} is ${costPhrase}${ltcNewsCostCite()}. Care costs inflate at ${s.cpi}% per year. Taxable assets are assumed to earn ${s.roi}% gross, with a ${s.taxRate ?? 0}% tax on that return (net ${net.toFixed(2)}%). Deferred annuities, life insurance cash value, and IRA / 401(k) grow tax-deferred at their own R.O.I. (IRA / 401(k) at ${s.iraRoi ?? s.roi}%). Roth IRA grows tax-free.`,
     `Using countable assets alone at today's cost, the pool is ${formatYearsLast(yearsToday)}. At the start of claim, countable assets (net after tax) are projected at ${money(result.startPoolNet)} against a first-year care bill of ${money(result.firstCost)}${ltcNewsCostCite()}; that asset pool is ${formatYearsLast(yearsClaimAssets)}. Deferred IRA / annuity / life cash value is reduced by the ${s.taxRate ?? 0}% tax rate as if distributed at claim; taxable sleeves already grew at net R.O.I.`,
   ];
 

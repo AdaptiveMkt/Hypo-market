@@ -119,9 +119,9 @@ export function Cite({
 export function HomeHealthCostNote({ className = "mt-2 text-xs leading-snug text-muted" }: { className?: string }) {
   return (
     <p className={className}>
-      * Home Health Care cost. The 44-hour-a-week median is from the{" "}
+      * Home Health Care cost is the 44-hour-a-week median from the{" "}
       <Cite href={SRC.ltcNews}>LTC News Cost of Care Calculator</Cite>.
-      Around-the-clock care in this model is 2.8 times that median (about 18 paid hours a day), not 168 billable hours.{" "}
+      The annual figure is that monthly rate × 12. It is not an around-the-clock bill.{" "}
       <Cite href={SRC.aaltciCareCost}>AALTCI</Cite> also publishes national home health aide cost information.
       Confirm a local quote. Not an agency price.
     </p>

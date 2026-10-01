@@ -84,7 +84,7 @@ const CORE: KnowledgeChunk[] = [
     url: "https://www.ltcnews.com/long-term-care/cost-of-care",
     aaltci: false,
     text:
-      "State care costs in this model are rounded planning medians. Confirm a location on the LTC News Cost of Care Calculator, a nationwide private-pay calculator that is not an insurance-company survey. 24-hour home care is an illustrative 2.8 multiple of a 44-hour annual median (about 18 paid hours a day), not 168 billable hours and not an agency quote.",
+      "Home health care in this model is the 44-hour-a-week median from the LTC News Cost of Care Calculator. The annual cost is that monthly rate times 12. It is not an around-the-clock bill and it is not 2.8 times the 44-hour median.",
   },
   {
     id: "cpi",
