@@ -165,8 +165,6 @@ export function FactFinder({
   section3Confirmed,
   annualIncome,
   onAnnualIncome,
-  agiIncluded,
-  onIncludeAgi,
   insuranceLocked,
   onRun,
   onOpenForm,
@@ -232,8 +230,6 @@ export function FactFinder({
   section3Confirmed: boolean;
   annualIncome: number;
   onAnnualIncome: (n: number) => void;
-  agiIncluded: boolean;
-  onIncludeAgi: () => void;
   insuranceLocked: boolean;
   onRun: (only?: "traditional" | "assetBased" | "ltcAnnuity" | "hybridLife") => void;
   onOpenForm: () => void;
@@ -487,15 +483,8 @@ export function FactFinder({
               <p className="mt-1 text-xs leading-snug text-muted">
                 {annualIncome > 0
                   ? `Suggested traditional premium ${money(agiPremiums(annualIncome).traditionalAnnual)} (7% of this income). Asset-based, annuity care, and hybrid life single premiums default to $100,000.`
-                  : "Optional. Include this income to use 7% as the suggested traditional premium. Asset-based, annuity care, and hybrid life single premiums default to $100,000."}
+                  : "Optional. Enter household income to use 7% as the suggested traditional premium. Asset-based, annuity care, and hybrid life single premiums default to $100,000."}
               </p>
-              <button
-                type="button"
-                className="btn-block mt-3 rounded-lg bg-teal px-4 py-2.5 text-sm font-semibold text-cream"
-                onClick={onIncludeAgi}
-              >
-                {agiIncluded ? "Adjusted gross income included" : "Include Adjusted Gross Income"}
-              </button>
             </div>
             {poolShown ? <p className="mt-3 font-display text-xl text-gold-ink">Countable pool: {money(pool)}</p> : null}
             <button

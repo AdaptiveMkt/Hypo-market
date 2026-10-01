@@ -287,7 +287,6 @@ export function Calculator() {
   const [duration, setDuration] = useState(10);
   const [taxRate, setTaxRate] = useState(DEFAULT_TAX_RATE);
   const [annualIncome, setAnnualIncome] = useState(0);
-  const [agiIncluded, setAgiIncluded] = useState(false);
   const [saveMsg, setSaveMsg] = useState("");
   const [stateNeeded, setStateNeeded] = useState(false);
   const [gapsOn, setGapsOn] = useState(false);
@@ -404,7 +403,6 @@ export function Calculator() {
       if (saved.duration) setDuration(saved.duration);
       if (saved.taxRate != null) setTaxRate(saved.taxRate);
       if (saved.annualIncome != null) setAnnualIncome(Number(saved.annualIncome) || 0);
-      setAgiIncluded(Boolean(saved.agiIncluded) && Number(saved.annualIncome) > 0);
       setExcludeHome(saved.excludeHome !== false);
       setPoolShown(Boolean(saved.poolShown));
       if (saved.finderPersonal && saved.client) setClient({ ...EMPTY_CONTACT, ...saved.client });
@@ -459,7 +457,6 @@ export function Calculator() {
       duration,
       taxRate,
       annualIncome,
-      agiIncluded,
       excludeHome,
       poolShown,
       client: finderPersonal ? client : undefined,
@@ -491,7 +488,6 @@ export function Calculator() {
     duration,
     taxRate,
     annualIncome,
-    agiIncluded,
     excludeHome,
     poolShown,
     client,
@@ -564,7 +560,7 @@ export function Calculator() {
   }, [holdings, taxRate, careStart, protectPct, claimCost, cpi, duration, ageToday]);
   const medicaid = useMemo(() => medicaidProfile(state), [state]);
   const netRoi = netRoiPct(roi, taxRate);
-  const incomeForRun = agiIncluded ? annualIncome : 0;
+  const incomeForRun = annualIncome;
   const premiumParts = targetPremiumParts(pool, incomeForRun);
   const premiumTarget = premiumParts.suggested;
   const hybridOn = isAssetBased(policy);
@@ -1133,7 +1129,6 @@ export function Calculator() {
     setProtectPct(DEFAULT_PROTECT_PCT);
     setTaxRate(DEFAULT_TAX_RATE);
     setAnnualIncome(0);
-    setAgiIncluded(false);
     const book = seedPlanningBook(DEFAULT_AGE_TODAY);
     setKindBook(book);
     setPolicy({ ...book.traditional, enabled: false });
@@ -1783,12 +1778,7 @@ export function Calculator() {
         onConfirm3={() => confirmSection3(true)}
         section3Confirmed={section3Confirmed}
         annualIncome={annualIncome}
-        onAnnualIncome={(n) => {
-          setAnnualIncome(n);
-          setAgiIncluded(false);
-        }}
-        agiIncluded={agiIncluded}
-        onIncludeAgi={() => setAgiIncluded(annualIncome > 0)}
+        onAnnualIncome={(n) => setAnnualIncome(n)}
         insuranceLocked={insuranceLocked}
         onRun={(only) => runHypo(only)}
         onOpenForm={() => setShowFullForm(true)}
@@ -1914,24 +1904,14 @@ export function Calculator() {
             <MoneyField
               id="agi-today"
               value={annualIncome}
-              onChange={(v) => {
-                setAnnualIncome(Number(v) || 0);
-                setAgiIncluded(false);
-              }}
+              onChange={(v) => setAnnualIncome(Number(v) || 0)}
               compact
             />
             <p className="mt-1 text-xs leading-snug text-muted">
               {annualIncome > 0
                 ? `Suggested traditional premium ${money(Math.round(annualIncome * 0.07))} (7% of this income). Asset-based, annuity care, and hybrid life single premiums default to $100,000.`
-                : "Optional. Include this income to use 7% as the suggested traditional premium. Asset-based, annuity care, and hybrid life single premiums default to $100,000."}
+                : "Optional. Enter household income to use 7% as the suggested traditional premium. Asset-based, annuity care, and hybrid life single premiums default to $100,000."}
             </p>
-            <button
-              type="button"
-              className="btn-block mt-3 rounded-lg bg-teal px-4 py-2.5 text-sm font-semibold text-cream hover:brightness-110"
-              onClick={() => setAgiIncluded(annualIncome > 0)}
-            >
-              {agiIncluded ? "Adjusted gross income included" : "Include Adjusted Gross Income"}
-            </button>
           </div>
           <div className="mt-4 grid w-full min-w-0 grid-cols-1 gap-2">
             <button
