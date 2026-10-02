@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import type { AdvisorParty } from "@/lib/report";
-import { fillRegistrationMessage, rememberAdvisorLead, reserveReportLink } from "@/lib/hubspot-report-link";
+import { fillLeadType, rememberAdvisorLead, reserveReportLink } from "@/lib/hubspot-report-link";
 
 const PORTAL_ID = "8744592";
 const FORM_ID = "20f78d66-2c90-479e-b20c-b92d5939d396";
@@ -91,7 +91,7 @@ export function HubspotAdvisorForm({
 
   useEffect(() => {
     const { url } = reserveReportLink();
-    const apply = () => fillRegistrationMessage(url);
+    const apply = () => fillLeadType(url);
     apply();
     const onReady = () => apply();
     window.addEventListener("hs-form-event:on-ready", onReady);

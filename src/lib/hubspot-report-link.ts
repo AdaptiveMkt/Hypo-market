@@ -34,7 +34,7 @@ function newCode() {
   return Array.from(bytes, (b) => alphabet[b % alphabet.length]).join("");
 }
 
-/** The address written into HubSpot Registration Message before the form is submitted. */
+/** The address written into the hidden HubSpot Lead Type field before the form is submitted. */
 export function reserveReportLink() {
   let code = "";
   try {
@@ -59,12 +59,12 @@ export function reservedReportCode() {
   return reserveReportLink().code;
 }
 
-export function fillRegistrationMessage(url: string) {
+export function fillLeadType(url: string) {
   const hs = (window as unknown as {
     HubSpotFormsV4?: { getForms?: () => { setFieldValue?: (name: string, value: string) => void }[] };
   }).HubSpotFormsV4;
   for (const form of hs?.getForms?.() ?? []) {
-    form.setFieldValue?.("0-1/registration_message", url);
+    form.setFieldValue?.("0-1/lead_type", url);
   }
 }
 
@@ -107,7 +107,7 @@ function fields(lead: AdvisorLeadNotice, includeLink: boolean) {
   add("lastname", lastname);
   add("company", lead.firm);
   add("mobilephone", lead.phone);
-  if (includeLink && lead.reportUrl) add("registration_message", lead.reportUrl);
+  if (includeLink && lead.reportUrl) add("lead_type", lead.reportUrl);
   return rows;
 }
 
@@ -152,7 +152,7 @@ export async function sendReportLinkToHubspot(lead: { email: string; name: strin
   if (!ready.email.includes("@")) return;
   try {
     const hsq = ((window as unknown as { _hsq?: unknown[] })._hsq ??= []);
-    hsq.push(["identify", { email: ready.email.trim(), registration_message: ready.reportUrl }]);
+    hsq.push(["identify", { email: ready.email.trim(), lead_type: ready.reportUrl }]);
     hsq.push(["trackPageView"]);
   } catch {
     /* tracking is optional */
