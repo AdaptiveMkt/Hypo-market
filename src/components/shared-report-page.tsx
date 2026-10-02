@@ -215,7 +215,10 @@ function printCheckedSections(_picked: Record<string, boolean>, done: () => void
   const started = Date.now();
   const onAfter = () => {
     if (Date.now() - started < 1500) return;
-    window.setTimeout(clear, 200);
+    window.setTimeout(() => {
+      clear();
+      window.location.assign("/communication");
+    }, 200);
   };
   const backup = window.setTimeout(clear, 60000);
   window.addEventListener("beforeprint", onBefore);

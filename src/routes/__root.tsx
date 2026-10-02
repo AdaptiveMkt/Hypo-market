@@ -159,6 +159,9 @@ function Root() {
                   <Link to="/sources" className="text-masthead-fg underline underline-offset-4 hover:text-gold">
                     Sources
                   </Link>
+                  <Link to="/communication" className="text-masthead-fg underline underline-offset-4 hover:text-gold">
+                    Communication
+                  </Link>
                   <Link
                     to="/suitability"
                     className="text-masthead-fg underline underline-offset-4 hover:text-gold"

@@ -336,6 +336,7 @@ export function Calculator() {
   } | null>(null);
   const [pdfError, setPdfError] = useState("");
   const pdfJob = useRef(0);
+  const pdfSaved = useRef(false);
   const pdfDetailsSnapshot = useRef<typeof details | null>(null);
   const pdfNameState = useRef(state);
   pdfNameState.current = state;
@@ -3436,6 +3437,7 @@ export function Calculator() {
             }
           }}
           onSaved={() => {
+            pdfSaved.current = true;
             if (!planHelp) setPlanHelp("ask");
           }}
         />,
@@ -3452,11 +3454,21 @@ export function Calculator() {
             email: client.email,
             phone: client.phone,
           }}
-          onNo={() => setPlanHelp(null)}
+          onNo={() => {
+            setPlanHelp(null);
+            if (pdfSaved.current) window.location.assign("/communication");
+          }}
           onYes={() => setPlanHelp("form")}
-          onCloseForm={() => setPlanHelp(null)}
+          onCloseForm={() => {
+            setPlanHelp(null);
+            if (pdfSaved.current) window.location.assign("/communication");
+          }}
           onSent={(ok) => {
             setPlanHelp(null);
+            if (pdfSaved.current) {
+              window.location.assign("/communication");
+              return;
+            }
             setSaveMsg(
               ok
                 ? "Planning request sent to Info@preserve-your-assets.com."
