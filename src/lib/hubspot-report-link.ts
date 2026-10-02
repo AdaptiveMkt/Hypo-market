@@ -59,13 +59,42 @@ export function reservedReportCode() {
   return reserveReportLink().code;
 }
 
-export function fillLeadType(url: string) {
+type HsForm = {
+  setFieldValue?: (name: string, value: string | string[]) => void;
+  getFormFieldValues?: () => Promise<{ name?: string }[]>;
+};
+
+function writeLeadType(form: HsForm, url: string) {
+  const write = (name: string) => {
+    try {
+      form.setFieldValue?.(name, [url]);
+    } catch {
+      form.setFieldValue?.(name, url);
+    }
+  };
+  write("0-1/lead_type");
+  void form.getFormFieldValues?.().then((rows) => {
+    for (const row of rows ?? []) {
+      const name = String(row.name ?? "");
+      if (/lead[_-]?type/i.test(name)) write(name);
+    }
+  });
+}
+
+export function fillLeadType(url: string, event?: Event) {
   const hs = (window as unknown as {
-    HubSpotFormsV4?: { getForms?: () => { setFieldValue?: (name: string, value: string) => void }[] };
+    HubSpotFormsV4?: {
+      getForms?: () => HsForm[];
+      getFormFromEvent?: (event: Event) => HsForm;
+    };
   }).HubSpotFormsV4;
-  for (const form of hs?.getForms?.() ?? []) {
-    form.setFieldValue?.("0-1/lead_type", url);
+  const forms: HsForm[] = [];
+  if (event && hs?.getFormFromEvent) {
+    const form = hs.getFormFromEvent(event);
+    if (form) forms.push(form);
   }
+  for (const form of hs?.getForms?.() ?? []) forms.push(form);
+  for (const form of forms) writeLeadType(form, url);
 }
 
 export function rememberAdvisorLead(partial: Partial<AdvisorLeadNotice>) {

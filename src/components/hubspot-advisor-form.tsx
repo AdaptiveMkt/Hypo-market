@@ -93,7 +93,7 @@ export function HubspotAdvisorForm({
     const { url } = reserveReportLink();
     const apply = () => fillLeadType(url);
     apply();
-    const onReady = () => apply();
+    const onReady = (event: Event) => fillLeadType(url, event);
     window.addEventListener("hs-form-event:on-ready", onReady);
     const timer = window.setInterval(apply, 600);
     const stop = window.setTimeout(() => window.clearInterval(timer), 10000);
