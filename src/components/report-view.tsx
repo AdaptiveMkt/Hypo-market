@@ -698,7 +698,7 @@ export function ReportView({
         </section>
 
         <section className="report-block">
-          <details>
+          <details className="print-page-start">
             <summary className="no-print inline-flex min-h-11 cursor-pointer list-none items-center justify-center rounded-lg bg-teal px-4 py-2.5 text-center text-sm font-semibold text-cream hover:brightness-110 [&::-webkit-details-marker]:hidden [&::marker]:content-none">
               REVIEW INPUT — Countable assets
             </summary>

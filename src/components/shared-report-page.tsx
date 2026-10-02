@@ -133,9 +133,14 @@ function applyPrintVisibility(root: HTMLElement) {
   let firstYear = true;
   root.querySelectorAll("h2").forEach((heading) => {
     const text = (heading.textContent || "").replace(/\s+/g, " ").trim();
-    if (/^(prepared for|your hypothetical is ready|descriptive summary|recommendations to consider|instructions)$/i.test(text) || /countable assets at risk|care assumptions|insurance — answers/i.test(text)) {
+    if (/^(prepared for|your hypothetical is ready|descriptive summary|recommendations to consider|instructions)$/i.test(text) || /care assumptions|insurance — answers/i.test(text)) {
       heading.closest("section, details, .report-block")?.classList.add("print-flow");
       heading.closest("section, details, .report-block")?.classList.remove("print-page-start");
+    }
+    if (/countable assets at risk/i.test(text)) {
+      const block = heading.closest("details, section, .report-block");
+      block?.classList.add("print-page-start");
+      block?.classList.remove("print-flow");
     }
     if (/^instructions$/i.test(text)) {
       const block = heading.closest("section, .report-block");
