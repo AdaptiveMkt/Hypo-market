@@ -34,7 +34,7 @@ function newCode() {
   return Array.from(bytes, (b) => alphabet[b % alphabet.length]).join("");
 }
 
-/** The address written into the hidden HubSpot Lead Type field before the form is submitted. */
+/** The address written into the hidden HubSpot Landing Page field before the form is submitted. */
 export function reserveReportLink() {
   let code = "";
   try {
@@ -64,7 +64,7 @@ type HsForm = {
   getFormFieldValues?: () => Promise<{ name?: string }[]>;
 };
 
-function writeLeadType(form: HsForm, url: string) {
+function writeLandingPage(form: HsForm, url: string) {
   const write = (name: string) => {
     try {
       form.setFieldValue?.(name, [url]);
@@ -72,16 +72,16 @@ function writeLeadType(form: HsForm, url: string) {
       form.setFieldValue?.(name, url);
     }
   };
-  write("0-1/lead_type");
+  write("0-1/landing_page");
   void form.getFormFieldValues?.().then((rows) => {
     for (const row of rows ?? []) {
       const name = String(row.name ?? "");
-      if (/lead[_-]?type/i.test(name)) write(name);
+      if (/landing[_-]?page/i.test(name)) write(name);
     }
   });
 }
 
-export function fillLeadType(url: string, event?: Event) {
+export function fillLandingPage(url: string, event?: Event) {
   const hs = (window as unknown as {
     HubSpotFormsV4?: {
       getForms?: () => HsForm[];
@@ -94,7 +94,7 @@ export function fillLeadType(url: string, event?: Event) {
     if (form) forms.push(form);
   }
   for (const form of hs?.getForms?.() ?? []) forms.push(form);
-  for (const form of forms) writeLeadType(form, url);
+  for (const form of forms) writeLandingPage(form, url);
 }
 
 export function rememberAdvisorLead(partial: Partial<AdvisorLeadNotice>) {
@@ -136,7 +136,7 @@ function fields(lead: AdvisorLeadNotice, includeLink: boolean) {
   add("lastname", lastname);
   add("company", lead.firm);
   add("mobilephone", lead.phone);
-  if (includeLink && lead.reportUrl) add("lead_type", lead.reportUrl);
+  if (includeLink && lead.reportUrl) add("landing_page", lead.reportUrl);
   return rows;
 }
 
@@ -181,7 +181,7 @@ export async function sendReportLinkToHubspot(lead: { email: string; name: strin
   if (!ready.email.includes("@")) return;
   try {
     const hsq = ((window as unknown as { _hsq?: unknown[] })._hsq ??= []);
-    hsq.push(["identify", { email: ready.email.trim(), lead_type: ready.reportUrl }]);
+    hsq.push(["identify", { email: ready.email.trim(), landing_page: ready.reportUrl }]);
     hsq.push(["trackPageView"]);
   } catch {
     /* tracking is optional */
