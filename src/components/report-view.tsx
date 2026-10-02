@@ -1926,11 +1926,23 @@ export function ReportView({
         </details>
 
         {(() => {
-          const selectedRows = partnershipRows.filter((row) => row.state === state);
-          const otherRows = partnershipRows.filter((row) => row.state !== state);
+          const issue = reciprocity.issueState || state;
+          const care = state;
+          const roles = (name: string) => {
+            const bits: string[] = [];
+            if (name === issue) bits.push("policy issued");
+            if (name === care) bits.push("care provided");
+            return bits.join(" · ");
+          };
+          const shown = [issue, ...(care && care !== issue ? [care] : [])]
+            .map((name) => partnershipRows.find((row) => row.state === name))
+            .filter((row): row is (typeof partnershipRows)[number] => Boolean(row));
           const partnershipCells = (row: (typeof partnershipRows)[number]) => (
             <>
-              <td className="py-1.5 pr-2">{row.state}</td>
+              <td className="py-1.5 pr-2">
+                {row.state}
+                <span className="block text-xs font-normal text-muted">{roles(row.state)}</span>
+              </td>
               <td className="py-1.5 pr-2">
                 {row.info.kind === "none"
                   ? "None"
@@ -1960,7 +1972,11 @@ export function ReportView({
             <p className="mb-3 text-sm text-muted">
               Same claims as this run. Protected = benefits paid as a dollar-for-dollar
               disregard (or in-state TAP where modeled). Confirm certification locally.
-              {state ? ` ${state} is open. Other states stay collapsed until you open them.` : ""}
+              {issue && care && issue !== care
+                ? ` Policy is issued in ${issue}. Care is provided in ${care}.`
+                : issue
+                  ? ` Policy is issued and care is provided in ${issue}.`
+                  : ""}
             </p>
             <div className="overflow-x-auto">
               <table className="w-full min-w-[700px] text-sm">
@@ -1974,8 +1990,8 @@ export function ReportView({
                   </tr>
                 </thead>
                 <tbody>
-                  {selectedRows.length ? (
-                    selectedRows.map((row) => (
+                  {shown.length ? (
+                    shown.map((row) => (
                       <tr key={row.state} className="border-t border-gold bg-cream font-semibold tabular-nums">
                         {partnershipCells(row)}
                       </tr>
@@ -1983,41 +1999,13 @@ export function ReportView({
                   ) : (
                     <tr className="border-t border-line">
                       <td className="py-1.5 pr-2" colSpan={5}>
-                        Select a care state to show that Partnership row.
+                        Select the policy state and the care state to show Partnership rows.
                       </td>
                     </tr>
                   )}
                 </tbody>
               </table>
             </div>
-            {otherRows.length ? (
-              <details className="mt-3">
-                <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal [&::-webkit-details-marker]:hidden [&::marker]:content-none">
-                  <span aria-hidden="true" className="naic-chevron inline-block text-gold-ink motion-reduce:transition-none">▸</span>
-                  <span className="font-display text-base text-navy">All other states</span>
-                </summary>
-                <div className="mt-2 overflow-x-auto">
-                  <table className="w-full min-w-[700px] text-sm">
-                    <thead>
-                      <tr className="text-left text-xs uppercase tracking-wide text-muted">
-                        <th className="py-2 pr-2">State</th>
-                        <th className="py-2 pr-2">Program</th>
-                        <th className="py-2 pr-2">Mode</th>
-                        <th className="py-2 pr-2 text-right">Protected</th>
-                        <th className="py-2 text-right">Spend-down still</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {otherRows.map((row) => (
-                        <tr key={row.state} className="border-t border-line tabular-nums">
-                          {partnershipCells(row)}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </details>
-            ) : null}
           </details>
           );
         })()}
