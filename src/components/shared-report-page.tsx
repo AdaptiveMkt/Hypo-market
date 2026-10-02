@@ -130,10 +130,9 @@ function applyPrintVisibility(root: HTMLElement) {
   root.querySelectorAll<HTMLElement>("[data-medicaid-fold]").forEach((node) => {
     node.setAttribute("data-medicaid-open", "1");
   });
-  let firstYear = true;
   root.querySelectorAll("h2").forEach((heading) => {
     const text = (heading.textContent || "").replace(/\s+/g, " ").trim();
-    if (/^(prepared for|your hypothetical is ready|descriptive summary|recommendations to consider|instructions)$/i.test(text) || /care assumptions|insurance — answers/i.test(text)) {
+    if (/^(prepared for|your hypothetical is ready|descriptive summary|recommendations to consider)$/i.test(text) || /care assumptions|insurance — answers/i.test(text)) {
       heading.closest("section, details, .report-block")?.classList.add("print-flow");
       heading.closest("section, details, .report-block")?.classList.remove("print-page-start");
     }
@@ -144,19 +143,13 @@ function applyPrintVisibility(root: HTMLElement) {
     }
     if (/^instructions$/i.test(text)) {
       const block = heading.closest("section, .report-block");
-      block?.classList.add("print-page-start", "print-keep-with-next");
-      block?.classList.remove("print-flow");
+      block?.classList.add("print-page-start");
+      block?.classList.remove("print-flow", "print-keep-with-next");
     }
     if (!/year-by-year projection/i.test(text)) return;
     const block = heading.closest("details, .report-block");
-    if (firstYear) {
-      firstYear = false;
-      block?.classList.add("print-keep-with-prev");
-      block?.classList.remove("print-page-start");
-      return;
-    }
     block?.classList.add("print-page-start");
-    block?.classList.remove("print-keep-with-prev");
+    block?.classList.remove("print-keep-with-prev", "print-flow");
   });
   root.querySelectorAll("h2, h3").forEach((heading) => {
     const text = heading.textContent || "";
