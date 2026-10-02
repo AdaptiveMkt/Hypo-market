@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createRootRoute, HeadContent, Link, Outlet, Scripts } from "@tanstack/react-router";
+import { createRootRoute, HeadContent, Link, Outlet, Scripts, useRouterState } from "@tanstack/react-router";
 import { AuthProvider } from "@/lib/auth/provider";
 import { PreviewHostBridge } from "@/components/preview-host-bridge";
 import { ScrollToHeaderOnLoad } from "@/components/scroll-to-header";
@@ -13,6 +13,23 @@ import { DisclosureTermsLink } from "@/components/disclosure-link";
 import { CopyrightMark } from "@/components/source-links";
 import { HOLD_HARMLESS_ACK, HOLD_HARMLESS_SHORT } from "@/lib/disclaimer";
 import appCss from "../styles.css?url";
+
+function SubscriptionLinks() {
+  const path = useRouterState({ select: (s) => s.location.pathname });
+  if (path !== "/communication") return null;
+  const button =
+    "inline-flex h-11 items-center justify-center rounded-lg bg-teal px-4 text-center text-sm font-semibold text-cream hover:brightness-110";
+  return (
+    <>
+      <a className={button} href="https://buy.stripe.com/6oU4gydFo8PkgO68zx4Ja01">
+        Monthly Subscription ($9.98/month)
+      </a>
+      <a className={button} href="https://buy.stripe.com/aFa5kC9p8e9E9lEg1Z4Ja00">
+        Annual Subscription ($99/year)
+      </a>
+    </>
+  );
+}
 
 const APP_NAME = "Long Term Care Asset Utilization Modeling";
 
@@ -172,8 +189,11 @@ function Root() {
                 </nav>
                 <FooterDownloadPdf />
                 </div>
-                <div className="mt-4 max-w-xs">
-                  <ThemeToggle />
+                <div className="mt-4 flex max-w-5xl flex-wrap items-center gap-2">
+                  <div className="w-full max-w-xs">
+                    <ThemeToggle />
+                  </div>
+                  <SubscriptionLinks />
                 </div>
               </div>
             </header>
