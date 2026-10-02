@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 
 const VIDEO_ID = "PPQW6w2RkaE";
-const EMBED_SRC = `https://www.youtube-nocookie.com/embed/${VIDEO_ID}?autoplay=1&mute=1&rel=0&modestbranding=1&playsinline=1&enablejsapi=1`;
+const EMBED_SRC = `https://www.youtube-nocookie.com/embed/${VIDEO_ID}?autoplay=1&rel=0&modestbranding=1&playsinline=1&enablejsapi=1`;
 
 const CAPTIONS: { start: number; end: number; text: string }[] = [
   { start: 0.4, end: 2, text: "So, what did you think?" },
@@ -64,6 +64,13 @@ const CAPTIONS: { start: number; end: number; text: string }[] = [
   { start: 100, end: 112, text: "You'll be glad you did. And thanks for participating." },
 ];
 
+const LICENSE_FORM_ID = "6b36b610-ae40-4878-841e-384b0c07bc84";
+const CONCLUDE_AT = 88;
+
+function revealLicenseButtons() {
+  window.dispatchEvent(new Event("aum-license-reveal"));
+}
+
 function captionAt(time: number) {
   return CAPTIONS.find((cue) => time >= cue.start && time < cue.end)?.text ?? "";
 }
@@ -85,46 +92,60 @@ export const Route = createFileRoute("/communication")({
 function Communication() {
   const frameRef = useRef<HTMLIFrameElement>(null);
   const [caption, setCaption] = useState("");
-  const [soundOn, setSoundOn] = useState(false);
 
   useEffect(() => {
     const frame = frameRef.current;
     if (!frame) return;
     let dead = false;
+    let revealed = false;
+    let started = false;
+    const startedAt = Date.now();
 
-    const listen = () => {
+    const withSound = () => {
+      command(frame, "unMute");
+      command(frame, "setVolume", [100]);
+      command(frame, "playVideo");
+    };
+
+    const handshake = () => {
       frame.contentWindow?.postMessage(
         JSON.stringify({ event: "listening", id: frame.id, channel: "widget" }),
         "*",
       );
-      command(frame, "playVideo");
+    };
+
+    const listen = () => {
+      handshake();
+      if (started) return;
+      started = true;
+      withSound();
     };
 
     const onMessage = (event: MessageEvent) => {
       if (dead || event.source !== frame.contentWindow) return;
       if (event.origin !== "https://www.youtube.com" && event.origin !== "https://www.youtube-nocookie.com") return;
-      let data: { event?: string; info?: { currentTime?: number } } | null = null;
+      let data: { event?: string; info?: { currentTime?: number; playerState?: number; muted?: boolean } } | null = null;
       try {
         data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
       } catch {
         return;
       }
       if (!data || typeof data !== "object") return;
-      if (data.event === "onReady" || data.event === "initialDelivery") listen();
+      if ((data.event === "onReady" || data.event === "initialDelivery") && !started) listen();
       const time = data.info?.currentTime;
       if (typeof time === "number") setCaption(captionAt(time));
-    };
-
-    const unmute = () => {
-      command(frame, "unMute");
-      command(frame, "setVolume", [100]);
-      command(frame, "playVideo");
-      setSoundOn(true);
+      if (data.info?.muted && Date.now() - startedAt < 5000) {
+        command(frame, "unMute");
+        command(frame, "setVolume", [100]);
+      }
+      if (!revealed && ((typeof time === "number" && time >= CONCLUDE_AT) || data.info?.playerState === 0)) {
+        revealed = true;
+        revealLicenseButtons();
+      }
     };
 
     window.addEventListener("message", onMessage);
-    window.addEventListener("pointerdown", unmute);
-    frame.addEventListener("load", listen);
+    frame.addEventListener("load", handshake);
     const poll = window.setInterval(() => {
       command(frame, "getCurrentTime");
     }, 400);
@@ -132,8 +153,7 @@ function Communication() {
     return () => {
       dead = true;
       window.removeEventListener("message", onMessage);
-      window.removeEventListener("pointerdown", unmute);
-      frame.removeEventListener("load", listen);
+      frame.removeEventListener("load", handshake);
       window.clearInterval(poll);
     };
   }, []);
@@ -161,16 +181,17 @@ function Communication() {
             className="mt-2 min-h-16 rounded-lg border border-line bg-cream px-3 py-2 text-sm leading-snug text-navy"
             aria-live="polite"
           >
-            {soundOn
-              ? caption || "Closed captions show here, under the video, so they do not cover the picture."
-              : caption
-                ? `${caption} Tap once to turn the sound on.`
-                : "Playing. Tap once to turn the sound on."}
+            {caption || "Closed captions show here, under the video, so they do not cover the picture."}
           </figcaption>
         </figure>
-        <p className="mt-3 text-pretty text-sm text-muted">
-          The monthly and annual license buttons are next to Light Mode.
-        </p>
+        <div className="mt-4 min-w-0 rounded-lg bg-white p-3 text-navy" style={{ colorScheme: "light" }}>
+          <div
+            className="hs-form-frame min-h-40 min-w-0"
+            data-region="na1"
+            data-form-id={LICENSE_FORM_ID}
+            data-portal-id="8744592"
+          />
+        </div>
         <Link to="/" className="mt-5 inline-block font-semibold text-teal underline-offset-4 hover:underline">
           Return to the calculator
         </Link>
