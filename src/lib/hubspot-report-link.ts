@@ -1,4 +1,5 @@
 const PORTAL_ID = "8744592";
+const LICENSE_FORM_ID = "6b36b610-ae40-4878-841e-384b0c07bc84";
 const FORM_ID = "20f78d66-2c90-479e-b20c-b92d5939d396";
 const SUBMIT_URL = `https://api.hsforms.com/submissions/v3/integration/submit/${PORTAL_ID}/${FORM_ID}`;
 
@@ -62,8 +63,67 @@ export function reservedReportCode() {
 type HsForm = {
   setFieldValue?: (name: string, value: string | string[]) => void;
   getFormFieldValues?: () => Promise<{ name?: string }[]>;
+  getFormId?: () => string;
+  formId?: string;
 };
 
+function formIdOf(form: HsForm) {
+  try {
+    return form.getFormId?.() || form.formId || "";
+  } catch {
+    return "";
+  }
+}
+
+function fieldKey(name: string) {
+  return (name.split("/").pop() ?? name).replace(/[\s_|-]+/g, "").toLowerCase();
+}
+
+function writeValue(form: HsForm, name: string, url: string) {
+  try {
+    form.setFieldValue?.(name, [url]);
+  } catch {
+    try {
+      form.setFieldValue?.(name, url);
+    } catch {
+      /* this form may not have that hidden field */
+    }
+  }
+}
+
+function writeLeadForm(form: HsForm, url: string) {
+  writeValue(form, "0-1/lead_form", url);
+  writeValue(form, "lead_form", url);
+  void form.getFormFieldValues?.().then((rows) => {
+    for (const row of rows ?? []) {
+      const name = String(row.name ?? "");
+      if (fieldKey(name) === "leadform") writeValue(form, name, url);
+    }
+  });
+}
+
+/** Writes the same report address into the communication form's hidden Lead Form field. */
+export function fillLeadForm(url: string, event?: Event) {
+  const hs = (window as unknown as {
+    HubSpotFormsV4?: {
+      getForms?: () => HsForm[];
+      getFormFromEvent?: (event: Event) => HsForm;
+    };
+  }).HubSpotFormsV4;
+  const detail = (event as CustomEvent<{ formId?: string }> | undefined)?.detail;
+  if (detail?.formId && detail.formId !== LICENSE_FORM_ID) return;
+  const forms: HsForm[] = [];
+  if (event && hs?.getFormFromEvent) {
+    const form = hs.getFormFromEvent(event);
+    if (form) forms.push(form);
+  }
+  for (const form of hs?.getForms?.() ?? []) forms.push(form);
+  for (const form of forms) {
+    const id = formIdOf(form);
+    if (id && id !== LICENSE_FORM_ID) continue;
+    writeLeadForm(form, url);
+  }
+}
 function writeLandingPage(form: HsForm, url: string) {
   const write = (name: string) => {
     try {

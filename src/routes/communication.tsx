@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { fillLeadForm, reserveReportLink } from "@/lib/hubspot-report-link";
 
 const VIDEO_ID = "PPQW6w2RkaE";
 const EMBED_SRC = `https://www.youtube-nocookie.com/embed/${VIDEO_ID}?autoplay=1&rel=0&modestbranding=1&playsinline=1&enablejsapi=1`;
@@ -155,6 +156,23 @@ function Communication() {
       window.removeEventListener("message", onMessage);
       frame.removeEventListener("load", handshake);
       window.clearInterval(poll);
+    };
+  }, []);
+
+  useEffect(() => {
+    const { url } = reserveReportLink();
+    const apply = (event?: Event) => fillLeadForm(url, event);
+    apply();
+    const onReady = (event: Event) => apply(event);
+    window.addEventListener("hs-form-event:on-ready", onReady);
+    window.addEventListener("hs-form-event:on-interaction:navigate", onReady);
+    const timer = window.setInterval(() => apply(), 600);
+    const stop = window.setTimeout(() => window.clearInterval(timer), 12000);
+    return () => {
+      window.clearInterval(timer);
+      window.clearTimeout(stop);
+      window.removeEventListener("hs-form-event:on-ready", onReady);
+      window.removeEventListener("hs-form-event:on-interaction:navigate", onReady);
     };
   }, []);
 
