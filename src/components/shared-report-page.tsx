@@ -317,8 +317,7 @@ export function SharedReportPage({ slug, code }: { slug: string; code: string })
               type="button"
               className="btn-block rounded-lg border border-navy bg-navy text-cream"
               onClick={() => {
-                window.close();
-                window.location.href = "/";
+                window.location.assign("/communication");
               }}
             >
               Close
