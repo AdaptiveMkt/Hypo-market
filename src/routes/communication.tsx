@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { fillLeadForm, reserveReportLink } from "@/lib/hubspot-report-link";
 
 const VIDEO_ID = "PPQW6w2RkaE";
@@ -93,6 +93,7 @@ export const Route = createFileRoute("/communication")({
 function Communication() {
   const frameRef = useRef<HTMLIFrameElement>(null);
   const [caption, setCaption] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const frame = frameRef.current;
@@ -175,6 +176,16 @@ function Communication() {
       window.removeEventListener("hs-form-event:on-interaction:navigate", onReady);
     };
   }, []);
+
+  useEffect(() => {
+    const onSuccess = (event: Event) => {
+      const detail = (event as CustomEvent<{ formId?: string }>).detail;
+      if (detail?.formId && detail.formId !== LICENSE_FORM_ID) return;
+      void navigate({ to: "/subscribe-now" });
+    };
+    window.addEventListener("hs-form-event:on-submission:success", onSuccess);
+    return () => window.removeEventListener("hs-form-event:on-submission:success", onSuccess);
+  }, [navigate]);
 
   return (
     <main id="main-content" className="mx-auto max-w-3xl space-y-5 px-4 py-8 sm:px-6" tabIndex={-1}>

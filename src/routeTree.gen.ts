@@ -15,6 +15,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as CommunicationRouteImport } from './routes/communication'
 import { Route as CopyrightRouteImport } from './routes/copyright'
 import { Route as SourcesRouteImport } from './routes/sources'
+import { Route as SubscribeNowRouteImport } from './routes/subscribe-now'
 import { Route as SuitabilityRouteImport } from './routes/suitability'
 import { Route as SlugCodeRouteImport } from './routes/$slug.$code'
 
@@ -48,6 +49,11 @@ const SourcesRoute = SourcesRouteImport.update({
   path: '/sources',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SubscribeNowRoute = SubscribeNowRouteImport.update({
+  id: '/subscribe-now',
+  path: '/subscribe-now',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SuitabilityRoute = SuitabilityRouteImport.update({
   id: '/suitability',
   path: '/suitability',
@@ -66,6 +72,7 @@ export interface FileRoutesByFullPath {
   '/communication': typeof CommunicationRoute
   '/copyright': typeof CopyrightRoute
   '/sources': typeof SourcesRoute
+  '/subscribe-now': typeof SubscribeNowRoute
   '/suitability': typeof SuitabilityRoute
   '/$slug/$code': typeof SlugCodeRoute
 }
@@ -76,6 +83,7 @@ export interface FileRoutesByTo {
   '/communication': typeof CommunicationRoute
   '/copyright': typeof CopyrightRoute
   '/sources': typeof SourcesRoute
+  '/subscribe-now': typeof SubscribeNowRoute
   '/suitability': typeof SuitabilityRoute
   '/$slug/$code': typeof SlugCodeRoute
 }
@@ -87,6 +95,7 @@ export interface FileRoutesById {
   '/communication': typeof CommunicationRoute
   '/copyright': typeof CopyrightRoute
   '/sources': typeof SourcesRoute
+  '/subscribe-now': typeof SubscribeNowRoute
   '/suitability': typeof SuitabilityRoute
   '/$slug/$code': typeof SlugCodeRoute
 }
@@ -99,6 +108,7 @@ export interface FileRouteTypes {
     | '/communication'
     | '/copyright'
     | '/sources'
+    | '/subscribe-now'
     | '/suitability'
     | '/$slug/$code'
   fileRoutesByTo: FileRoutesByTo
@@ -109,6 +119,7 @@ export interface FileRouteTypes {
     | '/communication'
     | '/copyright'
     | '/sources'
+    | '/subscribe-now'
     | '/suitability'
     | '/$slug/$code'
   id:
@@ -119,6 +130,7 @@ export interface FileRouteTypes {
     | '/communication'
     | '/copyright'
     | '/sources'
+    | '/subscribe-now'
     | '/suitability'
     | '/$slug/$code'
   fileRoutesById: FileRoutesById
@@ -130,6 +142,7 @@ export interface RootRouteChildren {
   CommunicationRoute: typeof CommunicationRoute
   CopyrightRoute: typeof CopyrightRoute
   SourcesRoute: typeof SourcesRoute
+  SubscribeNowRoute: typeof SubscribeNowRoute
   SuitabilityRoute: typeof SuitabilityRoute
 }
 
@@ -177,6 +190,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SourcesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/subscribe-now': {
+      id: '/subscribe-now'
+      path: '/subscribe-now'
+      fullPath: '/subscribe-now'
+      preLoaderRoute: typeof SubscribeNowRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/suitability': {
       id: '/suitability'
       path: '/suitability'
@@ -211,6 +231,7 @@ const rootRouteChildren: RootRouteChildren = {
   CommunicationRoute: CommunicationRoute,
   CopyrightRoute: CopyrightRoute,
   SourcesRoute: SourcesRoute,
+  SubscribeNowRoute: SubscribeNowRoute,
   SuitabilityRoute: SuitabilityRoute,
 }
 export const routeTree = rootRouteImport
