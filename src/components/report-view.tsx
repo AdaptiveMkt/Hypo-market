@@ -316,6 +316,10 @@ export function ReportView({
   onNeedAdvisor?: () => void;
 }) {
   const [closeAsk, setCloseAsk] = useState(false);
+  const [linkOpened, setLinkOpened] = useState(false);
+  const [leaveRemind, setLeaveRemind] = useState(false);
+  const linkOpenedRef = useRef(false);
+  const requestCloseRef = useRef<() => void>(() => {});
   const [medicaidSelected, setMedicaidSelected] = useState(false);
   const closeAskRef = useRef(false);
   closeAskRef.current = closeAsk;
@@ -371,7 +375,7 @@ export function ReportView({
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
       if (closeAskRef.current) setCloseAsk(false);
-      else onClose();
+      else requestCloseRef.current();
     };
     window.addEventListener("keydown", onKey);
     return () => {
@@ -389,6 +393,26 @@ export function ReportView({
       document.documentElement.dataset.demoPrintLock = "0";
     };
   }, [pdfDemo, shareUrl]);
+
+  function requestClose() {
+    if (shareUrl && !linkOpenedRef.current) {
+      setLeaveRemind(true);
+      return;
+    }
+    onClose();
+  }
+  requestCloseRef.current = requestClose;
+
+  useEffect(() => {
+    if (!shareUrl) return;
+    const onLeave = (event: BeforeUnloadEvent) => {
+      if (linkOpenedRef.current) return;
+      event.preventDefault();
+      event.returnValue = "";
+    };
+    window.addEventListener("beforeunload", onLeave);
+    return () => window.removeEventListener("beforeunload", onLeave);
+  }, [shareUrl]);
 
   useEffect(() => {
     const root = reportRef.current;
@@ -550,10 +574,15 @@ export function ReportView({
                 <p className="mt-2">
                   <a
                     href={shareUrl}
-                    className="text-lg font-bold uppercase underline underline-offset-2"
+                    className={`text-lg font-bold uppercase underline underline-offset-2 ${linkOpened ? "" : "report-link-blink"}`}
                     style={{ color: "#ff1a1a" }}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => {
+                      linkOpenedRef.current = true;
+                      setLinkOpened(true);
+                      setLeaveRemind(false);
+                    }}
                   >
                     Open Report Link
                   </a>
@@ -573,7 +602,7 @@ export function ReportView({
           <div className="stack-actions">
             <button
               type="button"
-              onClick={onClose}
+              onClick={() => requestCloseRef.current()}
               className="flex min-h-11 w-full items-center justify-center rounded-lg border border-white bg-black px-2 text-center text-sm font-semibold text-white hover:bg-neutral-900"
             >
               Edit
@@ -2583,6 +2612,35 @@ export function ReportView({
         </div>
 
       </article>
+      {leaveRemind && shareUrl ? (
+        <div className="no-print fixed inset-0 z-[70] flex items-end justify-center bg-navy/55 p-4 sm:items-center" role="dialog" aria-modal="true" aria-labelledby="report-link-remind-title">
+          <div className="card-xl w-full max-w-lg bg-paper p-5">
+            <h2 id="report-link-remind-title" className="font-display text-xl text-navy">See the report in full detail</h2>
+            <p className="mt-2 text-sm text-navy">
+              You are leaving without opening the report link. Open it to see the report in full detail.
+            </p>
+            <p className="mt-3 break-all text-sm font-semibold text-navy">{shareUrl}</p>
+            <div className="mt-4 grid gap-2">
+              <a
+                href={shareUrl}
+                className="flex min-h-11 items-center justify-center rounded-lg border border-navy bg-navy px-4 text-center text-sm font-bold uppercase text-cream"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => {
+                  linkOpenedRef.current = true;
+                  setLinkOpened(true);
+                  setLeaveRemind(false);
+                }}
+              >
+                Open Report Link
+              </a>
+              <button type="button" className="btn-block rounded-lg border border-navy text-navy" onClick={() => setLeaveRemind(false)}>
+                Stay on this view
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
       {closeAsk ? (
         <div className="no-print fixed inset-0 z-[60] flex items-end justify-center bg-navy/55 p-4 sm:items-center" role="dialog" aria-modal="true" aria-labelledby="close-pdf-title">
           <div className="card-xl w-full max-w-md bg-paper p-5">

@@ -654,6 +654,21 @@ html.dark {
   }
 }
 
+@keyframes report-link-blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0.15;
+  }
+}
+
+.report-link-blink {
+  animation: report-link-blink 0.85s steps(1, end) infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .red-wave > span,
   .text-deplete {
