@@ -27,6 +27,11 @@ function SubscribeNow() {
             Annual Subscription ($99/year)
           </a>
         </div>
+        <p className="mt-4 text-pretty text-sm text-muted">
+          The monthly subscription is $9.98 per month and continues until you cancel. You may cancel at any
+          time. Cancellation stops future monthly charges. A month already billed is not refunded. The annual
+          option is one payment of $99 for the year, and the first two months are included.
+        </p>
       </section>
     </main>
   );
