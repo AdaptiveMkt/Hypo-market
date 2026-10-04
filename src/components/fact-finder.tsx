@@ -53,13 +53,22 @@ type Step =
   | { kind: "claim" }
   | { kind: "cover" }
   | { kind: "benefits" }
+  | { kind: "brief" }
+  | { kind: "pool" }
+  | { kind: "design" }
   | { kind: "confirm2" }
   | { kind: "section3" }
   | { kind: "run" };
 
 const ASSET_QUESTIONS = ASSET_FIELDS.filter((f) => f.key !== "home");
 
+const TAXABLE_KEYS: AssetKey[] = ["cash", "savings", "stocks", "bonds", "funds", "metals", "other", "invre"];
+const DEFERRED_KEYS: AssetKey[] = ["ira", "annuity", "life"];
+
 function stepsFor(personalized: boolean, insuranceLocked: boolean, hasCoverage: boolean, daylight = false): Step[] {
+  if (!personalized && !daylight) {
+    return [{ kind: "mode" }, { kind: "brief" }, { kind: "pool" }, { kind: "design" }, { kind: "run" }];
+  }
   const steps: Step[] = [];
   if (!daylight) steps.push({ kind: "mode" });
   if (personalized || daylight) steps.push({ kind: "contact" });
@@ -89,6 +98,9 @@ function stepsFor(personalized: boolean, insuranceLocked: boolean, hasCoverage: 
 
 function sectionOf(step: Step) {
   if (step.kind === "mode" || step.kind === "contact") return "";
+  if (step.kind === "brief") return "1. Age and state";
+  if (step.kind === "pool") return "2. Countable assets";
+  if (step.kind === "design") return "3. Care and insurance";
   if (
     step.kind === "age" ||
     step.kind === "state" ||
@@ -248,6 +260,7 @@ export function FactFinder({
   );
   const selectedKinds = (["traditional", "assetBased", "ltcAnnuity", "hybridLife"] as PolicyKind[]).filter((k) => runKinds[k]);
   const [benefitKind, setBenefitKind] = useState<PolicyKind>("traditional");
+  const [adjustDesign, setAdjustDesign] = useState(false);
   const activeBenefit = selectedKinds.includes(benefitKind) ? benefitKind : selectedKinds[0] ?? "traditional";
   const done = index >= steps.length;
   const safeIndex = Math.min(index, Math.max(0, steps.length - 1));
@@ -264,7 +277,14 @@ export function FactFinder({
   }, [safeIndex, done]);
   useEffect(() => {
     if (!gotoStep) return;
-    const i = steps.findIndex((s) => s.kind === gotoStep);
+    const i = steps.findIndex(
+      (s) =>
+        s.kind === gotoStep ||
+        (s.kind === "pool" && (gotoStep === "calculate" || gotoStep === "asset")) ||
+        (s.kind === "brief" && (gotoStep === "age" || gotoStep === "state")) ||
+        (s.kind === "design" &&
+          (gotoStep === "setting" || gotoStep === "years" || gotoStep === "confirm2" || gotoStep === "section3")),
+    );
     if (i >= 0) onIndex(i);
     onGotoHandled();
   }, [gotoStep, steps, onIndex, onGotoHandled]);
@@ -285,6 +305,22 @@ export function FactFinder({
   const names = ASSET_QUESTIONS.map((f) => f.label).slice(0, 4).join(", ");
   const passedAssets = steps.slice(0, safeIndex).filter((s) => s.kind === "asset");
   const assetSubtotal = passedAssets.reduce((sum, s) => sum + (s.kind === "asset" ? Number(assets[s.key]) || 0 : 0), 0);
+  const taxableNow = TAXABLE_KEYS.reduce((sum, key) => sum + (Number(assets[key]) || 0), 0);
+  const deferredNow = DEFERRED_KEYS.reduce((sum, key) => sum + (Number(assets[key]) || 0), 0);
+  const enteredPool = taxableNow + deferredNow + (Number(assets.roth) || 0) + (excludeHome ? 0 : Number(assets.home) || 0);
+
+  function setBucket(keys: AssetKey[], lead: AssetKey, raw: string) {
+    const n = Number(raw);
+    const amount = Number.isFinite(n) ? n : 0;
+    onAsset(lead, String(amount));
+    for (const key of keys) {
+      if (key !== lead) onAsset(key, "0");
+    }
+  }
+
+  function setSharedRoi(raw: string) {
+    for (const field of ASSET_FIELDS) onRoi(field.key, raw);
+  }
 
   return (
     <section id="fact-finder" className="mt-4 card-xl min-w-0 scroll-mt-24 p-4 md:p-5" aria-label="Fact finder">
@@ -339,10 +375,127 @@ export function FactFinder({
               <button type="button" className="btn-block rounded-lg border border-navy bg-navy px-3 py-2.5 text-sm font-semibold text-cream" onClick={() => { onPersonalized(true); next(); }}>
                 Personalize
               </button>
-              <button type="button" className="btn-block rounded-lg bg-teal px-3 py-2.5 text-sm font-semibold text-cream" onClick={() => { onPersonalized(false); next(); }}>
+              <button type="button" className="btn-block rounded-lg bg-teal px-3 py-2.5 text-sm font-semibold text-cream" onClick={() => { onPersonalized(false); setAdjustDesign(false); next(); }}>
                 Incognito
               </button>
             </div>
+          </>
+        ) : null}
+
+        {step.kind === "brief" ? (
+          <>
+            <p className="text-base font-semibold text-teal">How old are you today, and where would care be received?</p>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              <div>
+                <label className={labelClass} htmlFor="ff-brief-age">Age today</label>
+                <StepperField id="ff-brief-age" value={ageToday} onChange={onAge} step={1} min={minAge} max={110} />
+              </div>
+              <div>
+                <label className={labelClass} htmlFor="ff-brief-state">State of care</label>
+                <FieldPicker id="ff-brief-state" value={state} options={STATE_NAMES.map((s) => ({ value: s, label: s }))} onChange={onState} />
+              </div>
+            </div>
+            <p className="mt-3 text-sm leading-snug text-muted">
+              Costs use {careCity || "the state capital"}. The policy is issued in the same state. Care is planned at age {claimAge}.
+            </p>
+            <Nav back={back} next={next} />
+          </>
+        ) : null}
+
+        {step.kind === "pool" ? (
+          <>
+            <p className="text-base font-semibold text-teal">What assets are at risk? Three totals are enough.</p>
+            <p className="mt-1 text-sm text-muted">Leave a line blank if there is nothing in that group. The home stays out of the spendable pool unless you include it.</p>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              <div>
+                <label className={labelClass} htmlFor="ff-taxable">Taxable assets</label>
+                <StepperField id="ff-taxable" value={taxableNow} onChange={(v) => setBucket(TAXABLE_KEYS, "cash", String(v))} step={1000} min={0} prefix="$" commas blankWhenZero />
+              </div>
+              <div>
+                <label className={labelClass} htmlFor="ff-deferred">Tax-deferred assets</label>
+                <StepperField id="ff-deferred" value={deferredNow} onChange={(v) => setBucket(DEFERRED_KEYS, "ira", String(v))} step={1000} min={0} prefix="$" commas blankWhenZero />
+              </div>
+              <div>
+                <label className={labelClass} htmlFor="ff-roth">Roth IRA</label>
+                <StepperField id="ff-roth" value={assets.roth} onChange={(v) => onAsset("roth", String(v))} step={1000} min={0} prefix="$" commas blankWhenZero />
+              </div>
+              <div>
+                <label className={labelClass} htmlFor="ff-brief-home">Primary residence</label>
+                <StepperField id="ff-brief-home" value={assets.home} onChange={(v) => onAsset("home", String(v))} step={1000} min={0} prefix="$" commas blankWhenZero />
+              </div>
+              <div>
+                <label className={labelClass} htmlFor="ff-brief-roi">Return on investment %</label>
+                <StepperField id="ff-brief-roi" value={Number(rois.cash) || 0} onChange={(v) => setSharedRoi(String(v))} step={0.1} min={0} max={20} decimals={1} />
+              </div>
+              <div>
+                <label className={labelClass} htmlFor="ff-brief-tax">Tax rate on taxable return</label>
+                <FieldPicker
+                  id="ff-brief-tax"
+                  value={String(taxRate)}
+                  options={TAX_RATE_OPTIONS.map((o) => ({
+                    value: String(o.rate),
+                    label: o.label,
+                    group: TAX_RATE_GROUPS.find((g) => g.key === o.group)?.heading,
+                  }))}
+                  onChange={(v) => onTaxRate(Number(v))}
+                />
+              </div>
+            </div>
+            <label className="mt-3 flex min-h-11 cursor-pointer items-center gap-2 text-sm font-semibold text-navy">
+              <input type="checkbox" className="size-4 accent-teal" checked={excludeHome} onChange={(e) => onExcludeHome(e.target.checked)} />
+              Exclude the primary residence from countable assets
+            </label>
+            <p className="mt-2 text-sm font-semibold tabular-nums text-navy">Countable assets entered {money(enteredPool)}</p>
+            <Nav
+              back={back}
+              next={() => {
+                onCalculate();
+                next();
+              }}
+            />
+          </>
+        ) : null}
+
+        {step.kind === "design" ? (
+          <>
+            <p className="text-base font-semibold text-teal">Use this care and insurance design?</p>
+            <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-navy">
+              <li>{setting ? SETTING_LABELS[setting as CareSetting] : "Home health care"} for {duration} years, starting at age {claimAge}.</li>
+              <li>Care inflation {Number(cpi.toFixed(1))}%.</li>
+              <li>Traditional coverage: {money(designs.traditional.dailyBenefit)} a day for {designs.traditional.benefitYears} years. Premium to be determined.</li>
+              <li>Asset-based, annuity care, and hybrid: {money(designs.assetBased.singlePremium || 100000)} single premium each.</li>
+            </ul>
+            {adjustDesign ? (
+              <div className="mt-4">
+                <BenefitEditor
+                  kind={activeBenefit}
+                  kinds={selectedKinds.length ? selectedKinds : ["traditional"]}
+                  onKind={setBenefitKind}
+                  policy={designs[activeBenefit]}
+                  riderOptions={riderOptions}
+                  ageToday={ageToday}
+                  onPatch={(partial) => onPatchKind(activeBenefit, partial)}
+                  onDone={() => {
+                    onConfirm3();
+                    setAdjustDesign(false);
+                    next();
+                  }}
+                  back={() => setAdjustDesign(false)}
+                />
+              </div>
+            ) : (
+              <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                <button type="button" className="btn-block rounded-lg bg-teal px-3 py-2.5 text-sm font-semibold text-cream" onClick={next}>
+                  Use this design
+                </button>
+                <button type="button" className="btn-block rounded-lg border border-navy px-3 py-2.5 text-sm font-semibold text-navy" onClick={() => setAdjustDesign(true)}>
+                  Change the benefits
+                </button>
+              </div>
+            )}
+            {adjustDesign ? null : (
+              <button type="button" className="mt-3 text-sm text-navy underline" onClick={back}>Back</button>
+            )}
           </>
         ) : null}
 
