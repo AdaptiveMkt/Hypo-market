@@ -4,18 +4,18 @@ import { useEffect, useRef, useState } from "react";
 import { WELCOME_BODY, WELCOME_HEADING } from "@/lib/welcome";
 
 const CAPTIONS: { start: number; end: number; text: string }[] = [
-  { start: 0, end: 1.9, text: "Hello there." },
-  { start: 2, end: 9, text: "If your clients are worried about what long-term care could do to the assets they have accumulated, this hypothetical is how you show them." },
-  { start: 10, end: 12.5, text: "It was built for licensed insurance professionals." },
-  { start: 13, end: 20, text: "Run it with the client's name, or run it incognito, with no client name and no client financial information stored on this site." },
-  { start: 20, end: 23, text: "Your own advisor information is required either way." },
-  { start: 23, end: 29.5, text: "You will see how quickly long-term care can use those assets, and what changes if insurance pays first." },
-  { start: 30, end: 38.5, text: "Traditional long-term care, asset-based design, annuity care, and a hybrid life and long-term care are all ready to test." },
-  { start: 39, end: 42.5, text: "This is not a quote. The carrier illustration still comes from you." },
-  { start: 43, end: 47, text: "Run it once, incognito, before your next long-term care appointment." },
-  { start: 47, end: 58.5, text: "If you want this platform branded with your name and your agency, call or text 321-795-7516 and ask about pricing and customization." },
-  { start: 59, end: 67, text: "Or email info@preserve-your-assets.com. You'll be glad you did." },
-  { start: 68, end: 70.1, text: "Thank you." },
+  { start: 0, end: 1.8, text: "Hello there." },
+  { start: 2, end: 12, text: "If your clients are worried about what long-term care could do to the assets they have accumulated, this hypothetical is how you show them. It was built for licensed insurance professionals." },
+  { start: 12, end: 20, text: "You can run it incognito, with just the basic questions, or run a more detailed analysis with the client's name and financial information." },
+  { start: 20, end: 26.5, text: "Once the report is generated, the advisor is given a report link to download the hypothetical analysis." },
+  { start: 27, end: 33.5, text: "It's your choice. To access the tool and test it, advisor information is required." },
+  { start: 34, end: 39.5, text: "You will see how quickly long-term care can use those assets, and what changes if insurance pays first." },
+  { start: 40, end: 48, text: "Traditional long-term care, an asset-based design, annuity care, and a hybrid life and long-term care policy are all ready to test." },
+  { start: 48.3, end: 51.5, text: "This is not a quote. The carrier illustration still comes from you." },
+  { start: 52, end: 56, text: "Run it once, incognito, before your next long-term care appointment." },
+  { start: 56, end: 71, text: "If you want this platform branded with your name and your agency, call or text 321-795-7516 and ask about pricing and customization." },
+  { start: 71, end: 76.5, text: "Or email info@preserve-your-assets.com. You'll be glad you did." },
+  { start: 77, end: 79.1, text: "Thank you." },
 ];
 
 export function WelcomeVideo({ onStart }: { onStart?: () => void }) {
@@ -108,7 +108,7 @@ export function WelcomeVideo({ onStart }: { onStart?: () => void }) {
           autoPlay
           playsInline
           preload="auto"
-          poster="/welcome/asset-preservation-poster.jpg?v=4"
+          poster="/welcome/asset-preservation-poster.jpg?v=5"
           onTimeUpdate={syncCaption}
           onSeeked={syncCaption}
           onPlay={() => setEnded(false)}
@@ -117,12 +117,12 @@ export function WelcomeVideo({ onStart }: { onStart?: () => void }) {
             setEnded(true);
           }}
         >
-          <source src="/welcome/asset-preservation.mp4?v=4" type="video/mp4" />
+          <source src="/welcome/asset-preservation.mp4?v=5" type="video/mp4" />
           <track
             kind="captions"
             srcLang="en"
             label="English"
-            src="/welcome/asset-preservation.vtt"
+            src="/welcome/asset-preservation.vtt?v=5"
           />
         </video>
         {ended ? (
