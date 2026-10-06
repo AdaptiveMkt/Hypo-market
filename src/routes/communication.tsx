@@ -172,7 +172,7 @@ function Communication() {
     const onSuccess = (event: Event) => {
       const detail = (event as CustomEvent<{ formId?: string }>).detail;
       if (detail?.formId && detail.formId !== LICENSE_FORM_ID) return;
-      void navigate({ to: "/subscribe-now" });
+      void navigate({ to: "/payment-selection" });
     };
     window.addEventListener("hs-form-event:on-submission:success", onSuccess);
     return () => window.removeEventListener("hs-form-event:on-submission:success", onSuccess);

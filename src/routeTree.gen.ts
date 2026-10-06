@@ -15,6 +15,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as CommissionCalculatorRouteImport } from './routes/commission-calculator'
 import { Route as CommunicationRouteImport } from './routes/communication'
 import { Route as CopyrightRouteImport } from './routes/copyright'
+import { Route as PaymentSelectionRouteImport } from './routes/payment-selection'
 import { Route as SourcesRouteImport } from './routes/sources'
 import { Route as SubscribeNowRouteImport } from './routes/subscribe-now'
 import { Route as SuitabilityRouteImport } from './routes/suitability'
@@ -50,6 +51,11 @@ const CopyrightRoute = CopyrightRouteImport.update({
   path: '/copyright',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PaymentSelectionRoute = PaymentSelectionRouteImport.update({
+  id: '/payment-selection',
+  path: '/payment-selection',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SourcesRoute = SourcesRouteImport.update({
   id: '/sources',
   path: '/sources',
@@ -78,6 +84,7 @@ export interface FileRoutesByFullPath {
   '/commission-calculator': typeof CommissionCalculatorRoute
   '/communication': typeof CommunicationRoute
   '/copyright': typeof CopyrightRoute
+  '/payment-selection': typeof PaymentSelectionRoute
   '/sources': typeof SourcesRoute
   '/subscribe-now': typeof SubscribeNowRoute
   '/suitability': typeof SuitabilityRoute
@@ -90,6 +97,7 @@ export interface FileRoutesByTo {
   '/commission-calculator': typeof CommissionCalculatorRoute
   '/communication': typeof CommunicationRoute
   '/copyright': typeof CopyrightRoute
+  '/payment-selection': typeof PaymentSelectionRoute
   '/sources': typeof SourcesRoute
   '/subscribe-now': typeof SubscribeNowRoute
   '/suitability': typeof SuitabilityRoute
@@ -103,6 +111,7 @@ export interface FileRoutesById {
   '/commission-calculator': typeof CommissionCalculatorRoute
   '/communication': typeof CommunicationRoute
   '/copyright': typeof CopyrightRoute
+  '/payment-selection': typeof PaymentSelectionRoute
   '/sources': typeof SourcesRoute
   '/subscribe-now': typeof SubscribeNowRoute
   '/suitability': typeof SuitabilityRoute
@@ -117,6 +126,7 @@ export interface FileRouteTypes {
     | '/commission-calculator'
     | '/communication'
     | '/copyright'
+    | '/payment-selection'
     | '/sources'
     | '/subscribe-now'
     | '/suitability'
@@ -129,6 +139,7 @@ export interface FileRouteTypes {
     | '/commission-calculator'
     | '/communication'
     | '/copyright'
+    | '/payment-selection'
     | '/sources'
     | '/subscribe-now'
     | '/suitability'
@@ -141,6 +152,7 @@ export interface FileRouteTypes {
     | '/commission-calculator'
     | '/communication'
     | '/copyright'
+    | '/payment-selection'
     | '/sources'
     | '/subscribe-now'
     | '/suitability'
@@ -154,6 +166,7 @@ export interface RootRouteChildren {
   CommissionCalculatorRoute: typeof CommissionCalculatorRoute
   CommunicationRoute: typeof CommunicationRoute
   CopyrightRoute: typeof CopyrightRoute
+  PaymentSelectionRoute: typeof PaymentSelectionRoute
   SourcesRoute: typeof SourcesRoute
   SubscribeNowRoute: typeof SubscribeNowRoute
   SuitabilityRoute: typeof SuitabilityRoute
@@ -201,6 +214,13 @@ declare module '@tanstack/react-router' {
       path: '/copyright'
       fullPath: '/copyright'
       preLoaderRoute: typeof CopyrightRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payment-selection': {
+      id: '/payment-selection'
+      path: '/payment-selection'
+      fullPath: '/payment-selection'
+      preLoaderRoute: typeof PaymentSelectionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sources': {
@@ -251,6 +271,7 @@ const rootRouteChildren: RootRouteChildren = {
   CommissionCalculatorRoute: CommissionCalculatorRoute,
   CommunicationRoute: CommunicationRoute,
   CopyrightRoute: CopyrightRoute,
+  PaymentSelectionRoute: PaymentSelectionRoute,
   SourcesRoute: SourcesRoute,
   SubscribeNowRoute: SubscribeNowRoute,
   SuitabilityRoute: SuitabilityRoute,
