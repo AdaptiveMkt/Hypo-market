@@ -2,7 +2,7 @@
 
 import { createPortal } from "react-dom";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import {
   Bar,
   CartesianGrid,
@@ -280,6 +280,7 @@ function Section1CueBody({
 }
 
 export function Calculator() {
+  const navigate = useNavigate();
   const narrow = useNarrow();
   const [assets, setAssets] = useState<Assets>(() => ({
     ...DEFAULT_ASSETS,
@@ -1692,6 +1693,7 @@ export function Calculator() {
             onReturnLater={() => {
               markReturnLater();
               setReturning(true);
+              void navigate({ to: "/commission-calculator" });
             }}
             onSelect={(role) => {
               setAudience(role);
