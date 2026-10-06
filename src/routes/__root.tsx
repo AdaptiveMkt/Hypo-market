@@ -168,10 +168,29 @@ function Root() {
             </a>
             <header id="page-header" className="bg-masthead text-masthead-fg">
               <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-                <p className="mb-1 text-xs tracking-[0.14em] text-gold">
-                  For licensed insurance professionals
-                </p>
-                <h1 className="font-display text-2xl font-medium leading-tight sm:text-3xl lg:text-4xl">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <Link to="/" aria-label="Preserve Your Assets, home" className="shrink-0 rounded-lg">
+                      <img
+                        src="/brand-icon.svg"
+                        alt=""
+                        width={44}
+                        height={44}
+                        className="h-11 w-11 rounded-lg"
+                      />
+                    </Link>
+                    <p className="text-xs tracking-[0.14em] text-gold">
+                      For licensed insurance professionals
+                    </p>
+                  </div>
+                  <Link
+                    to="/"
+                    className="shrink-0 rounded-lg bg-[#0072b2] px-4 py-2.5 text-sm font-semibold text-white hover:brightness-110"
+                  >
+                    Home
+                  </Link>
+                </div>
+                <h1 className="mt-3 font-display text-2xl font-medium leading-tight sm:text-3xl lg:text-4xl">
                   Long Term Care Asset Utilization Modeling
                 </h1>
                 <p className="mt-2 max-w-2xl text-sm text-masthead-fg/85 sm:text-base">

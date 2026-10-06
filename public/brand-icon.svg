@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Preserve Your Assets">
+  <rect width="64" height="64" rx="14" fill="#102028"/>
+  <path d="M32 7.5 52 15.5V34c0 13.2-8.4 21.6-20 25.2C20.4 55.6 12 47.2 12 34V15.5L32 7.5Z" fill="#c4a35a"/>
+  <path d="M32 13.5 46.5 19.5V33.2c0 9.6-6.1 15.8-14.5 18.5-8.4-2.7-14.5-8.9-14.5-18.5V19.5L32 13.5Z" fill="#1b3a4b"/>
+  <path d="M22 38.5V29.2h20v9.3" fill="none" stroke="#f6f1e8" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M20.5 29.2 32 21.8l11.5 7.4" fill="none" stroke="#f6f1e8" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M26.2 38.5V30.4M32 38.5V30.4M37.8 38.5V30.4" fill="none" stroke="#f6f1e8" stroke-width="2" stroke-linecap="round"/>
+</svg>
