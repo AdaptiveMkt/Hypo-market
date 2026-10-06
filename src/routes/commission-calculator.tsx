@@ -49,6 +49,7 @@ function CommissionCalculator() {
   const [customPrem, setCustomPrem] = useState(false);
   const [fyRate, setFyRate] = useState("55");
   const [renewalRate, setRenewalRate] = useState("8");
+  const [laterRate, setLaterRate] = useState("3");
 
   function useIndustry(nextAge = age, nextInfl = infl) {
     const next = industryPremium(nextAge, nextInfl);
@@ -65,16 +66,22 @@ function CommissionCalculator() {
     const singleAnnual = num(singlePrem);
     const firstPct = Math.min(100, num(fyRate)) / 100;
     const renewalPct = Math.min(100, num(renewalRate)) / 100;
+    const laterPct = Math.min(100, num(laterRate)) / 100;
     const couplePremium = coupleCount * coupleAnnual;
     const singlePremium = singleCount * singleAnnual;
     const newPremium = couplePremium + singlePremium;
     const firstYear = newPremium * firstPct;
     const renewalEach = newPremium * renewalPct;
-    const classTotal = firstYear + renewalEach * 19;
+    const laterEach = newPremium * laterPct;
+    const classTotal = firstYear + renewalEach * 9 + laterEach * 10;
     let cumulative = 0;
     const years = Array.from({ length: 20 }, (_, index) => {
       const year = index + 1;
-      const renewal = renewalEach * (year - 1);
+      const midClasses = Math.max(0, year - 1 - Math.max(0, year - 10));
+      const lateStart = Math.max(1, year - 19);
+      const lateEnd = year - 10;
+      const lateClasses = lateEnd >= lateStart ? lateEnd - lateStart + 1 : 0;
+      const renewal = renewalEach * midClasses + laterEach * lateClasses;
       const total = firstYear + renewal;
       cumulative += total;
       return { year, newPremium, firstYear, renewal, total, cumulative };
@@ -88,11 +95,12 @@ function CommissionCalculator() {
       newPremium,
       firstYear,
       renewalEach,
+      laterEach,
       classTotal,
       years,
       twentyYearBook: years[19]?.cumulative ?? 0,
     };
-  }, [couples, singles, couplePrem, singlePrem, fyRate, renewalRate]);
+  }, [couples, singles, couplePrem, singlePrem, fyRate, renewalRate, laterRate]);
 
   return (
     <main id="main-content" className="mx-auto max-w-5xl space-y-5 px-4 py-8 sm:px-6" tabIndex={-1}>
@@ -101,8 +109,8 @@ function CommissionCalculator() {
         <h1 className="mt-1 font-display text-2xl text-navy">Commission calculator</h1>
         <p className="mt-2 text-sm text-muted">
           This page is not in the site menu. It estimates long-term care insurance commission from the
-          number of new clients you enter, an average first-year premium, a first-year commission, and a
-          renewal commission for years 2 through 20.
+          number of new clients you enter, an average first-year premium, a first-year commission, the
+          renewal rate for years 2 through 10, and a lower rate for years 11 and after.
         </p>
       </section>
 
@@ -185,7 +193,7 @@ function CommissionCalculator() {
             </select>
           </label>
           <label className="block text-sm font-semibold text-teal">
-            Couple combined annual premium
+            Couple's Annual Premium Combined Premiums
             <input
               className="mt-1 w-full rounded-lg border border-line bg-paper px-3 py-2 text-base font-normal text-navy"
               inputMode="decimal"
@@ -197,7 +205,7 @@ function CommissionCalculator() {
             />
           </label>
           <label className="block text-sm font-semibold text-teal">
-            Single annual premium
+            Single Individual Annual Premium
             <input
               className="mt-1 w-full rounded-lg border border-line bg-paper px-3 py-2 text-base font-normal text-navy"
               inputMode="decimal"
@@ -227,7 +235,7 @@ function CommissionCalculator() {
 
       <section className="card-xl p-5">
         <h2 className="border-b-2 border-gold pb-2 font-display text-xl text-navy">Commission rates</h2>
-        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+        <div className="mt-4 grid gap-4 lg:grid-cols-3">
           <label className="block text-sm font-semibold text-teal">
             First-year commission
             <span className="mt-1 flex items-center gap-2">
@@ -241,7 +249,7 @@ function CommissionCalculator() {
             </span>
           </label>
           <label className="block text-sm font-semibold text-teal">
-            Years 2–20 renewal
+            Years 2–10 renewal
             <span className="mt-1 flex items-center gap-2">
               <input
                 className="w-full rounded-lg border border-line bg-paper px-3 py-2 text-base font-normal text-navy"
@@ -252,18 +260,36 @@ function CommissionCalculator() {
               <span className="text-base font-normal text-navy">%</span>
             </span>
           </label>
+          <label className="block text-sm font-semibold text-teal">
+            Years 11+ renewal
+            <span className="mt-1 flex items-center gap-2">
+              <input
+                className="w-full rounded-lg border border-line bg-paper px-3 py-2 text-base font-normal text-navy"
+                inputMode="decimal"
+                value={laterRate}
+                onChange={(event) => setLaterRate(event.target.value)}
+              />
+              <span className="text-base font-normal text-navy">%</span>
+            </span>
+          </label>
         </div>
+        <p className="mt-3 text-sm text-muted">
+          * First-year commissions vary based on distribution channel and age. Typical first-year
+          commission ranges from 50% to 65%, and renewal from 8% to 10%, for standard broker agreements.
+          Not typical for lead generation or high-end, top-level producers.
+        </p>
       </section>
 
       <section className="card-xl p-5" aria-live="polite">
         <h2 className="border-b-2 border-gold pb-2 font-display text-xl text-navy">This year-1 class</h2>
         <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          <Result label="Couple premium" value={moneyCents(run.couplePremium)} detail={`${run.coupleCount} × couple premium`} />
-          <Result label="Single premium" value={moneyCents(run.singlePremium)} detail={`${run.singleCount} × single premium`} />
+          <Result label="Couple's annual premium" value={moneyCents(run.couplePremium)} detail={`${run.coupleCount} × combined premium`} />
+          <Result label="Single individual annual premium" value={moneyCents(run.singlePremium)} detail={`${run.singleCount} × single premium`} />
           <Result label="First-year premium" value={moneyCents(run.newPremium)} detail="Couples plus singles" />
           <Result label="Year 1 commission" value={moneyCents(run.firstYear)} detail={`${fyRate || "0"}% of first-year premium`} />
-          <Result label="Each renewal year, 2–20" value={moneyCents(run.renewalEach)} detail={`${renewalRate || "0"}% of the same premium`} />
-          <Result label="Total on this class, 20 years" value={moneyCents(run.classTotal)} detail="Year 1 plus 19 renewal years" />
+          <Result label="Each year, years 2–10" value={moneyCents(run.renewalEach)} detail={`${renewalRate || "0"}% of the same premium`} />
+          <Result label="Each year, years 11–20" value={moneyCents(run.laterEach)} detail={`${laterRate || "0"}% of the same premium`} />
+          <Result label="Total on this class, 20 years" value={moneyCents(run.classTotal)} detail="Year 1, nine years at the renewal rate, ten years at the years 11+ rate" />
         </div>
       </section>
 
@@ -273,7 +299,8 @@ function CommissionCalculator() {
         </h2>
         <p className="mt-3 text-sm text-muted">
           If you write this same number of couples and singles every year, each new class pays the
-          first-year rate in its own first year and the renewal rate while it is in years 2 through 20.
+          first-year rate in its own first year, the renewal rate in policy years 2 through 10, and the
+          years 11+ rate in policy years 11 through 20.
           Over 20 years of writing at this pace, commission received is {moneyCents(run.twentyYearBook)}.
         </p>
         <div className="mt-4 overflow-x-auto">
@@ -308,9 +335,9 @@ function CommissionCalculator() {
         <h2 className="border-b-2 border-gold pb-2 font-display text-xl text-navy">What this leaves out</h2>
         <p className="mt-3 text-sm text-muted">
           Premium is held level. There is no rate increase, lapse, death, replacement, or chargeback.
-          The renewal rate applies to the original annual premium in policy years 2 through 20 only.
-          A carrier contract can pay a different first-year rate, a different renewal schedule, or stop
-          before year 20. This is an advisor illustration, not a quote and not a commission agreement.
+          Years 2 through 10 use the renewal rate. Years 11 through 20 use the lower rate. Nothing is
+          paid after policy year 20. A carrier contract can pay a different schedule. This is an advisor
+          illustration, not a quote and not a commission agreement.
         </p>
       </section>
     </main>
