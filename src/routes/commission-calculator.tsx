@@ -327,6 +327,62 @@ function CommissionCalculator() {
         </p>
       </section>
 
+      <section className="card-xl p-5" aria-live="polite">
+        <h2 className="border-b-2 border-gold pb-2 font-display text-xl text-navy">This year-1 class</h2>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <Result label="Couple's annual premium" value={moneyCents(run.couplePremium)} detail={`${run.coupleCount} × combined premium`} />
+          <Result label="Single individual annual premium" value={moneyCents(run.singlePremium)} detail={`${run.singleCount} × single premium`} />
+          <Result label="First-year premium" value={moneyCents(run.newPremium)} detail="Couples plus singles" />
+          <Result label="Year 1 commission" value={moneyCents(run.firstYear)} detail={`${fyRate || "0"}% of first-year premium`} />
+          <Result label="Each year, years 2–10" value={moneyCents(run.renewalEach)} detail={`${renewalRate || "0"}% of the same premium`} />
+          <Result label="Each year, years 11–20" value={moneyCents(run.laterEach)} detail={`${laterRate || "0"}% of the same premium`} />
+          <Result label="Total on this class, 20 years" value={moneyCents(run.classTotal)} detail="Before persistency. Year 1, nine years at the renewal rate, ten years at the years 11+ rate" />
+        </div>
+      </section>
+
+      <section className="card-xl p-5">
+        <h2 className="border-b-2 border-gold pb-2 font-display text-xl text-navy">
+          Same new clients each year
+        </h2>
+        <p className="mt-3 text-sm text-muted">
+          If you write this same number of couples and singles every year, each new class pays the
+          first-year rate in its own first year, the renewal rate in policy years 2 through 10, and the
+          years 11+ rate in policy years 11 through 20.
+          If every policy stays, commission received over 20 years is {moneyCents(run.twentyYearBook)}.
+          After the persistency below, it is {moneyCents(run.twentyYearPersisted)}.
+        </p>
+        <div className="mt-4 overflow-x-auto">
+          <table className="w-full min-w-[52rem] border-collapse text-center text-sm">
+            <thead>
+              <tr className="border-b border-line text-xs font-semibold text-teal">
+                <th className="px-2 py-2">Year</th>
+                <th className="px-2 py-2">New premium</th>
+                <th className="px-2 py-2">First-year commission</th>
+                <th className="px-2 py-2">Renewal commission</th>
+                <th className="px-2 py-2">Commission this year</th>
+                <th className="px-2 py-2">Cumulative</th>
+                <th className="px-2 py-2">After persistency</th>
+                <th className="px-2 py-2">Cumulative after persistency</th>
+              </tr>
+            </thead>
+            <tbody>
+              {run.years.map((row) => (
+                <tr key={row.year} className="border-b border-line/60">
+                  <td className="px-2 py-1.5">{row.year}</td>
+                  <td className="px-2 py-1.5">{moneyCents(row.newPremium)}</td>
+                  <td className="px-2 py-1.5">{moneyCents(row.firstYear)}</td>
+                  <td className="px-2 py-1.5">{moneyCents(row.renewal)}</td>
+                  <td className="px-2 py-1.5 font-semibold">{moneyCents(row.total)}</td>
+                  <td className="px-2 py-1.5">{moneyCents(row.cumulative)}</td>
+                  <td className="px-2 py-1.5 font-semibold">{moneyCents(row.persisted)}</td>
+                  <td className="px-2 py-1.5">{moneyCents(row.cumulativePersisted)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
       <section className="card-xl p-5">
         <h2 className="border-b-2 border-gold pb-2 font-display text-xl text-navy">Industry persistency</h2>
         <div className="mt-4 max-w-sm">
@@ -378,62 +434,6 @@ function CommissionCalculator() {
                   <td className="px-2 py-1.5">{pct(row.inForce)}</td>
                   <td className="px-2 py-1.5 font-semibold">{moneyCents(row.commission)}</td>
                   <td className="px-2 py-1.5">{moneyCents(row.cumulative)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <section className="card-xl p-5" aria-live="polite">
-        <h2 className="border-b-2 border-gold pb-2 font-display text-xl text-navy">This year-1 class</h2>
-        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          <Result label="Couple's annual premium" value={moneyCents(run.couplePremium)} detail={`${run.coupleCount} × combined premium`} />
-          <Result label="Single individual annual premium" value={moneyCents(run.singlePremium)} detail={`${run.singleCount} × single premium`} />
-          <Result label="First-year premium" value={moneyCents(run.newPremium)} detail="Couples plus singles" />
-          <Result label="Year 1 commission" value={moneyCents(run.firstYear)} detail={`${fyRate || "0"}% of first-year premium`} />
-          <Result label="Each year, years 2–10" value={moneyCents(run.renewalEach)} detail={`${renewalRate || "0"}% of the same premium`} />
-          <Result label="Each year, years 11–20" value={moneyCents(run.laterEach)} detail={`${laterRate || "0"}% of the same premium`} />
-          <Result label="Total on this class, 20 years" value={moneyCents(run.classTotal)} detail="Before persistency. Year 1, nine years at the renewal rate, ten years at the years 11+ rate" />
-        </div>
-      </section>
-
-      <section className="card-xl p-5">
-        <h2 className="border-b-2 border-gold pb-2 font-display text-xl text-navy">
-          Same new clients each year
-        </h2>
-        <p className="mt-3 text-sm text-muted">
-          If you write this same number of couples and singles every year, each new class pays the
-          first-year rate in its own first year, the renewal rate in policy years 2 through 10, and the
-          years 11+ rate in policy years 11 through 20.
-          If every policy stays, commission received over 20 years is {moneyCents(run.twentyYearBook)}.
-          After the persistency above, it is {moneyCents(run.twentyYearPersisted)}.
-        </p>
-        <div className="mt-4 overflow-x-auto">
-          <table className="w-full min-w-[52rem] border-collapse text-center text-sm">
-            <thead>
-              <tr className="border-b border-line text-xs font-semibold text-teal">
-                <th className="px-2 py-2">Year</th>
-                <th className="px-2 py-2">New premium</th>
-                <th className="px-2 py-2">First-year commission</th>
-                <th className="px-2 py-2">Renewal commission</th>
-                <th className="px-2 py-2">Commission this year</th>
-                <th className="px-2 py-2">Cumulative</th>
-                <th className="px-2 py-2">After persistency</th>
-                <th className="px-2 py-2">Cumulative after persistency</th>
-              </tr>
-            </thead>
-            <tbody>
-              {run.years.map((row) => (
-                <tr key={row.year} className="border-b border-line/60">
-                  <td className="px-2 py-1.5">{row.year}</td>
-                  <td className="px-2 py-1.5">{moneyCents(row.newPremium)}</td>
-                  <td className="px-2 py-1.5">{moneyCents(row.firstYear)}</td>
-                  <td className="px-2 py-1.5">{moneyCents(row.renewal)}</td>
-                  <td className="px-2 py-1.5 font-semibold">{moneyCents(row.total)}</td>
-                  <td className="px-2 py-1.5">{moneyCents(row.cumulative)}</td>
-                  <td className="px-2 py-1.5 font-semibold">{moneyCents(row.persisted)}</td>
-                  <td className="px-2 py-1.5">{moneyCents(row.cumulativePersisted)}</td>
                 </tr>
               ))}
             </tbody>
