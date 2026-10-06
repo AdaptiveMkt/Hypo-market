@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SlugRouteImport } from './routes/$slug'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as CommissionCalculatorRouteImport } from './routes/commission-calculator'
 import { Route as CommunicationRouteImport } from './routes/communication'
 import { Route as CopyrightRouteImport } from './routes/copyright'
 import { Route as SourcesRouteImport } from './routes/sources'
@@ -32,6 +33,11 @@ const SlugRoute = SlugRouteImport.update({
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CommissionCalculatorRoute = CommissionCalculatorRouteImport.update({
+  id: '/commission-calculator',
+  path: '/commission-calculator',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CommunicationRoute = CommunicationRouteImport.update({
@@ -69,6 +75,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$slug': typeof SlugRouteWithChildren
   '/about': typeof AboutRoute
+  '/commission-calculator': typeof CommissionCalculatorRoute
   '/communication': typeof CommunicationRoute
   '/copyright': typeof CopyrightRoute
   '/sources': typeof SourcesRoute
@@ -80,6 +87,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$slug': typeof SlugRouteWithChildren
   '/about': typeof AboutRoute
+  '/commission-calculator': typeof CommissionCalculatorRoute
   '/communication': typeof CommunicationRoute
   '/copyright': typeof CopyrightRoute
   '/sources': typeof SourcesRoute
@@ -92,6 +100,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/$slug': typeof SlugRouteWithChildren
   '/about': typeof AboutRoute
+  '/commission-calculator': typeof CommissionCalculatorRoute
   '/communication': typeof CommunicationRoute
   '/copyright': typeof CopyrightRoute
   '/sources': typeof SourcesRoute
@@ -105,6 +114,7 @@ export interface FileRouteTypes {
     | '/'
     | '/$slug'
     | '/about'
+    | '/commission-calculator'
     | '/communication'
     | '/copyright'
     | '/sources'
@@ -116,6 +126,7 @@ export interface FileRouteTypes {
     | '/'
     | '/$slug'
     | '/about'
+    | '/commission-calculator'
     | '/communication'
     | '/copyright'
     | '/sources'
@@ -127,6 +138,7 @@ export interface FileRouteTypes {
     | '/'
     | '/$slug'
     | '/about'
+    | '/commission-calculator'
     | '/communication'
     | '/copyright'
     | '/sources'
@@ -139,6 +151,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SlugRoute: typeof SlugRouteWithChildren
   AboutRoute: typeof AboutRoute
+  CommissionCalculatorRoute: typeof CommissionCalculatorRoute
   CommunicationRoute: typeof CommunicationRoute
   CopyrightRoute: typeof CopyrightRoute
   SourcesRoute: typeof SourcesRoute
@@ -167,6 +180,13 @@ declare module '@tanstack/react-router' {
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/commission-calculator': {
+      id: '/commission-calculator'
+      path: '/commission-calculator'
+      fullPath: '/commission-calculator'
+      preLoaderRoute: typeof CommissionCalculatorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/communication': {
@@ -228,6 +248,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SlugRoute: SlugRouteWithChildren,
   AboutRoute: AboutRoute,
+  CommissionCalculatorRoute: CommissionCalculatorRoute,
   CommunicationRoute: CommunicationRoute,
   CopyrightRoute: CopyrightRoute,
   SourcesRoute: SourcesRoute,
