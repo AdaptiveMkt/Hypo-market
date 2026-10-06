@@ -35,8 +35,21 @@ function industryPremium(age: Age, infl: Infl) {
 }
 
 function num(raw: string) {
-  const n = Number(raw.replace(/,/g, ""));
+  const n = Number(raw.replace(/[$,\s]/g, ""));
   return Number.isFinite(n) ? Math.max(0, n) : 0;
+}
+
+function dollars(n: number) {
+  return `$${Math.round(n).toLocaleString("en-US")}`;
+}
+
+function dollarsFromRaw(raw: string) {
+  const cleaned = raw.replace(/[^\d.]/g, "");
+  if (!cleaned) return "";
+  const [whole, frac] = cleaned.split(".");
+  const shown = Number(whole || "0").toLocaleString("en-US");
+  if (raw.trim().endsWith(".") && frac == null) return `$${shown}.`;
+  return frac != null ? `$${shown}.${frac.slice(0, 2)}` : `$${shown}`;
 }
 
 function CommissionCalculator() {
@@ -44,8 +57,8 @@ function CommissionCalculator() {
   const [singles, setSingles] = useState("5");
   const [age, setAge] = useState<Age>(55);
   const [infl, setInfl] = useState<Infl>(3);
-  const [couplePrem, setCouplePrem] = useState(String(industryPremium(55, 3).couple));
-  const [singlePrem, setSinglePrem] = useState(String(industryPremium(55, 3).single));
+  const [couplePrem, setCouplePrem] = useState(dollars(industryPremium(55, 3).couple));
+  const [singlePrem, setSinglePrem] = useState(dollars(industryPremium(55, 3).single));
   const [customPrem, setCustomPrem] = useState(false);
   const [fyRate, setFyRate] = useState("55");
   const [renewalRate, setRenewalRate] = useState("8");
@@ -53,8 +66,8 @@ function CommissionCalculator() {
 
   function useIndustry(nextAge = age, nextInfl = infl) {
     const next = industryPremium(nextAge, nextInfl);
-    setCouplePrem(String(next.couple));
-    setSinglePrem(String(next.single));
+    setCouplePrem(dollars(next.couple));
+    setSinglePrem(dollars(next.single));
     setCustomPrem(false);
   }
 
@@ -199,7 +212,7 @@ function CommissionCalculator() {
               inputMode="decimal"
               value={couplePrem}
               onChange={(event) => {
-                setCouplePrem(event.target.value);
+                setCouplePrem(dollarsFromRaw(event.target.value));
                 setCustomPrem(true);
               }}
             />
@@ -211,7 +224,7 @@ function CommissionCalculator() {
               inputMode="decimal"
               value={singlePrem}
               onChange={(event) => {
-                setSinglePrem(event.target.value);
+                setSinglePrem(dollarsFromRaw(event.target.value));
                 setCustomPrem(true);
               }}
             />
