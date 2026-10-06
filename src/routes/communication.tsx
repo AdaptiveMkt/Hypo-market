@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { fillLeadForm, reserveReportLink } from "@/lib/hubspot-report-link";
 import { SubscriptionLinks } from "@/components/subscription-links";
 
@@ -67,6 +67,12 @@ const CAPTIONS: { start: number; end: number; text: string }[] = [
 ];
 
 const LICENSE_FORM_ID = "6b36b610-ae40-4878-841e-384b0c07bc84";
+const PAYMENT_SELECTION = "https://www.preserve-your-assets.com/payment-selection";
+
+function goToPaymentSelection() {
+  if (window.location.href.startsWith(PAYMENT_SELECTION)) return;
+  window.location.assign(PAYMENT_SELECTION);
+}
 
 function captionAt(time: number) {
   return CAPTIONS.find((cue) => time >= cue.start && time < cue.end)?.text ?? "";
@@ -89,7 +95,6 @@ export const Route = createFileRoute("/communication")({
 function Communication() {
   const frameRef = useRef<HTMLIFrameElement>(null);
   const [caption, setCaption] = useState("");
-  const navigate = useNavigate();
 
   useEffect(() => {
     const frame = frameRef.current;
@@ -171,12 +176,25 @@ function Communication() {
   useEffect(() => {
     const onSuccess = (event: Event) => {
       const detail = (event as CustomEvent<{ formId?: string }>).detail;
-      if (detail?.formId && detail.formId !== LICENSE_FORM_ID) return;
-      void navigate({ to: "/payment-selection" });
+      const formId = detail?.formId?.toLowerCase();
+      if (formId && formId !== LICENSE_FORM_ID) return;
+      goToPaymentSelection();
+    };
+    const onMessage = (event: MessageEvent) => {
+      const origin = event.origin || "";
+      if (!/hubspot|hsforms|hs-sites/i.test(origin)) return;
+      const data = event.data as { type?: string; eventName?: string; id?: string } | null;
+      if (!data || data.type !== "hsFormCallback" || data.eventName !== "onFormSubmitted") return;
+      if (data.id && data.id.toLowerCase() !== LICENSE_FORM_ID) return;
+      goToPaymentSelection();
     };
     window.addEventListener("hs-form-event:on-submission:success", onSuccess);
-    return () => window.removeEventListener("hs-form-event:on-submission:success", onSuccess);
-  }, [navigate]);
+    window.addEventListener("message", onMessage);
+    return () => {
+      window.removeEventListener("hs-form-event:on-submission:success", onSuccess);
+      window.removeEventListener("message", onMessage);
+    };
+  }, []);
 
   return (
     <main id="main-content" className="mx-auto max-w-3xl space-y-5 px-4 py-8 sm:px-6" tabIndex={-1}>
