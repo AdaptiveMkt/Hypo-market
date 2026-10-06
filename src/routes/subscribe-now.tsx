@@ -20,10 +20,10 @@ function SubscribeNow() {
         </p>
         <p className="mt-3 text-pretty font-semibold text-navy">Select Your Subscription Option.</p>
         <div className="mt-4 flex flex-wrap gap-2">
-          <a className={button} href="https://buy.stripe.com/6oU4gydFo8PkgO68zx4Ja01">
+          <a className={button} href="https://www.preserve-your-assets.com/payment-selection">
             Monthly Subscription ($9.98/month)
           </a>
-          <a className={button} href="https://buy.stripe.com/aFa5kC9p8e9E9lEg1Z4Ja00">
+          <a className={button} href="https://www.preserve-your-assets.com/payment-selection">
             Annual Subscription ($99/year)
           </a>
         </div>
