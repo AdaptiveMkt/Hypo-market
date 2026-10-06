@@ -7,6 +7,7 @@ import { PreviewHostBridge } from "@/components/preview-host-bridge";
 import { ScrollToHeaderOnLoad } from "@/components/scroll-to-header";
 import { ContentGuard } from "@/components/content-guard";
 import { ThemeToggle, useDarkMode } from "@/components/theme-toggle";
+import { SubscriptionLinks } from "@/components/subscription-links";
 import { CookieConsent } from "@/components/cookie-consent";
 import { HypoChatbot } from "@/components/hypo-chatbot";
 import { DisclosureTermsLink } from "@/components/disclosure-link";
@@ -14,34 +15,10 @@ import { CopyrightMark } from "@/components/source-links";
 import { HOLD_HARMLESS_ACK, HOLD_HARMLESS_SHORT } from "@/lib/disclaimer";
 import appCss from "../styles.css?url";
 
-function SubscriptionLinks() {
+function HeaderSubscriptions() {
   const path = useRouterState({ select: (s) => s.location.pathname });
-  const [show, setShow] = useState(false);
-  useEffect(() => {
-    if (path !== "/communication") return;
-    const reveal = () => setShow(true);
-    window.addEventListener("aum-license-reveal", reveal);
-    return () => window.removeEventListener("aum-license-reveal", reveal);
-  }, [path]);
-  if (path !== "/communication") return null;
-  const button =
-    "inline-flex h-11 items-center justify-center rounded-lg bg-teal px-4 text-center text-sm font-semibold text-cream hover:brightness-110";
-  return (
-    <div
-      className={`flex max-w-full flex-wrap items-center gap-2 overflow-hidden transition-all duration-700 ease-out ${
-        show ? "max-h-40 opacity-100" : "pointer-events-none max-h-0 opacity-0"
-      }`}
-      aria-hidden={!show}
-      inert={show ? undefined : true}
-    >
-      <a className={button} href="https://buy.stripe.com/6oU4gydFo8PkgO68zx4Ja01" tabIndex={show ? 0 : -1}>
-        Monthly Subscription ($9.98/month)
-      </a>
-      <a className={button} href="https://buy.stripe.com/aFa5kC9p8e9E9lEg1Z4Ja00" tabIndex={show ? 0 : -1}>
-        Annual Subscription ($99/year)
-      </a>
-    </div>
-  );
+  if (path !== "/commission-calculator") return null;
+  return <SubscriptionLinks />;
 }
 
 const APP_NAME = "Long Term Care Asset Utilization Modeling";
@@ -225,7 +202,7 @@ function Root() {
                   <div className="w-full max-w-xs">
                     <ThemeToggle />
                   </div>
-                  <SubscriptionLinks />
+                  <HeaderSubscriptions />
                 </div>
               </div>
             </header>

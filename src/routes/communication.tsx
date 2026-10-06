@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { fillLeadForm, reserveReportLink } from "@/lib/hubspot-report-link";
+import { SubscriptionLinks } from "@/components/subscription-links";
 
 const VIDEO_ID = "PPQW6w2RkaE";
 const EMBED_SRC = `https://www.youtube-nocookie.com/embed/${VIDEO_ID}?autoplay=1&rel=0&modestbranding=1&playsinline=1&enablejsapi=1`;
@@ -66,11 +67,6 @@ const CAPTIONS: { start: number; end: number; text: string }[] = [
 ];
 
 const LICENSE_FORM_ID = "6b36b610-ae40-4878-841e-384b0c07bc84";
-const CONCLUDE_AT = 88;
-
-function revealLicenseButtons() {
-  window.dispatchEvent(new Event("aum-license-reveal"));
-}
 
 function captionAt(time: number) {
   return CAPTIONS.find((cue) => time >= cue.start && time < cue.end)?.text ?? "";
@@ -99,7 +95,6 @@ function Communication() {
     const frame = frameRef.current;
     if (!frame) return;
     let dead = false;
-    let revealed = false;
     let started = false;
     const startedAt = Date.now();
 
@@ -139,10 +134,6 @@ function Communication() {
       if (data.info?.muted && Date.now() - startedAt < 5000) {
         command(frame, "unMute");
         command(frame, "setVolume", [100]);
-      }
-      if (!revealed && ((typeof time === "number" && time >= CONCLUDE_AT) || data.info?.playerState === 0)) {
-        revealed = true;
-        revealLicenseButtons();
       }
     };
 
@@ -213,6 +204,7 @@ function Communication() {
             {caption || "Closed captions show here, under the video, so they do not cover the picture."}
           </figcaption>
         </figure>
+        <SubscriptionLinks className="mt-4" />
         <div className="mt-4 min-w-0 rounded-lg bg-white p-3 text-navy" style={{ colorScheme: "light" }}>
           <div
             className="hs-form-frame min-h-40 min-w-0"
