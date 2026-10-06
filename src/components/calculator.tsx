@@ -154,7 +154,7 @@ import { WelcomeCard } from "@/components/welcome-card";
 import { FactFinder } from "@/components/fact-finder";
 import { HubspotAdvisorForm } from "@/components/hubspot-advisor-form";
 import { AudienceBanner, AudienceGate } from "@/components/audience-gate";
-import { clearQaCookie, readQaCookie, writeQaCookie, type AudienceRole } from "@/lib/qa-cookie";
+import { clearQaCookie, clearReturnLater, markReturnLater, readQaCookie, readReturnLater, writeQaCookie, type AudienceRole } from "@/lib/qa-cookie";
 import { ChartRegion, useNarrow } from "@/components/chart-region";
 import { defaultExcludableAssets, medicaidProfile } from "@/lib/medicaid";
 import {
@@ -322,6 +322,7 @@ export function Calculator() {
   const [finderGoto, setFinderGoto] = useState("");
   const [showFullForm, setShowFullForm] = useState(false);
   const [audience, setAudience] = useState<AudienceRole | null>(null);
+  const [returning, setReturning] = useState(false);
   const [advisorCleared, setAdvisorCleared] = useState(false);
   const [hubspotAdvisor, setHubspotAdvisor] = useState(false);
   const [booted, setBooted] = useState(false);
@@ -401,6 +402,7 @@ export function Calculator() {
 
   useEffect(() => {
     const saved = readQaCookie();
+    if (readReturnLater()) setReturning(true);
     if (saved?.audience === "licensed-client") setAudience(saved.audience);
     if (saved?.advisor) setAdvisor({ ...EMPTY_ADVISOR, ...saved.advisor });
     if (saved?.advisorCleared) setAdvisorCleared(true);
@@ -1187,6 +1189,7 @@ export function Calculator() {
     setFinderGoto("");
     setShowFullForm(false);
     setAudience(null);
+    setReturning(false);
     setAdvisorCleared(false);
     setHubspotAdvisor(false);
     themeBeforeIncognito.current = null;
@@ -1215,6 +1218,7 @@ export function Calculator() {
       /* ignore */
     }
     clearQaCookie();
+    clearReturnLater();
     window.setTimeout(() => scrollToHeader(false), 50);
   }
   function applyIncognito(on: boolean) {
@@ -1684,6 +1688,11 @@ export function Calculator() {
       {!showQuestions ? (
         !booted ? null : !audience ? (
           <AudienceGate
+            returning={returning}
+            onReturnLater={() => {
+              markReturnLater();
+              setReturning(true);
+            }}
             onSelect={(role) => {
               setAudience(role);
               setAdvisorCleared(false);
@@ -1708,7 +1717,7 @@ export function Calculator() {
       ) : (
       <>
       <AudienceBanner role={audience} />
-      <WelcomeCard onReset={resetAll} />
+      <WelcomeCard onReset={resetAll} returning={returning} />
       {showFullForm ? null : (
       <>
       {audience === "licensed-client" ? <AdvisorOnRun advisor={advisor} /> : null}

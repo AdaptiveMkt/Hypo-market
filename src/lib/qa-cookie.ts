@@ -43,6 +43,25 @@ export type QaSave = {
   protectPct: number;
 };
 
+const RETURN_NAME = "aum-return";
+
+export function readReturnLater(): boolean {
+  if (typeof document === "undefined") return false;
+  return document.cookie.split("; ").some((part) => part.startsWith(`${RETURN_NAME}=1`));
+}
+
+export function markReturnLater() {
+  if (typeof document === "undefined") return;
+  const secure = location.protocol === "https:" ? "; Secure" : "";
+  document.cookie = `${RETURN_NAME}=1; Path=/; Max-Age=${MAX_AGE}; SameSite=Lax${secure}`;
+}
+
+export function clearReturnLater() {
+  if (typeof document === "undefined") return;
+  const secure = location.protocol === "https:" ? "; Secure" : "";
+  document.cookie = `${RETURN_NAME}=; Path=/; Max-Age=0; SameSite=Lax${secure}`;
+}
+
 export function readQaCookie(): QaSave | null {
   if (typeof document === "undefined") return null;
   const row = document.cookie.split("; ").find((part) => part.startsWith(`${NAME}=`));

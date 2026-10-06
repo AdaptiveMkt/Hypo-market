@@ -18,7 +18,7 @@ const CAPTIONS: { start: number; end: number; text: string }[] = [
   { start: 77, end: 79.1, text: "Thank you." },
 ];
 
-export function WelcomeVideo({ onStart }: { onStart?: () => void }) {
+export function WelcomeVideo({ onStart, onReturnLater }: { onStart?: () => void; onReturnLater?: () => void }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [caption, setCaption] = useState("");
   const [sound, setSound] = useState<"starting" | "on" | "tap">("starting");
@@ -179,12 +179,21 @@ export function WelcomeVideo({ onStart }: { onStart?: () => void }) {
         >
           Email info@preserve-your-assets.com
         </a>
+        {onReturnLater ? (
+          <button
+            type="button"
+            className="rounded-lg bg-teal px-4 py-2.5 text-sm font-semibold text-cream hover:brightness-110"
+            onClick={onReturnLater}
+          >
+            Return Later
+          </button>
+        ) : null}
       </div>
     </figure>
   );
 }
 
-export function WelcomeCard({ onReset }: { onReset?: () => void }) {
+export function WelcomeCard({ onReset, returning }: { onReset?: () => void; returning?: boolean }) {
   return (
     <section className="card-xl min-w-0 p-4 md:p-5" aria-labelledby="welcome-heading">
       <div className="flex items-center justify-between gap-3">
@@ -200,7 +209,7 @@ export function WelcomeCard({ onReset }: { onReset?: () => void }) {
         ) : null}
       </div>
       <h2 id="welcome-heading" className="font-display text-xl text-navy">
-        {WELCOME_HEADING}
+        {returning ? "Welcome Back" : WELCOME_HEADING}
       </h2>
       <p className="mt-3 text-sm leading-relaxed text-muted">{WELCOME_BODY}</p>
     </section>
