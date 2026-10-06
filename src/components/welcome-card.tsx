@@ -157,37 +157,35 @@ export function WelcomeVideo({ onStart, onReturnLater }: { onStart?: () => void;
             ? "Playing. Tap the page once to turn the sound on."
             : "Closed captions show here, under the video, so they do not cover the picture.")}
       </figcaption>
-      <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+      <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-4">
         {onStart ? (
           <button
             type="button"
-            className="rounded-lg border border-navy bg-navy px-4 py-2.5 text-sm font-semibold text-cream hover:bg-teal"
+            className="rounded-lg border border-navy bg-navy px-3 py-2.5 text-center text-sm font-semibold text-cream hover:bg-teal"
             onClick={onStart}
           >
             Start the hypothetical
           </button>
         ) : null}
         <a
-          className="rounded-lg border border-navy px-4 py-2.5 text-center text-sm font-semibold text-navy hover:bg-cream"
+          className="rounded-lg border border-navy px-3 py-2.5 text-center text-sm font-semibold text-navy hover:bg-cream"
           href="tel:+13217957516"
         >
           Call or text 321-795-7516
         </a>
         <a
-          className="rounded-lg border border-navy px-4 py-2.5 text-center text-sm font-semibold text-navy hover:bg-cream"
+          className="rounded-lg border border-navy px-3 py-2.5 text-center text-sm font-semibold text-navy hover:bg-cream"
           href="mailto:info@preserve-your-assets.com"
         >
           Email info@preserve-your-assets.com
         </a>
-        {onReturnLater ? (
-          <button
-            type="button"
-            className="rounded-lg bg-teal px-4 py-2.5 text-sm font-semibold text-cream hover:brightness-110"
-            onClick={onReturnLater}
-          >
-            Return Later
-          </button>
-        ) : null}
+        <button
+          type="button"
+          className="rounded-lg border border-[#0072b2] bg-[#0072b2] px-3 py-2.5 text-center text-sm font-semibold text-white hover:brightness-110"
+          onClick={onReturnLater}
+        >
+          Return Later
+        </button>
       </div>
     </figure>
   );
