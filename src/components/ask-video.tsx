@@ -60,7 +60,9 @@ export function AskVideo() {
     let dropGesture = () => {};
     video.playsInline = true;
     video.muted = true;
+    video.defaultMuted = true;
     video.volume = 1;
+    video.autoplay = true;
 
     const clearGesture = () => {
       dropGesture();
@@ -78,28 +80,56 @@ export function AskVideo() {
       window.addEventListener("pointerdown", go);
       dropGesture = () => window.removeEventListener("pointerdown", go);
     };
-
-    void video
-      .play()
-      .then(() => {
-        if (dead) return;
-        video.muted = false;
-        if (!video.paused && !video.muted) {
+    const keepPlaying = () => {
+      if (dead || !video.paused) return;
+      video.muted = true;
+      void video.play().catch(() => undefined);
+    };
+    const trySound = () => {
+      if (dead) return;
+      video.muted = false;
+      video.volume = 1;
+      void video
+        .play()
+        .then(() => {
+          if (dead) return;
+          if (video.paused || video.muted) {
+            keepPlaying();
+            setSound("tap");
+            armGesture();
+            return;
+          }
           setSound("on");
-          return;
-        }
-        setSound("tap");
-        armGesture();
-      })
-      .catch(() => {
-        if (dead) return;
-        setSound("tap");
-        armGesture();
-      });
+        })
+        .catch(() => {
+          if (dead) return;
+          keepPlaying();
+          setSound("tap");
+          armGesture();
+        });
+    };
+    const start = () => {
+      if (dead) return;
+      video.muted = true;
+      void video
+        .play()
+        .then(() => {
+          if (!dead) trySound();
+        })
+        .catch(() => {
+          if (dead) return;
+          setSound("tap");
+          armGesture();
+        });
+    };
+
+    if (video.readyState >= 2) start();
+    else video.addEventListener("canplay", start);
 
     return () => {
       dead = true;
       clearGesture();
+      video.removeEventListener("canplay", start);
       video.pause();
     };
   }, []);
@@ -111,6 +141,7 @@ export function AskVideo() {
         className="block w-full rounded-lg bg-navy"
         controls
         autoPlay
+        muted
         playsInline
         preload="auto"
         poster="/commission/ask-and-you-get-poster.jpg?v=1"
