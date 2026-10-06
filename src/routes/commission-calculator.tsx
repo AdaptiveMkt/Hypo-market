@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { AskVideo } from "@/components/ask-video";
 import { INFLATION_BY_AGE } from "@/lib/what-consumers-buy";
 import { moneyCents } from "@/lib/utils";
 
@@ -149,6 +150,7 @@ function CommissionCalculator() {
 
   return (
     <main id="main-content" className="mx-auto max-w-5xl space-y-5 px-4 py-8 sm:px-6" tabIndex={-1}>
+      <AskVideo />
       <section className="card-xl p-5">
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-teal">Advisor illustration</p>
         <h1 className="mt-1 font-display text-2xl text-navy">Commission calculator</h1>
