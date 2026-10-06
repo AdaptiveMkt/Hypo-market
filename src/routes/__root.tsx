@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createRootRoute, HeadContent, Link, Outlet, Scripts, useRouterState } from "@tanstack/react-router";
+import { createRootRoute, HeadContent, Link, Outlet, Scripts, useNavigate, useRouterState } from "@tanstack/react-router";
 import { AuthProvider } from "@/lib/auth/provider";
 import { PreviewHostBridge } from "@/components/preview-host-bridge";
 import { ScrollToHeaderOnLoad } from "@/components/scroll-to-header";
@@ -13,12 +13,29 @@ import { HypoChatbot } from "@/components/hypo-chatbot";
 import { DisclosureTermsLink } from "@/components/disclosure-link";
 import { CopyrightMark } from "@/components/source-links";
 import { HOLD_HARMLESS_ACK, HOLD_HARMLESS_SHORT } from "@/lib/disclaimer";
+import { markReturnLater } from "@/lib/qa-cookie";
 import appCss from "../styles.css?url";
 
 function HeaderSubscriptions() {
   const path = useRouterState({ select: (s) => s.location.pathname });
   if (path !== "/commission-calculator") return null;
   return <SubscriptionLinks />;
+}
+
+function HeaderReturnLater() {
+  const navigate = useNavigate();
+  return (
+    <button
+      type="button"
+      className="inline-flex h-11 items-center justify-center rounded-lg bg-[#0072b2] px-4 text-sm font-semibold text-white hover:brightness-110"
+      onClick={() => {
+        markReturnLater();
+        void navigate({ to: "/commission-calculator" });
+      }}
+    >
+      Return Later
+    </button>
+  );
 }
 
 const APP_NAME = "Long Term Care Asset Utilization Modeling";
@@ -202,6 +219,7 @@ function Root() {
                   <div className="w-full max-w-xs">
                     <ThemeToggle />
                   </div>
+                  <HeaderReturnLater />
                   <HeaderSubscriptions />
                 </div>
               </div>
