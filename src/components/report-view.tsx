@@ -518,7 +518,7 @@ export function ReportView({
     const panels = Array.from(root.querySelectorAll<HTMLElement>("[data-review-tab]"));
     if (panels.length < 2) return;
     const list = document.createElement("div");
-    list.className = "report-tablist no-print";
+    list.className = "report-tablist report-tablist-fit no-print";
     list.setAttribute("role", "tablist");
     list.setAttribute("aria-label", "Review inputs");
     const buttons: HTMLButtonElement[] = [];
