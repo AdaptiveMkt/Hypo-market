@@ -452,7 +452,8 @@ export function ReportView({
     if (panels.length < 2) return;
 
     const titleOf = (panel: HTMLElement) => {
-      const heading = panel.querySelector("h2, summary .font-display");
+      if (panel.hasAttribute("data-medicaid-fold")) return "Medicaid Planning";
+      const heading = panel.querySelector(":scope > summary h2, :scope > summary .font-display, h2");
       return (heading?.textContent || "Section")
         .replace(/\s+/g, " ")
         .trim()
@@ -2644,7 +2645,7 @@ export function ReportView({
 
         {policy.enabled ? <NaicLastPages afterDesignation={
           <section id="medicaid-information" className="report-block scroll-mt-28" data-medicaid-fold data-medicaid-open={medicaidSelected ? "1" : "0"}>
-            <TitleCollapse title="Medicaid Information" className="mt-3" defaultOpen={false} openOnHash="medicaid-information" onOpenChange={setMedicaidSelected}>
+            <TitleCollapse title="Medicaid Planning" className="mt-3" defaultOpen={false} openOnHash="medicaid-information" onOpenChange={setMedicaidSelected}>
               <MedicaidVaBody
                 state={state}
                 policy={policy}
@@ -2660,7 +2661,7 @@ export function ReportView({
         <>
         <DesignationNoticeFold className="report-block mt-0" />
         <section id="medicaid-information" className="report-block scroll-mt-28" data-medicaid-fold data-medicaid-open={medicaidSelected ? "1" : "0"}>
-          <TitleCollapse title="Medicaid Information" className="mt-0" defaultOpen={false} openOnHash="medicaid-information" onOpenChange={setMedicaidSelected}>
+          <TitleCollapse title="Medicaid Planning" className="mt-0" defaultOpen={false} openOnHash="medicaid-information" onOpenChange={setMedicaidSelected}>
             <MedicaidVaBody
               state={state}
               policy={policy}
