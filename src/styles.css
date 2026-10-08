@@ -852,6 +852,14 @@ details.report-fold > summary h2 {
     padding: 0;
     background: transparent;
   }
+
+  [data-review-tab]:not([data-tab-active="1"]) {
+    display: none;
+  }
+
+  [data-review-tab][data-tab-active="1"] > details > summary {
+    display: none;
+  }
 }
 
 html.pdf-capture .report-tablist {
@@ -859,6 +867,10 @@ html.pdf-capture .report-tablist {
 }
 
 html.pdf-capture [data-fold-region].is-tabbed [data-tab-panel] {
+  display: block !important;
+}
+
+html.pdf-capture [data-review-tab] {
   display: block !important;
 }
 
@@ -1177,6 +1189,10 @@ html.pdf-capture #aum-report .tabular-nums.font-bold.amt-green {
 
   [data-fold-region].is-tabbed [data-tab-panel] > summary {
     pointer-events: auto !important;
+  }
+
+  [data-review-tab] {
+    display: block !important;
   }
 
   details.print-show {

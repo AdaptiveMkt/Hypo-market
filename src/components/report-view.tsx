@@ -511,6 +511,49 @@ export function ReportView({
       });
     };
   }, []);
+
+  useEffect(() => {
+    const root = reportRef.current;
+    if (!root) return;
+    const panels = Array.from(root.querySelectorAll<HTMLElement>("[data-review-tab]"));
+    if (panels.length < 2) return;
+    const list = document.createElement("div");
+    list.className = "report-tablist no-print";
+    list.setAttribute("role", "tablist");
+    list.setAttribute("aria-label", "Review inputs");
+    const buttons: HTMLButtonElement[] = [];
+    const show = (index: number) => {
+      panels.forEach((panel, i) => {
+        const on = i === index;
+        panel.dataset.tabActive = on ? "1" : "0";
+        const det = panel.querySelector("details");
+        if (det instanceof HTMLDetailsElement) det.open = on;
+      });
+      buttons.forEach((button, i) => {
+        const on = i === index;
+        button.setAttribute("aria-selected", on ? "true" : "false");
+        button.tabIndex = on ? 0 : -1;
+      });
+    };
+    panels.forEach((panel, i) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "report-tab";
+      button.setAttribute("role", "tab");
+      button.textContent = (panel.querySelector("summary")?.textContent || "Section").replace(/\s+/g, " ").trim();
+      button.addEventListener("click", () => show(i));
+      list.appendChild(button);
+      buttons.push(button);
+    });
+    panels[0].before(list);
+    show(0);
+    return () => {
+      list.remove();
+      panels.forEach((panel) => {
+        delete panel.dataset.tabActive;
+      });
+    };
+  }, []);
   const linkedScenarios = useMemo(() => {
     if (!policy.enabled || !isLinkedKind(policy.kind)) return [];
     const holdings = holdingsFrom(assets, assetRois ?? DEFAULT_ASSET_ROIS, excludeHome);
@@ -796,11 +839,7 @@ export function ReportView({
           ));
         })()}
 
-        <section className="report-block">
-          <details>
-            <summary className="no-print inline-flex min-h-11 cursor-pointer list-none items-center justify-center rounded-lg bg-teal px-4 py-2.5 text-center text-sm font-semibold text-cream hover:brightness-110 [&::-webkit-details-marker]:hidden [&::marker]:content-none">
-              Review LTC Planning Considerations
-            </summary>
+        <section className="report-block" data-review-tab>
             <h2 className="mb-3 mt-4 font-display text-xl text-navy">Recommendations to consider</h2>
             <ol className="list-decimal space-y-3 pl-5 text-sm leading-relaxed">
               {recommendations.map((r) => (
@@ -810,11 +849,7 @@ export function ReportView({
           </details>
         </section>
 
-        <section className="report-block">
-          <details className="print-page-start">
-            <summary className="no-print inline-flex min-h-11 cursor-pointer list-none items-center justify-center rounded-lg bg-teal px-4 py-2.5 text-center text-sm font-semibold text-cream hover:brightness-110 [&::-webkit-details-marker]:hidden [&::marker]:content-none">
-              REVIEW INPUT — Countable assets
-            </summary>
+        <section className="report-block" data-review-tab>
             <h2 className="mb-3 mt-4 font-display text-xl text-navy">
               1. Countable assets at risk — answers
             </h2>
@@ -888,11 +923,7 @@ export function ReportView({
         </section>
         ) : null}
 
-        <section className="report-block">
-          <details>
-            <summary className="no-print inline-flex min-h-11 cursor-pointer list-none items-center justify-center rounded-lg bg-teal px-4 py-2.5 text-center text-sm font-semibold text-cream hover:brightness-110 [&::-webkit-details-marker]:hidden [&::marker]:content-none">
-              REVIEW INPUT — Care assumptions
-            </summary>
+        <section className="report-block" data-review-tab>
             <h2 className="mb-3 mt-4 font-display text-xl text-navy">
               2. Care assumptions — answers
             </h2>
@@ -956,11 +987,7 @@ export function ReportView({
           </details>
         </section>
 
-        <section className="report-block">
-          <details>
-            <summary className="no-print inline-flex min-h-11 cursor-pointer list-none items-center justify-center rounded-lg bg-teal px-4 py-2.5 text-center text-sm font-semibold text-cream hover:brightness-110 [&::-webkit-details-marker]:hidden [&::marker]:content-none">
-              REVIEW INPUT — Insurance
-            </summary>
+        <section className="report-block" data-review-tab>
             <h2 className="mb-3 mt-4 font-display text-xl text-navy">
               3. Insurance — answers
             </h2>
