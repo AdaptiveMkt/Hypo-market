@@ -1285,7 +1285,7 @@ export function ReportView({
             Select a tab to view that section. Print to PDF is on the report link.
           </p>
         </section>
-        <div data-fold-region className="flex flex-col">
+        <div data-fold-region className="w-full min-w-0 max-w-full">
 
         {details.yearByYear
           ? yearSets.map((set) => {
