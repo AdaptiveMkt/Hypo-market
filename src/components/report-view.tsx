@@ -427,6 +427,89 @@ export function ReportView({
     nodes.forEach((n) => n.addEventListener("toggle", onToggle));
     return () => nodes.forEach((n) => n.removeEventListener("toggle", onToggle));
   }, []);
+
+  useEffect(() => {
+    const region = reportRef.current?.querySelector<HTMLElement>("[data-fold-region]");
+    if (!region) return;
+    const panels: HTMLElement[] = [];
+    const seen = new Set<HTMLElement>();
+    const add = (el: Element | null) => {
+      if (!(el instanceof HTMLElement) || seen.has(el)) return;
+      if (el.closest("details.report-fold") && !el.classList.contains("report-fold")) return;
+      seen.add(el);
+      panels.push(el);
+    };
+    region.querySelectorAll(":scope > details.report-fold").forEach(add);
+    region.querySelectorAll(":scope > section details, :scope > details").forEach((el) => {
+      if (!(el instanceof HTMLElement) || el.classList.contains("report-fold")) return;
+      if (el.closest("details.report-fold") || el.parentElement?.closest("details")) return;
+      add(el);
+    });
+    region.querySelectorAll("[data-medicaid-fold]").forEach((el) => {
+      if (el.closest("details.report-fold")) return;
+      add(el);
+    });
+    if (panels.length < 2) return;
+
+    const titleOf = (panel: HTMLElement) => {
+      const heading = panel.querySelector("h2, summary .font-display");
+      return (heading?.textContent || "Section")
+        .replace(/\s+/g, " ")
+        .trim()
+        .replace(/\s*\(View how funds are used\)\s*$/i, "");
+    };
+    const stopSummary = (event: Event) => event.preventDefault();
+    const list = document.createElement("div");
+    list.className = "report-tablist no-print";
+    list.setAttribute("role", "tablist");
+    list.setAttribute("aria-label", "Report sections");
+    const buttons: HTMLButtonElement[] = [];
+
+    const show = (index: number) => {
+      panels.forEach((panel, i) => {
+        const on = i === index;
+        panel.dataset.tabPanel = "1";
+        panel.dataset.tabActive = on ? "1" : "0";
+        if (panel instanceof HTMLDetailsElement) panel.open = on;
+        if (!on) return;
+        const toggle = panel.querySelector<HTMLButtonElement>("button[aria-expanded='false']");
+        toggle?.click();
+      });
+      buttons.forEach((button, i) => {
+        const on = i === index;
+        button.setAttribute("aria-selected", on ? "true" : "false");
+        button.tabIndex = on ? 0 : -1;
+      });
+      window.dispatchEvent(new Event("resize"));
+    };
+
+    panels.forEach((panel, i) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "report-tab";
+      button.setAttribute("role", "tab");
+      button.id = `report-tab-${i}`;
+      button.textContent = titleOf(panel);
+      button.addEventListener("click", () => show(i));
+      list.appendChild(button);
+      buttons.push(button);
+      panel.querySelector(":scope > summary")?.addEventListener("click", stopSummary);
+    });
+
+    region.classList.add("is-tabbed");
+    region.prepend(list);
+    show(0);
+
+    return () => {
+      list.remove();
+      region.classList.remove("is-tabbed");
+      panels.forEach((panel) => {
+        delete panel.dataset.tabPanel;
+        delete panel.dataset.tabActive;
+        panel.querySelector(":scope > summary")?.removeEventListener("click", stopSummary);
+      });
+    };
+  }, []);
   const linkedScenarios = useMemo(() => {
     if (!policy.enabled || !isLinkedKind(policy.kind)) return [];
     const holdings = holdingsFrom(assets, assetRois ?? DEFAULT_ASSET_ROIS, excludeHome);
@@ -1154,9 +1237,8 @@ export function ReportView({
         <section className="report-block print-page-start">
           <h2 className="font-display text-xl text-navy">Instructions</h2>
           <p className="mt-2 text-sm text-muted">
-            Sections from Year-by-year through the end of this report start closed on this screen.
-            Open a title to view that section. Print to PDF is on the report link.
-            A section you open there is already selected for the PDF. A section you leave closed is not included unless you check it.
+            Sections from Year-by-year through the end of this report are tabs.
+            Select a tab to view that section. Print to PDF is on the report link.
           </p>
         </section>
         <div data-fold-region className="flex flex-col">
