@@ -26,7 +26,7 @@ export function DomainNote({ className = "" }: { className?: string }) {
         rel="noopener noreferrer"
         className="text-[10pt] leading-snug text-teal underline underline-offset-2"
       >
-        (*) Publications require an existing or new domain purchased separately.
+        Publications require an existing or new domain purchased separately.
       </a>
     </p>
   );
