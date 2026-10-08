@@ -840,6 +840,10 @@ export function ReportView({
         })()}
 
         <section className="report-block" data-review-tab>
+          <details>
+            <summary className="no-print inline-flex min-h-11 cursor-pointer list-none items-center justify-center rounded-lg bg-teal px-4 py-2.5 text-center text-sm font-semibold text-cream hover:brightness-110 [&::-webkit-details-marker]:hidden [&::marker]:content-none">
+              Review LTC Planning Considerations
+            </summary>
             <h2 className="mb-3 mt-4 font-display text-xl text-navy">Recommendations to consider</h2>
             <ol className="list-decimal space-y-3 pl-5 text-sm leading-relaxed">
               {recommendations.map((r) => (
@@ -850,6 +854,10 @@ export function ReportView({
         </section>
 
         <section className="report-block" data-review-tab>
+          <details className="print-page-start">
+            <summary className="no-print inline-flex min-h-11 cursor-pointer list-none items-center justify-center rounded-lg bg-teal px-4 py-2.5 text-center text-sm font-semibold text-cream hover:brightness-110 [&::-webkit-details-marker]:hidden [&::marker]:content-none">
+              REVIEW INPUT — Countable assets
+            </summary>
             <h2 className="mb-3 mt-4 font-display text-xl text-navy">
               1. Countable assets at risk — answers
             </h2>
@@ -924,6 +932,10 @@ export function ReportView({
         ) : null}
 
         <section className="report-block" data-review-tab>
+          <details>
+            <summary className="no-print inline-flex min-h-11 cursor-pointer list-none items-center justify-center rounded-lg bg-teal px-4 py-2.5 text-center text-sm font-semibold text-cream hover:brightness-110 [&::-webkit-details-marker]:hidden [&::marker]:content-none">
+              REVIEW INPUT — Care assumptions
+            </summary>
             <h2 className="mb-3 mt-4 font-display text-xl text-navy">
               2. Care assumptions — answers
             </h2>
@@ -988,6 +1000,10 @@ export function ReportView({
         </section>
 
         <section className="report-block" data-review-tab>
+          <details>
+            <summary className="no-print inline-flex min-h-11 cursor-pointer list-none items-center justify-center rounded-lg bg-teal px-4 py-2.5 text-center text-sm font-semibold text-cream hover:brightness-110 [&::-webkit-details-marker]:hidden [&::marker]:content-none">
+              REVIEW INPUT — Insurance
+            </summary>
             <h2 className="mb-3 mt-4 font-display text-xl text-navy">
               3. Insurance — answers
             </h2>
