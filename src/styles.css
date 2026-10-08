@@ -794,6 +794,36 @@ details.report-fold > summary h2 {
 
   .report-tablist {
     display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 0.25rem 0 1rem;
+  }
+
+  .report-tab {
+    max-width: 100%;
+    border: 1px solid var(--color-teal);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--color-navy);
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    line-height: 1.3;
+    text-align: left;
+    cursor: pointer;
+    white-space: normal;
+  }
+
+  .report-tab:hover {
+    background: color-mix(in srgb, var(--color-teal) 12%, transparent);
+  }
+
+  .report-tab[aria-selected="true"] {
+    background: var(--color-teal);
+    color: var(--color-cream);
+  }
+
+  .report-tablist-fit {
     flex-wrap: nowrap;
     align-items: center;
     gap: 0.35rem;
@@ -808,32 +838,17 @@ details.report-fold > summary h2 {
     scrollbar-width: thin;
   }
 
-  .report-tab {
+  .report-tablist-fit .report-tab {
     flex: 0 0 auto;
     width: auto;
     max-width: none;
     white-space: nowrap;
-    border: 1px solid transparent;
-    border-radius: 999px;
-    background: transparent;
-    color: var(--color-navy);
+    border-color: transparent;
     padding: 0.55rem 0.9rem;
     min-height: 2.5rem;
-    font-size: 0.8125rem;
     font-weight: 700;
     line-height: 1.2;
     text-align: center;
-    cursor: pointer;
-  }
-
-  .report-tab:hover {
-    background: color-mix(in srgb, var(--color-teal) 14%, transparent);
-  }
-
-  .report-tab[aria-selected="true"] {
-    background: var(--color-teal);
-    border-color: var(--color-teal);
-    color: var(--color-cream);
   }
 
   @media (min-width: 768px) {
