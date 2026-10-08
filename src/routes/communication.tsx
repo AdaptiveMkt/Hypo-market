@@ -175,24 +175,14 @@ function Communication() {
 
   useEffect(() => {
     const onSuccess = (event: Event) => {
-      const detail = (event as CustomEvent<{ formId?: string }>).detail;
-      const formId = detail?.formId?.toLowerCase();
+      const detail = (event as CustomEvent<{ formId?: string; formGuid?: string; id?: string }>).detail;
+      const formId = String(detail?.formId || detail?.formGuid || detail?.id || "").toLowerCase();
       if (formId && formId !== LICENSE_FORM_ID) return;
       goToPaymentSelection();
     };
-    const onMessage = (event: MessageEvent) => {
-      const origin = event.origin || "";
-      if (!/hubspot|hsforms|hs-sites/i.test(origin)) return;
-      const data = event.data as { type?: string; eventName?: string; id?: string } | null;
-      if (!data || data.type !== "hsFormCallback" || data.eventName !== "onFormSubmitted") return;
-      if (data.id && data.id.toLowerCase() !== LICENSE_FORM_ID) return;
-      goToPaymentSelection();
-    };
-    window.addEventListener("hs-form-event:on-submission:success", onSuccess);
-    window.addEventListener("message", onMessage);
+    document.addEventListener("hs-form-event:on-submission:success", onSuccess, true);
     return () => {
-      window.removeEventListener("hs-form-event:on-submission:success", onSuccess);
-      window.removeEventListener("message", onMessage);
+      document.removeEventListener("hs-form-event:on-submission:success", onSuccess, true);
     };
   }, []);
 
