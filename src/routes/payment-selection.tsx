@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { DomainNote } from "@/components/subscription-links";
 
 const MONTHLY = "https://buy.stripe.com/6oU4gydFo8PkgO68zx4Ja01";
 const ANNUAL = "https://buy.stripe.com/aFa5kC9p8e9E9lEg1Z4Ja00";
@@ -66,6 +67,7 @@ function PaymentSelection() {
           windowName="pay-annual"
         />
       </div>
+      <DomainNote className="mx-auto mt-4 max-w-4xl text-center" />
       <p className="mx-auto mt-4 max-w-4xl text-pretty text-center text-sm text-muted">
         The monthly subscription is $9.98 per month and continues until you cancel. You may cancel at any
         time. Cancellation stops future monthly charges. A month already billed is not refunded. The annual

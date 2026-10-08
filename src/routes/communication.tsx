@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { fillLeadForm, reserveReportLink } from "@/lib/hubspot-report-link";
-import { SubscriptionLinks } from "@/components/subscription-links";
+import { SubscriptionLinks, DomainNote } from "@/components/subscription-links";
 
 const VIDEO_ID = "PPQW6w2RkaE";
 const EMBED_SRC = `https://www.youtube-nocookie.com/embed/${VIDEO_ID}?autoplay=1&rel=0&modestbranding=1&playsinline=1&enablejsapi=1`;
@@ -223,6 +223,7 @@ function Communication() {
           </figcaption>
         </figure>
         <SubscriptionLinks className="mt-4" />
+        <DomainNote className="mt-2" />
         <div className="mt-4 min-w-0 rounded-lg bg-white p-3 text-navy" style={{ colorScheme: "light" }}>
           <div
             className="hs-form-frame min-h-40 min-w-0"
