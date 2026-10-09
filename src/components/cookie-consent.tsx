@@ -33,8 +33,9 @@ export function CookieConsent() {
         </h2>
         <p id="cookie-consent-body" className="mt-2 text-sm leading-relaxed text-navy">
           A necessary cookie keeps your fact-finder answers on this device if you leave and come back.
-          An optional analytics cookie (Google Analytics) shows which pages are used. We do not use
-          advertising cookies.{" "}
+          An optional analytics cookie (Google Analytics) shows which pages are used. A Meta pixel
+          measures visits from Adaptive Marketing Group ads. Essential only stops further ad
+          measurement after this page.{" "}
           <a href="/copyright#privacy-policy" className="font-semibold text-teal underline underline-offset-2">
             Privacy
           </a>

@@ -9,6 +9,7 @@ import { ContentGuard } from "@/components/content-guard";
 import { ThemeToggle, useDarkMode } from "@/components/theme-toggle";
 import { SubscriptionLinks } from "@/components/subscription-links";
 import { CookieConsent } from "@/components/cookie-consent";
+import { MetaPixel } from "@/components/meta-pixel";
 import { HypoChatbot } from "@/components/hypo-chatbot";
 import { DisclosureTermsLink } from "@/components/disclosure-link";
 import { CopyrightMark } from "@/components/source-links";
@@ -126,6 +127,9 @@ export const Route = createRootRoute({
       {
         async: true,
         src: "https://www.googletagmanager.com/gtag/js?id=G-C34YXPEQM1",
+      },
+      {
+        children: `(function(){var id="1851734376258650";!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version="2.0";n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,"script","https://connect.facebook.net/en_US/fbevents.js");var choice="";try{var m=document.cookie.match(/(?:^|; )aum-consent=([^;]+)/);if(m)choice=decodeURIComponent(m[1]);}catch(e){}if(choice==="essential")fbq("consent","revoke");fbq("init",id);if(choice!=="essential")fbq("track","PageView");})();`,
       },
       {
         children: `(function(){var ADVISOR="20f78d66-2c90-479e-b20c-b92d5939d396";var LICENSE="6b36b610-ae40-4878-841e-384b0c07bc84";function reportUrl(){var key="aum-report-code",existing="";try{existing=sessionStorage.getItem(key)||"";}catch(e){}if(!/^[a-z0-9]{16}$/.test(existing)){var alphabet="abcdefghijkmnopqrstuvwxyz23456789",bytes=new Uint8Array(16);crypto.getRandomValues(bytes);existing=Array.from(bytes,function(b){return alphabet[b%alphabet.length];}).join("");try{sessionStorage.setItem(key,existing);}catch(e){}}return "https://preserve-your-assets.com/incognito-"+existing;}function apply(event){try{var detail=(event&&event.detail)||{};var formId=detail.formId||"";if(formId&&formId!==ADVISOR&&formId!==LICENSE)return;var hs=window.HubSpotFormsV4;if(!hs)return;var url=reportUrl();var forms=[];if(hs.getFormFromEvent){var one=hs.getFormFromEvent(event);if(one)forms.push(one);}if(hs.getForms)forms=forms.concat(hs.getForms()||[]);function idOf(form){try{return(form.getFormId&&form.getFormId())||form.formId||"";}catch(e){return"";}}function keyOf(name){return String(name||"").split("/").pop().replace(/[\s_|-]+/g,"").toLowerCase();}function write(form,name){try{form.setFieldValue(name,[url]);}catch(e){try{form.setFieldValue(name,url);}catch(err){}}}function stamp(form,kind){if(!form||!form.setFieldValue)return;if(kind==="advisor")write(form,"0-1/landing_page");else{write(form,"0-1/lead_form");write(form,"lead_form");}if(!form.getFormFieldValues)return;form.getFormFieldValues().then(function(rows){(rows||[]).forEach(function(row){var name=String((row&&row.name)||"");var key=keyOf(name);if(kind==="advisor"&&key==="landingpage")write(form,name);if(kind==="license"&&key==="leadform")write(form,name);});}).catch(function(){});}forms.forEach(function(form){var id=idOf(form)||formId;if(id===ADVISOR)stamp(form,"advisor");else if(id===LICENSE)stamp(form,"license");else if(!id){stamp(form,"advisor");stamp(form,"license");}});}catch(e){}}window.addEventListener("hs-form-event:on-ready",apply);window.addEventListener("hs-form-event:on-interaction:navigate",apply);})();`,
@@ -253,6 +257,7 @@ function Root() {
               </p>
             </section>
             {campaign ? null : <HypoChatbot />}
+            <MetaPixel />
             <CookieConsent />
             <footer className="bg-masthead px-4 py-5 text-center text-sm text-masthead-fg sm:text-left">
               <div className="mx-auto flex max-w-6xl flex-col items-center gap-3 sm:flex-row sm:items-center sm:justify-between">

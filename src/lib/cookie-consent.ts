@@ -5,9 +5,20 @@ export type ConsentChoice = "analytics" | "essential";
 
 type Gtag = (...args: unknown[]) => void;
 
+declare global {
+  interface Window {
+    fbq?: (...args: unknown[]) => void;
+  }
+}
+
 function gtag(): Gtag | undefined {
   if (typeof window === "undefined") return undefined;
   return (window as Window & { gtag?: Gtag }).gtag;
+}
+
+function fbq(): ((...args: unknown[]) => void) | undefined {
+  if (typeof window === "undefined") return undefined;
+  return window.fbq;
 }
 
 export function readConsent(): ConsentChoice | null {
@@ -28,4 +39,9 @@ export function writeConsent(choice: ConsentChoice) {
     ad_user_data: "denied",
     ad_personalization: "denied",
   });
+  if (choice === "essential") fbq()?.("consent", "revoke");
+  else {
+    fbq()?.("consent", "grant");
+    fbq()?.("track", "PageView");
+  }
 }

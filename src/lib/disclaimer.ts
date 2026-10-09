@@ -106,7 +106,7 @@ export const PRIVACY_POLICY_PARAS = [
   },
   {
     heading: "Cookies, local storage, and hosting",
-    body: "A necessary cookie (aum-qa) keeps fact-finder answers on this device so a return visit can continue the same hypothetical. Reset clears it. A separate cookie (aum-consent) stores your cookie choice. Google Analytics loads only if you choose Accept analytics. Until then, analytics storage stays denied. We do not use advertising cookies. Display preferences such as dark mode stay in localStorage on your device. Hosting is used to deliver the page.",
+    body: "A necessary cookie (aum-qa) keeps fact-finder answers on this device so a return visit can continue the same hypothetical. Reset clears it. A separate cookie (aum-consent) stores your cookie choice. Google Analytics loads only if you choose Accept analytics. A Meta pixel (1851734376258650) measures visits from Adaptive Marketing Group ads, including the campaign page. Essential only stops further advertising measurement after that choice. Display preferences such as dark mode stay in localStorage on your device. Hosting is used to deliver the page.",
   },
   {
     heading: "Sharing and retention",
