@@ -150,6 +150,8 @@ export const Route = createRootRoute({
 
 function Root() {
   const dark = useDarkMode();
+  const path = useRouterState({ select: (s) => s.location.pathname });
+  const campaign = path === "/start";
   return (
     <html lang="en" className={dark ? "antialiased dark" : "antialiased"} suppressHydrationWarning>
       <head>
@@ -164,6 +166,19 @@ function Root() {
               Skip to main content
             </a>
             <header id="page-header" className="bg-masthead text-masthead-fg">
+              {campaign ? (
+                <div className="mx-auto flex max-w-3xl items-center justify-between gap-3 px-4 py-4 sm:px-6">
+                  <Link to="/start" aria-label="Preserve Your Assets" className="shrink-0 rounded-lg">
+                    <img src="/brand-icon.svg" alt="" width={44} height={44} className="h-11 w-11 rounded-lg" />
+                  </Link>
+                  <a
+                    href="/"
+                    className="inline-flex min-h-11 items-center justify-center rounded-lg bg-[#0072b2] px-4 text-sm font-semibold text-white hover:brightness-110"
+                  >
+                    Run the assessment
+                  </a>
+                </div>
+              ) : (
               <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex min-w-0 items-center gap-3">
@@ -226,6 +241,7 @@ function Root() {
                   <HeaderSubscriptions />
                 </div>
               </div>
+              )}
             </header>
             <Outlet />
             <section className="site-print-terms" aria-hidden="true">
@@ -236,7 +252,7 @@ function Root() {
                 <CopyrightMark /> Educational hypothetical only. Not a quote, illustration, or advice.
               </p>
             </section>
-            <HypoChatbot />
+            {campaign ? null : <HypoChatbot />}
             <CookieConsent />
             <footer className="bg-masthead px-4 py-5 text-center text-sm text-masthead-fg sm:text-left">
               <div className="mx-auto flex max-w-6xl flex-col items-center gap-3 sm:flex-row sm:items-center sm:justify-between">

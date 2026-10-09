@@ -17,6 +17,7 @@ import { Route as CommunicationRouteImport } from './routes/communication'
 import { Route as CopyrightRouteImport } from './routes/copyright'
 import { Route as PaymentSelectionRouteImport } from './routes/payment-selection'
 import { Route as SourcesRouteImport } from './routes/sources'
+import { Route as StartRouteImport } from './routes/start'
 import { Route as SubscribeNowRouteImport } from './routes/subscribe-now'
 import { Route as SuitabilityRouteImport } from './routes/suitability'
 import { Route as SlugCodeRouteImport } from './routes/$slug.$code'
@@ -61,6 +62,11 @@ const SourcesRoute = SourcesRouteImport.update({
   path: '/sources',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StartRoute = StartRouteImport.update({
+  id: '/start',
+  path: '/start',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SubscribeNowRoute = SubscribeNowRouteImport.update({
   id: '/subscribe-now',
   path: '/subscribe-now',
@@ -86,6 +92,7 @@ export interface FileRoutesByFullPath {
   '/copyright': typeof CopyrightRoute
   '/payment-selection': typeof PaymentSelectionRoute
   '/sources': typeof SourcesRoute
+  '/start': typeof StartRoute
   '/subscribe-now': typeof SubscribeNowRoute
   '/suitability': typeof SuitabilityRoute
   '/$slug/$code': typeof SlugCodeRoute
@@ -99,6 +106,7 @@ export interface FileRoutesByTo {
   '/copyright': typeof CopyrightRoute
   '/payment-selection': typeof PaymentSelectionRoute
   '/sources': typeof SourcesRoute
+  '/start': typeof StartRoute
   '/subscribe-now': typeof SubscribeNowRoute
   '/suitability': typeof SuitabilityRoute
   '/$slug/$code': typeof SlugCodeRoute
@@ -113,6 +121,7 @@ export interface FileRoutesById {
   '/copyright': typeof CopyrightRoute
   '/payment-selection': typeof PaymentSelectionRoute
   '/sources': typeof SourcesRoute
+  '/start': typeof StartRoute
   '/subscribe-now': typeof SubscribeNowRoute
   '/suitability': typeof SuitabilityRoute
   '/$slug/$code': typeof SlugCodeRoute
@@ -128,6 +137,7 @@ export interface FileRouteTypes {
     | '/copyright'
     | '/payment-selection'
     | '/sources'
+    | '/start'
     | '/subscribe-now'
     | '/suitability'
     | '/$slug/$code'
@@ -141,6 +151,7 @@ export interface FileRouteTypes {
     | '/copyright'
     | '/payment-selection'
     | '/sources'
+    | '/start'
     | '/subscribe-now'
     | '/suitability'
     | '/$slug/$code'
@@ -154,6 +165,7 @@ export interface FileRouteTypes {
     | '/copyright'
     | '/payment-selection'
     | '/sources'
+    | '/start'
     | '/subscribe-now'
     | '/suitability'
     | '/$slug/$code'
@@ -168,6 +180,7 @@ export interface RootRouteChildren {
   CopyrightRoute: typeof CopyrightRoute
   PaymentSelectionRoute: typeof PaymentSelectionRoute
   SourcesRoute: typeof SourcesRoute
+  StartRoute: typeof StartRoute
   SubscribeNowRoute: typeof SubscribeNowRoute
   SuitabilityRoute: typeof SuitabilityRoute
 }
@@ -230,6 +243,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SourcesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/start': {
+      id: '/start'
+      path: '/start'
+      fullPath: '/start'
+      preLoaderRoute: typeof StartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/subscribe-now': {
       id: '/subscribe-now'
       path: '/subscribe-now'
@@ -273,6 +293,7 @@ const rootRouteChildren: RootRouteChildren = {
   CopyrightRoute: CopyrightRoute,
   PaymentSelectionRoute: PaymentSelectionRoute,
   SourcesRoute: SourcesRoute,
+  StartRoute: StartRoute,
   SubscribeNowRoute: SubscribeNowRoute,
   SuitabilityRoute: SuitabilityRoute,
 }
