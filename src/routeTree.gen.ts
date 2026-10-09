@@ -15,6 +15,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as CommissionCalculatorRouteImport } from './routes/commission-calculator'
 import { Route as CommunicationRouteImport } from './routes/communication'
 import { Route as CopyrightRouteImport } from './routes/copyright'
+import { Route as FacebookAdsRouteImport } from './routes/facebook-ads'
 import { Route as PaymentSelectionRouteImport } from './routes/payment-selection'
 import { Route as SourcesRouteImport } from './routes/sources'
 import { Route as StartRouteImport } from './routes/start'
@@ -50,6 +51,11 @@ const CommunicationRoute = CommunicationRouteImport.update({
 const CopyrightRoute = CopyrightRouteImport.update({
   id: '/copyright',
   path: '/copyright',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FacebookAdsRoute = FacebookAdsRouteImport.update({
+  id: '/facebook-ads',
+  path: '/facebook-ads',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PaymentSelectionRoute = PaymentSelectionRouteImport.update({
@@ -90,6 +96,7 @@ export interface FileRoutesByFullPath {
   '/commission-calculator': typeof CommissionCalculatorRoute
   '/communication': typeof CommunicationRoute
   '/copyright': typeof CopyrightRoute
+  '/facebook-ads': typeof FacebookAdsRoute
   '/payment-selection': typeof PaymentSelectionRoute
   '/sources': typeof SourcesRoute
   '/start': typeof StartRoute
@@ -104,6 +111,7 @@ export interface FileRoutesByTo {
   '/commission-calculator': typeof CommissionCalculatorRoute
   '/communication': typeof CommunicationRoute
   '/copyright': typeof CopyrightRoute
+  '/facebook-ads': typeof FacebookAdsRoute
   '/payment-selection': typeof PaymentSelectionRoute
   '/sources': typeof SourcesRoute
   '/start': typeof StartRoute
@@ -119,6 +127,7 @@ export interface FileRoutesById {
   '/commission-calculator': typeof CommissionCalculatorRoute
   '/communication': typeof CommunicationRoute
   '/copyright': typeof CopyrightRoute
+  '/facebook-ads': typeof FacebookAdsRoute
   '/payment-selection': typeof PaymentSelectionRoute
   '/sources': typeof SourcesRoute
   '/start': typeof StartRoute
@@ -135,6 +144,7 @@ export interface FileRouteTypes {
     | '/commission-calculator'
     | '/communication'
     | '/copyright'
+    | '/facebook-ads'
     | '/payment-selection'
     | '/sources'
     | '/start'
@@ -149,6 +159,7 @@ export interface FileRouteTypes {
     | '/commission-calculator'
     | '/communication'
     | '/copyright'
+    | '/facebook-ads'
     | '/payment-selection'
     | '/sources'
     | '/start'
@@ -163,6 +174,7 @@ export interface FileRouteTypes {
     | '/commission-calculator'
     | '/communication'
     | '/copyright'
+    | '/facebook-ads'
     | '/payment-selection'
     | '/sources'
     | '/start'
@@ -178,6 +190,7 @@ export interface RootRouteChildren {
   CommissionCalculatorRoute: typeof CommissionCalculatorRoute
   CommunicationRoute: typeof CommunicationRoute
   CopyrightRoute: typeof CopyrightRoute
+  FacebookAdsRoute: typeof FacebookAdsRoute
   PaymentSelectionRoute: typeof PaymentSelectionRoute
   SourcesRoute: typeof SourcesRoute
   StartRoute: typeof StartRoute
@@ -227,6 +240,13 @@ declare module '@tanstack/react-router' {
       path: '/copyright'
       fullPath: '/copyright'
       preLoaderRoute: typeof CopyrightRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/facebook-ads': {
+      id: '/facebook-ads'
+      path: '/facebook-ads'
+      fullPath: '/facebook-ads'
+      preLoaderRoute: typeof FacebookAdsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/payment-selection': {
@@ -291,6 +311,7 @@ const rootRouteChildren: RootRouteChildren = {
   CommissionCalculatorRoute: CommissionCalculatorRoute,
   CommunicationRoute: CommunicationRoute,
   CopyrightRoute: CopyrightRoute,
+  FacebookAdsRoute: FacebookAdsRoute,
   PaymentSelectionRoute: PaymentSelectionRoute,
   SourcesRoute: SourcesRoute,
   StartRoute: StartRoute,
