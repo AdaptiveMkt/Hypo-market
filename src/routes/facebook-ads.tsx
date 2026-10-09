@@ -55,6 +55,34 @@ The license is $9.98 a month. Or $99 for the year, with the first two months inc
 
 Do not save this for later. Agents who want the next sit to turn into a plan are opening the picture now. Click and see it.`;
 
+const AD_THREE = `Stop. Look. Then keep going.
+
+Insurance pros everywhere are in shock. A crazy discovery just followed the release of an insanely simple planning technique. The technique can help preserve a client's retirement assets.
+
+That is not a slogan. That is a picture.
+
+A licensed agent opens the assets first. Then the picture shows care. Home care. Assisted living. A nursing home. Same money. Three speeds.
+
+Then the picture shows what changes when insurance pays first.
+
+The client can see a need to protect those assets. Or the client can see that the assets can cover the care. Either answer moves the meeting.
+
+We built this for a licensed agent. Life agents. Long-term care agents. A person with decades in long-term care did the work. Not a brand speech. Not a fancy promise.
+
+Care can touch millions of retirees. The old talk starts with a premium. This talk starts with the assets. Agents who see the picture are stopping mid-scroll and opening it the same day.
+
+The same run can show traditional coverage. An asset-based plan. Annuity care. Or a hybrid life plan. One care bill. Four ways a policy can pay first.
+
+A report can go home with the client. Change the state. Change the setting. Change the copay. Run it again.
+
+No quote. No promise of benefits. A carrier picture still comes from the agent.
+
+The license is $9.98 a month. Stop any time. Or $99 for the year. The year plan includes the first two months.
+
+Run it with a client today. Or run it first with no names and no personal details.
+
+Do not scroll past this. Click now. See the crazy discovery agents are opening before the next sit-down.`;
+
 export const Route = createFileRoute("/facebook-ads")({
   component: FacebookAds,
   head: () => ({
@@ -169,6 +197,16 @@ function FacebookAds() {
           copy={AD_TWO}
           headline="Agents, Open This Picture Today"
           description="Use it before the next client sits down."
+        />
+      </div>
+      <div className="mx-auto max-w-xl">
+        <AdCard
+          kicker="Ad 3 · stop, look, then read"
+          image="/facebook-ads/shock.jpg"
+          alt="A grey-haired man looks aside. Bold text on the photo says insurance pros are in shock after a crazy discovery."
+          copy={AD_THREE}
+          headline="Insurance Pros Are In Shock"
+          description="A crazy discovery that can protect client assets. Click."
         />
       </div>
     </main>
