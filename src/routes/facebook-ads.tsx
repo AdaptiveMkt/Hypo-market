@@ -55,9 +55,7 @@ The license is $9.98 a month. Or $99 for the year, with the first two months inc
 
 Do not save this for later. Agents who want the next sit to turn into a plan are opening the picture now. Click and see it.`;
 
-const AD_THREE = `Stop. Look. Then keep going.
-
-Insurance pros everywhere are in shock. A crazy discovery just followed the release of an insanely simple planning technique. The technique can help preserve a client's retirement assets.
+const AD_THREE = `Insurance pros everywhere are in shock. A crazy discovery just followed the release of an insanely simple planning technique. The technique can help preserve a client's retirement assets.
 
 That is not a slogan. That is a picture.
 
