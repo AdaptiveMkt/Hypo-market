@@ -1,15 +1,23 @@
 "use client";
 
 import { useEffect, type ReactNode } from "react";
+import { useRouterState } from "@tanstack/react-router";
 
 function isEditable(target: EventTarget | null) {
   if (!(target instanceof HTMLElement)) return false;
   return Boolean(target.closest("input, textarea, select, [contenteditable='true']"));
 }
 
+function isUnguarded(pathname: string) {
+  return pathname === "/facebook-ads" || pathname.startsWith("/facebook-ads/");
+}
+
 /** Deterrent only — not a DRM. Form fields stay copyable/pasteable. PDF download is allowed. */
 export function ContentGuard({ children }: { children: ReactNode }) {
+  const open = useRouterState({ select: (s) => isUnguarded(s.location.pathname) });
+
   useEffect(() => {
+    if (open) return;
     function onKey(e: KeyboardEvent) {
       if (isEditable(e.target)) return;
       const key = e.key.toLowerCase();
@@ -22,7 +30,9 @@ export function ContentGuard({ children }: { children: ReactNode }) {
     }
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
-  }, []);
+  }, [open]);
+
+  if (open) return <>{children}</>;
 
   return (
     <div
