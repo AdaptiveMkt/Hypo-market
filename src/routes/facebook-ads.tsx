@@ -201,7 +201,7 @@ function FacebookAds() {
         <AdCard
           kicker="Ad 3 · stop, look, then read"
           image="/facebook-ads/shock.jpg"
-          alt="A grey-haired man looks aside. Bold text on the photo says insurance pros are in shock after a crazy discovery."
+          alt="A shocked woman stands behind a shocked man and looks over his shoulder at the same laptop."
           copy={AD_THREE}
           headline="Insurance Pros Are In Shock"
           description="A crazy discovery that can protect client assets. Click."
