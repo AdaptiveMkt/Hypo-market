@@ -207,6 +207,16 @@ function FacebookAds() {
           description="A crazy discovery that can protect client assets. Click."
         />
       </div>
+      <div className="mx-auto max-w-xl">
+        <AdCard
+          kicker="Ad 4 · same story, new picture"
+          image="/facebook-ads/ad4.jpg"
+          alt="A shocked man at a laptop. A woman in a circle holds a finger to her lips. Text invites insurance pros to show clients how to preserve retirement assets."
+          copy={AD_THREE}
+          headline="Insurance Pros Are In Shock"
+          description="A crazy discovery that can protect client assets. Click."
+        />
+      </div>
     </main>
   );
 }
