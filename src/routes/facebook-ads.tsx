@@ -190,7 +190,7 @@ function FacebookAds() {
         <AdCard
           kicker="Ad 2 · breaking news"
           image="/facebook-ads/breaking.jpg"
-          alt="Breaking news layout: a grey-haired man tells other agents the news, with a headline about a simple asset picture."
+          alt="Insurance Newswire layout: a man speaks while a shocked woman holds her forehead in a circle. Headline says an industry expert dropped a bombshell about client retirement assets."
           copy={AD_TWO}
           headline="Agents, Open This Picture Today"
           description="Use it before the next client sits down."
