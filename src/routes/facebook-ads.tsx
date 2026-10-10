@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-const URL =
-  "https://www.preserve-your-assets.com/start?utm_source=facebook&utm_medium=paid&utm_campaign=agents";
+const URL = "https://www.preserve-your-assets.com/";
 
 const AD_ONE = `This cannot wait until the next blank appointment.
 
