@@ -39,8 +39,10 @@ export function WelcomeVideo({ onStart, onReturnLater }: { onStart?: () => void;
     v.setAttribute("playsinline", "");
     v.setAttribute("webkit-playsinline", "true");
     v.preload = "auto";
-    v.volume = 1;
+    v.defaultMuted = true;
     v.muted = true;
+    v.setAttribute("muted", "");
+    v.volume = 1;
 
     const clearGesture = () => {
       dropGesture();
@@ -68,31 +70,54 @@ export function WelcomeVideo({ onStart, onReturnLater }: { onStart?: () => void;
       };
     };
 
-    void v.play().then(() => {
+    const keepPlaying = () => {
       if (dead) return;
-      v.muted = false;
-      v.volume = 1;
-      if (!v.paused && !v.muted) {
-        setSound("on");
+      if (!v.paused) {
+        v.removeEventListener("canplay", keepPlaying);
         return;
       }
-      return v.play();
-    }).then(() => {
-      if (dead || sound === "on") return;
-      if (v.paused || v.muted) {
-        setSound("tap");
-        armGesture();
-      } else {
-        setSound("on");
-      }
-    }).catch(() => {
-      if (dead) return;
-      setSound("tap");
-      armGesture();
-    });
+      v.muted = true;
+      void v.play().catch(() => {
+        if (!dead) setSound("tap");
+      });
+    };
+
+    const start = () => {
+      v.muted = true;
+      return v.play().then(() => {
+        if (dead) return;
+        v.muted = false;
+        v.volume = 1;
+        if (!v.paused && !v.muted) {
+          setSound("on");
+          return;
+        }
+        return v.play().then(() => {
+          if (dead) return;
+          if (v.paused || v.muted) throw new Error("sound blocked");
+          setSound("on");
+        });
+      }).catch(() => {
+        if (dead) return;
+        v.muted = true;
+        return v.play().then(() => {
+          if (dead) return;
+          setSound("tap");
+          armGesture();
+        }).catch(() => {
+          if (dead) return;
+          setSound("tap");
+          armGesture();
+        });
+      });
+    };
+
+    v.addEventListener("canplay", keepPlaying);
+    void start();
 
     return () => {
       dead = true;
+      v.removeEventListener("canplay", keepPlaying);
       clearGesture();
       v.pause();
     };
@@ -106,6 +131,7 @@ export function WelcomeVideo({ onStart, onReturnLater }: { onStart?: () => void;
           className="block w-full rounded-lg bg-navy"
           controls
           autoPlay
+          muted
           playsInline
           preload="auto"
           poster="/welcome/asset-preservation-poster.jpg?v=5"
