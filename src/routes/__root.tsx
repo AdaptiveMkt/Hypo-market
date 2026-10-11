@@ -5,7 +5,7 @@ import { createRootRoute, HeadContent, Link, Outlet, Scripts, useNavigate, useRo
 import { AuthProvider } from "@/lib/auth/provider";
 import { PreviewHostBridge } from "@/components/preview-host-bridge";
 import { ScrollToHeaderOnLoad } from "@/components/scroll-to-header";
-import { ContentGuard } from "@/components/content-guard";
+import { ContentGuard, allowsCopy } from "@/components/content-guard";
 import { ThemeToggle, useDarkMode } from "@/components/theme-toggle";
 import { SubscriptionLinks } from "@/components/subscription-links";
 import { CookieConsent } from "@/components/cookie-consent";
@@ -156,12 +156,13 @@ function Root() {
   const dark = useDarkMode();
   const path = useRouterState({ select: (s) => s.location.pathname });
   const campaign = path === "/start";
+  const copyOk = allowsCopy(path);
   return (
     <html lang="en" className={dark ? "antialiased dark" : "antialiased"} suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>
-      <body className="min-h-screen bg-cream text-ink">
+      <body className={copyOk ? "copy-ok min-h-screen bg-cream text-ink" : "min-h-screen bg-cream text-ink"}>
         <PreviewHostBridge />
         <ScrollToHeaderOnLoad />
         <AuthProvider>

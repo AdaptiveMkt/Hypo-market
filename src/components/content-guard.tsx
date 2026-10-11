@@ -8,8 +8,22 @@ function isEditable(target: EventTarget | null) {
   return Boolean(target.closest("input, textarea, select, [contenteditable='true']"));
 }
 
+const COPY_PATHS = [
+  "/facebook-ads",
+  "/start",
+  "/communication",
+  "/payment-selection",
+  "/subscribe-now",
+  "/commission-calculator",
+];
+
+/** Marketing and Facebook pages stay selectable so the copy can be pasted into social posts. */
+export function allowsCopy(pathname: string) {
+  return COPY_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`));
+}
+
 function isUnguarded(pathname: string) {
-  return pathname === "/facebook-ads" || pathname.startsWith("/facebook-ads/");
+  return allowsCopy(pathname);
 }
 
 /** Deterrent only — not a DRM. Form fields stay copyable/pasteable. PDF download is allowed. */
