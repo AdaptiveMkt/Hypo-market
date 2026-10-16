@@ -252,7 +252,7 @@ export function HypoChatbot() {
         aria-expanded={false}
         aria-controls="hypo-chatbot"
       >
-        Ask the model
+        Ask the LTC Specialist
       </button>
     );
   }
@@ -268,14 +268,14 @@ export function HypoChatbot() {
       <div className="flex items-start justify-between gap-2 border-b border-card-border px-4 py-3">
         <div>
           <p id="hypo-chat-title" className="font-display text-base text-navy">
-            Educational assistant
+            Ask the LTC Specialist
           </p>
           <p className="text-xs text-muted">Text answers from this hypothetical.</p>
         </div>
           <button
           type="button"
           className="min-h-11 min-w-11 rounded-lg border border-card-border px-2 text-sm font-semibold text-navy hover:bg-cream"
-          aria-label="Close educational assistant"
+          aria-label="Close Ask the LTC Specialist"
           onClick={() => {
             stopListen();
             setOpen(false);
@@ -340,7 +340,7 @@ export function HypoChatbot() {
       >
         <div className="flex gap-2">
           <label htmlFor="hypo-chat-q" className="sr-only">
-            Question for the educational assistant
+            Question for the LTC Specialist
           </label>
           <input
             id="hypo-chat-q"
